@@ -1,0 +1,19 @@
+name: Commit Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  commit-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if any commit contains WIP
+        run: |
+          git fetch origin
+          git log origin/${GITHUB_REF#refs/heads/}..HEAD --pretty=format:"%s" | grep -i 'wip' && {
+            echo "WIP commit found. Please remove WIP from your commit messages."
+            exit 1
+          } || echo "No WIP commits found."
+      - uses: commit-check/commit-check-action@v1
