@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage: copier dans .git/hooks/commit-msg et chmod +x
-
 COMMIT_MSG=$(cat "$1")
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
 
