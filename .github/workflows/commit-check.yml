@@ -5,20 +5,9 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 jobs:
-  wip_check:
-    name: WIP Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for WIP status in PR title or labels
-        uses: wip/action@v1
-        with:
-          # You can customize the terms to look for
-          terms: '["WIP", "wip", "work in progress"]'
-
   commit_format_check:
     name: Conventional Commit Check
     runs-on: ubuntu-latest
-    needs: wip_check # Run this only if WIP check passes
     steps:
       - uses: actions/checkout@v4
         with:
