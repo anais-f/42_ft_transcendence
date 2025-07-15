@@ -8,7 +8,7 @@ COMMIT_MSG=$(cat "$1")
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
 
 # Préfixes autorisés
-PREFIXES="build:|chore:|ci:|docs:|feat:|fix:|perf:|refactor:|revert:|style:|test:"
+PREFIXES="build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|wip"
 
 # Branches où WIP est autorisé
 WIP_BRANCHES="bugfix/|feature/|hotfix/|docs/|refactor/|chore/"
@@ -27,13 +27,13 @@ if [[ "$COMMIT_MSG" =~ ^WIP ]]; then
 fi
 
 # Vérifier préfixes standards
-if [[ "$COMMIT_MSG" =~ ^($PREFIXES) ]]; then
+if [[ "$COMMIT_MSG" =~ ^($PREFIXES):\  ]]; then
     exit 0
 fi
 
 # Sinon, refuser
 echo "Invalid format: $COMMIT_MSG" >&2
-echo "Use : build:|chore:|ci:|docs:|feat:|fix:|perf:|refactor:|revert:|style:|test:" >&2
+echo "Use : build: |chore: |ci: |docs: |feat: |fix: |perf: |refactor: |revert: |style: |test: |wip: " >&2
 echo "Or WIP on bugfix/|feature/|hotfix/|docs/|refactor/|chore/" >&2
 exit 1
 EOF
