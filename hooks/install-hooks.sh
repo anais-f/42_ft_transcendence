@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Installation simple du hook
+
+cat > .git/hooks/commit-msg << 'EOF'
+#!/usr/bin/env bash
+
+COMMIT_MSG=$(cat "$1")
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+
+# Préfixes autorisés
+PREFIXES="build:|chore:|ci:|docs:|feat:|fix:|perf:|refactor:|revert:|style:|test:"
+
+# Branches où WIP est autorisé
+WIP_BRANCHES="bugfix/|feature/|hotfix/|docs/|refactor/|chore/"
+
+# Ignorer les merges
+[[ "$COMMIT_MSG" =~ ^Merge ]] && exit 0
+
+# Vérifier WIP
+if [[ "$COMMIT_MSG" =~ ^WIP ]]; then
+    if [[ "$CURRENT_BRANCH" =~ ^($WIP_BRANCHES) ]]; then
+        exit 0
+    else
+        echo "WIP forbidden on $CURRENT_BRANCH" >&2
+        exit 1
+    fi
+fi
+
+# Vérifier préfixes standards
+if [[ "$COMMIT_MSG" =~ ^($PREFIXES) ]]; then
+    exit 0
+fi
+
+# Sinon, refuser
+echo "Invalid format: $COMMIT_MSG" >&2
+echo "Use : build:|chore:|ci:|docs:|feat:|fix:|perf:|refactor:|revert:|style:|test:" >&2
+echo "Or WIP on bugfix/|feature/|hotfix/|docs/|refactor/|chore/" >&2
+exit 1
+EOF
+
+chmod +x .git/hooks/commit-msg
+echo "Hook installed !"
