@@ -1,0 +1,23 @@
+name: Commit Check
+
+on:
+  pull_request:
+
+jobs:
+  commit_check:
+    name: Commit Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history for git log
+
+      - name: Fail if any commit starts with wip
+        run: |
+          # Get the list of commits from the pull request and check their subjects
+          if git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty='format:%s' | grep -qi '^wip:'; then
+            echo "Found a commit message starting with 'wip:'. Please remove it."
+            exit 1
+          else
+            echo "No 'wip:' commits found. Proceeding."
+          fi
