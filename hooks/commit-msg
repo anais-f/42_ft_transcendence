@@ -28,7 +28,7 @@ fi
 #if [[ "$COMMIT_MSG" =~ ^($PREFIXES) ]]; then
 #    exit 0
 #fi
-if [[ "$COMMIT_MSG" =~ ^(${PREFIXES}):\ . ]]; then
+if [[ "$COMMIT_MSG" =~ ^(${PREFIXES}):\ [^[:space:]].* ]]; then
     exit 0
 fi
 
