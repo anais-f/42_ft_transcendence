@@ -1,7 +1,6 @@
 name: Commit Check
 
 on:
-  push:
   pull_request:
 
 jobs:
@@ -9,11 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fail if any commit contains WIP
+        with:
+          fetch-depth: 0  # Fetch all history
+
+      - name: Fail if any commit message starts with WIP
         run: |
-          git fetch origin
-          git log origin/${GITHUB_REF#refs/heads/}..HEAD --pretty=format:"%s" | grep -i 'wip' && {
-            echo "WIP commit found. Please remove WIP from your commit messages."
-            exit 1
-          } || echo "No WIP commits found."
-      - uses: commit-check/commit-check-action@v1
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For pull requests
+            git fetch origin ${{ github.event.pull_request.base.ref }}
+            git log --pretty=format:"%s" origin/${{ github.event.pull_request.base.ref }}..HEAD | grep -qi "^wip:" && {
+              echo "ERROR: Found commit message starting with 'wip:'"
+              echo "Please remove WIP commits before merging."
+              exit 1
+            } || echo "No WIP commits found."
+            else
+              # Existing branch
+              git log --pretty=format:"%s" $BEFORE_SHA..$AFTER_SHA | grep -qi "^wip:" && {
+                echo "ERROR: Found commit message starting with 'wip:'"
+                echo "Please remove WIP commits before pushing."
+                exit 1
+              } || echo "No WIP commits found."
+            fi
+          fi
+
+      - uses: commit-check/commit-check-action@v1heck/commit-check-action@v1
