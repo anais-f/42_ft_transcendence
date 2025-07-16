@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+BRANCH_NAME=$(git branch --show-current)
+PATTERN="^(feature|bugfix|hotfix|docs|refactor|chore)/[a-z0-9.-]+$"
+
+if [[ ! "$BRANCH_NAME" =~ $PATTERN ]]; then
+  echo "Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
+  echo "Allowed: feature|bugfix|hotfix|docs|refactor|chore/<name>"
+  exit 1
+fi
