@@ -1,10 +1,10 @@
-#!/usr/bin/bash
+#!/usr/bin/ruby
 
-BRANCH_NAME=$(git branch --show-current)
-PATTERN="^(feature|bugfix|hotfix|docs|refactor|chore)/[a-z0-9.-]+$"
+branch_name = `git branch --show-current`.strip
+pattern = /^(feature|bugfix|hotfix|docs|refactor|chore)\/[a-z0-9.\-]+$|^main$/
 
-if [[ ! "$BRANCH_NAME" =~ $PATTERN ]]; then
-  echo "Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
-  echo "Allowed: feature|bugfix|hotfix|docs|refactor|chore/<name>"
+unless branch_name.match?(pattern)
+  puts "Error: Branch name '#{branch_name}' does not follow the naming convention."
+  puts "Allowed: feature|bugfix|hotfix|docs|refactor|chore/<name>"
   exit 1
-fi
+end
