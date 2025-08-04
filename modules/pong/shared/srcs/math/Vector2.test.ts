@@ -102,4 +102,41 @@ describe("Vector2", () => {
     expect(v.getX()).toBe(1)
     expect(v.getY()).toBe(2)
   })
+
+  describe("Vector2 squaredDist and dist", () => {
+    test("static squaredDist returns correct squared distance", () => {
+      const v1 = new Vector2(1, 2)
+      const v2 = new Vector2(4, 6)
+      const expected = (1 - 4) ** 2 + (2 - 6) ** 2 // 9 + 16 = 25
+      expect(Vector2.squaredDist(v1, v2)).toBe(expected)
+    })
+
+    test("static dist returns correct distance", () => {
+      const v1 = new Vector2(-1, -2)
+      const v2 = new Vector2(2, 2)
+      const expected = Math.sqrt((-1 - 2) ** 2 + (-2 - 2) ** 2) // sqrt(9+16) = 5
+      expect(Vector2.dist(v1, v2)).toBeCloseTo(expected)
+    })
+
+    test("instance squaredDist returns correct squared distance", () => {
+      const v1 = new Vector2(0, 0)
+      const v2 = new Vector2(3, 4)
+      expect(v1.squaredDist(v2)).toBe(25)
+      expect(v2.squaredDist(v1)).toBe(25) // symmetry
+    })
+
+    test("instance dist returns correct distance", () => {
+      const v1 = new Vector2(0, 0)
+      const v2 = new Vector2(0, 0)
+      expect(v1.dist(v2)).toBe(0)
+      expect(v2.dist(v1)).toBe(0)
+    })
+
+    test("distance is symmetric", () => {
+      const v1 = new Vector2(5, 2)
+      const v2 = new Vector2(-1, 9)
+      expect(Vector2.dist(v1, v2)).toBeCloseTo(Vector2.dist(v2, v1))
+      expect(v1.dist(v2)).toBeCloseTo(v2.dist(v1))
+    })
+})
 })
