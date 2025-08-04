@@ -15,7 +15,7 @@ jobs:
       - name: Fail if any commit starts with wip
         run: |
           # Get the list of commits from the pull request and check their subjects
-          if git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty='format:%s' | grep -qi '^wip:'; then
+          if git log origin/${{ github.event.pull_request.base.ref }}..HEAD --pretty='format:%s' | grep -qi '/^wip(?:(?:.+:)|(?::))/'; then
             echo "Found a commit message starting with 'wip:'. Please remove it."
             exit 1
           else

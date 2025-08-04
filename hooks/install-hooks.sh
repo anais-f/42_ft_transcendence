@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-cp "$(dirname "$0")/commit-msg" .git/hooks/
-cp "$(dirname "$0")/pre-push" .git/hooks/
+set -e
 
-chmod +x .git/hooks/commit-msg
-chmod +x .git/hooks/pre-push
+GIT_ROOT=$(git rev-parse --show-toplevel)
 
-echo "Hook installed !"
+cp "$GIT_ROOT/hooks/commit-msg" "$GIT_ROOT/.git/hooks/"
+cp "$GIT_ROOT/hooks/pre-push" "$GIT_ROOT/.git/hooks/"
+
+chmod +x "$GIT_ROOT/.git/hooks/commit-msg"
+chmod +x "$GIT_ROOT/.git/hooks/pre-push"
+
+echo "Hook installed!"
