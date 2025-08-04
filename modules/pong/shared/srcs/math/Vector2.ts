@@ -64,8 +64,24 @@ export class Vector2 {
 		)
 	}
 
-	static multiply(v:Vector2, scalar: number) {
+	static multiply(v:Vector2, scalar: number): Vector2 {
 		return new Vector2(v.getX() * scalar, v.getY() * scalar)
+	}
+
+	static squaredDist(v1: Vector2, v2: Vector2): number {
+		return (v1.getX() - v2.getX())**2 + (v1.getY() - v2.getY())**2
+	}
+
+	static dist(v1: Vector2, v2: Vector2): number {
+		return Math.sqrt(Vector2.squaredDist(v1, v2))
+	}
+
+	squaredDist(v2: Vector2): number {
+		return Vector2.squaredDist(this, v2)
+	}
+
+	dist(v2: Vector2): number {
+		return Vector2.dist(this, v2)
 	}
 
 	add(v2: Vector2): Vector2 {

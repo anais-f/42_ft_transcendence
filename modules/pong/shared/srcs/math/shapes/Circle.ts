@@ -1,10 +1,15 @@
+import { Segment } from "../Segment"
 import { Vector2 } from "../Vector2"
 
 export class Circle {
+	private rad!:number
+
 	constructor(
 		private pos: Vector2,
-		private rad:number
-	) {}
+		rad: number
+	) {
+		this.setRad(rad)
+	}
 
 
 	getPos(): Vector2 {
@@ -19,6 +24,27 @@ export class Circle {
 	}
 
 	setRad(rad: number): void {
+		if (rad <= 0) {
+			throw "invlalid Radius" 
+		}
 		this.rad = rad
+	}
+
+
+	intersect(other: Segment): boolean
+	intersect(other: Circle): boolean
+	intersect(other: Segment | Circle): boolean {
+		if (other instanceof Segment) {
+			return other.intersect(this)
+		} else if (other instanceof Circle) {
+			return this.intersectCircle(other)
+		} else {
+			throw "invalid Type in circle intersect"
+		}
+	}
+
+	private intersectCircle(other: Circle): boolean {
+		const sqDistance: number = this.getPos().squaredDist(other.getPos()) 
+		return sqDistance <= (this.getRad() + other.getRad())**2
 	}
 }
