@@ -1,5 +1,11 @@
 .secret
+.env
 
 #IDE
 .idea/
 .vscode/
+
+
+**/dist/
+**/tsconfig.tsbuildinfo
+**/node_modules/
