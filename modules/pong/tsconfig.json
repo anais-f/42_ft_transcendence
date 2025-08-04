@@ -1,0 +1,14 @@
+{
+	"extends": "../../config/tsconfig.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@pong/*": ["./*"]
+		}
+	},
+	"references": [
+		{ "path": "./shared" },
+		{ "path": "./Client" },
+		{ "path": "./Server" }
+	]
+}
