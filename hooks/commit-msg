@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 commit_message = File.read(ARGV[0])
-pattern = /^(?:wip|feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)\(\S+\)?:.{0,50}$(?:\n\n^.{0,100}$){0,2}(?:\n#.*)*/
+pattern = /^(?:wip|feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(\S+\))?:.{0,50}$(?:\n\n^.{0,100}$){0,2}(?:\n#.*)*/
 
 unless commit_message.match?(pattern)
   puts "Invalid commit message format."
