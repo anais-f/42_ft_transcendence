@@ -4,7 +4,7 @@ import { Ray } from "../Ray"
 import { Segment } from "../Segment"
 
 export class Polygon {
-	private segments: Segment[]
+	private segments: Segment[] = []
 
 	constructor(points: Vector2[]) {
 		for (let i = 0; i < points.length; ++i) {
