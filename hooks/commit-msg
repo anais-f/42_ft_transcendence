@@ -1,12 +1,12 @@
-#!/usr/bin/env bash
+#!/usr/bin/ruby
 
-COMMIT_MSG=$(cat "$1")
-PREFIXES="build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|wip"
+commit_message = File.read(ARGV[0])
+pattern = /^(?:wip|feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(\S+\))?:.{0,50}$(?:\n\n^.{0,100}$){0,2}(?:\n#.*)*/
 
-if [[ "$COMMIT_MSG" =~ ^(${PREFIXES}):\ [^[:space:]].* ]]; then
-    exit 0
-fi
+unless commit_message.match?(pattern)
+  puts "Invalid commit message format."
+  puts "See: https://github.com/anais-f/42_ft_transcendence/wiki/Git-conventions#commit-convention"
+  puts commit_message
+  exit 1
+end
 
-echo "Invalid format: $COMMIT_MSG" >&2
-echo "Use : build: |chore: |ci: |docs: |feat: |fix: |perf: |refactor: |revert: |style: |test: |wip: " >&2
-exit 1
