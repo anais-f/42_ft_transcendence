@@ -6,6 +6,6 @@
 		"build:shared": "cd shared && tsc -b",
 		"build:client": "cd Client && tsc -b",
 		"build:server": "cd Server && tsc -b",
-		"test": "jest --config ../../config/jest.config.ts --selectProjects=pong"
+		"test": "jest --config ../../jest.config.ts --selectProjects=pong"
 	}
 }

@@ -2,15 +2,15 @@ NAME := ft_transcendence
 
 .PHONY: test
 test:
-	cd config && npm test
+	npm test
 
 .PHONY: install
 install:
-	npm --prefix ./config install
+	npm install
 
 .PHONY: compile
 compile:
-	(cd config && npm run build)
+	npm run build
 
 .PHONY: logs-%
 logs-%:

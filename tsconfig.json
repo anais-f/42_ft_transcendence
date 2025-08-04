@@ -9,7 +9,7 @@
 		"sourceMap": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
-		"baseUrl": "..",
+		"baseUrl": ".",
 		"paths": {
 			"@modules/*": ["modules/*"]
 		}

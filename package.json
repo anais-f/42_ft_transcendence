@@ -6,13 +6,13 @@
 		"test": "jest --config ./jest.config.ts",
 		"test:pong": "jest --config ./jest.config.ts --selectProjects=pong",
 		"build": "npm run build:pong",
-		"build:pong": "cd ../modules/pong && npm run build"
+		"build:pong": "cd ./modules/pong && npm run build"
 	},
 	"workspaces": [
-		"../modules/pong",
-		"../modules/pong/shared",
-		"../modules/pong/Client",
-		"../modules/pong/Server"
+		"./modules/pong",
+		"./modules/pong/shared",
+		"./modules/pong/Client",
+		"./modules/pong/Server"
 	],
 	"devDependencies": {
 		"@jest/types": "^29.5.0",
@@ -21,8 +21,5 @@
 		"ts-jest": "^29.1.1",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.1.6"
-	},
-	"script": {
-		"test": "jest --config ./jest.config.js"
 	}
 }
