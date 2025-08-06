@@ -1,12 +1,27 @@
-#!/usr/bin/ruby
+#!/usr/bin/php
 
-commit_message = File.read(ARGV[0])
-pattern = /^(?:wip|feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(\S+\))?:.{0,50}$(?:\n\n^.{0,100}$){0,2}(?:\n#.*)*/
+<?php
 
-unless commit_message.match?(pattern)
-  puts "Invalid commit message format."
-  puts "See: https://github.com/anais-f/42_ft_transcendence/wiki/Git-conventions#commit-convention"
-  puts commit_message
-  exit 1
-end
+if ($argc < 2) {
+    fwrite(STDERR, "Usage: {$argv[0]} <commit-file>\n");
+    exit(1);
+}
 
+$file = $argv[1];
+
+if (!is_file($file) || !is_readable($file)) {
+    fwrite(STDERR, "Can't open or read: {$file}\n");
+    exit(1);
+}
+
+$content = file_get_contents($file);
+
+$commit_regex = '/^\A(?:(?:feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(.+\))?!?:[ \t].+(?:(?:[\n]{2}^(?:(?![#]).+(?:\n(?!\n))?)+){1,2})?|(?:Merge|Revert).+\v?(?:^(?![#]).*\n?)*)(?:(?:#.*|\n)+)?\z/m';
+
+if ($content == false || !preg_match($commit_regex, $content)) {
+    fwrite(STDERR, "invalid commit format !\nplz see: https://github.com/anais-f/42_ft_transcendence/wiki/Git-conventions#commit-convention");
+    fwrite(STDERR, "\n\n$content");
+    exit(1);
+}
+
+exit(0);
