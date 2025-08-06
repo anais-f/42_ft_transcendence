@@ -1,10 +1,11 @@
 #!/usr/bin/ruby
+# frozen_string_literal: true
 
 branch_name = `git branch --show-current`.strip
-pattern = /^(feature|bugfix|hotfix|docs|refactor|chore)\/[a-z0-9.\-]+$|^main$/
+pattern = %r{^(feature|bugfix|hotfix|docs|refactor|chore)/[a-z0-9.-]+$|^main$}
 
 unless branch_name.match?(pattern)
   puts "Error: Branch name '#{branch_name}' does not follow the naming convention."
-  puts "Allowed: feature|bugfix|hotfix|docs|refactor|chore/<name>"
+  puts 'Allowed: feature|bugfix|hotfix|docs|refactor|chore/<name>'
   exit 1
 end
