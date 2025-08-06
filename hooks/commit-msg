@@ -16,7 +16,7 @@ if (!is_file($file) || !is_readable($file)) {
 
 $content = file_get_contents($file);
 
-$commit_regex = '/^\A(?:(?:feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(.+\))?!?:[ \t].+(?:(?:[\n]{2}^(?:(?![#]).+(?:\n(?!\n))?)+){1,2})?|(?:Merge|Revert).+\v[?](?:^(?![#]).*\n?)*)(?:(?:#.*|\n)+)?\z/m';
+$commit_regex = '/^\A(?:(?:feat|fix|build|ci|docs|perf|refactor|style|test|revert|chore)(?:\(.+\))?!?:[ \t].+(?:(?:[\n]{2}^(?:(?![#]).+(?:\n(?!\n))?)+){1,2})?|(?:Merge|Revert).+\v?(?:^(?![#]).*\n?)*)(?:(?:#.*|\n)+)?\z/m';
 
 if ($content == false || !preg_match($commit_regex, $content)) {
     fwrite(STDERR, "invalid commit format !\nplz see: https://github.com/anais-f/42_ft_transcendence/wiki/Git-conventions#commit-convention");
