@@ -1,13 +1,15 @@
 import { Segment } from "../Segment"
 import { Vector2 } from "../Vector2"
+import { Shape } from "./Shape"
 
-export class Circle {
+export class Circle extends Shape {
 	private rad!:number
 
 	constructor(
 		private pos: Vector2,
 		rad: number
 	) {
+		super()
 		this.setRad(rad)
 	}
 
