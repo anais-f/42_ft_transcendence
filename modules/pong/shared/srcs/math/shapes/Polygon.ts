@@ -2,11 +2,13 @@ import { Vector2 } from "../Vector2"
 import { Circle } from "./Circle"
 import { Ray } from "../Ray"
 import { Segment } from "../Segment"
+import { Shape } from "./Shape"
 
-export class Polygon {
+export class Polygon extends Shape {
 	private segments: Segment[] = []
 
 	constructor(points: Vector2[]) {
+		super()
 		for (let i = 0; i < points.length; ++i) {
 			this.segments.push(
 				new Segment(
