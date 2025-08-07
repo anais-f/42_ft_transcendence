@@ -1,11 +1,7 @@
-import { Shape } from "../math/shapes/Shape"
+import { PhysicsEngine } from "./physics-engine";
 
 export class GameEngine {
-	private objs: Shape[] = []
-	public constructor() {
-	}
-
-	public addObj(obj: Shape) {
-		this.objs.push(obj)
-	}
+    public constructor(private PhysicsEngine: PhysicsEngine) {
+    }
 }
+
