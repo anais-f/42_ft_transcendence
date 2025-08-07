@@ -19,6 +19,7 @@ export default [
       },
     },
     rules: {
+      "@typescript-eslint/no-explicit-any": "error",
       "no-unused-vars": ["error"],
       "prettier/prettier": "error",
     },
