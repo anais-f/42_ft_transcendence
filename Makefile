@@ -31,4 +31,3 @@ sh-%:
 .PHONY: logs-%
 logs-%:
 	docker logs -f -t --details $(patsubst logs-%, %, $@)
-
