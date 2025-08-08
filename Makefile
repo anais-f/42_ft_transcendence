@@ -1,8 +1,16 @@
 NAME := ft_transcendence
+DOCKER_COMPOSE_FILE := ./docker-compose.yaml
+
+.PHONY: build
+build:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
 
 .PHONY: test
 test:
 	npm test
+.PHONY: up
+up:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: install
 install:
@@ -11,6 +19,13 @@ install:
 .PHONY: compile
 compile:
 	npm run build
+.PHONY: down
+down:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
+
+.PHONY: sh-%
+sh-%:
+	docker exec -it $(patsubst sh-%, %, $@) sh
 
 .PHONY: logs-%
 logs-%:
