@@ -1,24 +1,25 @@
 NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
-
-.PHONY: build
-build:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
+.DEFAULT_GOAL = up
 
 .PHONY: test
 test:
 	npm test
-.PHONY: up
-up:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: install
 install:
 	npm install
 
-.PHONY: compile
-compile:
+.PHONY: build
+build:
 	npm run build
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
+
+.PHONY: up
+up:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
+
+
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
@@ -30,5 +31,3 @@ sh-%:
 .PHONY: logs-%
 logs-%:
 	docker logs -f -t --details $(patsubst logs-%, %, $@)
-
-.DEFAULT_GOAL = up
