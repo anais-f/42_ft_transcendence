@@ -3,7 +3,7 @@ DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 .DEFAULT_GOAL = up
 
 .PHONY: test
-test: install
+test:
 	npm test
 
 .PHONY: install
