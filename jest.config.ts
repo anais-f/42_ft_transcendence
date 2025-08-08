@@ -19,7 +19,7 @@ const config: Config.InitialOptions = {
 		}
 	],
 	collectCoverageFrom: [
-		'modules/**/srcs/**/*.{ts,tsx}',
+		'modules/**/srcs/**/*.{ts}',
 		'!**/node_modules/**',
 		'!**/dist/**',
 	],

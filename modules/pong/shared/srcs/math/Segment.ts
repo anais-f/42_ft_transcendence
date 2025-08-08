@@ -1,3 +1,4 @@
+import { Ray } from "./Ray"
 import { Vector2 } from "./Vector2"
 import { Circle } from "./shapes/Circle"
 import { Polygon } from "./shapes/Polygon"
@@ -18,12 +19,15 @@ export class Segment {
 	intersect(other: Circle): boolean
 	intersect(other: Segment): boolean
 	intersect(other: Polygon): boolean
-	intersect(other: Circle | Segment | Polygon): boolean {
+	intersect(other: Ray): boolean
+	intersect(other: Circle | Segment | Polygon | Ray): boolean {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
 			return this.intersectSeg(other)
 		} else if (other instanceof Polygon) {
+			return other.intersect(this)
+		} else if (other instanceof Ray) {
 			return other.intersect(this)
 		}
 		throw "invalid Type in segment intersect"

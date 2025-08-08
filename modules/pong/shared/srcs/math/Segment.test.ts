@@ -1,6 +1,7 @@
 import { Vector2 } from "./Vector2"
 import { Segment } from "./Segment"
 import { Circle } from "./shapes/Circle"
+import { Ray } from "./Ray"
 
 describe("Segment", () => {
   test("getPoints returns endpoints", () => {
@@ -72,14 +73,14 @@ describe("Segment", () => {
         expect(s1.intersect(s2)).toBe(true)
       })
 
-      test("paralelle no intersect", () => {
+      test("paralel no intersect", () => {
         const s1 = new Segment(new Vector2(0,0), new Vector2(0, 1))
         const s2 = new Segment(new Vector2(1,0), new Vector2(1, 1))
 
         expect(s1.intersect(s2)).toBe(false)
       })
 
-      test("paralelle intersect", () => {
+      test("paralel intersect", () => {
         const s1 = new Segment(new Vector2(0,0), new Vector2(0, 1))
         const s2 = new Segment(new Vector2(0,.5), new Vector2(0, 1.5))
 
@@ -93,6 +94,53 @@ describe("Segment", () => {
       })
 
 
+    })
+
+    describe("Ray", () => {
+      let ray: Ray
+
+      beforeEach(() => {
+        ray = new Ray(
+          new Vector2(-1,-1),
+          new Vector2(1,1).normalize()
+        )
+      })
+
+      test("perpendicular segment", () => {
+        const s1 = new Segment(
+          new Vector2(-1, 1),
+          new Vector2(1, -1)
+        )
+        const s2 = new Segment(
+          new Vector2(-2, -1),
+          new Vector2(-1, -2)
+        )
+
+        expect(ray.intersect(s1)).toBe(true)
+        expect(ray.intersect(s2)).toBe(false)
+      })
+
+      test("start intersection", () => {
+        const s1 = new Segment(
+          new Vector2(0, -2),
+          new Vector2(-2, 0)
+        )
+
+        expect(ray.intersect(s1)).toBe(true)
+      })
+
+      test("parallel collinear", () => {
+        const s1 = new Segment(
+          new Vector2(0, -2),
+          new Vector2(2, 0)
+        )
+        const s2 = new Segment(
+          new Vector2(0, 0),
+          new Vector2(1, 1)
+        )
+        expect(ray.intersect(s1)).toBe(false)
+        expect(ray.intersect(s2)).toBe(true)
+      })
     })
 
     test("intersect throws on invalid type", () => {
