@@ -68,11 +68,11 @@ export class GameEngine {
         if (this.isClientSide) {
             return performance.now() + this.offset;
         }
-        return Date.now();
+        return Date.now()
     }
 
     protected getTimeMs(): number {
-        if (typeof performance !== "undefined" && performance.now) {
+        if (this.isClientSide) {
             return performance.now()
         }
         return Date.now()
