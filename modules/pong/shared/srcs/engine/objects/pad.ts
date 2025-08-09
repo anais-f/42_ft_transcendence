@@ -1,16 +1,18 @@
-import { Shape } from "../../math/shapes/Shape"
+import { PongObject } from "./PongObject";
 
 export class pad {
-    private hitbox: Shape
-
-    public constructor(hitbox: Shape) {
-        this.hitbox = hitbox
+    private player: number
+    private obj: PongObject
+    public constructor(player: number, obj: PongObject) {
+        this.player = player
+        this.obj = obj
     }
 
-    public intersect(objs: Shape[]) {
-        for (const obj of objs) {
-            if (obj.intersect(this.hitbox)) return true
-        }
-        return false
+    getPlayer(): number {
+        return this.player
+    }
+
+    getObjs(): PongObject {
+        return this.obj
     }
 }
