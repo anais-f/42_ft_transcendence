@@ -20,6 +20,7 @@ export class GameEngine {
     private currentState: GameState = GameState.Paused
     private TPS_DATA: TPS_MANAGER
     private tickTimer: ReturnType<typeof setInterval> | null = null
+    //private pongWorld = new World(WorldShape.Rectangle, new PongMap())
 
     constructor(physicsEngine: PhysicsEngine, TPS: number) {
         this.physicsEngine = physicsEngine
