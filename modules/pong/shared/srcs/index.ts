@@ -7,3 +7,6 @@ export * from "./math/Segment"
 export * from "./math/shapes/Circle"
 export * from "./math/shapes/Polygon"
 export * from "./math/shapes/Rectangle"
+
+// engine
+export * from "./engine/game-engine"

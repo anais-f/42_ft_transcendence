@@ -282,7 +282,6 @@ describe("WorldRect", () => {
 
         describe("Polygon", () => {
             test("fully inside", () => {
-                // Triangle bien à l'intérieur
                 const poly = new Polygon([
                     new Vector2(-10, 0),
                     new Vector2(0, 5),
@@ -292,17 +291,15 @@ describe("WorldRect", () => {
             })
 
             test("crossing border", () => {
-                // Un sommet dehors
                 const poly = new Polygon([
                     new Vector2(-10, 0),
                     new Vector2(0, 5),
-                    new Vector2(30, 0) // dehors
+                    new Vector2(30, 0) 
                 ])
                 expect(w.isInside(poly)).toBe(false)
             })
 
             test("polygon on border", () => {
-                // Sommets sur le rectangle
                 const poly = new Polygon([
                     new Vector2(-20, -10),
                     new Vector2(20, -10),
@@ -323,7 +320,6 @@ describe("WorldRect", () => {
         })
 
         describe("Polygon - extra cases", () => {
-            // Rectangle goes from (-20, -10) to (20, 10)
 
             test("simple triangle fully inside", () => {
                 const poly = new Polygon([
