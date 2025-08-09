@@ -1,0 +1,28 @@
+name: Unit Tests
+
+on:
+  pull_request:
+
+jobs:
+  unit_tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests via Makefile
+        run: |
+          # Install npm for test
+          if make install; then
+            echo "Npm installed succesfully."
+          else
+            echo "Npm installed failed."
+            exit 1
+          fi
+          # Run unit tests via Makefile
+          if make test; then
+            echo "All unit tests passed successfully."
+          else
+            echo "Unit tests failed. Please fix the failing tests before merging."
+            exit 1
+          fi
