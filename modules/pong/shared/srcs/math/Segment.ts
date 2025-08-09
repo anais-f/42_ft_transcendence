@@ -85,7 +85,7 @@ export class Segment {
 		return point.getX() >= Math.min(p1.getX(), p2.getX()) &&
 			   point.getX() <= Math.max(p1.getX(), p2.getX()) &&
 			   point.getY() >= Math.min(p1.getY(), p2.getY()) &&
-			   point.getY() <= Math.max(p1.getY(), p2.getY());
+			   point.getY() <= Math.max(p1.getY(), p2.getY())
 
 	}
 
