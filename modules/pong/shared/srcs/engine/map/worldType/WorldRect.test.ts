@@ -3,9 +3,8 @@ import { Circle } from "../../../math/shapes/Circle"
 import { Segment } from "../../../math/Segment"
 import { Vector2 } from "../../../math/Vector2"
 import { WorldRect } from "./WorldRect"
+
 describe("WorldRect", () => {
-
-
 
     test("WorldRect init", () => {
         const w = new WorldRect()
