@@ -2,7 +2,7 @@
 	"name": "@modules/pong",
 	"version": "1.0.0",
 	"scripts": {
-		"build": "npm run build:shared && npm run build:client && npm run build:server",
+		"build": "tsc -b ./packages/shared ./packages/Client ./packages/Server",
 		"build:shared": "cd shared && tsc -b",
 		"build:client": "cd Client && tsc -b",
 		"build:server": "cd Server && tsc -b",
