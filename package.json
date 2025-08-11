@@ -22,7 +22,8 @@
 	"workspaces": [
 		"packages/pong-shared",
 		"packages/pong-client",
-		"packages/pong-server"
+		"packages/pong-server",
+		"services/pong-server/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",

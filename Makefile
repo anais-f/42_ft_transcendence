@@ -18,7 +18,6 @@ build:
 up:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
-
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
