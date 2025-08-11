@@ -19,7 +19,6 @@ build:
 up:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
-
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
@@ -31,3 +30,11 @@ sh-%:
 .PHONY: logs-%
 logs-%:
 	docker logs -f -t --details $(patsubst logs-%, %, $@)
+
+.PHONY: format
+format:
+	npx prettier --write
+
+.PHONY: format-%
+format-%:
+	npx prettier --write $(patsubst format-%, %, $@)
