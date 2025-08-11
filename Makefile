@@ -29,12 +29,10 @@ sh-%:
 
 .PHONY: logs-%
 logs-%:
-	docker logs -f -t --details $(patsubst logs-%, %, $@)
+	docker logs -f -t --details $(patsubst logs-%,%, $@)
 
 .PHONY: format
+TARGET ?= .
 format:
-	npx prettier --write
+	npx prettier --write $(TARGET)
 
-.PHONY: format-%
-format-%:
-	npx prettier --write $(patsubst format-%, %, $@)
