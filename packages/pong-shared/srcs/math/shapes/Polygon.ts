@@ -76,7 +76,7 @@ export class Polygon extends Shape {
 		return false
 	}
 
-	containsPoint(point: Vector2): boolean {
+	public containsPoint(point: Vector2): boolean {
 		let inside = false;
 		const points: Vector2[] = this.segments.map((e) => e.getP1());
 		
@@ -112,5 +112,8 @@ export class Polygon extends Shape {
 		}
 		return false
 	}
-	
+
+	public getSegment(): Segment[] {
+		return this.segments
+	}
 }

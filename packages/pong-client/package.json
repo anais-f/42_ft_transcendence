@@ -1,0 +1,19 @@
+{
+	"name": "@ft_transcendence/pong-client",
+	"version": "0.0.1",
+	"description": "Client lib for the pong game",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"test": "jest",
+		"clean": "rimraf dist"
+	},
+	"dependencies": {
+		"@ft_transcendence/pong-shared": "0.0.1"
+	},
+	"devDependencies": {
+		"rimraf": "^5.0.0",
+		"typescript": "^5.1.6"
+	}
+}

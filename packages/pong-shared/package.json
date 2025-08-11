@@ -1,0 +1,16 @@
+{
+	"name": "@ft_transcendence/pong-shared",
+	"version": "0.0.1",
+	"description": "Shared code for the pong game",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc --project tsconfig.json",
+		"test": "jest",
+		"clean": "rimraf dist"
+	},
+	"devDependencies": {
+		"rimraf": "^5.0.0",
+		"typescript": "^5.1.6"
+	}
+}

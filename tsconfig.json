@@ -11,9 +11,15 @@
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"isolatedModules": true,
+		"composite": true,
 		"paths": {
-			"@modules/*": ["modules/*"]
+			"@packages/*": ["packages/*"]
 		}
 	},
-	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"]
+	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
+	"references": [
+		{ "path": "./packages/pong-shared" },
+		{ "path": "./packages/pong-client" },
+		{ "path": "./packages/pong-server" }
+	]
 }

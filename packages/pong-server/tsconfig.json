@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./srcs",
+		"composite": true
+	},
+	"include": ["srcs/**/*"],
+	"exclude": ["**/*.test.ts", "node_modules"],
+	"references": [
+		{ "path": "../pong-shared" }
+	]
+}

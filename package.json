@@ -2,19 +2,27 @@
 	"name": "ft_transcendence",
 	"version": "0.0.1",
 	"description": "competitive pong website",
+	"type": "module",
 	"scripts": {
 		"test": "jest --config ./jest.config.ts",
-		"test:pong": "jest --config ./jest.config.ts --selectProjects=pong",
-		"build": "npm run build:pong",
-		"build:pong": "cd ./modules/pong && npm run build",
-		"lint": "eslint 'modules/**/**/*.ts'",
-		"format": "prettier --write 'modules/**/**/*.ts'"
+		"test:pong": "npm run test:pong:shared && npm run test:pong:client && npm run test:pong:server",
+		"test:pong:shared": "jest --selectProjects=pong-shared",
+		"test:pong:client": "jest --selectProjects=pong-client",
+		"test:pong:server": "jest --selectProjects=pong-server",
+
+		"build": "npm run build --workspaces --if-present",
+		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
+		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
+		"build:pong:client": "npm run build --workspace=packages/pong-client",
+		"build:pong:server": "npm run build --workspace=packages/pong-server",
+
+		"lint": "eslint 'packages/**/*.ts'",
+		"format": "prettier --write 'packages/**/*.ts'"
 	},
 	"workspaces": [
-		"./modules/pong",
-		"./modules/pong/shared",
-		"./modules/pong/Client",
-		"./modules/pong/Server"
+		"packages/pong-shared",
+		"packages/pong-client",
+		"packages/pong-server"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",

@@ -9,6 +9,22 @@ export class Rectangle extends Polygon {
 
 		super([origin, topRight, bottomRight, bottomLeft]);
 	}
+
+	public getMinX() {
+		return this.getSegment()[0].getP1().getX()
+	}
+
+	public getMinY() {
+		return this.getSegment()[0].getP1().getY()
+	}
+
+	public getMaxX() {
+		return this.getSegment()[1].getP1().getX()
+	}
+	
+	public getMaxY() {
+		return this.getSegment()[2].getP1().getY()
+	}
 }
 
 

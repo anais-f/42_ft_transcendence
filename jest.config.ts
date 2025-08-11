@@ -1,28 +1,32 @@
-import type { Config } from '@jest/types';
+import type { Config } from '@jest/types'
 
 const config: Config.InitialOptions = {
-	preset: 'ts-jest',
-	testEnvironment: 'node',
-	roots: ['<rootDir>/'],
-	modulePaths: ['<rootDir>/'],
-	moduleNameMapper: {
-		'^@modules/(.*)$': '<rootDir>/modules/$1'
-	},
-	projects: [
-		{
-			displayName: 'pong',
-			testMatch: ['<rootDir>/modules/pong/**/*.test.ts'],
-			preset: 'ts-jest',
-			moduleNameMapper: {
-				'^@modules/pong/(.*)$': '<rootDir>/modules/pong/$1'
-			}
-		}
-	],
-	collectCoverageFrom: [
-		'modules/**/srcs/**/*.{ts}',
-		'!**/node_modules/**',
-		'!**/dist/**',
-	],
-};
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  modulePaths: ['<rootDir/'],
+  moduleNameMapper: {
+    '^@ft_transcendence/(.*)$': '<rootDir>/packages/$1',
+  },
+  projects: [
+    {
+      displayName: 'pong-shared',
+      testMatch: ['<rootDir>/packages/pong-shared/**/*.test.ts'],
+      preset: 'ts-jest',
+      rootDir: './',
+    },
+    {
+      displayName: 'pong-client',
+      testMatch: ['<rootDir>/packages/pong-client/**/*.test.ts'],
+      preset: 'ts-jest',
+      rootDir: './'
+    },
+    {
+      displayName: 'pong-server',
+      testMatch: ['<rootDir>/packages/pong-server/**/*.test.ts'],
+      preset: 'ts-jest',
+      rootDir: './'
+    }
+  ]
+}
 
-export default config;
+export default config
