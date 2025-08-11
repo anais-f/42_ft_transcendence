@@ -12,7 +12,6 @@ install:
 
 .PHONY: build
 build:
-	npm run build
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
 
 .PHONY: up
