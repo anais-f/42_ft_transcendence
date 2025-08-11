@@ -32,7 +32,6 @@ logs-%:
 	docker logs -f -t --details $(patsubst logs-%,%, $@)
 
 .PHONY: format
-TARGET ?= .
 format:
 	npx prettier --write $(TARGET)
 
