@@ -2,13 +2,13 @@ NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 .DEFAULT_GOAL = up
 
-.PHONY: test
-test:
-	npm test
-
 .PHONY: install
 install:
 	npm install
+
+.PHONY: test
+test:
+	npm test
 
 .PHONY: build
 build:
