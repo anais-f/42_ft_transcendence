@@ -35,9 +35,6 @@ TARGET ?= .
 .PHONY: format
 format:
 	npx prettier --write $(TARGET)
-.PHONY: format
-format:
-	npx prettier --write $(TARGET)
 	
 .PHONY: format-check
 format-check:
