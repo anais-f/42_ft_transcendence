@@ -9,13 +9,11 @@
 		"test:pong:shared": "jest --selectProjects=pong-shared",
 		"test:pong:client": "jest --selectProjects=pong-client",
 		"test:pong:server": "jest --selectProjects=pong-server",
-
 		"build": "npm run build --workspaces --if-present",
 		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
 		"build:pong:client": "npm run build --workspace=packages/pong-client",
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
-
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write 'packages/**/*.ts'"
 	},

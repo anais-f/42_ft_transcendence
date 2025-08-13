@@ -1,6 +1,6 @@
-import { S04BallVeloChange } from "../network/Packet/Server/SPackets"
-import { Segment } from "./Segment"
-import { Vector2 } from "./Vector2"
+import { S04BallVeloChange } from '../network/Packet/Server/SPackets'
+import { Segment } from './Segment'
+import { Vector2 } from './Vector2'
 
 export class Ray {
 	private direction!: Vector2
@@ -28,10 +28,7 @@ export class Ray {
 	}
 
 	static RayFromPoints(p1: Vector2, p2: Vector2) {
-		return new Ray(
-			p1,
-			Vector2.subtract(p2, p1).normalize()
-		)
+		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
 	intersect(other: Segment): boolean
@@ -42,7 +39,7 @@ export class Ray {
 		} else if (other instanceof Ray) {
 			return this.intersectRay(other)
 		} else {
-			throw "Invalid intersect type expected: Segment"
+			throw 'Invalid intersect type expected: Segment'
 		}
 	}
 
@@ -53,14 +50,20 @@ export class Ray {
 			return false
 		}
 
-		const t1 = Vector2.subtract(other.getOrigin(), this.getOrigin()).cross(other.getDirection()) / crossProduct
-		const t2 = Vector2.subtract(other.getOrigin(), this.getOrigin()).cross(this.getDirection()) / crossProduct
+		const t1 =
+			Vector2.subtract(other.getOrigin(), this.getOrigin()).cross(
+				other.getDirection()
+			) / crossProduct
+		const t2 =
+			Vector2.subtract(other.getOrigin(), this.getOrigin()).cross(
+				this.getDirection()
+			) / crossProduct
 
 		return t1 >= 0 && t2 >= 0
 	}
 
 	private intersectSegment(other: Segment): boolean {
-		const [start, end]: Vector2 [] = other.getPoints()
+		const [start, end]: Vector2[] = other.getPoints()
 		const segV = Vector2.subtract(end, start)
 
 		const crossProduct = this.getDirection().cross(segV)
@@ -68,14 +71,19 @@ export class Ray {
 		if (Math.abs(crossProduct) < Number.EPSILON) {
 			const v1 = Vector2.subtract(start, this.getOrigin())
 			if (Math.abs(v1.cross(this.getDirection())) < Number.EPSILON) {
-				const t0 = Vector2.dot(v1, this.getDirection()) / this.getDirection().squaredLength()
+				const t0 =
+					Vector2.dot(v1, this.getDirection()) /
+					this.getDirection().squaredLength()
 				return t0 >= 0
 			}
 			return false
 		}
 
-		const t1 = Vector2.subtract(start, this.getOrigin()).cross(segV) / crossProduct
-		const t2 = Vector2.subtract(start, this.getOrigin()).cross(this.getDirection()) / crossProduct
+		const t1 =
+			Vector2.subtract(start, this.getOrigin()).cross(segV) / crossProduct
+		const t2 =
+			Vector2.subtract(start, this.getOrigin()).cross(this.getDirection()) /
+			crossProduct
 
 		return t1 >= 0 && t2 >= 0 && t2 <= 1
 	}

@@ -4,8 +4,6 @@
 		"outDir": "dist",
 		"rootDir": "."
 	},
-	"references": [
-		{ "path": "../../../packages/pong-shared" }
-	],
+	"references": [{ "path": "../../../packages/pong-shared" }],
 	"include": ["index.ts"]
 }

@@ -1,11 +1,10 @@
-
-import { Vector2 } from "../../../math/Vector2"
+import { Vector2 } from '../../../math/Vector2'
 
 interface IC00PongBase {
 	time: number
 
 	getTime(): number
-	
+
 	serialize(): Uint8Array
 }
 
@@ -27,9 +26,8 @@ export class C01Move implements IC00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
-
 }
 
 export class C03BallBase {
@@ -59,10 +57,10 @@ export class C04BallVelo extends C03BallBase implements IC00PongBase {
 	getVelo(): Vector2 {
 		return this.velo
 	}
-	
+
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
 
@@ -74,14 +72,13 @@ export class C05BallPos extends C03BallBase implements IC00PongBase {
 		this.pos = pos
 	}
 
-
 	getPos(): Vector2 {
 		return this.pos
 	}
-	
+
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
 
@@ -111,6 +108,6 @@ export class C06BallVeloPos extends C03BallBase implements IC00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }

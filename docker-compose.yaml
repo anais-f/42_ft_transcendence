@@ -4,14 +4,14 @@ services:
     build: services/nginx/
     container_name: nginx
     ports:
-      - "8080:8080"
+      - '8080:8080'
 
   front-app:
     restart: on-failure
     build: services/front-app/
     container_name: front-app
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - nginx
   pong-server:

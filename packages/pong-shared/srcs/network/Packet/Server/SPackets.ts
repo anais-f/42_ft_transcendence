@@ -1,5 +1,4 @@
-
-import { Vector2 } from "../../../math/Vector2"
+import { Vector2 } from '../../../math/Vector2'
 
 export interface IS00PongBase {
 	time: number
@@ -20,7 +19,7 @@ export class S01ServerTickConfirmation implements IS00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
 
@@ -43,7 +42,7 @@ export class S03BaseBall {
 export class S04BallVeloChange extends S03BaseBall implements IS00PongBase {
 	private velo: Vector2
 
-	constructor(S03: S03BaseBall, velo: Vector2){
+	constructor(S03: S03BaseBall, velo: Vector2) {
 		super(S03.getTime())
 		this.velo = velo
 	}
@@ -54,10 +53,9 @@ export class S04BallVeloChange extends S03BaseBall implements IS00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
-
 
 export class S05BallPos extends S03BaseBall implements IS00PongBase {
 	private pos: Vector2
@@ -73,7 +71,7 @@ export class S05BallPos extends S03BaseBall implements IS00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
 
@@ -103,8 +101,6 @@ export class S06BallSync extends S03BaseBall implements IS00PongBase {
 
 	serialize(): Uint8Array {
 		// TODO: implement
-		return new Uint8Array
+		return new Uint8Array()
 	}
 }
-
-

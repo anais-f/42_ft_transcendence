@@ -1,9 +1,7 @@
-
 export class Shape {
-	public constructor(){
-	}
+	public constructor() {}
 
 	intersect(_other: Shape): boolean {
-		throw "unknow shape"
+		throw 'unknow shape'
 	}
 }

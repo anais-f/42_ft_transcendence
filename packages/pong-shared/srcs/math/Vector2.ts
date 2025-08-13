@@ -1,38 +1,43 @@
 export class Vector2 {
 	// init class fields
-	private x:number
-	private y:number
+	private x: number
+	private y: number
 
-	constructor(x:number = 0, y:number = 0) {
+	constructor(x: number = 0, y: number = 0) {
 		this.x = x
 		this.y = y
 	}
 
 	// getters
-	public getX():number { return this.x }
-	public getY():number { return this.y }
+	public getX(): number {
+		return this.x
+	}
+	public getY(): number {
+		return this.y
+	}
 
 	// setter
-	public setX(newX:number) { this.x = newX }
-	public setY(newY:number) { this.y = newY }
-	public setXY(newX:number, newY:number) { this.x = newX; this.y = newY }
+	public setX(newX: number) {
+		this.x = newX
+	}
+	public setY(newY: number) {
+		this.y = newY
+	}
+	public setXY(newX: number, newY: number) {
+		this.x = newX
+		this.y = newY
+	}
 
 	// operator
 	public static subtract(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(
-			v1.getX() - v2.getX(),
-			v1.getY() - v2.getY()
-		)
+		return new Vector2(v1.getX() - v2.getX(), v1.getY() - v2.getY())
 	}
 
 	public static add(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(
-			v1.getX() + v2.getX(),
-			v1.getY() + v2.getY()
-		)
+		return new Vector2(v1.getX() + v2.getX(), v1.getY() + v2.getY())
 	}
 
-	public static dot(v1: Vector2, v2:Vector2): number {
+	public static dot(v1: Vector2, v2: Vector2): number {
 		return v1.getX() * v2.getX() + v1.getY() * v2.getY()
 	}
 
@@ -51,25 +56,19 @@ export class Vector2 {
 			return new Vector2()
 		}
 
-		return new Vector2(
-			v.getX() / length,
-			v.getY() / length
-		)
+		return new Vector2(v.getX() / length, v.getY() / length)
 	}
 
 	public static negate(v: Vector2): Vector2 {
-		return new Vector2(
-			-v.getX(),
-			-v.getY()
-		)
+		return new Vector2(-v.getX(), -v.getY())
 	}
 
-	public static multiply(v:Vector2, scalar: number): Vector2 {
+	public static multiply(v: Vector2, scalar: number): Vector2 {
 		return new Vector2(v.getX() * scalar, v.getY() * scalar)
 	}
 
-	public 	static squaredDist(v1: Vector2, v2: Vector2): number {
-		return (v1.getX() - v2.getX())**2 + (v1.getY() - v2.getY())**2
+	public static squaredDist(v1: Vector2, v2: Vector2): number {
+		return (v1.getX() - v2.getX()) ** 2 + (v1.getY() - v2.getY()) ** 2
 	}
 
 	public static dist(v1: Vector2, v2: Vector2): number {
@@ -77,7 +76,7 @@ export class Vector2 {
 	}
 
 	public static clone(v: Vector2): Vector2 {
-		return v.clone();
+		return v.clone()
 	}
 
 	public clone(): Vector2 {
@@ -92,52 +91,50 @@ export class Vector2 {
 		return Vector2.dist(this, v2)
 	}
 
-	public 	add(v2: Vector2): Vector2 {
+	public add(v2: Vector2): Vector2 {
 		const result = Vector2.add(this, v2)
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
 	}
 
-	public 	subtract(v2: Vector2): Vector2 {
+	public subtract(v2: Vector2): Vector2 {
 		const result = Vector2.subtract(this, v2)
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
 	}
 
-	public 	squaredLength(): number {
+	public squaredLength(): number {
 		return Vector2.dot(this, this)
 	}
 
-	public 	magnitude(): number {
+	public magnitude(): number {
 		return Vector2.magnitude(this)
 	}
 
-	public 	normalize(): Vector2 {
+	public normalize(): Vector2 {
 		const result = Vector2.normalize(this)
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
 	}
 
-	public 	negate(): Vector2 {
+	public negate(): Vector2 {
 		const result = Vector2.negate(this)
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
 	}
 
-	public 	cross(v2: Vector2): number {
+	public cross(v2: Vector2): number {
 		return Vector2.cross(this, v2)
 	}
-	
-	public 	multiply(scalar: number) {
+
+	public multiply(scalar: number) {
 		const result = Vector2.multiply(this, scalar)
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
 	}
 }
-
-
