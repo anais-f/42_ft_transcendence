@@ -2,13 +2,13 @@ NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 .DEFAULT_GOAL = up
 
-.PHONY: test
-test:
-	npm test
-
 .PHONY: install
 install:
 	npm install
+
+.PHONY: test
+test:
+	npm test
 
 .PHONY: build
 build:
@@ -28,4 +28,13 @@ sh-%:
 
 .PHONY: logs-%
 logs-%:
-	docker logs -f -t --details $(patsubst logs-%, %, $@)
+	docker logs -f -t --details $(patsubst logs-%,%, $@)
+
+TARGET ?= .
+.PHONY: format
+format:
+	npx prettier --write $(TARGET)
+	
+.PHONY: format-check
+format-check:
+	npx prettier --check $(TARGET)
