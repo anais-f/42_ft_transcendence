@@ -1,0 +1,28 @@
+name: Format Check
+
+on:
+  pull_request:
+
+jobs:
+  format_check:
+    name: Format Check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check valid format via Makefile
+        run: |
+          # Install npm for prettier
+           if make install; then
+            echo "Npm installed succesfully."
+          else
+            echo "Npm installed failed."
+            exit 1
+          fi
+          # Check valid format via Makefile
+          if make format-check; then
+            echo "Prettier check passed — no formatting issues found."
+          else
+            echo "Prettier check failed."
+            exit 1
+          fi
