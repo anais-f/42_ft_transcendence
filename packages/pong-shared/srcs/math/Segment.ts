@@ -1,20 +1,24 @@
-import { Ray } from "./Ray"
-import { Vector2 } from "./Vector2"
-import { Circle } from "./shapes/Circle"
-import { Polygon } from "./shapes/Polygon"
+import { Ray } from './Ray'
+import { Vector2 } from './Vector2'
+import { Circle } from './shapes/Circle'
+import { Polygon } from './shapes/Polygon'
 
 export class Segment {
 	constructor(
 		private p1: Vector2,
 		private p2: Vector2
-	){}
+	) {}
 
 	getPoints(): Vector2[] {
 		return [this.p1, this.p2]
 	}
 
-	getP1() { return this.p1 }
-	getP2() { return this.p2 }
+	getP1() {
+		return this.p1
+	}
+	getP2() {
+		return this.p2
+	}
 
 	intersect(other: Circle): boolean
 	intersect(other: Segment): boolean
@@ -30,12 +34,11 @@ export class Segment {
 		} else if (other instanceof Ray) {
 			return other.intersect(this)
 		}
-		throw "invalid Type in segment intersect"
-		
+		throw 'invalid Type in segment intersect'
 	}
 
 	private intersectSeg(other: Segment): boolean {
-		function direction(p: Vector2, q: Vector2, r:Vector2): number {
+		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
 
@@ -46,8 +49,10 @@ export class Segment {
 		const d3 = direction(this.p1, this.p2, p3)
 		const d4 = direction(this.p1, this.p2, p4)
 
-		if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
-			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+		if (
+			((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
+		) {
 			return true
 		}
 
@@ -57,7 +62,6 @@ export class Segment {
 		if (d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4)) return true
 
 		return false
-
 	}
 
 	private intersectCircle(other: Circle): boolean {
@@ -65,7 +69,10 @@ export class Segment {
 		const segLengthSq = segVector.squaredLength()
 
 		const p1ToCircle = Vector2.subtract(other.getPos(), this.p1)
-		const t = Math.max(0, Math.min(1, Vector2.dot(p1ToCircle, segVector) / segLengthSq))
+		const t = Math.max(
+			0,
+			Math.min(1, Vector2.dot(p1ToCircle, segVector) / segLengthSq)
+		)
 
 		const closestP = Vector2.add(this.p1, segVector.multiply(t))
 
@@ -75,26 +82,27 @@ export class Segment {
 	}
 
 	static pointIsOnSeg(p1: Vector2, p2: Vector2, point: Vector2): boolean {
-		const crossProduct = (point.getY() - p1.getY()) * (p2.getX() - p1.getX()) -
-							 (point.getX() - p1.getX()) * (p2.getY() - p1.getY());
-		
-		if (Math.abs(crossProduct) > Number.EPSILON) {
-			return false;
-		}
-		
-		return point.getX() >= Math.min(p1.getX(), p2.getX()) &&
-			   point.getX() <= Math.max(p1.getX(), p2.getX()) &&
-			   point.getY() >= Math.min(p1.getY(), p2.getY()) &&
-			   point.getY() <= Math.max(p1.getY(), p2.getY())
+		const crossProduct =
+			(point.getY() - p1.getY()) * (p2.getX() - p1.getX()) -
+			(point.getX() - p1.getX()) * (p2.getY() - p1.getY())
 
+		if (Math.abs(crossProduct) > Number.EPSILON) {
+			return false
+		}
+
+		return (
+			point.getX() >= Math.min(p1.getX(), p2.getX()) &&
+			point.getX() <= Math.max(p1.getX(), p2.getX()) &&
+			point.getY() >= Math.min(p1.getY(), p2.getY()) &&
+			point.getY() <= Math.max(p1.getY(), p2.getY())
+		)
 	}
 
 	static containPoint(s: Segment, p: Vector2) {
 		return Segment.pointIsOnSeg(s.getP1(), s.getP2(), p)
 	}
-	
+
 	contain(p: Vector2): boolean {
 		return Segment.pointIsOnSeg(this.p1, this.p2, p)
 	}
-
 }

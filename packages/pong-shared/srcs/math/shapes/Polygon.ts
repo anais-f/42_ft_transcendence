@@ -1,8 +1,8 @@
-import { Vector2 } from "../Vector2"
-import { Circle } from "./Circle"
-import { Ray } from "../Ray"
-import { Segment } from "../Segment"
-import { Shape } from "./Shape"
+import { Vector2 } from '../Vector2'
+import { Circle } from './Circle'
+import { Ray } from '../Ray'
+import { Segment } from '../Segment'
+import { Shape } from './Shape'
 
 export class Polygon extends Shape {
 	private segments: Segment[] = []
@@ -11,9 +11,7 @@ export class Polygon extends Shape {
 		super()
 		for (let i = 0; i < points.length; ++i) {
 			this.segments.push(
-				new Segment(
-					points[i], points[(i + 1) % points.length]
-				)
+				new Segment(points[i], points[(i + 1) % points.length])
 			)
 		}
 	}
@@ -33,7 +31,7 @@ export class Polygon extends Shape {
 		} else if (other instanceof Segment) {
 			return this.intersectSeg(other)
 		}
-		throw "Invalid intersect"
+		throw 'Invalid intersect'
 	}
 
 	private intersectCircle(other: Circle): boolean {
@@ -42,7 +40,7 @@ export class Polygon extends Shape {
 				return true
 			}
 		}
-		
+
 		return this.containsPoint(other.getPos())
 	}
 
@@ -56,7 +54,6 @@ export class Polygon extends Shape {
 	}
 
 	private intersectPolygon(other: Polygon): boolean {
-		
 		for (const seg1 of this.segments) {
 			for (const seg2 of other.segments) {
 				if (seg1.intersect(seg2)) {
@@ -65,7 +62,6 @@ export class Polygon extends Shape {
 			}
 		}
 
-		
 		if (this.containsPoint(other.segments[0].getP1())) {
 			return true
 		}
@@ -77,37 +73,44 @@ export class Polygon extends Shape {
 	}
 
 	public containsPoint(point: Vector2): boolean {
-		let inside = false;
-		const points: Vector2[] = this.segments.map((e) => e.getP1());
-		
+		let inside = false
+		const points: Vector2[] = this.segments.map((e) => e.getP1())
+
 		for (const seg of this.segments) {
 			if (seg.contain(point)) {
-				return true;
+				return true
 			}
 		}
 
 		for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-			const pi = points[i];
-			const pj = points[j];
+			const pi = points[i]
+			const pj = points[j]
 
-			if (((pi.getY() > point.getY()) !== (pj.getY() > point.getY())) &&
-				(point.getX() < (pj.getX() - pi.getX()) * (point.getY() - pi.getY()) /
-				 (pj.getY() - pi.getY()) + pi.getX())) {
-				inside = !inside;
+			if (
+				pi.getY() > point.getY() !== pj.getY() > point.getY() &&
+				point.getX() <
+					((pj.getX() - pi.getX()) * (point.getY() - pi.getY())) /
+						(pj.getY() - pi.getY()) +
+						pi.getX()
+			) {
+				inside = !inside
 			}
 		}
 
-		return inside;
+		return inside
 	}
 
 	private intersectSeg(other: Segment) {
-		if (this.containsPoint(other.getP1()) || this.containsPoint(other.getP2())) {
+		if (
+			this.containsPoint(other.getP1()) ||
+			this.containsPoint(other.getP2())
+		) {
 			return true
 		}
 
 		for (const seg of this.segments) {
 			if (seg.intersect(other)) {
-				return true;
+				return true
 			}
 		}
 		return false
