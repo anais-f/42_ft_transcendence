@@ -6,7 +6,7 @@ on:
 jobs:
   format_check:
     name: Format Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-25.04
     steps:
       - uses: action/checkout@4
       
@@ -26,3 +26,4 @@ jobs:
             echo "Prettier check failed."
             exit 1
           fi
+          

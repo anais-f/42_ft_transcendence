@@ -6,7 +6,7 @@ on:
 jobs:
   unit_tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-25.04
     steps:
       - uses: actions/checkout@v4
 
@@ -26,3 +26,4 @@ jobs:
             echo "Unit tests failed. Please fix the failing tests before merging."
             exit 1
           fi
+          
