@@ -11,4 +11,7 @@
 **/node_modules/
 package-lock.json
 
+# SQLite databases
+*.db
+
 TODO
