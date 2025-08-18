@@ -30,11 +30,10 @@ sh-%:
 logs-%:
 	docker logs -f -t --details $(patsubst logs-%,%, $@)
 
-TARGET ?= .
 .PHONY: format
 format:
-	npx prettier --write $(TARGET)
+	npm run format
 	
 .PHONY: format-check
 format-check:
-	npx prettier --check $(TARGET)
+	npm run format:check

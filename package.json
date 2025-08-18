@@ -15,7 +15,8 @@
 		"build:pong:client": "npm run build --workspace=packages/pong-client",
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
 		"lint": "eslint 'packages/**/*.ts'",
-		"format": "prettier --write 'packages/**/*.ts'"
+		"format": "prettier --write '**/*.{ts,tsx,js,jsx,json,css,scss,html,md,yml,yaml}'",
+		"format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,css,scss,html,md,yml,yaml}'"
 	},
 	"workspaces": [
 		"packages/pong-shared",
