@@ -2,12 +2,7 @@
 	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": ".",
-		"esModuleInterop": true
+		"rootDir": "."
 	},
-	//	"references": [{ "path": "../../../packages/pong-shared" }],
-	//	"include": ["index.ts"],
-	"ts-node": {
-		"esm": true
-	}
+	"include": ["index.ts"]
 }
