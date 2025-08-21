@@ -1,14 +1,14 @@
-import { Shape } from '../../math/shapes/Shape'
+import { PongObject } from '../objects/PongObject'
 
 export class PongMap {
-	private objs: Shape[] = []
+	private objs: PongObject[] = []
 	public constructor() {}
 
-	public addObj(obj: Shape) {
+	public addObj(obj: PongObject) {
 		this.objs.push(obj)
 	}
 
-	public getObjs(): Shape[] {
+	public getObjs(): PongObject[] {
 		return this.objs
 	}
 }
