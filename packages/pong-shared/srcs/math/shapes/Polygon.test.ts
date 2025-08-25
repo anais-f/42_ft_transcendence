@@ -5,6 +5,40 @@ import { Segment } from '../Segment'
 import { Ray } from '../Ray'
 
 describe('Polygon', () => {
+	describe('getAbsolutePoints', () => {
+		test('basic test', () => {
+			const origin = new Vector2(5, 5)
+			const relativePoints = [
+				new Vector2(1, 1),
+				new Vector2(2, 2),
+				new Vector2(3, 3),
+			]
+			const poly = new Polygon(relativePoints, origin)
+
+			const abs = poly.getAbsolutePoints()
+
+			expect(abs).toEqual([
+				new Vector2(6, 6), // 5 + 1, 5 + 1
+				new Vector2(7, 7), // 5 + 2, 5 + 2
+				new Vector2(8, 8), // 5 + 3, 5 + 3
+			])
+		})
+		test('negative origin', () => {
+			const origin = new Vector2(-10, -1)
+			const poly = new Polygon(
+				[new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1)],
+				origin
+			)
+
+			const abs = poly.getAbsolutePoints()
+			expect(abs).toEqual([
+				new Vector2(-10, -1),
+				new Vector2(-10, 0),
+				new Vector2(-9, 0),
+			])
+		})
+	})
+
 	describe('containsPoint function', () => {
 		describe('with a square polygon', () => {
 			let square: Polygon
