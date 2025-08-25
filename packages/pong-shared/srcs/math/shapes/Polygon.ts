@@ -18,6 +18,10 @@ export class Polygon extends Shape {
 		}
 	}
 
+	public getAbsolutePoints(): Vector2[] {
+		return this.relativePoints.map((point) => Vector2.add(point, this.origin))
+	}
+
 	public getAbsoluteSegments(): Segment[] {
 		return this.segments.map(
 			(seg) =>

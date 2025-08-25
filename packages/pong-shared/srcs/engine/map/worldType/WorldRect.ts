@@ -46,8 +46,7 @@ export class WorldRect extends World {
 		const center = o.getOrigin()
 		const rad = o.getRad()
 
-		// TODO: create rect -> getAbsolutePoints
-		const absPoints = this.rect.getAbsoluteSegments().map((seg) => seg.getP1())
+		const absPoints = this.rect.getAbsolutePoints()
 		const xs = absPoints.map((p) => p.getX())
 		const ys = absPoints.map((p) => p.getY())
 		const minX = Math.min(...xs)
