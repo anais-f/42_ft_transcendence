@@ -6,7 +6,11 @@ export class PongObject {
 	private velocity: Vector2
 	private hitbox: Shape[] = []
 
-	constructor(hitbox: Shape | Shape[], origin: Vector2 = new Vector2(), velocity: Vector2 = new Vector2()) {
+	constructor(
+		hitbox: Shape | Shape[],
+		origin: Vector2 = new Vector2(),
+		velocity: Vector2 = new Vector2()
+	) {
 		if (Array.isArray(hitbox)) {
 			this.hitbox = hitbox
 		} else {
@@ -31,7 +35,7 @@ export class PongObject {
 	static clone(obj: PongObject) {
 		return new PongObject(obj.getHitbox(), obj.getOrigin(), obj.getVelocity())
 	}
-	
+
 	clone() {
 		return PongObject.clone(this)
 	}

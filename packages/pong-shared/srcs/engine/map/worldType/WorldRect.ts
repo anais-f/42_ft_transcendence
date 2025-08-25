@@ -6,7 +6,6 @@ import { PongMap } from '../Map'
 import { World, WorldShape } from '../World'
 import { Rectangle } from '../../../math/shapes/Rectangle'
 
-// TODO: unit test
 export class WorldRect extends World {
 	private rect: Rectangle = new Rectangle(
 		new Vector2(-20, -10),
@@ -14,7 +13,6 @@ export class WorldRect extends World {
 	)
 
 	public constructor() {
-		// TODO: add pads shape
 		super(WorldShape.Rectangle, new PongMap()) // empty map
 	}
 
@@ -39,32 +37,34 @@ export class WorldRect extends World {
 	private isInsideVec2(o: Vector2): boolean {
 		return this.rect.containsPoint(o)
 	}
+
 	private isInsideSeg(o: Segment): boolean {
 		return this.isInsideVec2(o.getP1()) && this.isInsideVec2(o.getP2())
 	}
 
-	private isInsideCircle(o: Circle) {
-		const center = o.getPos()
+	private isInsideCircle(o: Circle): boolean {
+		const center = o.getOrigin()
 		const rad = o.getRad()
 
-		const minX = this.rect.getSegment()[0].getP1().getX() // origin.x
-		const minY = this.rect.getSegment()[0].getP1().getY() // origin.y
-		const maxX = this.rect.getSegment()[1].getP1().getX() // topRight.x
-		const maxY = this.rect.getSegment()[2].getP1().getY() // bottomRight.y
+		// TODO: create rect -> getAbsolutePoints
+		const absPoints = this.rect.getAbsoluteSegments().map((seg) => seg.getP1())
+		const xs = absPoints.map((p) => p.getX())
+		const ys = absPoints.map((p) => p.getY())
+		const minX = Math.min(...xs)
+		const maxX = Math.max(...xs)
+		const minY = Math.min(...ys)
+		const maxY = Math.max(...ys)
+
 		return (
-			center.getX() - rad >= minX &&
-			center.getX() + rad <= maxX &&
-			center.getY() - rad >= minY &&
-			center.getY() + rad <= maxY
+			center.getX() - rad >= minX - Number.EPSILON &&
+			center.getX() + rad <= maxX + Number.EPSILON &&
+			center.getY() - rad >= minY - Number.EPSILON &&
+			center.getY() + rad <= maxY + Number.EPSILON
 		)
 	}
 
-	private isInsidePolygon(o: Polygon) {
-		for (const s of o.getSegment()) {
-			if (!this.rect.containsPoint(s.getP1())) {
-				return false
-			}
-		}
-		return true
+	private isInsidePolygon(o: Polygon): boolean {
+		const absPoints = o.getAbsoluteSegments().map((seg) => seg.getP1())
+		return absPoints.every((pt) => this.rect.containsPoint(pt))
 	}
 }
