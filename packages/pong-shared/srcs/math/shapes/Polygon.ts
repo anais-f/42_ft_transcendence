@@ -6,9 +6,11 @@ import { Shape } from './Shape'
 
 export class Polygon extends Shape {
 	private segments: Segment[] = []
+	private relativePoints: Vector2[]
 
-	constructor(points: Vector2[]) {
-		super()
+	public constructor(points: Vector2[], origin: Vector2 = new Vector2()) {
+		super(origin)
+		this.relativePoints = points
 		for (let i = 0; i < points.length; ++i) {
 			this.segments.push(
 				new Segment(points[i], points[(i + 1) % points.length])
@@ -16,12 +18,22 @@ export class Polygon extends Shape {
 		}
 	}
 
-	intersect(other: Circle): boolean
-	intersect(other: Polygon): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Segment): boolean
+	public getAbsoluteSegments(): Segment[] {
+		return this.segments.map(
+			(seg) =>
+				new Segment(
+					Vector2.add(seg.getP1(), this.origin),
+					Vector2.add(seg.getP2(), this.origin)
+				)
+		)
+	}
 
-	intersect(other: Circle | Ray | Polygon | Segment): boolean {
+	public intersect(other: Circle): boolean
+	public intersect(other: Polygon): boolean
+	public intersect(other: Ray): boolean
+	public intersect(other: Segment): boolean
+
+	public intersect(other: Circle | Ray | Polygon | Segment): boolean {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Ray) {
@@ -35,7 +47,8 @@ export class Polygon extends Shape {
 	}
 
 	private intersectCircle(other: Circle): boolean {
-		for (const seg of this.segments) {
+		const AS = this.getAbsoluteSegments()
+		for (const seg of AS) {
 			if (seg.intersect(other)) {
 				return true
 			}
@@ -45,7 +58,8 @@ export class Polygon extends Shape {
 	}
 
 	private intersectRay(other: Ray): boolean {
-		for (const seg of this.segments) {
+		const AS = this.getAbsoluteSegments()
+		for (const seg of AS) {
 			if (other.intersect(seg)) {
 				return true
 			}
@@ -54,18 +68,20 @@ export class Polygon extends Shape {
 	}
 
 	private intersectPolygon(other: Polygon): boolean {
-		for (const seg1 of this.segments) {
-			for (const seg2 of other.segments) {
+		const localAbSeg = this.getAbsoluteSegments()
+		const otherAbSeg = other.getAbsoluteSegments()
+		for (const seg1 of localAbSeg) {
+			for (const seg2 of otherAbSeg) {
 				if (seg1.intersect(seg2)) {
 					return true
 				}
 			}
 		}
 
-		if (this.containsPoint(other.segments[0].getP1())) {
+		if (this.containsPoint(otherAbSeg[0].getP1())) {
 			return true
 		}
-		if (other.containsPoint(this.segments[0].getP1())) {
+		if (other.containsPoint(localAbSeg[0].getP1())) {
 			return true
 		}
 
@@ -74,9 +90,9 @@ export class Polygon extends Shape {
 
 	public containsPoint(point: Vector2): boolean {
 		let inside = false
-		const points: Vector2[] = this.segments.map((e) => e.getP1())
+		const points = this.relativePoints.map((p) => Vector2.add(p, this.origin))
 
-		for (const seg of this.segments) {
+		for (const seg of this.getAbsoluteSegments()) {
 			if (seg.contain(point)) {
 				return true
 			}
@@ -108,7 +124,7 @@ export class Polygon extends Shape {
 			return true
 		}
 
-		for (const seg of this.segments) {
+		for (const seg of this.getAbsoluteSegments()) {
 			if (seg.intersect(other)) {
 				return true
 			}

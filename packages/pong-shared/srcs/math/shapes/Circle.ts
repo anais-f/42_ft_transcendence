@@ -1,50 +1,46 @@
-import { Segment } from '../Segment'
-import { Vector2 } from '../Vector2'
 import { Shape } from './Shape'
+import { Vector2 } from '../Vector2'
+import { Segment } from '../Segment'
 
 export class Circle extends Shape {
 	private rad!: number
 
-	constructor(
-		private pos: Vector2,
-		rad: number
-	) {
-		super()
+	constructor(origin: Vector2 = new Vector2(), rad: number) {
+		super(origin)
 		this.setRad(rad)
 	}
 
-	getPos(): Vector2 {
-		return this.pos
+	public getPos(): Vector2 {
+		return this.origin
 	}
-	getRad(): number {
+
+	public getRad(): number {
 		return this.rad
 	}
 
-	setPos(pos: Vector2): void {
-		this.pos = pos
+	public setPos(pos: Vector2): void {
+		this.origin = pos
 	}
 
-	setRad(rad: number): void {
-		if (rad <= 0) {
-			throw 'invlalid Radius'
-		}
+	public setRad(rad: number): void {
+		if (rad <= 0) throw 'invalid Radius'
 		this.rad = rad
 	}
 
-	intersect(other: Segment): boolean
-	intersect(other: Circle): boolean
-	intersect(other: Segment | Circle): boolean {
+	public intersect(other: Segment): boolean
+	public intersect(other: Circle): boolean
+	public intersect(other: Segment | Circle): boolean {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else {
-			throw 'invalid Type in circle intersect'
+			throw 'invalid Type'
 		}
 	}
 
 	private intersectCircle(other: Circle): boolean {
-		const sqDistance: number = this.getPos().squaredDist(other.getPos())
-		return sqDistance <= (this.getRad() + other.getRad()) ** 2
+		const sqDistance = this.origin.squaredDist(other.getPos())
+		return sqDistance <= (this.rad + other.getRad()) ** 2
 	}
 }

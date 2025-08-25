@@ -10,39 +10,42 @@ describe('Polygon', () => {
 			let square: Polygon
 
 			beforeEach(() => {
-				square = new Polygon([
-					new Vector2(0, 0), // bottom left
-					new Vector2(10, 0), // bottom right
-					new Vector2(10, 10), // top right
-					new Vector2(0, 10), // top left
-				])
+				square = new Polygon(
+					[
+						new Vector2(0, 0), // bottom left
+						new Vector2(10, 0), // bottom right
+						new Vector2(10, 10), // top right
+						new Vector2(0, 10), // top left
+					],
+					new Vector2(1, 2)
+				)
 			})
 
 			test('should return true for points inside the square', () => {
-				expect(square.containsPoint(new Vector2(5, 5))).toBe(true)
-				expect(square.containsPoint(new Vector2(1, 1))).toBe(true)
-				expect(square.containsPoint(new Vector2(9, 9))).toBe(true)
+				expect(square.containsPoint(new Vector2(6, 7))).toBe(true)
+				expect(square.containsPoint(new Vector2(2, 3))).toBe(true)
+				expect(square.containsPoint(new Vector2(10, 11))).toBe(true)
 			})
 
 			test('should return false for points outside the square', () => {
-				expect(square.containsPoint(new Vector2(-5, 5))).toBe(false)
-				expect(square.containsPoint(new Vector2(15, 5))).toBe(false)
-				expect(square.containsPoint(new Vector2(5, 15))).toBe(false)
-				expect(square.containsPoint(new Vector2(5, -5))).toBe(false)
+				expect(square.containsPoint(new Vector2(-4, 7))).toBe(false)
+				expect(square.containsPoint(new Vector2(16, 7))).toBe(false)
+				expect(square.containsPoint(new Vector2(6, 17))).toBe(false)
+				expect(square.containsPoint(new Vector2(6, -3))).toBe(false)
 			})
 
 			test('should handle edge cases on the boundary', () => {
 				// Points on edges
-				expect(square.containsPoint(new Vector2(0, 5))).toBe(true)
-				expect(square.containsPoint(new Vector2(5, 0))).toBe(true)
-				expect(square.containsPoint(new Vector2(10, 5))).toBe(true) // wtf
-				expect(square.containsPoint(new Vector2(5, 10))).toBe(true)
+				expect(square.containsPoint(new Vector2(1, 7))).toBe(true)
+				expect(square.containsPoint(new Vector2(6, 2))).toBe(true)
+				expect(square.containsPoint(new Vector2(11, 7))).toBe(true) // wtf
+				expect(square.containsPoint(new Vector2(6, 12))).toBe(true)
 
 				// Points on vertices
-				expect(square.containsPoint(new Vector2(0, 0))).toBe(true)
-				expect(square.containsPoint(new Vector2(10, 0))).toBe(true)
-				expect(square.containsPoint(new Vector2(10, 10))).toBe(true)
-				expect(square.containsPoint(new Vector2(0, 10))).toBe(true)
+				expect(square.containsPoint(new Vector2(1, 2))).toBe(true)
+				expect(square.containsPoint(new Vector2(11, 2))).toBe(true)
+				expect(square.containsPoint(new Vector2(11, 12))).toBe(true)
+				expect(square.containsPoint(new Vector2(1, 12))).toBe(true)
 			})
 		})
 
@@ -131,6 +134,87 @@ describe('Polygon', () => {
 
 				expect(thinPolygon.containsPoint(new Vector2(5, 0.05))).toBe(true)
 				expect(thinPolygon.containsPoint(new Vector2(5, 0.2))).toBe(false)
+			})
+		})
+
+		describe('with relative position (origin)', () => {
+			test('should work for a square polygon with origin (5, 10)', () => {
+				const square = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(10, 0),
+						new Vector2(10, 10),
+						new Vector2(0, 10),
+					],
+					new Vector2(5, 10)
+				)
+
+				// Points inside (shifted by origin)
+				expect(square.containsPoint(new Vector2(6, 11))).toBe(true)
+				expect(square.containsPoint(new Vector2(10, 15))).toBe(true)
+				expect(square.containsPoint(new Vector2(14, 19))).toBe(true)
+
+				// Points outside
+				expect(square.containsPoint(new Vector2(4, 11))).toBe(false)
+				expect(square.containsPoint(new Vector2(15, 25))).toBe(false)
+				expect(square.containsPoint(new Vector2(8, 9))).toBe(false)
+
+				// Points on the border (should be true)
+				expect(square.containsPoint(new Vector2(5, 15))).toBe(true)
+				expect(square.containsPoint(new Vector2(15, 20))).toBe(true)
+				expect(square.containsPoint(new Vector2(10, 10))).toBe(true)
+				expect(square.containsPoint(new Vector2(5, 10))).toBe(true)
+			})
+
+			test('should work for triangle with origin (-3, 7)', () => {
+				const triangle = new Polygon(
+					[new Vector2(0, 0), new Vector2(10, 0), new Vector2(5, 10)],
+					new Vector2(-3, 7)
+				)
+
+				// Inside
+				expect(triangle.containsPoint(new Vector2(2, 10))).toBe(true)
+				expect(triangle.containsPoint(new Vector2(4, 8))).toBe(true)
+				expect(triangle.containsPoint(new Vector2(1, 7))).toBe(true)
+
+				// Outside
+				expect(triangle.containsPoint(new Vector2(-10, 20))).toBe(false)
+				expect(triangle.containsPoint(new Vector2(13, 0))).toBe(false)
+				expect(triangle.containsPoint(new Vector2(-3, 17))).toBe(false)
+
+				// On border/vertex
+				expect(triangle.containsPoint(new Vector2(-3, 7))).toBe(true)
+				expect(triangle.containsPoint(new Vector2(7, 7))).toBe(true)
+				expect(triangle.containsPoint(new Vector2(2, 17))).toBe(true)
+			})
+
+			test('should work for concave polygon with origin (-7, -3)', () => {
+				const concavePolygon = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(10, 0),
+						new Vector2(10, 5),
+						new Vector2(5, 5),
+						new Vector2(5, 10),
+						new Vector2(0, 10),
+					],
+					new Vector2(-7, -3)
+				)
+
+				// Inside
+				expect(concavePolygon.containsPoint(new Vector2(0, 0))).toBe(true)
+				expect(concavePolygon.containsPoint(new Vector2(3, 1))).toBe(true)
+				expect(concavePolygon.containsPoint(new Vector2(-2, 6))).toBe(true)
+				expect(concavePolygon.containsPoint(new Vector2(-5, -2))).toBe(true)
+
+				// Concave hole
+				expect(concavePolygon.containsPoint(new Vector2(6, 7))).toBe(false)
+				expect(concavePolygon.containsPoint(new Vector2(4, 4))).toBe(false)
+				expect(concavePolygon.containsPoint(new Vector2(-1, 3))).toBe(false)
+
+				// Outside
+				expect(concavePolygon.containsPoint(new Vector2(-20, 0))).toBe(false)
+				expect(concavePolygon.containsPoint(new Vector2(20, 20))).toBe(false)
 			})
 		})
 	})
@@ -304,6 +388,81 @@ describe('Polygon', () => {
 				])
 				expect(square.intersect(concavePolygon)).toBe(true)
 				expect(concavePolygon.intersect(square)).toBe(true)
+			})
+		})
+		describe('with relative position (origin)', () => {
+			test('basic test', () => {
+				const poly1 = new Polygon(
+					[
+						new Vector2(-1, -1),
+						new Vector2(-1, 0),
+						new Vector2(0, 1),
+						new Vector2(1, 0),
+					],
+					new Vector2(-1, -1)
+				)
+
+				const poly2 = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(1, 0),
+						new Vector2(1, 1),
+						new Vector2(0, 1),
+					],
+					new Vector2(-1.5, -1.5)
+				)
+
+				expect(poly1.intersect(poly2)).toBe(true)
+				expect(poly2.intersect(poly1)).toBe(true)
+			})
+			test('should detect intersection for two polygons with different origins', () => {
+				const poly1 = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(10, 0),
+						new Vector2(10, 10),
+						new Vector2(0, 10),
+					],
+					new Vector2(0, 0)
+				)
+
+				const poly2 = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(5, 0),
+						new Vector2(5, 5),
+						new Vector2(0, 5),
+					],
+					new Vector2(8, 8)
+				) // poly2 moved to (8,8)-(13,13)
+
+				expect(poly1.intersect(poly2)).toBe(true)
+				expect(poly2.intersect(poly1)).toBe(true)
+			})
+
+			test('should not detect intersection for separated polygons with origins', () => {
+				const poly1 = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(3, 0),
+						new Vector2(3, 3),
+						new Vector2(0, 3),
+					],
+					new Vector2(0, 0)
+				)
+
+				const poly2 = new Polygon(
+					[
+						new Vector2(0, 0),
+						new Vector2(2, 0),
+						new Vector2(2, 2),
+						new Vector2(0, 2),
+					],
+					new Vector2(10, 10)
+				)
+
+				expect(poly1.intersect(poly2)).toBe(false)
+				expect(poly2.intersect(poly1)).toBe(false)
 			})
 		})
 	})
