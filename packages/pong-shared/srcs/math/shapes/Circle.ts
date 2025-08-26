@@ -7,23 +7,21 @@ import { Shape } from './Shape'
 export class Circle extends Shape {
 	private rad!: number
 
-	constructor(
-		private pos: Vector2,
-		rad: number
-	) {
-		super()
+	constructor(origin: Vector2 = new Vector2(), rad: number) {
+		super(origin)
 		this.setRad(rad)
 	}
 
-	getPos(): Vector2 {
-		return this.pos
+	public getPos(): Vector2 {
+		return this.origin
 	}
-	getRad(): number {
+
+	public getRad(): number {
 		return this.rad
 	}
 
-	setPos(pos: Vector2): void {
-		this.pos = pos
+	public setPos(pos: Vector2): void {
+		this.origin = pos
 	}
 
 	setRad(rad: number): void {
@@ -83,8 +81,8 @@ export class Circle extends Shape {
 	}
 
 	private intersectCircle(other: Circle): boolean {
-		const sqDistance: number = this.getPos().squaredDist(other.getPos())
-		return sqDistance <= (this.getRad() + other.getRad()) ** 2
+		const sqDistance: number = this.origin.squaredDist(other.getPos())
+		return sqDistance <= (this.rad + other.getRad()) ** 2
 	}
 
 	public containsPoint(point: Vector2): boolean {

@@ -1,11 +1,16 @@
-import { Shape } from '../math/shapes/Shape'
+import { WorldRect } from './map/worldType/WorldRect'
+import { PongObject } from './objects/PongObject'
+import { World } from './map/World'
 
 export class PhysicsEngine {
-	private objs: Shape[] = []
+	private objs: PongObject[] = []
+	private world: World
 
-	public constructor() {}
+	public constructor() {
+		this.world = new WorldRect()
+	}
 
-	public addObj(obj: Shape) {
+	public addObj(obj: PongObject) {
 		this.objs.push(obj)
 	}
 
