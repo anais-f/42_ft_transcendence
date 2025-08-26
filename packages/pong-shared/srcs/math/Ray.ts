@@ -1,5 +1,5 @@
-import { S04BallVeloChange } from '../network/Packet/Server/SPackets'
 import { Segment } from './Segment'
+import { Circle } from './shapes/Circle'
 import { Vector2 } from './Vector2'
 
 export class Ray {
@@ -33,14 +33,17 @@ export class Ray {
 
 	intersect(other: Segment): boolean
 	intersect(other: Ray): boolean
-	intersect(other: Segment | Ray): boolean {
+	intersect(other: Circle): boolean
+
+	intersect(other: Segment | Circle | Ray): boolean {
 		if (other instanceof Segment) {
 			return this.intersectSegment(other)
 		} else if (other instanceof Ray) {
 			return this.intersectRay(other)
-		} else {
-			throw 'Invalid intersect type expected: Segment'
+		} else if (other instanceof Circle) {
+			return other.intersect(this)
 		}
+		throw 'Invalid type'
 	}
 
 	private intersectRay(other: Ray): boolean {

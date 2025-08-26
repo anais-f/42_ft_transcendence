@@ -97,7 +97,7 @@ describe('WorldRect', () => {
 			})
 		})
 		describe('Circle - extra cases', () => {
-			test('tiny circle in the top-left corner (inside)', () => {
+			test('tiny circle in the top-left corner', () => {
 				const c = new Circle(new Vector2(-19.999, -9.999), 0.001)
 				expect(w.isInside(c)).toBe(true)
 			})
