@@ -107,4 +107,27 @@ describe('Circle', () => {
 			expect(c1.intersect(c2)).toBe(false)
 		})
 	})
+
+	describe('containsPoint', () => {
+		let circle: Circle
+
+		beforeEach(() => {
+			circle = new Circle(new Vector2(0, 0), 5)
+		})
+
+		test('point inside the circle', () => {
+			const pointInside = new Vector2(3, 4)
+			expect(circle.containsPoint(pointInside)).toBe(true)
+		})
+
+		test('point on the edge of the circle', () => {
+			const pointOnEdge = new Vector2(5, 0)
+			expect(circle.containsPoint(pointOnEdge)).toBe(true)
+		})
+
+		test('point outside the circle', () => {
+			const pointOutside = new Vector2(6, 0)
+			expect(circle.containsPoint(pointOutside)).toBe(false)
+		})
+	})
 })
