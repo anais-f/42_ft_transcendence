@@ -111,7 +111,7 @@ describe('Circle', () => {
 		describe('intersect Ray', () => {
 			test('intersect method should exist for Ray', () => {
 				const c = new Circle(new Vector2(0, 0), 5)
-				const r = new Ray(new Vector2(0, -10), new Vector2(0, 1)) // Un rayon pointant vers le haut
+				const r = new Ray(new Vector2(0, -10), new Vector2(0, 1))
 
 				expect(() => {
 					c.intersect(r)
@@ -120,25 +120,25 @@ describe('Circle', () => {
 
 			test('intersect with ray inside circle', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayInside = new Ray(new Vector2(0, 0), new Vector2(1, 1)) // Un rayon partant du centre
+				const rayInside = new Ray(new Vector2(0, 0), new Vector2(1, 1))
 				expect(circle.intersect(rayInside)).toBe(true)
 			})
 
 			test('intersect with ray touching circle', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayTouching = new Ray(new Vector2(0, 5), new Vector2(1, 0)) // Un rayon tangent au cercle
+				const rayTouching = new Ray(new Vector2(0, 5), new Vector2(1, 0))
 				expect(circle.intersect(rayTouching)).toBe(true)
 			})
 
 			test('intersect with ray outside circle', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayOutside = new Ray(new Vector2(10, 10), new Vector2(1, 1)) // Un rayon qui ne touche pas le cercle
+				const rayOutside = new Ray(new Vector2(10, 10), new Vector2(1, 1))
 				expect(circle.intersect(rayOutside)).toBe(false)
 			})
 
 			test('intersect with ray partially inside', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayPartial = new Ray(new Vector2(-10, -10), new Vector2(1, 1)) // Un rayon qui entre dans le cercle
+				const rayPartial = new Ray(new Vector2(-10, -10), new Vector2(1, 1))
 				expect(circle.intersect(rayPartial)).toBe(true)
 			})
 
@@ -156,13 +156,13 @@ describe('Circle', () => {
 
 			test('intersect with ray starting inside circle', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayStartingInside = new Ray(new Vector2(1, 1), new Vector2(1, 1)) // Un rayon partant d'un point à l'intérieur
+				const rayStartingInside = new Ray(new Vector2(1, 1), new Vector2(1, 1))
 				expect(circle.intersect(rayStartingInside)).toBe(true)
 			})
 
 			test('intersect with ray starting at circle edge', () => {
 				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayAtEdge = new Ray(new Vector2(5, 0), new Vector2(1, 0)) // Un rayon partant du bord du cercle
+				const rayAtEdge = new Ray(new Vector2(5, 0), new Vector2(1, 0))
 				expect(circle.intersect(rayAtEdge)).toBe(true)
 			})
 		})
