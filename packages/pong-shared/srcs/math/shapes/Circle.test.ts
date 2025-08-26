@@ -150,7 +150,7 @@ describe('Circle', () => {
 
 			test('outside but close', () => {
 				const circle = new Circle(new Vector2(), 5)
-				const r = new Ray(new Vector2(10, -10), new Vector2(-4, 18).normalize())
+				const r = new Ray(new Vector2(10, -10), new Vector2(-8, 18).normalize())
 				expect(circle.intersect(r)).toBe(false)
 			})
 
