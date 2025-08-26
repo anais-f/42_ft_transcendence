@@ -47,4 +47,9 @@ export class Circle extends Shape {
 		const sqDistance: number = this.getPos().squaredDist(other.getPos())
 		return sqDistance <= (this.getRad() + other.getRad()) ** 2
 	}
+
+	public containsPoint(point: Vector2): boolean {
+		const sqDistance: number = this.getPos().squaredDist(point)
+		return sqDistance <= this.getRad() ** 2
+	}
 }
