@@ -1,21 +1,15 @@
 import { Vector2 } from '../Vector2'
 
-export interface IShape {
-	clone(): Shape
-	intersect(other: Shape): boolean
-	containsPoint(point: Vector2): boolean
-}
-
-export abstract class Shape {
+export abstract class AShape {
 	protected origin: Vector2
 
 	public constructor(origin: Vector2 = new Vector2()) {
 		this.origin = origin
 	}
 
-	abstract intersect(_other: Shape): boolean
+	abstract intersect(_other: AShape): boolean
 	abstract containsPoint(point: Vector2): boolean
-	abstract clone(): Shape
+	abstract clone(): AShape
 
 	setOrigin(o: Vector2): void {
 		this.origin = o

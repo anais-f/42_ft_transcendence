@@ -1,13 +1,13 @@
-import { Shape } from '../../math/shapes/Shape'
+import { AShape } from '../../math/shapes/AShape'
 import { Vector2 } from '../../math/Vector2'
 
 export class PongObject {
 	private origin: Vector2
 	private velocity: Vector2
-	private hitbox: Shape[] = []
+	private hitbox: AShape[] = []
 
 	constructor(
-		hitbox: Shape | Shape[],
+		hitbox: AShape | AShape[],
 		origin: Vector2 = new Vector2(),
 		velocity: Vector2 = new Vector2()
 	) {
@@ -24,7 +24,7 @@ export class PongObject {
 		return this.velocity
 	}
 
-	getHitbox(): Shape[] {
+	getHitbox(): AShape[] {
 		return this.hitbox
 	}
 
