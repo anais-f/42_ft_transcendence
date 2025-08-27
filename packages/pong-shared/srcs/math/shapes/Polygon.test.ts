@@ -502,21 +502,31 @@ describe('Polygon', () => {
 	})
 	describe('clone', () => {
 		test('value', () => {
-			 const p1 = new Polygon([new Vector2(), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0)])
-			 const p2 = p1.clone()
+			const p1 = new Polygon([
+				new Vector2(),
+				new Vector2(0, 1),
+				new Vector2(1, 1),
+				new Vector2(1, 0),
+			])
+			const p2 = p1.clone()
 
-			 expect(p1).toEqual(p2)
+			expect(p1).toEqual(p2)
 		})
 		test('deep copy', () => {
-			 const p1 = new Polygon([new Vector2(), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0)])
-			 const p2 = p1.clone()
-			 p1.getSegment()[0].getP1().setX(6)
+			const p1 = new Polygon([
+				new Vector2(),
+				new Vector2(0, 1),
+				new Vector2(1, 1),
+				new Vector2(1, 0),
+			])
+			const p2 = p1.clone()
+			p1.getSegment()[0].getP1().setX(6)
 
-			 expect(p1).not.toEqual(p2)
+			expect(p1).not.toEqual(p2)
 
-			 p1.setOrigin(new Vector2(8, 9))
+			p1.setOrigin(new Vector2(8, 9))
 
-			 expect(p2.getOrigin()).toEqual(new Vector2())
+			expect(p2.getOrigin()).toEqual(new Vector2())
 		})
 	})
 })
