@@ -32,4 +32,11 @@ export class Rectangle extends Polygon {
 	public getHeight(): number {
 		return this.height
 	}
+
+	public clone(): Rectangle {
+		return new Rectangle(
+			this.origin,
+			new Vector2(this.getWidth(), this.getHeight())
+		)
+	}
 }

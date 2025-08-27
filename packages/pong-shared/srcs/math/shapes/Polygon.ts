@@ -139,4 +139,9 @@ export class Polygon extends Shape {
 	public getSegment(): Segment[] {
 		return this.segments
 	}
+
+	public clone(): Polygon {
+		const points = this.segments.map((seg) => seg.getP1().clone())
+		return new Polygon(points, this.origin)
+	}
 }

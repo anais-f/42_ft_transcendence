@@ -20,10 +20,6 @@ export class Circle extends Shape {
 		return this.rad
 	}
 
-	public setPos(pos: Vector2): void {
-		this.origin = pos
-	}
-
 	setRad(rad: number): void {
 		if (rad <= 0) {
 			throw 'Invlalid Radius'
@@ -88,5 +84,9 @@ export class Circle extends Shape {
 	public containsPoint(point: Vector2): boolean {
 		const sqDistance: number = this.getPos().squaredDist(point)
 		return sqDistance <= this.getRad() ** 2
+	}
+
+	public clone(): Circle {
+		return new Circle(this.getPos().clone(), this.rad)
 	}
 }
