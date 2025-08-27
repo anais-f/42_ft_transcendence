@@ -6,16 +6,16 @@ export interface IShape {
 	containsPoint(point: Vector2): boolean
 }
 
-export class Shape {
+export abstract class Shape {
 	protected origin: Vector2
 
 	public constructor(origin: Vector2 = new Vector2()) {
 		this.origin = origin
 	}
 
-	intersect(_other: Shape): boolean {
-		throw 'unknow shape'
-	}
+	abstract intersect(_other: Shape): boolean
+	abstract containsPoint(point: Vector2): boolean
+	abstract clone(): Shape
 
 	setOrigin(o: Vector2): void {
 		this.origin = o
