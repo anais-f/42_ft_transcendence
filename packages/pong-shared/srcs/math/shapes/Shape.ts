@@ -1,5 +1,11 @@
 import { Vector2 } from '../Vector2'
 
+export interface IShape {
+	clone(): Shape
+	intersect(other: Shape): boolean
+	containsPoint(point: Vector2): boolean
+}
+
 export class Shape {
 	protected origin: Vector2
 

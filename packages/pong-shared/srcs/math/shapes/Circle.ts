@@ -2,9 +2,9 @@ import { Ray } from '../Ray'
 import { Segment } from '../Segment'
 import { Vector2 } from '../Vector2'
 import { Polygon } from './Polygon'
-import { Shape } from './Shape'
+import { IShape, Shape } from './Shape'
 
-export class Circle extends Shape {
+export class Circle extends Shape implements IShape {
 	private rad!: number
 
 	constructor(origin: Vector2 = new Vector2(), rad: number) {

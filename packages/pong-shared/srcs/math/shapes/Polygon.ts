@@ -2,9 +2,9 @@ import { Vector2 } from '../Vector2'
 import { Circle } from './Circle'
 import { Ray } from '../Ray'
 import { Segment } from '../Segment'
-import { Shape } from './Shape'
+import { IShape, Shape } from './Shape'
 
-export class Polygon extends Shape {
+export class Polygon extends Shape implements IShape {
 	private segments: Segment[] = []
 	private relativePoints: Vector2[]
 
