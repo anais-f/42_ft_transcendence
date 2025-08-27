@@ -11,6 +11,10 @@ export class Shape {
 		throw 'unknow shape'
 	}
 
+	setOrigin(o: Vector2): void {
+		this.origin = o
+	}
+
 	getOrigin(): Vector2 {
 		return this.origin
 	}
