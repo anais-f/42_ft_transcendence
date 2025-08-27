@@ -6,7 +6,7 @@ export class PongObject {
 	private velocity: Vector2
 	private hitbox: AShape[] = []
 
-	constructor(
+	public constructor(
 		hitbox: AShape | AShape[],
 		origin: Vector2 = new Vector2(),
 		velocity: Vector2 = new Vector2()
@@ -20,23 +20,49 @@ export class PongObject {
 		this.velocity = velocity
 	}
 
-	getVelocity(): Vector2 {
+	public getVelocity(): Vector2 {
 		return this.velocity
 	}
 
-	getHitbox(): AShape[] {
+	public getHitbox(): AShape[] {
 		return this.hitbox
 	}
 
-	getOrigin(): Vector2 {
+	public getOrigin(): Vector2 {
 		return this.origin
 	}
 
-	static clone(obj: PongObject) {
-		return new PongObject(obj.getHitbox(), obj.getOrigin(), obj.getVelocity())
+	public setOrigin(o: Vector2) {
+		this.origin = o
 	}
 
-	clone() {
+	public static clone(obj: PongObject): PongObject{
+		const dupHitbox = obj.getHitbox().map((h) => h.clone())
+		return new PongObject(dupHitbox, obj.getOrigin().clone(), obj.getVelocity().clone())
+	}
+
+	public clone() {
 		return PongObject.clone(this)
 	}
+
+	public intersect(other: PongObject): boolean {
+		const createAbsHitbox = (hitbox: AShape, origin: Vector2) => {
+			const clonedHitbox = hitbox.clone()
+			clonedHitbox.setOrigin(origin.clone())
+			return clonedHitbox
+		}
+
+		const absLocalHitbox = this.hitbox.map(h => createAbsHitbox(h, this.origin))
+		const absOtherHitbox = other.getHitbox().map(h => createAbsHitbox(h, other.getOrigin()))
+
+		for (let localObj of absLocalHitbox) {
+			for (let otherObj of absOtherHitbox) {
+				if (otherObj.intersect(localObj)) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
 }
