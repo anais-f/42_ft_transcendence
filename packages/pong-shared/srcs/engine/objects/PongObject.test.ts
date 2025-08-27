@@ -60,7 +60,7 @@ describe('PongObject', () => {
 
 			o1.setOrigin(new Vector2(-1.5, 0.5))
 			o2.setOrigin(new Vector2(1.5, 0.5))
-			
+
 			expect(o1.intersect(o2)).toBe(true)
 		})
 

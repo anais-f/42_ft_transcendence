@@ -20,6 +20,13 @@ export class PongObject {
 		this.velocity = velocity
 	}
 
+	public applyVelo() {
+		this.origin.setXY(
+			this.origin.getX() + this.velocity.getX(),
+			this.origin.getY() + this.velocity.getY()
+		)
+	}
+
 	public getVelocity(): Vector2 {
 		return this.velocity
 	}
@@ -36,9 +43,13 @@ export class PongObject {
 		this.origin = o
 	}
 
-	public static clone(obj: PongObject): PongObject{
+	public static clone(obj: PongObject): PongObject {
 		const dupHitbox = obj.getHitbox().map((h) => h.clone())
-		return new PongObject(dupHitbox, obj.getOrigin().clone(), obj.getVelocity().clone())
+		return new PongObject(
+			dupHitbox,
+			obj.getOrigin().clone(),
+			obj.getVelocity().clone()
+		)
 	}
 
 	public clone() {
@@ -52,8 +63,12 @@ export class PongObject {
 			return clonedHitbox
 		}
 
-		const absLocalHitbox = this.hitbox.map(h => createAbsHitbox(h, this.origin))
-		const absOtherHitbox = other.getHitbox().map(h => createAbsHitbox(h, other.getOrigin()))
+		const absLocalHitbox = this.hitbox.map((h) =>
+			createAbsHitbox(h, this.origin)
+		)
+		const absOtherHitbox = other
+			.getHitbox()
+			.map((h) => createAbsHitbox(h, other.getOrigin()))
 
 		for (let localObj of absLocalHitbox) {
 			for (let otherObj of absOtherHitbox) {
@@ -64,5 +79,4 @@ export class PongObject {
 		}
 		return false
 	}
-
 }
