@@ -8,7 +8,7 @@ export enum WorldShape {
 	Rectangle,
 }
 
-export class World {
+export abstract class AWorld {
 	private shape: WorldShape
 	private map: PongMap
 
@@ -25,18 +25,10 @@ export class World {
 		return this.map.getObjs()
 	}
 
-	// Vec2, Segment, Polygon, Circle
-	public isInside(o: Vector2): boolean
-	public isInside(o: Segment): boolean
-	public isInside(o: Circle): boolean
-	public isInside(o: Polygon): boolean
+	public abstract isInside(o: Vector2): boolean
+	public abstract isInside(o: Segment): boolean
+	public abstract isInside(o: Circle): boolean
+	public abstract isInside(o: Polygon): boolean
 
-	public isInside(o: Vector2 | Segment | Circle | Polygon): boolean {
-		if (o instanceof Vector2) {
-		} else if (o instanceof Segment) {
-		} else if (o instanceof Circle) {
-		} else if (o instanceof Polygon) {
-		}
-		throw 'Invalid type'
-	}
+	public abstract isInside(_o: Vector2 | Segment | Circle | Polygon): boolean
 }

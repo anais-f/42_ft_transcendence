@@ -3,10 +3,10 @@ import { Segment } from '../../../math/Segment'
 import { Circle } from '../../../math/shapes/Circle'
 import { Polygon } from '../../../math/shapes/Polygon'
 import { PongMap } from '../Map'
-import { World, WorldShape } from '../World'
+import { AWorld, WorldShape } from '../AWorld'
 import { Rectangle } from '../../../math/shapes/Rectangle'
 
-export class WorldRect extends World {
+export class WorldRect extends AWorld {
 	private rect: Rectangle = new Rectangle(
 		new Vector2(-20, -10),
 		new Vector2(40, 20)
