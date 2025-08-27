@@ -12,7 +12,7 @@ describe('Circle', () => {
 
 	test('circle setter', () => {
 		const c = new Circle(new Vector2(), 1)
-		c.setPos(new Vector2(5, 6))
+		c.setOrigin(new Vector2(5, 6))
 		c.setRad(5)
 		expect(c.getPos()).toEqual(new Vector2(5, 6))
 		expect(c.getRad()).toBe(5)
@@ -188,6 +188,28 @@ describe('Circle', () => {
 		test('point outside the circle', () => {
 			const pointOutside = new Vector2(6, 0)
 			expect(circle.containsPoint(pointOutside)).toBe(false)
+		})
+	})
+	describe('clone', () => {
+		test('value', () => {
+			const c1 = new Circle(new Vector2(), 5)
+			const c2 = c1.clone()
+
+			expect(c1).toEqual(c2)
+		})
+
+		test('deep copy', () => {
+			const c1 = new Circle(new Vector2(), 5)
+			const c2 = c1.clone()
+
+			c1.setRad(6)
+			c1.setOrigin(new Vector2(-1, -1))
+
+			expect(c1).not.toBe(c2)
+			expect(c1.getPos()).not.toEqual(c2.getPos())
+			expect(c1.getRad()).not.toEqual(c2.getRad())
+			expect(c1.getPos()).toEqual(new Vector2(-1, -1))
+			expect(c1.getRad()).toEqual(6)
 		})
 	})
 })
