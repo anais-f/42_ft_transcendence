@@ -1,6 +1,6 @@
 import { WorldRect } from './map/worldType/WorldRect'
 import { PongObject } from './objects/PongObject'
-import { AWorld } from './map/World'
+import { AWorld } from './map/AWorld'
 
 export class PhysicsEngine {
 	private objs: PongObject[] = []
