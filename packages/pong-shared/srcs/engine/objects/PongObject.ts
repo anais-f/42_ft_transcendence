@@ -59,7 +59,7 @@ export class PongObject {
 	public intersect(other: PongObject): boolean {
 		const createAbsHitbox = (hitbox: AShape, origin: Vector2) => {
 			const clonedHitbox = hitbox.clone()
-			clonedHitbox.setOrigin(origin.clone())
+			clonedHitbox.addToOrigin(origin.clone())
 			return clonedHitbox
 		}
 

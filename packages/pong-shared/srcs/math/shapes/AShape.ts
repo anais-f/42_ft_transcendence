@@ -15,6 +15,10 @@ export abstract class AShape {
 		this.origin = o
 	}
 
+	addToOrigin(v: Vector2): void {
+		this.origin.add(v)
+	}
+
 	getOrigin(): Vector2 {
 		return this.origin
 	}
