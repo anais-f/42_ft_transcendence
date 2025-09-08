@@ -77,6 +77,12 @@ describe('PongObject', () => {
 			obj1.setOrigin(new Vector2(0, 1))
 			obj2.setOrigin(new Vector2(0, -1))
 			expect(obj2.intersect(obj1)).toBe(true)
-		})
+
+			const obj3 = new PongObject(new Circle(new Vector2(0, 0), .2), new Vector2(), new Vector2())
+
+			expect(obj1.intersect(obj3)).toBe(false)
+			expect(obj2.intersect(obj3)).toBe(false)
+
+		}) // TODO: issue detected in OBJ but i forgot :skull:
 	})
 })
