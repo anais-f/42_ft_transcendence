@@ -137,4 +137,17 @@ export class Vector2 {
 		this.y = result.getY()
 		return this
 	}
+
+	public static reflect(v: Vector2, normal: Vector2): Vector2 {
+		const dot = this.dot(v, normal)
+		return new Vector2(
+			v.getX() - 2 * dot * normal.getX(),
+			v.getY() - 2 * dot * normal.getY()
+		)
+	}
+
+	public reflect(normal: Vector2): Vector2 {
+		return Vector2.reflect(this, normal);
+	}
+
 }
