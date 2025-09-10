@@ -107,12 +107,12 @@ export class Segment {
 		return Segment.pointIsOnSeg(this.p1, this.p2, p)
 	}
 
-	public distanceToPoint(point: Vector2): number { 
+	public distanceToPoint(point: Vector2): number {
 		const closestPoint = this.closestPointToPoint(point)
 		return point.dist(closestPoint)
 	}
 
-	public closestPointToPoint(point: Vector2): Vector2 { 
+	public closestPointToPoint(point: Vector2): Vector2 {
 		const segmentVector = Vector2.subtract(this.p2, this.p1)
 		const segmentLengthSquared = segmentVector.squaredLength()
 
@@ -121,12 +121,21 @@ export class Segment {
 		}
 
 		const pointVector = Vector2.subtract(point, this.p1)
-		const projection = Vector2.dot(pointVector, segmentVector) / segmentLengthSquared
+		const projection =
+			Vector2.dot(pointVector, segmentVector) / segmentLengthSquared
 
 		if (projection <= 0) return this.p1.clone()
 		if (projection >= 1) return this.p2.clone()
 
 		const segmentVectorClone = segmentVector.clone()
 		return Vector2.add(this.p1, segmentVectorClone.multiply(projection))
+	}
+
+	public getNormal(): Vector2 {
+		const dx = this.p2.getX() - this.p1.getX()
+		const dy = this.p2.getY() - this.p1.getY()
+		const normal = new Vector2(-dy, dx)
+
+		return normal.normalize()
 	}
 }
