@@ -27,12 +27,12 @@ export class Circle extends AShape {
 		this.rad = rad
 	}
 
-	intersect(other: Segment): boolean
-	intersect(other: Circle): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Polygon): boolean
+	intersect(other: Segment): Vector2 | null
+	intersect(other: Circle): Vector2 | null
+	intersect(other: Ray): Vector2 | null
+	intersect(other: Polygon): Vector2 | null
 
-	intersect(other: Segment | Ray | Polygon | Circle): boolean {
+	intersect(other: Segment | Ray | Polygon | Circle): Vector2 | null {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
@@ -45,7 +45,7 @@ export class Circle extends AShape {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): boolean {
+	private intersectRay(other: Ray): Vector2 | null {
 		const rayOrigin = other.getOrigin()
 		const rayDirection = other.getDirection()
 
@@ -56,14 +56,14 @@ export class Circle extends AShape {
 		const squaredRadius = this.getRad() * this.getRad()
 
 		if (squaredDistanceToCenter <= squaredRadius) {
-			return true
+			return new Vector2() // TODO
 		}
 
 		const toCircle = Vector2.subtract(this.getPos(), rayOrigin)
 		const projection = Vector2.dot(toCircle, rayDirection)
 
 		if (projection < 0) {
-			return false
+			return null
 		}
 
 		const scaledDirection = Vector2.multiply(rayDirection, projection)
@@ -72,13 +72,17 @@ export class Circle extends AShape {
 			closestPoint,
 			this.getPos()
 		)
-
-		return squaredDistanceToClosest <= squaredRadius
+		
+		if (squaredDistanceToClosest <= squaredRadius) {
+			return new Vector2() // TODO
+		} else return null
 	}
 
-	private intersectCircle(other: Circle): boolean {
+	private intersectCircle(other: Circle): Vector2 | null {
 		const sqDistance: number = this.origin.squaredDist(other.getPos())
-		return sqDistance <= (this.rad + other.getRad()) ** 2
+		if (sqDistance <= (this.rad + other.getRad()) ** 2) {
+			return new Vector2() // TODO
+		} else return null
 	}
 
 	public containsPoint(point: Vector2): boolean {

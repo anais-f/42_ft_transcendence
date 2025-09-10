@@ -21,11 +21,11 @@ export class Segment {
 		return this.p2
 	}
 
-	intersect(other: Circle): boolean
-	intersect(other: Segment): boolean
-	intersect(other: Polygon): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Circle | Segment | Polygon | Ray): boolean {
+	intersect(other: Circle): Vector2 | null
+	intersect(other: Segment): Vector2 | null
+	intersect(other: Polygon): Vector2 | null
+	intersect(other: Ray): Vector2 | null
+	intersect(other: Circle | Segment | Polygon | Ray): Vector2 | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
@@ -38,7 +38,7 @@ export class Segment {
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(other: Segment): boolean {
+	private intersectSeg(other: Segment): Vector2 | null {
 		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
@@ -54,7 +54,7 @@ export class Segment {
 			((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
-			return true
+			return new Vector2() // TODO
 		}
 
 		if (d1 === 0 && Segment.pointIsOnSeg(p3, p4, this.p1)) return true
@@ -62,10 +62,10 @@ export class Segment {
 		if (d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) return true
 		if (d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4)) return true
 
-		return false
+		return null
 	}
 
-	private intersectCircle(other: Circle): boolean {
+	private intersectCircle(other: Circle): Vector2 | null {
 		const segVector = Vector2.subtract(this.p2, this.p1)
 		const segLengthSq = segVector.squaredLength()
 
@@ -79,7 +79,10 @@ export class Segment {
 
 		const distToCircle = Vector2.subtract(closestP, other.getPos()).magnitude()
 
-		return distToCircle <= other.getRad()
+		if (distToCircle <= other.getRad()) {
+			return new Vector2() // TODO
+		}
+		return null
 	}
 
 	static pointIsOnSeg(p1: Vector2, p2: Vector2, point: Vector2): boolean {
@@ -103,7 +106,7 @@ export class Segment {
 		return Segment.pointIsOnSeg(s.getP1(), s.getP2(), p)
 	}
 
-	contain(p: Vector2): boolean {
+	public contain(p: Vector2): boolean {
 		return Segment.pointIsOnSeg(this.p1, this.p2, p)
 	}
 

@@ -31,11 +31,11 @@ export class Ray {
 		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
-	intersect(other: Segment): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Circle): boolean
+	intersect(other: Segment): Vector2 | null
+	intersect(other: Ray): Vector2 | null
+	intersect(other: Circle): Vector2 | null
 
-	intersect(other: Segment | Circle | Ray): boolean {
+	intersect(other: Segment | Circle | Ray): Vector2 | null {
 		if (other instanceof Segment) {
 			return this.intersectSegment(other)
 		} else if (other instanceof Ray) {
@@ -46,11 +46,11 @@ export class Ray {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): boolean {
+	private intersectRay(other: Ray): Vector2 | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
 		if (Math.abs(crossProduct) < Number.EPSILON) {
-			return false
+			return null
 		}
 
 		const t1 =
@@ -62,10 +62,13 @@ export class Ray {
 				this.getDirection()
 			) / crossProduct
 
-		return t1 >= 0 && t2 >= 0
+		if (t1 >= 0 && t2 >= 0) {
+			return new Vector2() // TODO
+		}
+		return null
 	}
 
-	private intersectSegment(other: Segment): boolean {
+	private intersectSegment(other: Segment): Vector2 | null {
 		const [start, end]: Vector2[] = other.getPoints()
 		const segV = Vector2.subtract(end, start)
 
@@ -77,9 +80,11 @@ export class Ray {
 				const t0 =
 					Vector2.dot(v1, this.getDirection()) /
 					this.getDirection().squaredLength()
-				return t0 >= 0
+				if (t0 >= 0) {
+					return new Vector2() // TODO
+				} else return null
 			}
-			return false
+			return null
 		}
 
 		const t1 =
@@ -88,6 +93,9 @@ export class Ray {
 			Vector2.subtract(start, this.getOrigin()).cross(this.getDirection()) /
 			crossProduct
 
-		return t1 >= 0 && t2 >= 0 && t2 <= 1
+		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
+			return new Vector2() // TODO
+		}
+		return null
 	}
 }

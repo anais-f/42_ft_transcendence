@@ -7,10 +7,10 @@ export abstract class AShape {
 		this.origin = origin
 	}
 
-	abstract intersect(_other: AShape): boolean
+	abstract intersect(_other: AShape): Vector2 | null 
 	abstract containsPoint(point: Vector2): boolean
 	abstract clone(): AShape
-	abstract getNormalAt(point: Vector2): Vector2 // TODO: UNIT TEST
+	abstract getNormalAt(point: Vector2): Vector2 
 
 	setOrigin(o: Vector2): void {
 		this.origin = o
