@@ -144,4 +144,42 @@ export class Polygon extends AShape {
 		const points = this.segments.map((seg) => seg.getP1().clone())
 		return new Polygon(points, this.origin)
 	}
+
+	private getCentroid(): Vector2 {
+		const vertices = this.getAbsolutePoints()
+		const xSum = vertices.reduce((sum, v) => sum + v.getX(), 0)
+		const ySum = vertices.reduce((sum, v) => sum + v.getY(), 0)
+		const count = vertices.length
+		return new Vector2(xSum / count, ySum / count)
+	}
+
+	public getNormalAt(point: Vector2): Vector2 {
+		const segments = this.getAbsoluteSegments()
+
+		let minDist = Infinity
+		let closestSeg: Segment | null = null
+
+		for (const seg of segments) {
+			const dist = seg.distanceToPoint(point)
+			if (dist < minDist) {
+				minDist = dist
+				closestSeg = seg
+			}
+		}
+
+		if (!closestSeg) {
+			throw new Error('No segment found for normal calculation')
+		}
+
+		let normal = closestSeg.getNormal()
+
+		const centroid = this.getCentroid()
+		const dirToCentroid = Vector2.subtract(centroid, point)
+
+		if (Vector2.dot(normal, dirToCentroid) > 0) {
+			normal.negate()
+		}
+
+		return normal.normalize()
+	}
 }

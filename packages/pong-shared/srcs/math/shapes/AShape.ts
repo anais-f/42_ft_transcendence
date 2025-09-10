@@ -10,6 +10,7 @@ export abstract class AShape {
 	abstract intersect(_other: AShape): boolean
 	abstract containsPoint(point: Vector2): boolean
 	abstract clone(): AShape
+	abstract getNormalAt(point: Vector2): Vector2 // TODO: UNIT TEST
 
 	setOrigin(o: Vector2): void {
 		this.origin = o

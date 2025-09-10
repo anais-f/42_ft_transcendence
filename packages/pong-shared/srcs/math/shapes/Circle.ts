@@ -89,4 +89,10 @@ export class Circle extends AShape {
 	public clone(): Circle {
 		return new Circle(this.getPos().clone(), this.rad)
 	}
+
+	public getNormalAt(point: Vector2): Vector2 {
+		const normal = Vector2.subtract(point, this.getOrigin())
+		normal.normalize()
+		return normal
+	}
 }
