@@ -40,7 +40,7 @@ describe('PongObject', () => {
 				new Vector2()
 			)
 
-			expect(obj.intersect(obj)).toBe(true)
+			expect(obj.intersect(obj)).toBeGreaterThanOrEqual(0)
 		})
 
 		test('2 circle', () => {
@@ -48,7 +48,7 @@ describe('PongObject', () => {
 			const o1 = new PongObject(c, new Vector2(-1, 0), new Vector2())
 			const o2 = new PongObject(c, new Vector2(1, 0), new Vector2())
 
-			expect(o1.intersect(o2)).toBe(true)
+			expect(o1.intersect(o2)).toBeGreaterThanOrEqual(0)
 		})
 
 		test('test relative coord', () => {
@@ -56,12 +56,12 @@ describe('PongObject', () => {
 			const o1 = new PongObject(c, new Vector2(-13, 0), new Vector2())
 			const o2 = new PongObject(c, new Vector2(109, 0), new Vector2())
 
-			expect(o1.intersect(o2)).toBe(false)
+			expect(o1.intersect(o2)).toEqual(-1)
 
 			o1.setOrigin(new Vector2(-1.5, 0.5))
 			o2.setOrigin(new Vector2(1.5, 0.5))
 
-			expect(o1.intersect(o2)).toBe(true)
+			expect(o1.intersect(o2)).toBeGreaterThanOrEqual(0)
 		})
 
 		test('multiobj test', () => {
@@ -72,17 +72,26 @@ describe('PongObject', () => {
 			const obj2 = obj1.clone()
 			obj2.setOrigin(new Vector2(0, 10))
 
-			expect(obj2.intersect(obj1)).toBe(false)
+			expect(obj2.intersect(obj1)).toEqual(-1)
 
 			obj1.setOrigin(new Vector2(0, 1))
 			obj2.setOrigin(new Vector2(0, -1))
-			expect(obj2.intersect(obj1)).toBe(true)
+			expect(obj2.intersect(obj1)).toBeGreaterThanOrEqual(0)
 
-			const obj3 = new PongObject(new Circle(new Vector2(0, 0), .2), new Vector2(), new Vector2())
+			const obj3 = new PongObject(
+				new Circle(new Vector2(0, 0), 0.2),
+				new Vector2(),
+				new Vector2()
+			)
 
-			expect(obj1.intersect(obj3)).toBe(false)
-			expect(obj2.intersect(obj3)).toBe(false)
+			expect(obj1.intersect(obj3)).toEqual(-1)
+			expect(obj2.intersect(obj3)).toEqual(-1)
+		})
 
-		}) // TODO: issue detected in OBJ but i forgot :skull:
+		test('obj inside other', () => {
+			const o1 = new PongObject(new Circle(new Vector2(1, 5), 1), new Vector2())
+			const o2 = new PongObject(new Circle(new Vector2(), 20), new Vector2())
+			expect(o1.intersect(o2)).toBeGreaterThanOrEqual(0)
+		})
 	})
 })
