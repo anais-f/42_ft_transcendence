@@ -118,4 +118,93 @@ describe('Segment', () => {
 			expect(() => s.intersect({})).toThrow()
 		})
 	})
+
+
+	describe('distanceToPoint', () => {
+		test('distance to point on segment', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(2, 2)
+			expect(s.distanceToPoint(point)).toBe(0)
+		})
+		test('distance to point on segment 2', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(1, 1)
+			expect(s.distanceToPoint(point)).toBe(0)
+		})
+
+		test('distance to point on segment 3', () => {
+			const s = new Segment(new Vector2(-3.36, 2.82), new Vector2(3.1, -3.4))
+			const point = new Vector2(-2.26, 1.76)
+			const p2 = new Vector2(-1.8, 1.16)
+			expect(s.distanceToPoint(point)).toBeCloseTo(0)
+			expect(s.distanceToPoint(p2)).not.toBeCloseTo(0)
+			expect(s.distanceToPoint(p2)).toBeCloseTo(0.113)
+		})
+
+		test('distance to point off segment', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(0, 4)
+			expect(s.distanceToPoint(point)).toBeCloseTo(Math.sqrt(8))
+		})
+
+		test('distance to endpoint', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(0, 0)
+			expect(s.distanceToPoint(point)).toBe(0)
+		})
+	})
+
+
+
+	describe('closestPointToPoint', () => {
+		test('closest point on segment', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(2, 3)
+			const closestPoint = s.closestPointToPoint(point)
+			expect(closestPoint).toEqual(new Vector2(2.5, 2.5))
+		})
+
+		test('closest point at endpoint', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(5, 5)
+			const closestPoint = s.closestPointToPoint(point)
+			expect(closestPoint).toEqual(new Vector2(4, 4))
+		})
+
+		test('closest point when point is before segment', () => {
+			const s = new Segment(new Vector2(1, 1), new Vector2(3, 3))
+			const point = new Vector2(0, 0)
+			const closestPoint = s.closestPointToPoint(point)
+			expect(closestPoint).toEqual(new Vector2(1, 1))
+		})
+
+		test('closest point when point is after segment', () => {
+			const s = new Segment(new Vector2(1, 1), new Vector2(3, 3))
+			const point = new Vector2(4, 4)
+			const closestPoint = s.closestPointToPoint(point)
+			expect(closestPoint).toEqual(new Vector2(3, 3))
+		})
+	})
+
+	describe('contain', () => {
+		test('point on segment', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(2, 2)
+			expect(s.contain(point)).toBe(true)
+		})
+
+		test('point not on segment', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(5, 5)
+			expect(s.contain(point)).toBe(false)
+		})
+
+		test('point at endpoint', () => {
+			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
+			const point = new Vector2(0, 0)
+			expect(s.contain(point)).toBe(true)
+		})
+	})
+
+
 })
