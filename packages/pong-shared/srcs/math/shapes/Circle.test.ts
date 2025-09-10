@@ -212,4 +212,27 @@ describe('Circle', () => {
 			expect(c1.getRad()).toEqual(6)
 		})
 	})
+
+	describe('getNormalAt', () => {
+		test('normal at a point on the circle', () => {
+			const circle = new Circle(new Vector2(0, 0), 5)
+			const pointOnCircle = new Vector2(5, 0)
+			const normal = circle.getNormalAt(pointOnCircle)
+			expect(normal).toEqual(new Vector2(1, 0))
+		})
+
+		test('normal at a point on the circle (negative coordinates)', () => {
+			const circle = new Circle(new Vector2(0, 0), 5)
+			const pointOnCircle = new Vector2(-5, 0)
+			const normal = circle.getNormalAt(pointOnCircle)
+			expect(normal).toEqual(new Vector2(-1, 0))
+		})
+
+		test('normal at a point on the circle (non-axis aligned)', () => {
+			const circle = new Circle(new Vector2(0, 0), 5)
+			const pointOnCircle = new Vector2(3, 4)
+			const normal = circle.getNormalAt(pointOnCircle)
+			expect(normal).toEqual(new Vector2(0.6, 0.8))
+		})
+	})
 })

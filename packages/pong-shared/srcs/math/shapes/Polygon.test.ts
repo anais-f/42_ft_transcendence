@@ -529,4 +529,47 @@ describe('Polygon', () => {
 			expect(p2.getOrigin()).toEqual(new Vector2())
 		})
 	})
+
+	describe('normal', () => {
+		let polygon: Polygon
+
+		beforeEach(() => {
+			const vertices = [
+				new Vector2(0, 0),
+				new Vector2(5, 0),
+				new Vector2(2.5, 5),
+			]
+			polygon = new Polygon(vertices)
+		})
+
+		test('normal at point below the base', () => {
+			const point = new Vector2(2.5, -0.1)
+			const normal = polygon.getNormalAt(point)
+			expect(normal.getX()).toBeCloseTo(0)
+			expect(normal.getY()).toBeCloseTo(-1)
+		})
+
+		test('normal at point near left edge', () => {
+			const point = new Vector2(-0.1, 2.5)
+			const normal = polygon.getNormalAt(point)
+			const len = Math.sqrt(25 + 6.25)
+			expect(normal.getX()).toBeCloseTo(-5 / len)
+			expect(normal.getY()).toBeCloseTo(2.5 / len)
+		})
+
+		test('normal at point near right edge', () => {
+			const point = new Vector2(5.1, 2.5)
+			const normal = polygon.getNormalAt(point)
+			const expected = new Vector2(1.08, 0.54).normalize()
+			expect(normal.getX()).toBeCloseTo(expected.getX())
+			expect(normal.getY()).toBeCloseTo(expected.getY())
+		})
+
+		test('normal at point on a vertex (base left)', () => {
+			const point = new Vector2(0, 0)
+			const normal = polygon.getNormalAt(point)
+			expect(normal.getX()).toBeCloseTo(0)
+			expect(normal.getY()).toBeCloseTo(-1)
+		})
+	})
 })
