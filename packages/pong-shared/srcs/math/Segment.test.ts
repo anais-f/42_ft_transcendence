@@ -119,7 +119,6 @@ describe('Segment', () => {
 		})
 	})
 
-
 	describe('distanceToPoint', () => {
 		test('distance to point on segment', () => {
 			const s = new Segment(new Vector2(0, 0), new Vector2(4, 4))
@@ -153,8 +152,6 @@ describe('Segment', () => {
 			expect(s.distanceToPoint(point)).toBe(0)
 		})
 	})
-
-
 
 	describe('closestPointToPoint', () => {
 		test('closest point on segment', () => {
@@ -206,5 +203,31 @@ describe('Segment', () => {
 		})
 	})
 
+	describe('normal', () => {
+		test('horizontal one', () => {
+			const seg = new Segment(new Vector2(0, 0), new Vector2(10, 0))
+			const normal = seg.getNormal()
 
+			expect(Math.abs(normal.getX())).toBe(0)
+			expect(Math.abs(normal.getY())).toBe(1)
+		})
+
+		test('vertical one', () => {
+			const seg = new Segment(new Vector2(0, 0), new Vector2(0, 10))
+			const normal = seg.getNormal()
+
+			expect(Math.abs(normal.getX())).toBe(1)
+			expect(Math.abs(normal.getY())).toBe(0)
+		})
+
+		test('45 deg test', () => {
+			const seg = new Segment(new Vector2(0, 0), new Vector2(1, 1))
+			const normal = seg.getNormal()
+
+			const expectedX = Math.abs(1 / Math.sqrt(2))
+			const expectedY = Math.abs(-1 / Math.sqrt(2))
+			expect(Math.abs(normal.getX())).toBeCloseTo(expectedX)
+			expect(Math.abs(normal.getY())).toBeCloseTo(expectedY)
+		})
+	})
 })
