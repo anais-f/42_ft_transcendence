@@ -31,11 +31,11 @@ export class Ray {
 		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
-	intersect(other: Segment): Vector2 | null
-	intersect(other: Ray): Vector2 | null
-	intersect(other: Circle): Vector2 | null
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Circle): Vector2[] | null
 
-	intersect(other: Segment | Circle | Ray): Vector2 | null {
+	intersect(other: Segment | Circle | Ray): Vector2[] | null {
 		if (other instanceof Segment) {
 			return this.intersectSegment(other)
 		} else if (other instanceof Ray) {
@@ -46,7 +46,7 @@ export class Ray {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): Vector2 | null {
+	private intersectRay(other: Ray): Vector2[] | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
 		if (Math.abs(crossProduct) < Number.EPSILON) {
@@ -63,12 +63,16 @@ export class Ray {
 			) / crossProduct
 
 		if (t1 >= 0 && t2 >= 0) {
-			return new Vector2() // TODO
+			const intersectionPoint = Vector2.add(
+				this.getOrigin(),
+				this.getDirection().multiply(t1)
+			)
+			return [intersectionPoint]
 		}
 		return null
 	}
 
-	private intersectSegment(other: Segment): Vector2 | null {
+	private intersectSegment(other: Segment): Vector2[] | null {
 		const [start, end]: Vector2[] = other.getPoints()
 		const segV = Vector2.subtract(end, start)
 
@@ -81,8 +85,8 @@ export class Ray {
 					Vector2.dot(v1, this.getDirection()) /
 					this.getDirection().squaredLength()
 				if (t0 >= 0) {
-					return new Vector2() // TODO
-				} else return null
+					return [start.clone(), end.clone()]
+				}
 			}
 			return null
 		}
@@ -94,7 +98,11 @@ export class Ray {
 			crossProduct
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
-			return new Vector2() // TODO
+			const intersectionPoint = Vector2.add(
+				this.getOrigin(),
+				this.getDirection().multiply(t1)
+			)
+			return [intersectionPoint]
 		}
 		return null
 	}

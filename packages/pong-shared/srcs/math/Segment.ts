@@ -21,11 +21,11 @@ export class Segment {
 		return this.p2
 	}
 
-	intersect(other: Circle): Vector2 | null
-	intersect(other: Segment): Vector2 | null
-	intersect(other: Polygon): Vector2 | null
-	intersect(other: Ray): Vector2 | null
-	intersect(other: Circle | Segment | Polygon | Ray): Vector2 | null {
+	intersect(other: Circle): Vector2[] | null
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Polygon): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Circle | Segment | Polygon | Ray): Vector2[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
@@ -38,7 +38,7 @@ export class Segment {
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(other: Segment): Vector2 | null {
+	private intersectSeg(other: Segment): Vector2[] | null {
 		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
@@ -54,18 +54,34 @@ export class Segment {
 			((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
-			return new Vector2() // TODO
+			const t = d1 / (d1 - d2)
+			const intersectionPoint = Vector2.add(
+				p3,
+				Vector2.subtract(p4, p3).multiply(t)
+			)
+			return [intersectionPoint]
 		}
 
-		if (d1 === 0 && Segment.pointIsOnSeg(p3, p4, this.p1)) return true
-		if (d2 === 0 && Segment.pointIsOnSeg(p3, p4, this.p2)) return true
-		if (d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) return true
-		if (d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4)) return true
+		if (
+			(d1 === 0 && Segment.pointIsOnSeg(p3, p4, this.p1)) ||
+			(d2 === 0 && Segment.pointIsOnSeg(p3, p4, this.p2)) ||
+			(d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) ||
+			(d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4))
+		) {
+			const overlapStart = Vector2.max(this.p1, other.getP1())
+			const overlapEnd = Vector2.min(this.p2, other.getP2())
+
+			if (overlapStart.equals(overlapEnd)) {
+				return [overlapStart]
+			}
+
+			return [overlapStart, overlapEnd]
+		}
 
 		return null
 	}
 
-	private intersectCircle(other: Circle): Vector2 | null {
+	private intersectCircle(other: Circle): Vector2[] | null {
 		const segVector = Vector2.subtract(this.p2, this.p1)
 		const segLengthSq = segVector.squaredLength()
 
@@ -76,11 +92,16 @@ export class Segment {
 		)
 
 		const closestP = Vector2.add(this.p1, segVector.multiply(t))
-
 		const distToCircle = Vector2.subtract(closestP, other.getPos()).magnitude()
 
 		if (distToCircle <= other.getRad()) {
-			return new Vector2() // TODO
+			const d = Math.sqrt(other.getRad() ** 2 - distToCircle ** 2)
+			const direction = segVector.normalize()
+
+			const t1 = Vector2.add(closestP, direction.multiply(d))
+			const t2 = Vector2.subtract(closestP, direction.multiply(d))
+
+			return [t1, t2]
 		}
 		return null
 	}
