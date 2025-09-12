@@ -27,12 +27,12 @@ export class Circle extends AShape {
 		this.rad = rad
 	}
 
-	intersect(other: Segment): Vector2 | null
-	intersect(other: Circle): Vector2 | null
-	intersect(other: Ray): Vector2 | null
-	intersect(other: Polygon): Vector2 | null
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Circle): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Polygon): Vector2[] | null
 
-	intersect(other: Segment | Ray | Polygon | Circle): Vector2 | null {
+	intersect(other: Segment | Ray | Polygon | Circle): Vector2[] | null {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
@@ -45,10 +45,9 @@ export class Circle extends AShape {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): Vector2 | null {
+	private intersectRay(other: Ray): Vector2[] | null {
 		const rayOrigin = other.getOrigin()
 		const rayDirection = other.getDirection()
-
 		const squaredDistanceToCenter = Vector2.squaredDist(
 			rayOrigin,
 			this.getPos()
@@ -56,7 +55,7 @@ export class Circle extends AShape {
 		const squaredRadius = this.getRad() * this.getRad()
 
 		if (squaredDistanceToCenter <= squaredRadius) {
-			return new Vector2() // TODO
+			return [new Vector2(rayOrigin.getX(), rayOrigin.getY())]
 		}
 
 		const toCircle = Vector2.subtract(this.getPos(), rayOrigin)
@@ -72,17 +71,63 @@ export class Circle extends AShape {
 			closestPoint,
 			this.getPos()
 		)
-		
+
 		if (squaredDistanceToClosest <= squaredRadius) {
-			return new Vector2() // TODO
-		} else return null
+			const distanceToIntersection = Math.sqrt(
+				squaredRadius - squaredDistanceToClosest
+			)
+			const t1 = Vector2.add(
+				closestPoint,
+				Vector2.multiply(rayDirection, distanceToIntersection)
+			)
+			const t2 = Vector2.subtract(
+				closestPoint,
+				Vector2.multiply(rayDirection, distanceToIntersection)
+			)
+			
+			if (t1.equals(t2)) {
+				return [t1]
+			}
+			return [t1, t2]
+		}
+
+		return null
 	}
 
-	private intersectCircle(other: Circle): Vector2 | null {
-		const sqDistance: number = this.origin.squaredDist(other.getPos())
-		if (sqDistance <= (this.rad + other.getRad()) ** 2) {
-			return new Vector2() // TODO
-		} else return null
+	private intersectCircle(other: Circle): Vector2[] | null {
+		let d = Vector2.subtract(other.getPos(), this.origin)
+		const sqDistance = d.squaredLength()
+		const radiusSum = this.rad + other.getRad()
+		d.normalize()
+
+		if (sqDistance > radiusSum ** 2) {
+			return null
+		}
+
+		const distance = Math.sqrt(sqDistance)
+
+		if (distance === radiusSum) {
+			const intersectionPoint = Vector2.add(this.origin, d.multiply(this.rad))
+			return [intersectionPoint]
+		}
+
+		const a =
+			(this.rad ** 2 - other.getRad() ** 2 + sqDistance) / (2 * distance)
+		const h = Math.sqrt(this.rad ** 2 - a ** 2)
+
+		const p2 = Vector2.add(this.origin, d.multiply(a))
+
+		const t1 = new Vector2(
+			p2.getX() + (h * (other.getPos().getY() - this.origin.getY())) / distance,
+			p2.getY() - (h * (other.getPos().getX() - this.origin.getX())) / distance
+		)
+
+		const t2 = new Vector2(
+			p2.getX() - (h * (other.getPos().getY() - this.origin.getY())) / distance,
+			p2.getY() + (h * (other.getPos().getX() - this.origin.getX())) / distance
+		)
+
+		return [t1, t2]
 	}
 
 	public containsPoint(point: Vector2): boolean {
