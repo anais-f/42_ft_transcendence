@@ -21,5 +21,8 @@
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" }
-	]
+	],
+  "ts-node": {
+    "esm": true,
+  }
 }
