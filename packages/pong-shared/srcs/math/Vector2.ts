@@ -155,14 +155,23 @@ export class Vector2 {
 	}
 
 	public static equals(v1: Vector2, v2: Vector2): boolean {
-		return (v1.getX() === v2.getX() && v1.getY() === v2.getY())
+		return (
+			Math.abs(v1.getX() - v2.getX()) < Number.EPSILON &&
+			Math.abs(v1.getY() - v2.getY()) < Number.EPSILON
+		)
 	}
 
 	public static min(v1: Vector2, v2: Vector2): Vector2 {
-        return new Vector2(Math.min(v1.getX(), v2.getX()), Math.min(v1.getY(), v2.getY()))
-    }
+		return new Vector2(
+			Math.min(v1.getX(), v2.getX()),
+			Math.min(v1.getY(), v2.getY())
+		)
+	}
 
-    public static max(v1: Vector2, v2: Vector2): Vector2 {
-        return new Vector2(Math.max(v1.getX(), v2.getX()), Math.max(v1.getY(), v2.getY()))
+	public static max(v1: Vector2, v2: Vector2): Vector2 {
+		return new Vector2(
+			Math.max(v1.getX(), v2.getX()),
+			Math.max(v1.getY(), v2.getY())
+		)
 	}
 }
