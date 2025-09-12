@@ -72,7 +72,7 @@ export class Ray {
 		return null
 	}
 
-	private intersectSegment(other: Segment): Vector2[] | null {
+	private intersectSegment(other: Segment): Vector2[] | null { // TODO: return the closest one
 		const [start, end]: Vector2[] = other.getPoints()
 		const segV = Vector2.subtract(end, start)
 

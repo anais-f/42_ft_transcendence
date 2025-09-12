@@ -107,8 +107,7 @@ export class Circle extends AShape {
 		const distance = Math.sqrt(sqDistance)
 
 		if (distance === radiusSum) {
-			const intersectionPoint = Vector2.add(this.origin, d.multiply(this.rad))
-			return [intersectionPoint]
+			return [Vector2.add(this.origin, d.multiply(this.rad))]
 		}
 
 		const a =
@@ -140,8 +139,6 @@ export class Circle extends AShape {
 	}
 
 	public getNormalAt(point: Vector2): Vector2 {
-		const normal = Vector2.subtract(point, this.getOrigin())
-		normal.normalize()
-		return normal
+		return Vector2.subtract(point, this.getOrigin()).normalize()
 	}
 }

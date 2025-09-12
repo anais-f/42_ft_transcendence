@@ -32,12 +32,12 @@ export class Polygon extends AShape {
 		)
 	}
 
-	public intersect(other: Circle): Vector2 | null
-	public intersect(other: Polygon): Vector2 | null
-	public intersect(other: Ray): Vector2 | null
-	public intersect(other: Segment): Vector2 | null
+	public intersect(other: Circle): Vector2[] | null
+	public intersect(other: Polygon): Vector2[] | null
+	public intersect(other: Ray): Vector2[] | null
+	public intersect(other: Segment): Vector2[] | null
 
-	public intersect(other: Circle | Ray | Polygon | Segment): Vector2 | null {
+	public intersect(other: Circle | Ray | Polygon | Segment): Vector2[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Ray) {
@@ -50,46 +50,46 @@ export class Polygon extends AShape {
 		throw 'Invalid intersect'
 	}
 
-	private intersectCircle(other: Circle): Vector2 | null {
+	private intersectCircle(other: Circle): Vector2[] | null {
 		const AS = this.getAbsoluteSegments()
 		for (const seg of AS) {
 			if (seg.intersect(other)) {
-				return new Vector2() // TODO
+				return [new Vector2()] // TODO
 			}
 		}
 
 		if (this.containsPoint(other.getPos())) {
-			return new Vector2() // TODO
+			return [new Vector2()] // TODO
 		}
 		return null
 	}
 
-	private intersectRay(other: Ray): Vector2 | null {
+	private intersectRay(other: Ray): Vector2[] | null {
 		const AS = this.getAbsoluteSegments()
 		for (const seg of AS) {
 			if (other.intersect(seg)) {
-				return new Vector2() // TODO
+				return [new Vector2()] // TODO
 			}
 		}
 		return null
 	}
 
-	private intersectPolygon(other: Polygon): Vector2 | null {
+	private intersectPolygon(other: Polygon): Vector2[] | null {
 		const localAbSeg = this.getAbsoluteSegments()
 		const otherAbSeg = other.getAbsoluteSegments()
 		for (const seg1 of localAbSeg) {
 			for (const seg2 of otherAbSeg) {
 				if (seg1.intersect(seg2)) {
-					return new Vector2() // TODO
+					return [new Vector2()] // TODO
 				}
 			}
 		}
 
 		if (this.containsPoint(otherAbSeg[0].getP1())) {
-			return new Vector2() // TODO
+			return [new Vector2()] // TODO
 		}
 		if (other.containsPoint(localAbSeg[0].getP1())) {
-			return new Vector2() // TODO
+			return [new Vector2()] // TODO
 		}
 
 		return null
@@ -123,17 +123,17 @@ export class Polygon extends AShape {
 		return inside
 	}
 
-	private intersectSeg(other: Segment): Vector2 | null {
+	private intersectSeg(other: Segment): Vector2[] | null {
 		if (
 			this.containsPoint(other.getP1()) ||
 			this.containsPoint(other.getP2())
 		) {
-			return new Vector2() // TODO
+			return [new Vector2()] // TODO
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {
 			if (seg.intersect(other)) {
-				return new Vector2() // TODO
+				return [new Vector2()] // TODO
 			}
 		}
 		return null
