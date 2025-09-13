@@ -24,6 +24,16 @@ services:
       - nginx
       - front-app
 
+  users-account:
+    restart: on-failure
+    container_name: users-account
+    build:
+      context: .
+      dockerfile: ./services/users-account/Dockerfile
+    depends_on:
+      - nginx
+      - front-app
+
 networks:
   pong:
     driver: bridge

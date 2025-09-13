@@ -16,103 +16,91 @@ db.exec(
 // stmt.run('lrio', 'loic rio', 'passwd');
 // stmt.run('mjuffard', 'michel juffard', 'passwd');
 
-
-
-
 // créer le serveur
 const app = Fastify({
-  logger: false,
-});
-
+	logger: false,
+})
 
 //REPOSITORY - lib de requete SQL
 function getAllUsersRepo() {
-  const stmt = db.prepare("SELECT id, login, name FROM users").all();
-  return stmt;
+	const stmt = db.prepare('SELECT id, login, name FROM users').all()
+	return stmt
 }
 
 function addUserRepo(login: string, name: string, password: string) {
-  const stmt = db.prepare("INSERT INTO users (login, name, password) VALUES (?, ?, ?)");
-  return stmt.run(login, name, password);
+	const stmt = db.prepare(
+		'INSERT INTO users (login, name, password) VALUES (?, ?, ?)'
+	)
+	return stmt.run(login, name, password)
 }
 
 function deleteUserRepo(login: string) {
-  const stmt = db.prepare("DELETE FROM users WHERE login = ?");
-  return stmt.run(login);
+	const stmt = db.prepare('DELETE FROM users WHERE login = ?')
+	return stmt.run(login)
 }
 
 // SERVICE BACK - fonction logique metier
 function fetchAllUsers() {
-  return getAllUsersRepo();
+	return getAllUsersRepo()
 }
 
 function addUser(login: string, name: string, password: string) {
-  return addUserRepo(login, name, password);
+	return addUserRepo(login, name, password)
 }
 
 function deleteUser(login: string) {
-  return deleteUserRepo(login);
+	return deleteUserRepo(login)
 }
 
 // CONTROLLER - ROUTER - definir une route en callback
 app.get('/', (req, res) => {
-  res.send("heho michel!");
+	res.send('heho michel!')
 })
 
 app.get('/users', (req, res) => {
-  try {
-    const users = fetchAllUsers();
-    res.send(users);
-  }
-  catch (e) {
-    console.error(e);
-  }
+	try {
+		const users = fetchAllUsers()
+		res.send(users)
+	} catch (e) {
+		console.error(e)
+	}
 })
 
 app.post('/users/add', (req, res) => {
-  try {
-    const { login, name, password } = req.body as { login: string; name: string; password: string };
-    const result = addUser(login, name, password);
-    res.status(201).send({ success: true, result: result });
-  }
-  catch (e) {
-    console.error(e);
-    res.status(500).send({ error: "An error occurred" });
-  }
+	try {
+		const { login, name, password } = req.body as {
+			login: string
+			name: string
+			password: string
+		}
+		const result = addUser(login, name, password)
+		res.status(201).send({ success: true, result: result })
+	} catch (e) {
+		console.error(e)
+		res.status(500).send({ error: 'An error occurred' })
+	}
 })
 
 app.delete('/users/delete', (req, res) => {
-  try {
-    const { login } = req.body as { login: string };
-    const result = deleteUser(login)
-    res.status(204).send({ success: true, result: result.changes });
-  }
-  catch (e) {
-    console.error(e);
-  }
+	try {
+		const { login } = req.body as { login: string }
+		const result = deleteUser(login)
+		res.status(204).send({ success: true, result: result.changes })
+	} catch (e) {
+		console.error(e)
+	}
 })
 
 // variable pour lancer le serveur
 const start = async () => {
-  try {
-    await app.listen({ port: 3000, host: '0.0.0.0' });
-    console.log('Listening on port 3000');
-  } catch (err) {
-    console.error('Error strating server: ', err);
-    process.exit(1);
-  }
+	try {
+		await app.listen({ port: 3000, host: '0.0.0.0' })
+		console.log('Listening on port 3000')
+	} catch (err) {
+		console.error('Error strating server: ', err)
+		process.exit(1)
+	}
 }
 
-/* on pourrait faire pour le lancer, callback !
-app.listen({ port: 3000 }, function (err, address) {
-  if (err) {
-    app.log.error(err)
-    process.exit(1)
-  }
-  // Server is now listening on ${address}
-})
- */
-
 // lancer le serveur
-start();
-
+start()
