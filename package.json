@@ -23,13 +23,14 @@
 		"packages/pong-client",
 		"packages/pong-server",
 		"services/pong-server/app",
-    "services/users-account/app"
+		"services/users-account/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",
 		"@jest/types": "^29.5.0",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/jest": "^29.5.3",
+		"@types/node": "^24.5.2",
 		"@typescript-eslint/eslint-plugin": "^8.39.0",
 		"@typescript-eslint/parser": "^8.39.0",
 		"eslint": "^9.32.0",
