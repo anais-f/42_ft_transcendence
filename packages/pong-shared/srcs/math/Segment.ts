@@ -69,19 +69,29 @@ export class Segment {
 			(d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) ||
 			(d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4))
 		) {
-			const overlapStart = Vector2.max(this.p1, other.getP1())
-			const overlapEnd = Vector2.min(this.p2, other.getP2())
+			const seg1 = [this.p1, this.p2]
+			const seg2 = [other.getP1(), other.getP2()]
 
-			if (overlapStart.equals(overlapEnd)) {
-				return [overlapStart]
-			}
+			const allPoints = [...seg1, ...seg2].sort((a, b) => {
+				const da = Vector2.subtract(a, this.p1).squaredLength()
+				const db = Vector2.subtract(b, this.p1).squaredLength()
+				return da - db
+			})
 
-			return [overlapStart, overlapEnd]
+			const overlapPoints = allPoints.slice(1, 3)
+
+			const closest = overlapPoints.reduce((min, p) => {
+				return Vector2.subtract(p, this.p1).squaredLength() <
+					Vector2.subtract(min, this.p1).squaredLength()
+					? p
+					: min
+			}, overlapPoints[0])
+
+			return [closest]
 		}
 
 		return null
 	}
-
 	private intersectCircle(other: Circle): Vector2[] | null {
 		const segVector = Vector2.subtract(this.p2, this.p1)
 		const segLengthSq = segVector.squaredLength()

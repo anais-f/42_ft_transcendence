@@ -52,47 +52,67 @@ export class Polygon extends AShape {
 
 	private intersectCircle(other: Circle): Vector2[] | null {
 		const AS = this.getAbsoluteSegments()
+		let hps: Vector2[] = []
 		for (const seg of AS) {
-			if (seg.intersect(other)) {
-				return [new Vector2()] // TODO
+			const hp = seg.intersect(other)
+			if(Array.isArray(hp)) {
+				hps = [...hps, ...hp]
 			}
+		}
+		if (hps.length !== 0) {
+			return hps
 		}
 
 		if (this.containsPoint(other.getPos())) {
-			return [new Vector2()] // TODO
+			return [other.getPos()]
 		}
 		return null
 	}
 
 	private intersectRay(other: Ray): Vector2[] | null {
 		const AS = this.getAbsoluteSegments()
+		let hps: Vector2[] = []
+
 		for (const seg of AS) {
-			if (other.intersect(seg)) {
-				return [new Vector2()] // TODO
+			let hp: Vector2[] | null = other.intersect(seg)
+			if (Array.isArray(hp)) {
+				hps.push(hp[0])
 			}
 		}
-		return null
+
+		if (hps.length === 0) {
+			return null
+		}
+		return hps
 	}
 
 	private intersectPolygon(other: Polygon): Vector2[] | null {
 		const localAbSeg = this.getAbsoluteSegments()
 		const otherAbSeg = other.getAbsoluteSegments()
+
+		let res: Vector2[] = []
 		for (const seg1 of localAbSeg) {
 			for (const seg2 of otherAbSeg) {
-				if (seg1.intersect(seg2)) {
-					return [new Vector2()] // TODO
+				const t: Vector2[] | null = seg1.intersect(seg2)
+				if (Array.isArray(t)) {
+					res = [...res, ...t]
 				}
 			}
 		}
-
+		if (res.length !== 0) {
+			return res
+		}
 		if (this.containsPoint(otherAbSeg[0].getP1())) {
-			return [new Vector2()] // TODO
+			res.push(otherAbSeg[0].getP1())
 		}
 		if (other.containsPoint(localAbSeg[0].getP1())) {
-			return [new Vector2()] // TODO
+			res.push(localAbSeg[0].getP1())
 		}
 
-		return null
+		if (res.length === 0) {
+			return null
+		}
+		return res
 	}
 
 	public containsPoint(point: Vector2): boolean {
@@ -124,19 +144,24 @@ export class Polygon extends AShape {
 	}
 
 	private intersectSeg(other: Segment): Vector2[] | null {
-		if (
-			this.containsPoint(other.getP1()) ||
-			this.containsPoint(other.getP2())
-		) {
-			return [new Vector2()] // TODO
+		let hps: Vector2[] = []
+		if (this.containsPoint(other.getP1())) {
+				hps.push(other.getP1())
+		}
+		if (this.containsPoint(other.getP2())) {
+				hps.push(other.getP2())
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {
-			if (seg.intersect(other)) {
-				return [new Vector2()] // TODO
+			const hp = seg.intersect(other)
+			if (Array.isArray(hp)) {
+				hps = [...hps, ...hp]
 			}
 		}
-		return null
+		if (hps.length === 0) {
+			return null
+		}
+		return hps
 	}
 
 	public getSegment(): Segment[] {
