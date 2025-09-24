@@ -1,3 +1,4 @@
+import { EPSILON } from '../define'
 import { Ray } from './Ray'
 import { Vector2 } from './Vector2'
 import { Circle } from './shapes/Circle'
@@ -111,7 +112,7 @@ export class Segment {
 			(point.getY() - p1.getY()) * (p2.getX() - p1.getX()) -
 			(point.getX() - p1.getX()) * (p2.getY() - p1.getY())
 
-		if (Math.abs(crossProduct) > Number.EPSILON) {
+		if (Math.abs(crossProduct) > EPSILON) {
 			return false
 		}
 

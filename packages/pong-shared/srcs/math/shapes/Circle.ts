@@ -84,7 +84,7 @@ export class Circle extends AShape {
 				closestPoint,
 				Vector2.multiply(rayDirection, distanceToIntersection)
 			)
-			
+
 			if (t1.equals(t2)) {
 				return [t1]
 			}

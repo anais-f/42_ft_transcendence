@@ -1,3 +1,5 @@
+import { EPSILON } from '../define'
+
 export class Vector2 {
 	// init class fields
 	private x: number
@@ -156,8 +158,8 @@ export class Vector2 {
 
 	public static equals(v1: Vector2, v2: Vector2): boolean {
 		return (
-			Math.abs(v1.getX() - v2.getX()) < Number.EPSILON &&
-			Math.abs(v1.getY() - v2.getY()) < Number.EPSILON
+			Math.abs(v1.getX() - v2.getX()) < EPSILON &&
+			Math.abs(v1.getY() - v2.getY()) < EPSILON
 		)
 	}
 

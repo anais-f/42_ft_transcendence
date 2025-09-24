@@ -1,3 +1,4 @@
+import { EPSILON } from '../define'
 import { Segment } from './Segment'
 import { Circle } from './shapes/Circle'
 import { Vector2 } from './Vector2'
@@ -49,7 +50,7 @@ export class Ray {
 	private intersectRay(other: Ray): Vector2[] | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
-		if (Math.abs(crossProduct) < Number.EPSILON) {
+		if (Math.abs(crossProduct) < EPSILON) {
 			return null
 		}
 
@@ -72,21 +73,29 @@ export class Ray {
 		return null
 	}
 
-	private intersectSegment(other: Segment): Vector2[] | null { // TODO: return the closest one
+	private intersectSegment(other: Segment): Vector2[] | null {
 		const [start, end]: Vector2[] = other.getPoints()
 		const segV = Vector2.subtract(end, start)
+		const dir = this.getDirection()
+		const crossProduct = Vector2.cross(dir, segV)
 
-		const crossProduct = this.getDirection().cross(segV)
+		if (Math.abs(crossProduct) < EPSILON) {
+			const origin = this.getOrigin()
+			const v1 = Vector2.subtract(start, origin)
 
-		if (Math.abs(crossProduct) < Number.EPSILON) {
-			const v1 = Vector2.subtract(start, this.getOrigin())
-			if (Math.abs(v1.cross(this.getDirection())) < Number.EPSILON) {
-				const t0 =
-					Vector2.dot(v1, this.getDirection()) /
-					this.getDirection().squaredLength()
-				if (t0 >= 0) {
-					return [start.clone(), end.clone()]
-				}
+			if (Math.abs(Vector2.cross(v1, dir)) < EPSILON) {
+				const dirNorm = dir.normalize()
+				const tStart = Vector2.dot(Vector2.subtract(start, origin), dirNorm)
+				const tEnd = Vector2.dot(Vector2.subtract(end, origin), dirNorm)
+
+				const candidates: { t: number; point: Vector2 }[] = []
+				if (tStart >= 0) candidates.push({ t: tStart, point: start.clone() })
+				if (tEnd >= 0) candidates.push({ t: tEnd, point: end.clone() })
+
+				if (candidates.length === 0) return null
+
+				candidates.sort((a, b) => a.t - b.t)
+				return [candidates[0].point]
 			}
 			return null
 		}
@@ -94,14 +103,10 @@ export class Ray {
 		const t1 =
 			Vector2.subtract(start, this.getOrigin()).cross(segV) / crossProduct
 		const t2 =
-			Vector2.subtract(start, this.getOrigin()).cross(this.getDirection()) /
-			crossProduct
+			Vector2.subtract(start, this.getOrigin()).cross(dir) / crossProduct
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
-			const intersectionPoint = Vector2.add(
-				this.getOrigin(),
-				this.getDirection().multiply(t1)
-			)
+			const intersectionPoint = Vector2.add(this.getOrigin(), dir.multiply(t1))
 			return [intersectionPoint]
 		}
 		return null
