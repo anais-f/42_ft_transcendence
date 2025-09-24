@@ -37,3 +37,13 @@ format:
 .PHONY: format-check
 format-check:
 	npm run format:check
+
+.PHONY: setup
+setup:
+	./hooks/install-hooks.sh
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    export NVM_DIR="$${HOME}/.nvm" && \
+    [ -s "$$NVM_DIR/nvm.sh" ] && \. "$$NVM_DIR/nvm.sh" && \
+    nvm install 22.20.0 && \
+	nvm use 22.20.0 && \
+    npm install -g ts-node
