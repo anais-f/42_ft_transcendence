@@ -1,3 +1,5 @@
+#-------------------------------------------------------------#
+# Build app
 FROM node:20-alpine AS build-app
 
 WORKDIR /build
@@ -11,7 +13,8 @@ COPY services ./services/
 
 RUN npm run build --workspace=users-account-app
 
-
+#-------------------------------------------------------------#
+# prod
 FROM node:20-alpine
 
 WORKDIR /app
