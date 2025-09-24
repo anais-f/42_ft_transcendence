@@ -3,11 +3,11 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"rootDir": ".",
-    "esModuleInterop": true
+		"esModuleInterop": true
 	},
-//	"references": [{ "path": "../../../packages/pong-shared" }],
-//	"include": ["index.ts"],
-  "ts-node": {
-    "esm": true,
-  }
+	//	"references": [{ "path": "../../../packages/pong-shared" }],
+	//	"include": ["index.ts"],
+	"ts-node": {
+		"esm": true
+	}
 }

@@ -2,10 +2,10 @@
 	"name": "users-account-app",
 	"version": "1.0.0",
 	"main": "dist/index.js",
-  "type": "module",
+	"type": "module",
 	"scripts": {
 		"build": "tsc",
 		"start": "node dist/index.js",
-    "dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
+		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
 	}
 }

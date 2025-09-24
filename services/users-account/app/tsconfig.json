@@ -4,9 +4,9 @@
 		"outDir": "dist",
 		"rootDir": "."
 	},
-//	"references": [{ "path": "../../../packages/pong-shared" }],
-//	"include": ["index.ts"],
-  "ts-node": {
-    "esm": true,
-  }
+	//	"references": [{ "path": "../../../packages/pong-shared" }],
+	//	"include": ["index.ts"],
+	"ts-node": {
+		"esm": true
+	}
 }

@@ -22,7 +22,7 @@
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" }
 	],
-  "ts-node": {
-    "esm": true,
-  }
+	"ts-node": {
+		"esm": true
+	}
 }
