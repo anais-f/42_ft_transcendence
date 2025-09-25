@@ -46,4 +46,5 @@ setup:
     [ -s "$$NVM_DIR/nvm.sh" ] && \. "$$NVM_DIR/nvm.sh" && \
     nvm install 22.20.0 && \
 	nvm use 22.20.0 && \
+	nvm alias default 22.20.0 && \
     npm install -g ts-node
