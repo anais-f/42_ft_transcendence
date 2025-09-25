@@ -43,7 +43,6 @@ export class Segment {
 		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
-
 		const [p3, p4] = other.getPoints()
 
 		const d1 = direction(p3, p4, this.p1)
@@ -57,8 +56,8 @@ export class Segment {
 		) {
 			const t = d1 / (d1 - d2)
 			const intersectionPoint = Vector2.add(
-				p3,
-				Vector2.subtract(p4, p3).multiply(t)
+				this.p1,
+				Vector2.subtract(this.p2, this.p1).multiply(t)
 			)
 			return [intersectionPoint]
 		}
@@ -69,29 +68,20 @@ export class Segment {
 			(d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) ||
 			(d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4))
 		) {
-			const seg1 = [this.p1, this.p2]
-			const seg2 = [other.getP1(), other.getP2()]
+			const points = [this.p1, this.p2, p3, p4]
 
-			const allPoints = [...seg1, ...seg2].sort((a, b) => {
-				const da = Vector2.subtract(a, this.p1).squaredLength()
-				const db = Vector2.subtract(b, this.p1).squaredLength()
-				return da - db
-			})
+			points.sort((a, b) =>
+				a.getX() !== b.getX() ? a.getX() - b.getX() : a.getY() - b.getY()
+			)
 
-			const overlapPoints = allPoints.slice(1, 3)
+			const overlapStart = points[1]
 
-			const closest = overlapPoints.reduce((min, p) => {
-				return Vector2.subtract(p, this.p1).squaredLength() <
-					Vector2.subtract(min, this.p1).squaredLength()
-					? p
-					: min
-			}, overlapPoints[0])
-
-			return [closest]
+			return [overlapStart] // or [(overlapStart + overlapEnd [point2]) / 2]
 		}
 
 		return null
 	}
+
 	private intersectCircle(other: Circle): Vector2[] | null {
 		const segVector = Vector2.subtract(this.p2, this.p1)
 		const segLengthSq = segVector.squaredLength()
@@ -102,15 +92,16 @@ export class Segment {
 			Math.min(1, Vector2.dot(p1ToCircle, segVector) / segLengthSq)
 		)
 
-		const closestP = Vector2.add(this.p1, segVector.multiply(t))
+		const closestP = Vector2.add(this.p1, Vector2.multiply(segVector, t))
 		const distToCircle = Vector2.subtract(closestP, other.getPos()).magnitude()
 
 		if (distToCircle <= other.getRad()) {
 			const d = Math.sqrt(other.getRad() ** 2 - distToCircle ** 2)
-			const direction = segVector.normalize()
+			const direction = Vector2.normalize(segVector)
 
-			const t1 = Vector2.add(closestP, direction.multiply(d))
-			const t2 = Vector2.subtract(closestP, direction.multiply(d))
+			const t1 = Vector2.add(closestP, Vector2.multiply(direction, d))
+			const t2 = Vector2.subtract(closestP, Vector2.multiply(direction, d))
+			if (t1.equals(t2)) return [t1]
 
 			return [t1, t2]
 		}

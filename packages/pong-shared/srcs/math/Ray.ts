@@ -74,41 +74,44 @@ export class Ray {
 	}
 
 	private intersectSegment(other: Segment): Vector2[] | null {
-		const [start, end]: Vector2[] = other.getPoints()
-		const segV = Vector2.subtract(end, start)
-		const dir = this.getDirection()
-		const crossProduct = Vector2.cross(dir, segV)
+		const O = this.getOrigin()
+		const D = this.getDirection()
+		const A = other.getP1()
+		const B = other.getP2()
 
-		if (Math.abs(crossProduct) < EPSILON) {
-			const origin = this.getOrigin()
-			const v1 = Vector2.subtract(start, origin)
+		const v1 = Vector2.subtract(O, A)
+		const v2 = Vector2.subtract(B, A)
+		const denom = Vector2.cross(D, v2)
 
-			if (Math.abs(Vector2.cross(v1, dir)) < EPSILON) {
-				const dirNorm = dir.normalize()
-				const tStart = Vector2.dot(Vector2.subtract(start, origin), dirNorm)
-				const tEnd = Vector2.dot(Vector2.subtract(end, origin), dirNorm)
-
-				const candidates: { t: number; point: Vector2 }[] = []
-				if (tStart >= 0) candidates.push({ t: tStart, point: start.clone() })
-				if (tEnd >= 0) candidates.push({ t: tEnd, point: end.clone() })
-
-				if (candidates.length === 0) return null
-
-				candidates.sort((a, b) => a.t - b.t)
-				return [candidates[0].point]
+		if (Math.abs(denom) < EPSILON) {
+			const dDot = Vector2.dot(D, D)
+			if (dDot < EPSILON ||  Math.abs(Vector2.cross(Vector2.subtract(A, O), D)) > EPSILON) {
+				return null;
 			}
-			return null
-		}
 
-		const t1 =
-			Vector2.subtract(start, this.getOrigin()).cross(segV) / crossProduct
-		const t2 =
-			Vector2.subtract(start, this.getOrigin()).cross(dir) / crossProduct
+			const tA = Vector2.dot(Vector2.subtract(A, O), D) / dDot
+			const tB = Vector2.dot(Vector2.subtract(B, O), D) / dDot
+			const tMin = Math.min(tA, tB)
+			const tMax = Math.max(tA, tB)
+			const tOverlapStart = Math.max(0, tMin)
+			const tOverlapEnd = tMax
+
+			if (tOverlapStart > tOverlapEnd) {
+				return null
+			}
+
+			const hitPoint = Vector2.add(O, D.clone().multiply(tOverlapStart))
+			return [hitPoint]
+
+		}
+		const t1 = Vector2.cross(v2, v1) / denom
+		const t2 = Vector2.cross(D, v1) / denom
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
-			const intersectionPoint = Vector2.add(this.getOrigin(), dir.multiply(t1))
+			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1));
 			return [intersectionPoint]
 		}
-		return null
+
+		return null;
 	}
 }

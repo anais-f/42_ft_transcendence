@@ -1,1 +1,1 @@
-export const EPSILON = 10e-8
+export const EPSILON = 10e-6
