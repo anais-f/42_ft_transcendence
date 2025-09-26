@@ -2,36 +2,34 @@ import { Vector2 } from '../Vector2'
 import { Polygon } from './Polygon'
 
 export class Rectangle extends Polygon {
+	private width: number
+	private height: number
+
 	constructor(origin: Vector2, dimensions: Vector2) {
-		const topRight = new Vector2(
-			origin.getX() + dimensions.getX(),
-			origin.getY()
+		const w = dimensions.getX()
+		const h = dimensions.getY()
+		super(
+			[
+				new Vector2(0, 0),
+				new Vector2(w, 0),
+				new Vector2(w, h),
+				new Vector2(0, h),
+			],
+			origin
 		)
-		const bottomLeft = new Vector2(
-			origin.getX(),
-			origin.getY() + dimensions.getY()
-		)
-		const bottomRight = new Vector2(
-			origin.getX() + dimensions.getX(),
-			origin.getY() + dimensions.getY()
-		)
-
-		super([origin, topRight, bottomRight, bottomLeft])
+		this.width = w
+		this.height = h
 	}
 
-	public getMinX() {
-		return this.getSegment()[0].getP1().getX()
+	public getOrigin(): Vector2 {
+		return super.getOrigin()
 	}
 
-	public getMinY() {
-		return this.getSegment()[0].getP1().getY()
+	public getWidth(): number {
+		return this.width
 	}
 
-	public getMaxX() {
-		return this.getSegment()[1].getP1().getX()
-	}
-
-	public getMaxY() {
-		return this.getSegment()[2].getP1().getY()
+	public getHeight(): number {
+		return this.height
 	}
 }

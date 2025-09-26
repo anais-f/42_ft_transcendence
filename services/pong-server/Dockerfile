@@ -30,7 +30,6 @@ COPY services/ ./services/
 
 COPY --from=build-packages /build/packages/pong-shared/dist ./packages/pong-shared/dist
 
-#RUN npm run build --workspace=services/app/pong-server dont work
 RUN npm run build --workspace=pong-server-app
 
 #-------------------------------------------------------------#
@@ -39,9 +38,6 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-
-#COPY --from=build-app /build ./build
-#CMD ["tail", "-f"]
 COPY --from=build-app /build/services/pong-server/app/dist ./dist
 COPY --from=build-app /build/services/pong-server/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules

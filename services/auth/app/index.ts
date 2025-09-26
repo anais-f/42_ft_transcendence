@@ -1,10 +1,10 @@
 import Fastify from 'fastify'
+import argon2, { argon2id } from 'argon2'
 import BetterSqlite3 from 'better-sqlite3'
 import type { Database as BetterSqlite3Database } from 'better-sqlite3'
 
 const fastify = Fastify({ logger: true })
 
-// Initialisation de la base SQLite
 let db!: BetterSqlite3Database
 
 function setupDb() {
@@ -18,15 +18,29 @@ function setupDb() {
     `)
 }
 
-// Route d'inscription
+async function hashPassword(password: string): Promise<string> {
+  const hash = await argon2.hash(password, {
+    type: argon2id,
+    memoryCost: 65536,
+    timeCost: 2,
+    parallelism: 1,
+  });
+  return hash;
+}
+
+async function verifyPassword(hash: string, password: string): Promise<boolean> {
+  return await argon2.verify(hash, password);
+}
+
 fastify.post('/register', async (request, reply) => {
     const { username, password } = request.body as { username: string; password: string }
     if (!username || !password) {
         return reply.status(400).send({ error: 'Missing username or password' })
     }
+    const hashedPassword = await hashPassword(password)
     try {
         const stmt = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)')
-        stmt.run(username, password)
+        stmt.run(username, hashedPassword)
         return { success: true }
     } catch (err: any) {
         if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -36,7 +50,6 @@ fastify.post('/register', async (request, reply) => {
     }
 })
 
-// Route de connexion
 fastify.post('/login', async (request, reply) => {
     const { username, password } = request.body as { username: string; password: string }
     if (!username || !password) {
@@ -50,7 +63,15 @@ fastify.post('/login', async (request, reply) => {
     return { success: true }
 })
 
-// Démarrage du serveur
+fastify.get('/health', async (request, reply) => {
+    if (db) {
+        return { status: 'abetemps' }
+    }
+    else {
+        return reply.status(500).send({ status: 'error', message: 'Database not initialized' })
+    }
+})
+
 const start = async () => {
     setupDb()
     try {
