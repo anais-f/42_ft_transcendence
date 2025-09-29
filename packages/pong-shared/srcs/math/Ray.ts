@@ -85,8 +85,11 @@ export class Ray {
 
 		if (Math.abs(denom) < EPSILON) {
 			const dDot = Vector2.dot(D, D)
-			if (dDot < EPSILON ||  Math.abs(Vector2.cross(Vector2.subtract(A, O), D)) > EPSILON) {
-				return null;
+			if (
+				dDot < EPSILON ||
+				Math.abs(Vector2.cross(Vector2.subtract(A, O), D)) > EPSILON
+			) {
+				return null
 			}
 
 			const tA = Vector2.dot(Vector2.subtract(A, O), D) / dDot
@@ -102,16 +105,15 @@ export class Ray {
 
 			const hitPoint = Vector2.add(O, D.clone().multiply(tOverlapStart))
 			return [hitPoint]
-
 		}
 		const t1 = Vector2.cross(v2, v1) / denom
 		const t2 = Vector2.cross(D, v1) / denom
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
-			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1));
+			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1))
 			return [intersectionPoint]
 		}
 
-		return null;
+		return null
 	}
 }

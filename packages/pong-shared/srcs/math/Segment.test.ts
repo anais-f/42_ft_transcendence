@@ -150,7 +150,10 @@ describe('Segment', () => {
 			})
 
 			test('random test intersect', () => {
-				const s = new Segment(new Vector2(-1.2692, -1.67395), new Vector2(0.78382, 1.52463))
+				const s = new Segment(
+					new Vector2(-1.2692, -1.67395),
+					new Vector2(0.78382, 1.52463)
+				)
 				const res: Vector2[] | null = ray.intersect(s)
 
 				expect(res).toBeInstanceOf(Array)
@@ -167,7 +170,6 @@ describe('Segment', () => {
 			// @ts-ignore intentionally wrong type
 			expect(() => s.intersect({})).toThrow()
 		})
-
 	})
 
 	describe('distanceToPoint', () => {

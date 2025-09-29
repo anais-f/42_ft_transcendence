@@ -55,7 +55,7 @@ export class Polygon extends AShape {
 		let hps: Vector2[] = []
 		for (const seg of AS) {
 			const hp = seg.intersect(other)
-			if(Array.isArray(hp)) {
+			if (Array.isArray(hp)) {
 				hps = [...hps, ...hp]
 			}
 		}
@@ -146,10 +146,10 @@ export class Polygon extends AShape {
 	private intersectSeg(other: Segment): Vector2[] | null {
 		let hps: Vector2[] = []
 		if (this.containsPoint(other.getP1())) {
-				hps.push(other.getP1())
+			hps.push(other.getP1())
 		}
 		if (this.containsPoint(other.getP2())) {
-				hps.push(other.getP2())
+			hps.push(other.getP2())
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {

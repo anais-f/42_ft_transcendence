@@ -82,29 +82,51 @@ export class Segment {
 		return null
 	}
 
-	private intersectCircle(other: Circle): Vector2[] | null {
-		const segVector = Vector2.subtract(this.p2, this.p1)
-		const segLengthSq = segVector.squaredLength()
+	intersectCircle(other: Circle): Vector2[] | null {
+		const a = this.p1
+		const b = this.p2
+		const center = other.getPos()
+		const radius = other.getRad()
 
-		const p1ToCircle = Vector2.subtract(other.getPos(), this.p1)
-		const t = Math.max(
-			0,
-			Math.min(1, Vector2.dot(p1ToCircle, segVector) / segLengthSq)
-		)
+		const aIn = Vector2.subtract(a, center).squaredLength() <= radius * radius
+		const bIn = Vector2.subtract(b, center).squaredLength() <= radius * radius
 
-		const closestP = Vector2.add(this.p1, Vector2.multiply(segVector, t))
-		const distToCircle = Vector2.subtract(closestP, other.getPos()).magnitude()
-
-		if (distToCircle <= other.getRad()) {
-			const d = Math.sqrt(other.getRad() ** 2 - distToCircle ** 2)
-			const direction = Vector2.normalize(segVector)
-
-			const t1 = Vector2.add(closestP, Vector2.multiply(direction, d))
-			const t2 = Vector2.subtract(closestP, Vector2.multiply(direction, d))
-			if (t1.equals(t2)) return [t1]
-
-			return [t1, t2]
+		if (aIn && bIn) {
+			return [a.clone(), b.clone()]
 		}
+
+		const d = Vector2.subtract(b, a)
+		const f = Vector2.subtract(a, center)
+
+		const aCoeff = Vector2.dot(d, d)
+		const bCoeff = 2 * Vector2.dot(f, d)
+		const cCoeff = Vector2.dot(f, f) - radius * radius
+
+		const discriminant = bCoeff * bCoeff - 4 * aCoeff * cCoeff
+		if (discriminant < 0) {
+			return null
+		}
+
+		const sqrtDiscriminant = Math.sqrt(discriminant)
+		const t1 = (-bCoeff - sqrtDiscriminant) / (2 * aCoeff)
+		const t2 = (-bCoeff + sqrtDiscriminant) / (2 * aCoeff)
+
+		const points: Vector2[] = []
+		if (t1 >= 0 && t1 <= 1) {
+			points.push(Vector2.add(a, Vector2.multiply(d, t1)))
+		}
+		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
+			points.push(Vector2.add(a, Vector2.multiply(d, t2)))
+		}
+
+		if ((aIn || bIn) && points.length === 1) {
+			return [/*aIn ? a : b,*/ points[0]]
+		}
+
+		if (points.length > 0) {
+			return points
+		}
+
 		return null
 	}
 

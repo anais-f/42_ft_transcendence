@@ -104,6 +104,11 @@ export class Circle extends AShape {
 			return null
 		}
 
+		// weird fix
+		if (sqDistance <= 0) {
+			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+		}
+
 		const distance = Math.sqrt(sqDistance)
 
 		if (distance === radiusSum) {
@@ -126,6 +131,15 @@ export class Circle extends AShape {
 			p2.getY() + (h * (other.getPos().getX() - this.origin.getX())) / distance
 		)
 
+		// weird fix
+		if (
+			isNaN(t1.getX()) ||
+			isNaN(t2.getX()) ||
+			isNaN(t1.getY()) ||
+			isNaN(t2.getY())
+		) {
+			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+		}
 		return [t1, t2]
 	}
 
