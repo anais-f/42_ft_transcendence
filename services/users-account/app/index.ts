@@ -1,9 +1,15 @@
+import { db } from './database/database.js'
 import Fastify from 'fastify'
-
+import { ZodTypeProvider, validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
 const app = Fastify({
   logger: false,
-})
+}).withTypeProvider<ZodTypeProvider>()
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+
+// app.register(userRoutes)
 
 const start = async () => {
   try {
@@ -67,43 +73,51 @@ start()
 // }
 //
 // // CONTROLLER - ROUTER - definir une route en callback
-app.get('/', (req, res) => {
-  res.send('heho michel!')
-})
-
-app.get('/users', (req, res) => {
-  try {
-    const users = fetchAllUsers()
-    res.send(users)
-  } catch (e) {
-    console.error(e)
-  }
-})
+// app.get('/', (req, res) => {
+//   res.send('heho michel!')
+// })
 //
-app.post('/users/add', (req, res) => {
-  try {
-    const { login, name, password } = req.body as {
-      login: string
-      name: string
-      password: string
-    }
-    const result = addUser(login, name, password)
-    res.status(201).send({ success: true, result: result })
-  } catch (e) {
-    console.error(e)
-    res.status(500).send({ error: 'An error occurred' })
-  }
-})
 
-app.delete('/users/delete', (req, res) => {
-  try {
-    const { login } = req.body as { login: string }
-    const result = deleteUser(login)
-    res.status(204).send({ success: true, result: result.changes })
-  } catch (e) {
-    console.error(e)
-  }
-})
+
+
+
+
+
+
+// app.get('/users', (req, res) => {
+
+//   try {
+//     const users = fetchAllUsers()
+//     res.send(users)
+//   } catch (e) {
+//     console.error(e)
+//   }
+// })
+// //
+// app.post('/users/add', (req, res) => {
+//   try {
+//     const { login, name, password } = req.body as {
+//       login: string
+//       name: string
+//       password: string
+//     }
+//     const result = addUser(login, name, password)
+//     res.status(201).send({ success: true, result: result })
+//   } catch (e) {
+//     console.error(e)
+//     res.status(500).send({ error: 'An error occurred' })
+//   }
+// })
+//
+// app.delete('/users/delete', (req, res) => {
+//   try {
+//     const { login } = req.body as { login: string }
+//     const result = deleteUser(login)
+//     res.status(204).send({ success: true, result: result.changes })
+//   } catch (e) {
+//     console.error(e)
+//   }
+// })
 //
 // // variable pour lancer le serveur
 // const start = async () => {
