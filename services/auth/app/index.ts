@@ -1,11 +1,18 @@
 import Fastify from 'fastify'
 import argon2, { argon2id } from 'argon2'
 import BetterSqlite3 from 'better-sqlite3'
+import jwt from 'jsonwebtoken'
 import type { Database as BetterSqlite3Database } from 'better-sqlite3'
 
 const fastify = Fastify({ logger: true })
 
 let db!: BetterSqlite3Database
+
+type UserRow = {
+  id: number
+  username: string
+  password: string
+}
 
 function setupDb() {
     db = new BetterSqlite3('./auth.db')
@@ -55,17 +62,22 @@ fastify.post('/login', async (request, reply) => {
     if (!username || !password) {
         return reply.status(400).send({ error: 'Missing username or password' })
     }
-    const stmt = db.prepare('SELECT * FROM users WHERE username = ? AND password = ?')
-    const user = stmt.get(username, password)
+    const stmt = db.prepare('SELECT * FROM users WHERE username = ?')
+    const user = stmt.get(username) as UserRow | undefined
     if (!user) {
         return reply.status(401).send({ error: 'Invalid credentials' })
     }
-    return { success: true }
+    const validPassword = await verifyPassword(user.password, password)
+    if (!validPassword) {
+        return reply.status(401).send({ error: 'Invalid credentials' })
+    }
+    const token = jwt.sign({ userId: user.id, username: user.username }, 'your_jwt_secret', { expiresIn: '1h' })
+    return { token }
 })
 
 fastify.get('/health', async (request, reply) => {
     if (db) {
-        return { status: 'abetemps' }
+        return { status: 'ok' }
     }
     else {
         return reply.status(500).send({ status: 'error', message: 'Database not initialized' })
