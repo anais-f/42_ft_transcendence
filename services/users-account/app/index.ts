@@ -1,7 +1,6 @@
-import { db } from './database/database.js'
+import { db } from './database/usersDatabase.js'
 import Fastify from 'fastify'
 import { ZodTypeProvider, validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
-
 
 const app = Fastify({
   logger: false,
@@ -10,7 +9,6 @@ const app = Fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-// app.register(userRoutes)
 // Enregistrer les routes
 //app.register(userRoutes)
 

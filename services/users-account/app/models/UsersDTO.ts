@@ -1,12 +1,6 @@
-/*
-  zod schema validation example
- */
-
 import { z } from 'zod'
-import { User, UserId, UserStatus, UserConnection, UserAvatar } from './Users'
 
-
-// Schémas pour les routes
+// Routes schema
 export const UserIdSchema = z.object({
   id_user: z.number().int().positive()
 });
@@ -27,7 +21,7 @@ export const WebhookNewUserSchema = z.object({
 });
 
 
-// Schémas pour les réponses
+// Response schema
 export const UserResponseSchema = z.object({
   id_user: z.number(),
   avatar: z.string(),
@@ -40,7 +34,7 @@ export const UsersListResponseSchema = z.object({
 });
 
 
-// Types inférés
+// Infer types
 export type UserIdDTO = z.infer<typeof UserIdSchema>;
 export type UserStatusDTO = z.infer<typeof UserStatusSchema>;
 export type UserAvatarDTO = z.infer<typeof UserAvatarSchema>;
