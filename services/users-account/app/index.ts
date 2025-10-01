@@ -2,6 +2,7 @@ import { db } from './database/database.js'
 import Fastify from 'fastify'
 import { ZodTypeProvider, validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
+
 const app = Fastify({
   logger: false,
 }).withTypeProvider<ZodTypeProvider>()
@@ -10,6 +11,15 @@ app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
 // app.register(userRoutes)
+// Enregistrer les routes
+//app.register(userRoutes)
+
+// Récupérer les utilisateurs existants depuis le service auth au démarrage
+//const initializeUsers = async () => {
+//  console.log('Initialisation: récupération des utilisateurs depuis le service auth...');
+//  await fetchUsersFromAuth();
+//}
+
 
 const start = async () => {
   try {

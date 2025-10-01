@@ -36,7 +36,7 @@ export async function fetchUsersFromAuth() {
   }
 }
 
-export class UserServices {
+export class UserServicesRequests {
   static userExists(user: UserId): boolean {
     return UsersRepository.userExists(user);
   }
