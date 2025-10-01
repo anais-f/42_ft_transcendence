@@ -10,9 +10,9 @@
 
 export interface User {
   id_user: number
-  avatar?: string
-  status?: number // 0 = offline, 1 = online
-  last_connection?: string // ISO timestamp
+  avatar: string
+  status: number // 0 = offline, 1 = online
+  last_connection: string // ISO timestamp
 }
 
 export type UserId = Pick<User, 'id_user'>
