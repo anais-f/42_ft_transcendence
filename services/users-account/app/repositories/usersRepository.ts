@@ -1,17 +1,4 @@
-// accès DB call SQL et persistance des données
-/*
-    Abstraction de la base de données.
-    Contiennent les requêtes SQL ou ORM.
-    Gestion directe des opérations CRUD.
-    Ex: UserRepository.insert(), UserRepository.findById().
-*/
-// bool status 0 = offline, 1 = online
-// TODO: changer l'adresse de l'avatar par defaut
-// TODO: pouvoir changer le username -> call avec l'auth pour la modif
-// TODO: get username (from auth service)
-// TODO: get all users avec le username (from auth service)
-
-import { db } from '../database/database.js'
+import { db } from '../database/usersDatabase.js'
 import type {
 	User,
 	UserStatus,
@@ -19,6 +6,12 @@ import type {
 	UserAvatar,
 	UserId,
 } from '../models/Users.js'
+
+// bool status 0 = offline, 1 = online
+// TODO: changer l'adresse de l'avatar par defaut
+// TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
+// TODO: get username (from auth service) -> internalApi
+// TODO: get all users avec le username (from auth service) -> internalApi partiellement
 
 const defaultAvatar: string = '../img.png' // default avatar path
 
