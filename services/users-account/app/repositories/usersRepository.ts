@@ -7,7 +7,6 @@ import type {
 	UserId,
 } from '../models/Users.js'
 
-// bool status 0 = offline, 1 = online
 // TODO: changer l'adresse de l'avatar par defaut
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
 // TODO: get username (from auth service) -> internalApi
@@ -16,7 +15,7 @@ import type {
 const defaultAvatar: string = '../img.png' // default avatar path
 
 export class UsersRepository {
-  static userExists(user: UserId): boolean {
+  static existsById(user: UserId): boolean {
     const selectStmt = db.prepare('SELECT 1 FROM users WHERE id_user = ?')
     const row = selectStmt.get(user.id_user)
     return !!row

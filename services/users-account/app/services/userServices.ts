@@ -9,9 +9,9 @@ import type {
 import { UsersRepository } from '../repositories/usersRepository.js';
 
 
-export class UserServicesRequests {
-  static userExists(user: UserId): boolean {
-    return UsersRepository.userExists(user);
+export class UsersServicesRequests {
+  static existsById(user: UserId): boolean {
+    return UsersRepository.existsById(user);
   }
 
   // INSERT methods
