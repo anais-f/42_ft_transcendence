@@ -6,6 +6,9 @@
     Appeler les services métier pour la logique.
     Renvoyer la réponse au client.
     Ne contenir quasiment pas de logique métier.
+    gère les requetes entrantes et les reponses sortantes
+    utilise les schemas de validation et de typage (Zod)
+    appelle les services pour la logique métier
  */
 
 // utilisation ici des schemas de validation et de typage avec Zod
@@ -28,7 +31,7 @@
 // export default controller;
 
 
-// faire le webhiik a chaque notif et tout les X temps faire un fetch de la DB auth pour update/create les users et comparer si j'en ai un manquant
+// faire le webhook a chaque notif et tout les X temps faire un fetch de la DB auth pour update/create les users et comparer si j'en ai un manquant
 
 /*
 Service AUTH : Quand un utilisateur se crée → envoie POST vers http://users-account:3000/users/webhookNewUser
