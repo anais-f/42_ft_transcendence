@@ -9,7 +9,6 @@
     appelle les services pour la logique métier
  */
 
-
 // import { FastifyPluginAsync } from 'fastify';
 // import { z } from 'zod';
 // import { UserSchema } from '../models/users';
@@ -26,7 +25,6 @@
 // };
 //
 // export default controller;
-
 
 // faire le webhook a chaque notif et tout les X temps faire un fetch de la DB auth pour update/create les users et comparer si j'en ai un manquant
 

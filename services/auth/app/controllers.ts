@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { AuthRepository } from './repositories';
+import { AuthRepository } from './repositories.js';
 
 export const AuthController = {
   // Exporter les données utilisateurs pour users-account
@@ -18,10 +18,10 @@ export const AuthController = {
 
     try {
       const userId = AuthRepository.createUser(username, password);
-      const newUser = { id_user: userId, username };
+      const newUser = { id_user: userId.id_user };
 
       // Webhook SYNCHRONE - doit réussir pour valider la création -> donc pas de onResponse de fastify, ni de preHandler à cause du id_user généré à la création
-      const webhookUrl = 'http://users:3000/users/webhookNewUser';
+      const webhookUrl = 'http://localhost:3000/users/webhookNewUser';
       const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,7 +30,7 @@ export const AuthController = {
 
       if (!webhookResponse.ok) {
         // Si le webhook échoue, on annule la création en supprimant l'utilisateur
-        AuthRepository.deleteUser(userId);
+        AuthRepository.deleteUser(userId.id_user);
         reply.status(400).send({
           error: `Erreur synchronisation users-account: ${webhookResponse.statusText}`
         });

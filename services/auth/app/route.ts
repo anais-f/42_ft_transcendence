@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { AuthController } from './controllers';
+import { AuthController } from './controllers.js';
 
 export default async function routes(fastify: FastifyInstance) {
   // Route d'export des données utilisateurs pour users-account

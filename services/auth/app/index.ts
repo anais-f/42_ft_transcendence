@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import DatabaseConstructor from 'better-sqlite3';
 import type { Database } from 'better-sqlite3';
-import routes from './route';
+import routes from './route.js';
 
 // Base de données
 export const db: Database = new DatabaseConstructor('./database.sqlite');
@@ -28,8 +28,8 @@ app.register(routes);
 // Démarrage du serveur
 const start = async () => {
   try {
-    await app.listen({ port: 3000, host: '0.0.0.0' });
-    console.log('Serveur auth en écoute sur le port 3000');
+    await app.listen({ port: 3001, host: '0.0.0.0' });
+    console.log('Serveur auth en écoute sur le port 3001');
   } catch (err) {
     console.error('Erreur lors du démarrage du serveur: ', err);
     process.exit(1);

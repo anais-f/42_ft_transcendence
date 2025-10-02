@@ -1,37 +1,41 @@
-import { db } from './database/usersDatabase.js'
+import './database/usersDatabase.js'
 import Fastify from 'fastify'
-import { ZodTypeProvider, validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
+import {
+	ZodTypeProvider,
+	validatorCompiler,
+	serializerCompiler,
+} from 'fastify-type-provider-zod'
+import { usersRoutes } from './routes/usersRoutes.js'
+import { UsersServices } from './services/usersServices.js'
 
 const app = Fastify({
-  logger: false,
+	logger: false,
 }).withTypeProvider<ZodTypeProvider>()
 
-app.setValidatorCompiler(validatorCompiler);
-app.setSerializerCompiler(serializerCompiler);
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
 
-// Enregistrer les routes
-//app.register(userRoutes)
+// Register routes
+app.register(usersRoutes)
 
-// Récupérer les utilisateurs existants depuis le service auth au démarrage
-//const initializeUsers = async () => {
-//  console.log('Initialisation: récupération des utilisateurs depuis le service auth...');
-//  await fetchUsersFromAuth();
-//}
-
+const initializeUsers = async () => {
+	console.log('Initializing users from auth service...')
+	await UsersServices.syncAllUsersFromAuth()
+	console.log('User initialization complete.')
+}
 
 const start = async () => {
-  try {
-    await app.listen({ port: 3000, host: '0.0.0.0' })
-    console.log('Listening on port 3000')
-  } catch (err) {
-    console.error('Error starting server: ', err)
-    process.exit(1)
-  }
+	try {
+		await initializeUsers()
+		await app.listen({ port: 3000, host: '0.0.0.0' })
+		console.log('Listening on port 3000')
+	} catch (err) {
+		console.error('Error starting server: ', err)
+		process.exit(1)
+	}
 }
 
 start()
-
-
 
 // import DatabaseConstructor from 'better-sqlite3'
 // import type { Database } from 'better-sqlite3'
@@ -85,12 +89,6 @@ start()
 //   res.send('heho michel!')
 // })
 //
-
-
-
-
-
-
 
 // app.get('/users', (req, res) => {
 
