@@ -1,15 +1,15 @@
-import Fastify from 'fastify'
+import Fastify from 'fastify';
 import DatabaseConstructor from 'better-sqlite3';
 import type { Database } from 'better-sqlite3';
+import routes from './route';
 
+// Base de données
+export const db: Database = new DatabaseConstructor('./database.sqlite');
 
-// On annote explicitement le type de 'database' pour résoudre l'erreur TS4023.
-// L'export reste 'database', donc 'index.ts' n'est pas impacté.
-const db: Database = new DatabaseConstructor('./database.sqlite')
-
+// Création de la table et insertion des données de test
 db.exec(
-    'CREATE TABLE IF NOT EXISTS users (id_user INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)'
-)
+  'CREATE TABLE IF NOT EXISTS users (id_user INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)'
+);
 
 const stmt = db.prepare('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)');
 stmt.run('anfichet', 'passwd');
@@ -17,64 +17,23 @@ stmt.run('acancel', 'passwd');
 stmt.run('lrio', 'passwd');
 stmt.run('mjuffard', 'passwd');
 
-
+// Configuration Fastify
 const app = Fastify({
   logger: false,
-})
-
-// Route export des données utilisateurs pour users-account
-fastify.get('/auth/users', async (request, reply) => {
-  try {
-    // Requête pour récupérer tous les utilisateurs
-    const users = db.prepare('SELECT id_user, username FROM users').all();
-    reply.send({ users });
-  } catch (err) {
-    reply.status(500).send({ error: 'Erreur lors de la récupération des utilisateurs' });
-  }
 });
 
-// creation d'un compte utilisateur
-fastify.post('/auth/createAccount', async (request, reply) => {
-  const { username, password } = request.body;
-  // Valider, vérifier unicité, hasher le mot de passe puis insérer en base
+// Enregistrement des routes
+app.register(routes);
 
-  try {
-    const insertStmt = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-    insertStmt.run(username, password);
-
-    const newUser = { id_user: db.prepare('SELECT last_insert_rowid() as id_user').get().id_user, username };
-    const webhookUrl = 'http://users:3000/users/webhookNewUser';
-    try {
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser),
-      });
-      console.log('Webhook sent successfully');
-    }
-    catch (err) {
-      console.error('Error sending webhook: ', err);
-    }
-    reply.code(201).send({ status: 'account created', username });
-  } catch (err) {
-    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-      reply.status(400).send({ error: 'Username already exists' });
-      return;
-    }
-    reply.status(500).send({ error: 'Database error' });
-    return;
-  }
-  return { status: 'account created', username };
-});
-
+// Démarrage du serveur
 const start = async () => {
   try {
-    await app.listen({ port: 3000, host: '0.0.0.0' })
-    console.log('Listening on port 3000')
+    await app.listen({ port: 3000, host: '0.0.0.0' });
+    console.log('Serveur auth en écoute sur le port 3000');
   } catch (err) {
-    console.error('Error starting server: ', err)
-    process.exit(1)
+    console.error('Erreur lors du démarrage du serveur: ', err);
+    process.exit(1);
   }
-}
+};
 
-start()
+start();

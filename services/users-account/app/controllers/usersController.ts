@@ -18,3 +18,34 @@ export const createUser = async (req, res) => {
 };
 
  */
+
+import { UsersService } from '../services/userServices.js';
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js';
+import {NewUserDTO} from "../models/UsersDTO.js";
+
+/**
+ * Handle user creation via webhook
+ * @description This function handles the creation of a new user when a webhook notification is received from the auth service.
+ * It checks if the user already exists and creates a new user if not. Responds with appropriate status codes and messages based on the operation outcome.
+ * @param req
+ * @param res
+ */
+export async function handleUserCreated(req: FastifyRequest<{ Body: NewUserDTO }>, res: FastifyReply) {
+  try {
+    const newUser: NewUserDTO = req.body
+
+    await UsersService.createUser(newUser)
+    return res.status(201).send({ success: true, message: SUCCESS_MESSAGES.USER_CREATED })
+  } catch (error) {
+    if (error instanceof Error && error.message === ERROR_MESSAGES.USER_ALREADY_EXISTS) {
+      return res.status(200).send({ success: true, message: ERROR_MESSAGES.USER_ALREADY_EXISTS })
+    }
+    return res.status(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+  }
+}
+
+export async function getUser(req: FastifyRequest, res: FastifyReply) {
+  return res.status(200).send({ success: true })
+  // TODO: implement get user with enrichissement from auth service
+}
