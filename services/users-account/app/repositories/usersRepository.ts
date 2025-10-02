@@ -19,19 +19,19 @@ const defaultAvatar: string = '../img.png' // default avatar path
  * @class UsersRepository
  */
 export class UsersRepository {
-  /**
-   * @description Check if a user exists by id
-   * @param user
-   */
+	/**
+	 * @description Check if a user exists by id
+	 * @param user
+	 */
 	static existsById(user: UserId): boolean {
 		const selectStmt = db.prepare('SELECT 1 FROM users WHERE id_user = ?')
 		const row = selectStmt.get(user.id_user)
 		return !!row
 	}
 
-  /**
-   * @description Insert many or one user with default values for avatar, status and last_connection
-   */
+	/**
+	 * @description Insert many or one user with default values for avatar, status and last_connection
+	 */
 	static insertManyUsers(users: UserId[]) {
 		const insertStmt = db.prepare(
 			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
@@ -45,7 +45,7 @@ export class UsersRepository {
 		insertMany(users)
 	}
 
-	static insertUser(user: UserId) {
+	static insertUser(user: UserId): void {
 		const insertStmt = db.prepare(
 			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
 		)
@@ -53,17 +53,17 @@ export class UsersRepository {
 		insertStmt.run(user.id_user, defaultAvatar, 1, now)
 	}
 
-  /**
-   * @description Update methods for user status, last connection or avatar
-   */
-	static updateUserStatus(user: UserStatus) {
+	/**
+	 * @description Update methods for user status, last connection or avatar
+	 */
+	static updateUserStatus(user: UserStatus): void {
 		const updateStmt = db.prepare(
 			'UPDATE users SET status = ? WHERE id_user = ?'
 		)
 		updateStmt.run(user.status, user.id_user)
 	}
 
-	static updateLastConnection(user: UserConnection) {
+	static updateLastConnection(user: UserConnection): void {
 		const updateStmt = db.prepare(
 			'UPDATE users SET last_connection = ? WHERE id_user = ?'
 		)
@@ -71,30 +71,30 @@ export class UsersRepository {
 		updateStmt.run(now, user.id_user)
 	}
 
-	static updateUserAvatar(user: UserAvatar) {
+	static updateUserAvatar(user: UserAvatar): void {
 		const updateStmt = db.prepare(
 			'UPDATE users SET avatar = ? WHERE id_user = ?'
 		)
 		updateStmt.run(user.avatar, user.id_user)
 	}
 
-  /**
-   * @description Some get methods according to the table fields
-   */
-	static getUserById(user: UserId) {
+	/**
+	 * @description Some get methods according to the table fields
+	 */
+	static getUserById(user: UserId): User | undefined {
 		const selectStmt = db.prepare(
 			'SELECT id_user, avatar, status, last_connection FROM users WHERE id_user = ?'
 		)
-		return selectStmt.get(user.id_user)
+		return selectStmt.get(user.id_user) as User | undefined
 	}
 
-	static getStatusById(user: UserStatus): number {
+	static getStatusById(user: UserId): number {
 		const selectStmt = db.prepare('SELECT status FROM users WHERE id_user = ?')
 		const row = selectStmt.get(user.id_user) as { status: number }
 		return row.status
 	}
 
-	static getLastConnectionById(user: UserConnection): string {
+	static getLastConnectionById(user: UserId): string {
 		const selectStmt = db.prepare(
 			'SELECT last_connection FROM users WHERE id_user = ?'
 		)
@@ -102,15 +102,15 @@ export class UsersRepository {
 		return row.last_connection
 	}
 
-	static getAvatarById(user: UserAvatar): string {
+	static getAvatarById(user: UserId): string {
 		const selectStmt = db.prepare('SELECT avatar FROM users WHERE id_user = ?')
 		const row = selectStmt.get(user.id_user) as { avatar: string }
 		return row.avatar
 	}
 
-  /**
-   * @description Get all users or users according to their status
-   */
+	/**
+	 * @description Get all users or users according to their status
+	 */
 	static getAllUsers(): User[] {
 		const selectStmt = db.prepare(
 			'SELECT id_user, avatar, status, last_connection FROM users'
@@ -125,11 +125,11 @@ export class UsersRepository {
 		return selectStmt.all() as User[]
 	}
 
-  /**
-   * @description Delete user by id
-   */
-  static deleteUserById(user: UserId) {
-    const deleteStmt = db.prepare('DELETE FROM users WHERE id_user = ?')
-    deleteStmt.run(user.id_user)
-  }
+	/**
+	 * @description Delete user by id
+	 */
+	static deleteUserById(user: UserId): void {
+		const deleteStmt = db.prepare('DELETE FROM users WHERE id_user = ?')
+		deleteStmt.run(user.id_user)
+	}
 }

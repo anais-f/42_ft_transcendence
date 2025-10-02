@@ -11,38 +11,39 @@ export default function (fastify, opts, done) {
 fastify.METHOD(PATH, OPTIONS, HANDLER)
  */
 
-import { FastifyPluginAsync } from 'fastify';
-import { z } from 'zod';
+import { FastifyPluginAsync } from 'fastify'
 import {
-  SuccessResponseSchema,
-  ErrorResponseSchema,
-  NewUserSchema,
-  UserResponseSchema,
-  UsersListResponseSchema,
-} from '../models/UsersDTO.js';
-import { handleUserCreated, getUser } from '../controllers/usersController.js';
+	SuccessResponseSchema,
+	ErrorResponseSchema,
+	NewUserSchema,
+} from '../models/UsersDTO.js'
+import { handleUserCreated } from '../controllers/usersController.js'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-  // POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
-  fastify.post('/users/webhookNewUser', {
-    schema: {
-      body: NewUserSchema,
-      response: {
-        200: SuccessResponseSchema,
-        201: SuccessResponseSchema,
-        400: ErrorResponseSchema,
-        500: ErrorResponseSchema,
-      }
-    }
-  }, handleUserCreated);
+	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
+	fastify.post(
+		'/users/webhookNewUser',
+		{
+			schema: {
+				body: NewUserSchema,
+				response: {
+					200: SuccessResponseSchema,
+					201: SuccessResponseSchema,
+					400: ErrorResponseSchema,
+					500: ErrorResponseSchema,
+				},
+			},
+		},
+		handleUserCreated
+	)
 
-  // fastify.get('/users/:id', {
-  //   schema: {
-  //     response: {
-  //       200: UserResponseSchema,
-  //       404: ErrorResponseSchema,
-  //       500: ErrorResponseSchema,
-  //     }
-  //   }
-  // }, getUser);
-};
+	// fastify.get('/users/:id', {
+	//   schema: {
+	//     response: {
+	//       200: UserResponseSchema,
+	//       404: ErrorResponseSchema,
+	//       500: ErrorResponseSchema,
+	//     }
+	//   }
+	// }, getUser);
+}

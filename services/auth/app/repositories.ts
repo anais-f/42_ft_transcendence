@@ -1,4 +1,4 @@
-import { db } from './index';
+import { db } from './index.js';
 
 export const AuthRepository = {
   // Récupérer tous les utilisateurs pour l'export vers users-account
@@ -10,7 +10,7 @@ export const AuthRepository = {
   createUser: (username: string, password: string) => {
     const insertStmt = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
     insertStmt.run(username, password);
-    return db.prepare('SELECT last_insert_rowid() as id_user').get().id_user;
+    return db.prepare('SELECT last_insert_rowid() as id_user').get() as { id_user: number };
   },
 
   // Supprimer un utilisateur (utilisé si le webhook échoue)
