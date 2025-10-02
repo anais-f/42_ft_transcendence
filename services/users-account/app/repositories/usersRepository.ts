@@ -14,14 +14,24 @@ import type {
 
 const defaultAvatar: string = '../img.png' // default avatar path
 
+/**
+ * @description Repository for users table
+ * @class UsersRepository
+ */
 export class UsersRepository {
-  static existsById(user: UserId): boolean {
-    const selectStmt = db.prepare('SELECT 1 FROM users WHERE id_user = ?')
-    const row = selectStmt.get(user.id_user)
-    return !!row
-  }
+  /**
+   * @description Check if a user exists by id
+   * @param user
+   */
+	static existsById(user: UserId): boolean {
+		const selectStmt = db.prepare('SELECT 1 FROM users WHERE id_user = ?')
+		const row = selectStmt.get(user.id_user)
+		return !!row
+	}
 
-	// INSERT methods
+  /**
+   * @description Insert many or one user with default values for avatar, status and last_connection
+   */
 	static insertManyUsers(users: UserId[]) {
 		const insertStmt = db.prepare(
 			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
@@ -43,15 +53,17 @@ export class UsersRepository {
 		insertStmt.run(user.id_user, defaultAvatar, 1, now)
 	}
 
-	// SET / UPDATE methods
-	static setUserStatus(user: UserStatus) {
+  /**
+   * @description Update methods for user status, last connection or avatar
+   */
+	static updateUserStatus(user: UserStatus) {
 		const updateStmt = db.prepare(
 			'UPDATE users SET status = ? WHERE id_user = ?'
 		)
 		updateStmt.run(user.status, user.id_user)
 	}
 
-	static setLastConnection(user: UserConnection) {
+	static updateLastConnection(user: UserConnection) {
 		const updateStmt = db.prepare(
 			'UPDATE users SET last_connection = ? WHERE id_user = ?'
 		)
@@ -59,14 +71,16 @@ export class UsersRepository {
 		updateStmt.run(now, user.id_user)
 	}
 
-	static setUserAvatar(user: UserAvatar) {
+	static updateUserAvatar(user: UserAvatar) {
 		const updateStmt = db.prepare(
 			'UPDATE users SET avatar = ? WHERE id_user = ?'
 		)
 		updateStmt.run(user.avatar, user.id_user)
 	}
 
-	// GET methods
+  /**
+   * @description Some get methods according to the table fields
+   */
 	static getUserById(user: UserId) {
 		const selectStmt = db.prepare(
 			'SELECT id_user, avatar, status, last_connection FROM users WHERE id_user = ?'
@@ -94,6 +108,9 @@ export class UsersRepository {
 		return row.avatar
 	}
 
+  /**
+   * @description Get all users or users according to their status
+   */
 	static getAllUsers(): User[] {
 		const selectStmt = db.prepare(
 			'SELECT id_user, avatar, status, last_connection FROM users'
@@ -101,10 +118,18 @@ export class UsersRepository {
 		return selectStmt.all() as User[]
 	}
 
-  static getOnlineUsers(): User[] {
-    const selectStmt = db.prepare(
-      'SELECT id_user, avatar, status, last_connection FROM users WHERE status = 1'
-    )
-    return selectStmt.all() as User[]
+	static getOnlineUsers(): User[] {
+		const selectStmt = db.prepare(
+			'SELECT id_user, avatar, status, last_connection FROM users WHERE status = 1'
+		)
+		return selectStmt.all() as User[]
+	}
+
+  /**
+   * @description Delete user by id
+   */
+  static deleteUserById(user: UserId) {
+    const deleteStmt = db.prepare('DELETE FROM users WHERE id_user = ?')
+    deleteStmt.run(user.id_user)
   }
 }
