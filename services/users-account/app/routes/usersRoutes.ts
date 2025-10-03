@@ -17,12 +17,12 @@ import {
 	ErrorResponseSchema,
 	NewUserSchema,
 } from '../models/UsersDTO.js'
-import { handleUserCreated } from '../controllers/usersController.js'
+import { handleUserCreated } from '../controllers/usersControllers.js'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
 	fastify.post(
-		'/users/webhookNewUser',
+		'/api/users/webhookNewUser',
 		{
 			schema: {
 				body: NewUserSchema,

@@ -21,7 +21,7 @@ export const AuthController = {
       const newUser = { id_user: userId.id_user };
 
       // Webhook SYNCHRONE - doit réussir pour valider la création -> donc pas de onResponse de fastify, ni de preHandler à cause du id_user généré à la création
-      const webhookUrl = 'http://localhost:3000/users/webhookNewUser';
+      const webhookUrl = 'http://localhost:3000/api/users/webhookNewUser';
       const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

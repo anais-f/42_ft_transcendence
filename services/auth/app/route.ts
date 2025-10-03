@@ -3,8 +3,8 @@ import { AuthController } from './controllers.js';
 
 export default async function routes(fastify: FastifyInstance) {
   // Route d'export des données utilisateurs pour users-account
-  fastify.get('/auth/users', AuthController.getAllUsers);
+  fastify.get('/api/auth/users', AuthController.getAllUsers);
 
   // Route de création de compte utilisateur
-  fastify.post('/auth/register', AuthController.register);
+  fastify.post('/api/auth/register', AuthController.register);
 }

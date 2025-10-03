@@ -15,7 +15,7 @@ import fetch from 'node-fetch'
 export class AuthApi {
 	static async getAllUsers(): Promise<{ id_user: number }[]> {
 		try {
-			const response = await fetch('http://localhost:3001/auth/users')
+			const response = await fetch('http://localhost:3001/api/auth/users')
 			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`)
 
