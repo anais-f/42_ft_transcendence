@@ -15,7 +15,7 @@ import fetch from 'node-fetch'
 export class AuthApi {
 	static async getAllUsers(): Promise<{ id_user: number }[]> {
 		try {
-			const response = await fetch('http://localhost:3001/api/auth/users')
+			const response = await fetch('http://localhost:3001/auth/users')
 			if (!response.ok)
 				throw new Error(`HTTP error! status: ${response.status}`)
 
@@ -27,6 +27,10 @@ export class AuthApi {
 			throw error
 		}
 	}
+
+  // auth/users/:id -> get username
+  // renvoi l'id et le username'
+
 }
 
 // ✅ Récupérer tous les users du service auth

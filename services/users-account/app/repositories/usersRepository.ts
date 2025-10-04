@@ -5,7 +5,7 @@ import type {
 	UserConnection,
 	UserAvatar,
 	UserId,
-} from '../models/Users.js'
+} from '../models/Users'
 
 // TODO: changer l'adresse de l'avatar par defaut
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi

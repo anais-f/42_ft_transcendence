@@ -9,6 +9,7 @@
 		"test:pong:shared": "jest --selectProjects=pong-shared",
 		"test:pong:client": "jest --selectProjects=pong-client",
 		"test:pong:server": "jest --selectProjects=pong-server",
+    "test:users-account": "jest --selectProjects=users-account-app",
 		"build": "npm run build --workspaces --if-present",
 		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
@@ -49,6 +50,7 @@
 		"better-sqlite3": "^12.2.0",
 		"fastify": "^5.6.0",
 		"fastify-type-provider-zod": "^6.0.0",
-		"node-fetch": "^3.3.2"
+		"node-fetch": "^3.3.2",
+		"zod": "^4.1.11"
 	}
 }

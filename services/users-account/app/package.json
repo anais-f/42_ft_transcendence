@@ -3,8 +3,14 @@
 	"version": "1.0.0",
 	"main": "dist/index.js",
 	"scripts": {
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --runInBand",
 		"build": "tsc",
 		"start": "node dist/index.js",
 		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0",
+		"jest": "^30.2.0",
+		"ts-jest": "^29.4.4"
 	}
 }
