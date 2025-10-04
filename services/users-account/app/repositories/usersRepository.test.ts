@@ -1,7 +1,6 @@
-import { UsersRepository } from './usersRepository'
-import { db } from '../database/usersDatabase'
+import db from '../database/usersDatabase'
+import { UsersRepository} from "./usersRepository";
 
-// Mock la base SQLite
 jest.mock('../database/usersDatabase', () => ({
   db: {
     prepare: jest.fn(() => ({
