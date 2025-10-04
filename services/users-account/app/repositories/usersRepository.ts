@@ -1,4 +1,4 @@
-import { db } from '../database/usersDatabase.js'
+import { db } from '../database/usersDatabase'
 import type {
 	User,
 	UserStatus,
