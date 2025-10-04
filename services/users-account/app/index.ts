@@ -1,12 +1,12 @@
-import './database/usersDatabase.js'
+import './database/usersDatabase'
 import Fastify from 'fastify'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
 	serializerCompiler,
 } from 'fastify-type-provider-zod'
-import { usersRoutes } from './routes/usersRoutes.js'
-import { UsersServices } from './services/usersServices.js'
+import { usersRoutes } from './routes/usersRoutes'
+import { UsersServices } from './services/usersServices'
 
 const app = Fastify({
 	logger: false,
