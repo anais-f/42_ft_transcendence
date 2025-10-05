@@ -5,7 +5,7 @@ const config: Config.InitialOptions = {
 	testEnvironment: 'node',
 	modulePaths: ['<rootDir/'],
 	moduleNameMapper: {
-		'^@ft_transcendence/(.*)$': '<rootDir>/packages/$1',
+		'^@ft_transcendence/(.*)$': '<rootDir>/(packages|services)/$1',
 	},
 	projects: [
 		{
@@ -23,6 +23,12 @@ const config: Config.InitialOptions = {
 		{
 			displayName: 'pong-server',
 			testMatch: ['<rootDir>/packages/pong-server/**/*.test.ts'],
+			preset: 'ts-jest',
+			rootDir: './',
+		},
+		{
+			displayName: 'pong-server-app',
+			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
 			preset: 'ts-jest',
 			rootDir: './',
 		},
