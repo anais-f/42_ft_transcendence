@@ -46,52 +46,45 @@ export class Circle extends AShape {
 	}
 
 	private intersectRay(other: Ray): Vector2[] | null {
-		const rayOrigin = other.getOrigin()
-		const rayDirection = other.getDirection()
-		const squaredDistanceToCenter = Vector2.squaredDist(
-			rayOrigin,
-			this.getPos()
-		)
-		const squaredRadius = this.getRad() * this.getRad()
-
-		if (squaredDistanceToCenter <= squaredRadius) {
-			return [new Vector2(rayOrigin.getX(), rayOrigin.getY())]
+		function getHitPoint(ray: Ray, t: number): Vector2 {
+			return Vector2.add(
+				ray.getOrigin(),
+				Vector2.multiply(ray.getDirection(), t)
+			)
 		}
 
-		const toCircle = Vector2.subtract(this.getPos(), rayOrigin)
-		const projection = Vector2.dot(toCircle, rayDirection)
+		const op = Vector2.subtract(this.getOrigin(), other.getOrigin())
+		const squaredRad = this.getRad() ** 2
+		const dotOp = Vector2.dot(op, op)
 
-		if (projection < 0) {
+		const D = Vector2.dot(other.getDirection(), op)
+		const H2 = dotOp - D ** 2
+
+		if (H2 > squaredRad) {
 			return null
 		}
 
-		const scaledDirection = Vector2.multiply(rayDirection, projection)
-		const closestPoint = Vector2.add(rayOrigin, scaledDirection)
-		const squaredDistanceToClosest = Vector2.squaredDist(
-			closestPoint,
-			this.getPos()
-		)
+		const K = Math.sqrt(squaredRad - H2)
 
-		if (squaredDistanceToClosest <= squaredRadius) {
-			const distanceToIntersection = Math.sqrt(
-				squaredRadius - squaredDistanceToClosest
-			)
-			const t1 = Vector2.add(
-				closestPoint,
-				Vector2.multiply(rayDirection, distanceToIntersection)
-			)
-			const t2 = Vector2.subtract(
-				closestPoint,
-				Vector2.multiply(rayDirection, distanceToIntersection)
-			)
-
-			if (t1.equals(t2)) {
-				return [t1]
-			}
-			return [t1, t2]
+		if (dotOp <= squaredRad) {
+			const t = D + K
+			return [getHitPoint(other, t)]
 		}
 
-		return null
+		const t1 = D - K
+		const t2 = D + K
+
+		if (t1 < 0) {
+			return null
+		}
+
+		const p1 = getHitPoint(other, t1)
+		const p2 = getHitPoint(other, t2)
+
+		if (p1.equals(p2)) {
+			return [p1]
+		}
+		return [p1, p2]
 	}
 
 	private intersectCircle(other: Circle): Vector2[] | null {
