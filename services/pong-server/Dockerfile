@@ -1,6 +1,6 @@
 #-------------------------------------------------------------#
 # Build packages 
-FROM node:20-alpine AS build-packages
+FROM node:22-alpine AS build-packages
 
 WORKDIR /build
 
