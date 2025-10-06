@@ -5,23 +5,15 @@ import { z } from 'zod'
   They can be used in Fastify routes as follows:
   app.post('/user/status', { schema: { body: UserStatusSchema } }, (req, res) => { ... })
  */
-// export const UserIdSchema = z.object({
-// 	id_user: z.number().int().positive(),
-// })
-//
-// export const UserStatusSchema = z.object({
-// 	id_user: z.number().int().positive(),
-// 	status: z.number().int().min(0).max(1), // 0 = offline, 1 = online
-// })
-//
-// export const UserAvatarSchema = z.object({
-// 	id_user: z.number().int().positive(),
-// 	avatar: z.string().min(1),
-// })
-
-export const NewUserSchema = z.object({
+export const UserIdSchema = z.object({
 	id_user: z.number().int().positive(),
-})
+}).strict()
+
+// TODO : reprendre le schéma de l'auth -> DTO commun in progress
+export const UserAuthSchema = z.object({
+  id_user: z.number().int().positive(),
+  username: z.string().min(3).max(30),
+}).strict()
 
 /**
  * These schemas validate outgoing responses.
@@ -37,17 +29,17 @@ export const UserResponseSchema = z.object({
 
 export const UsersListResponseSchema = z.object({
 	users: z.array(UserResponseSchema),
-})
+}).strict()
 
 export const SuccessResponseSchema = z.object({
 	success: z.literal(true),
 	message: z.string().optional(),
-})
+}).strict()
 
 export const ErrorResponseSchema = z.object({
 	success: z.boolean().optional(),
 	error: z.string(),
-})
+}).strict()
 
 /**
   Typescript types inferred from zod schemas
@@ -56,7 +48,8 @@ export const ErrorResponseSchema = z.object({
 */
 export type UserResponseDTO = z.infer<typeof UserResponseSchema>
 export type UsersListResponseDTO = z.infer<typeof UsersListResponseSchema>
-export type NewUserDTO = z.infer<typeof NewUserSchema>
+export type UserIdDTO = z.infer<typeof UserIdSchema>
+export type UserAuthDTO = z.infer<typeof UserAuthSchema>
 export type SuccessResponseDTO = z.infer<typeof SuccessResponseSchema>
 export type ErrorResponseDTO = z.infer<typeof ErrorResponseSchema>
 // export type UserIdDTO = z.infer<typeof UserIdSchema>
