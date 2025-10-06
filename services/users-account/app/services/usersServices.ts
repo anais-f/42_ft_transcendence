@@ -7,7 +7,7 @@ import type {
 } from '../models/Users'
 import { UsersRepository } from '../repositories/usersRepository'
 import { ERROR_MESSAGES } from '../utils/utils'
-import { NewUserDTO } from '../models/UsersDTO'
+import { UserIdDTO } from '../models/UsersDTO'
 import { AuthApi } from './internalApi/AuthApi'
 
 export class UsersServices {
@@ -17,7 +17,7 @@ export class UsersServices {
 	 * @throws Error if user already exists
 	 * @returns void
 	 */
-	static async createUser(newUser: NewUserDTO): Promise<void> {
+	static async createUser(newUser: UserId): Promise<void> {
 		if (UsersRepository.existsById({ id_user: newUser.id_user }))
 			throw new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
 
@@ -25,7 +25,10 @@ export class UsersServices {
 		console.log(`User ${newUser.id_user} created`)
 	}
 
-	// create many users avec le tableau d'id ?
+  /**
+   * @description Sync all users from Auth service to local database
+   * @returns void
+   */
 	static async syncAllUsersFromAuth(): Promise<void> {
 		const authUsers = await AuthApi.getAllUsers()
 
@@ -36,18 +39,7 @@ export class UsersServices {
 		}
 	}
 
-	//
-	// // ✅ Logique métier pour sync périodique
-	// static async syncAllUsersFromAuth(): Promise<void> {
-	//   const authUsers = await AuthApi.getAllUsers();
-	//
-	//   for (const authUser of authUsers) {
-	//     if (!UsersRepository.existsById({ id_user: authUser.id_user })) {
-	//       UsersRepository.insertUser({ id_user: authUser.id_user });
-	//     }
-	//   }
-	// }
-	//
+
 	// // ✅ Récupération avec enrichissement
 	// static async getUserWithProfile(id_user: number): Promise<UserWithProfile> {
 	//   const localUser = UsersRepository.getUserById({ id_user });
