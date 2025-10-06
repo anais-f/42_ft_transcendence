@@ -15,7 +15,7 @@ import { FastifyPluginAsync } from 'fastify'
 import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
-	NewUserSchema,
+	UserIdSchema,
 } from '../models/UsersDTO.js'
 import { handleUserCreated } from '../controllers/usersControllers'
 
@@ -25,7 +25,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/users/webhookNewUser',
 		{
 			schema: {
-				body: NewUserSchema,
+				body: UserIdSchema,
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
@@ -37,6 +37,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handleUserCreated
 	)
 
+  // TODO: GET /users/:id - Récupérer un utilisateur avec enrichissement (username from auth service)
 	// fastify.get('/users/:id', {
 	//   schema: {
 	//     response: {

@@ -7,51 +7,52 @@
 */
 
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
-// TODO: get username (from auth service) -> internalApi
 // TODO: get all users avec le username (from auth service) -> internalApi partiellement
 
 import fetch from 'node-fetch'
+import { UserIdDTO, UserAuthDTO } from '../models/UsersDTO'
+import {UserId} from "../../models/Users";
 
 export class AuthApi {
-	static async getAllUsers(): Promise<{ id_user: number }[]> {
-		try {
-			const response = await fetch('http://localhost:3001/auth/users')
-			if (!response.ok)
-				throw new Error(`HTTP error! status: ${response.status}`)
+  /**
+   * @description Fetch all users from the auth service
+   * @returns Array of users with id_user and username
+   * @throws Error if the request fails
+   */
+  static async getAllUsers(): Promise<UserIdDTO[]> {
+    try {
+      const response = await fetch('http://localhost:3001/auth/users')
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
-			const data = (await response.json()) as { users: { id_user: number }[] }
+      const data = (await response.json()) as UserAuthDTO[]
+      if (!Array.isArray(data)) throw new Error('Invalid response shape from auth service')
 
-			return data.users
-		} catch (error) {
-			console.error('Error fetching users from auth service:', error)
-			throw error
-		}
-	}
+      return data.map(user => ({ id_user: user.id_user }))
+    } catch (error) {
+      console.error('Error fetching users from auth service:', error)
+      throw error
+    }
+  }
 
-  // auth/users/:id -> get username
-  // renvoi l'id et le username'
+  /**
+   * @description Fetch username by user ID from the auth service
+   * @returns UsernameDTO
+   * @throws Error if the request fails
+   * @param The ID of the user to fetch the username for
+   */
+  static async getUsernameById(id: UserId): Promise<string> {
+    try {
+      const response = await fetch(`http://localhost:3001/auth/users/${id.id_user}`)
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
+      const data = (await response.json()) as UserAuthDTO
+      if (!data || typeof data.username !== 'string')
+        throw new Error('Invalid response shape from auth service')
+
+      return data.username
+    } catch (error) {
+      console.error('Error fetching username from auth service:', error)
+      throw error
+    }
+  }
 }
-
-// ✅ Récupérer tous les users du service auth
-// static async getAllUsers(): Promise<{ id_user: number, username: string }[]> {
-//   const response = await fetch('http://auth:3000/auth/users');
-//   const data = await response.json();
-//   return data.users;
-// }
-//
-// // ✅ Récupérer le username d'un user spécifique
-// static async getUsernameById(id_user: number): Promise<string> {
-//   const response = await fetch(`http://auth:3000/auth/users/${id_user}`);
-//   const data = await response.json();
-//   return data.username;
-// }
-
-// // ✅ Notifier le service auth d'un changement
-// static async notifyUserStatusChange(id_user: number, status: number): Promise<void> {
-//   await fetch(`http://auth:3000/auth/users/${id_user}/status`, {
-//     method: 'POST',
-//     body: JSON.stringify({ status }),
-//     headers: { 'Content-Type': 'application/json' }
-//   });
-// }

@@ -22,7 +22,7 @@ export const createUser = async (req, res) => {
 import { UsersServices } from '../services/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js'
-import { NewUserDTO } from '../models/UsersDTO.js'
+import { UserIdDTO } from '../models/UsersDTO.js'
 
 /**
  * Handle user creation via webhook
@@ -32,11 +32,11 @@ import { NewUserDTO } from '../models/UsersDTO.js'
  * @param res
  */
 export async function handleUserCreated(
-	req: FastifyRequest<{ Body: NewUserDTO }>,
+	req: FastifyRequest<{ Body: UserIdDTO }>,
 	res: FastifyReply
 ): Promise<FastifyReply> {
 	try {
-		const newUser: NewUserDTO = req.body
+		const newUser: UserIdDTO = req.body
 
 		await UsersServices.createUser(newUser)
 		return res

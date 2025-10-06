@@ -5,6 +5,8 @@ jest.mock('../database/usersDatabase', () => ({
   },
 }))
 
+// TODO : check les tests et leur pertinence
+
 import { UsersRepository } from './usersRepository'
 import { db } from '../database/usersDatabase'
 
