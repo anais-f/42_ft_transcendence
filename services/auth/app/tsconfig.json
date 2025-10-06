@@ -2,7 +2,9 @@
 	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": "."
+		"rootDir": ".",
 	},
-	"include": ["index.ts"]
+	"ts-node": {
+		"esm": true
+	}
 }
