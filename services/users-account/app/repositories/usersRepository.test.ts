@@ -34,6 +34,15 @@ describe('UsersRepository', () => {
     expect(mockRun).toHaveBeenCalledWith(42, '../img.png', 1, expect.any(String))
   })
 
+  test('insertUser does not call run if id_user is missing', () => {
+    const mockRun = jest.fn()
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
+    // id_user manquant
+    UsersRepository.insertUser({} as any)
+    // On attend que run ne soit pas appelé
+    expect(mockRun).not.toHaveBeenCalled()
+  })
+
   test('insertManyUsers calls transaction and run for each user', () => {
     const mockRun = jest.fn()
     ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
@@ -47,12 +56,28 @@ describe('UsersRepository', () => {
     expect(mockRun).toHaveBeenCalledWith(2, '../img.png', 1, expect.any(String))
   })
 
+  test('insertManyUsers handles empty array', () => {
+    const mockRun = jest.fn()
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
+    const mockTransaction = jest.fn((fn) => fn)
+    ;(db.transaction as jest.Mock).mockImplementationOnce(mockTransaction)
+    UsersRepository.insertManyUsers([])
+    expect(mockRun).not.toHaveBeenCalled()
+  })
+
   test('updateUserStatus calls prepare and run with correct params', () => {
     const mockRun = jest.fn()
     ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
     UsersRepository.updateUserStatus({ id_user: 1, status: 0 })
     expect(db.prepare).toHaveBeenCalledWith('UPDATE users SET status = ? WHERE id_user = ?')
     expect(mockRun).toHaveBeenCalledWith(0, 1)
+  })
+
+  test('updateUserStatus does nothing if status is undefined', () => {
+    const mockRun = jest.fn()
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
+    UsersRepository.updateUserStatus({ id_user: 1 } as any)
+    expect(mockRun).toHaveBeenCalledWith(undefined, 1)
   })
 
   test('updateLastConnection calls prepare and run with correct params', () => {
@@ -79,11 +104,23 @@ describe('UsersRepository', () => {
     expect(res).toEqual(fakeUser)
   })
 
+  test('getUserById returns undefined if user not found', () => {
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ get: jest.fn().mockReturnValue(undefined) })
+    const res = UsersRepository.getUserById({ id_user: 999 })
+    expect(res).toBeUndefined()
+  })
+
   test('getStatusById returns status', () => {
     ;(db.prepare as jest.Mock).mockReturnValueOnce({ get: jest.fn().mockReturnValue({ status: 1 }) })
     const res = UsersRepository.getStatusById({ id_user: 1 })
     expect(db.prepare).toHaveBeenCalledWith('SELECT status FROM users WHERE id_user = ?')
     expect(res).toBe(1)
+  })
+
+  test('getStatusById returns undefined if user not found', () => {
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ get: jest.fn().mockReturnValue(undefined) })
+    const res = UsersRepository.getStatusById({ id_user: 999 })
+    expect(res).toBeUndefined()
   })
 
   test('getLastConnectionById returns last_connection', () => {
@@ -122,5 +159,12 @@ describe('UsersRepository', () => {
     UsersRepository.deleteUserById({ id_user: 1 })
     expect(db.prepare).toHaveBeenCalledWith('DELETE FROM users WHERE id_user = ?')
     expect(mockRun).toHaveBeenCalledWith(1)
+  })
+
+  test('deleteUserById does not throw if user does not exist', () => {
+    const mockRun = jest.fn()
+    ;(db.prepare as jest.Mock).mockReturnValueOnce({ run: mockRun })
+    expect(() => UsersRepository.deleteUserById({ id_user: 999 })).not.toThrow()
+    expect(mockRun).toHaveBeenCalledWith(999)
   })
 })
