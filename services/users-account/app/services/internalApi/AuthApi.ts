@@ -7,11 +7,12 @@
 */
 
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
-// TODO: get all users avec le username (from auth service) -> internalApi partiellement
+// TODO: pouvoir changer le mot de passe -> call avec l'auth pour la modif -> internalApi
+// TODO: gérer les erreurs (try/catch) + logger
 
 import fetch from 'node-fetch'
-import { UserIdDTO, UserAuthDTO } from '../models/UsersDTO'
-import {UserId} from "../../models/Users";
+import { UserIdDTO, UserAuthDTO } from '../../models/UsersDTO'
+import {UserId} from "../../models/Users"
 
 export class AuthApi {
   /**
