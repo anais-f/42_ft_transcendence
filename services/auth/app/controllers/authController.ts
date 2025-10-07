@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { registerUser, loginUser } from '../usecases/registerUser.js'
+import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginSchema } from '../models/authDTO.js'
 
 export async function registerController(

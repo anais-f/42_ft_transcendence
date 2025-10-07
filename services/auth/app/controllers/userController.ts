@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { getUsers, getUser } from '../usecases/userService.js'
+import { getUsers, getUser } from '../usecases/user.js'
 import { PublicUserSchema, PublicUserListSchema } from '../models/usersDTO.js'
 
 export async function listUsersController(
