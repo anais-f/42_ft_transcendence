@@ -8,7 +8,7 @@ import type {
 import { UsersRepository } from '../repositories/usersRepository.js'
 import { ERROR_MESSAGES } from '../utils/utils.js'
 import { AuthApi } from './internalApi/AuthApi.js'
-import {UserProfileDTO} from "@services/users-account/app/models/UsersDTO.js";
+import {UserProfileDTO} from "../models/UsersDTO.js";
 
 export class UsersServices {
 	/**

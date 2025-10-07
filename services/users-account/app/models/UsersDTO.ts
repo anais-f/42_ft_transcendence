@@ -29,7 +29,7 @@ export const UserProfileSchema = z.object({
 })
 
 export const UsersListResponseSchema = z.object({
-	users: z.array(UserResponseSchema),
+	users: z.array(UserProfileSchema),
 }).strict()
 
 export const SuccessResponseSchema = z.object({
