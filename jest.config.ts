@@ -1,32 +1,53 @@
-import type { Config } from '@jest/types'
+import type { Config } from '@jest/types';
+
+const commonConfig: Partial<Config.InitialProjectOptions> = {
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@packages/(.*)$': '<rootDir>/packages/$1',
+    '^@services/(.*)$': '<rootDir>/services/$1',
+  },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: true,
+      },
+    ],
+  },
+};
 
 const config: Config.InitialOptions = {
-	preset: 'ts-jest',
-	testEnvironment: 'node',
-	modulePaths: ['<rootDir/'],
-	moduleNameMapper: {
-		'^@ft_transcendence/(.*)$': '<rootDir>/packages/$1',
-	},
-	projects: [
-		{
-			displayName: 'pong-shared',
-			testMatch: ['<rootDir>/packages/pong-shared/**/*.test.ts'],
-			preset: 'ts-jest',
-			rootDir: './',
-		},
-		{
-			displayName: 'pong-client',
-			testMatch: ['<rootDir>/packages/pong-client/**/*.test.ts'],
-			preset: 'ts-jest',
-			rootDir: './',
-		},
-		{
-			displayName: 'pong-server',
-			testMatch: ['<rootDir>/packages/pong-server/**/*.test.ts'],
-			preset: 'ts-jest',
-			rootDir: './',
-		},
-	],
-}
+  rootDir: './',
+  projects: [
+    {
+      ...commonConfig,
+      displayName: 'pong-shared',
+      rootDir: '<rootDir>/packages/pong-shared',
+      testMatch: ['**/*.test.ts'],
+    },
+    {
+      ...commonConfig,
+      displayName: 'pong-client',
+      rootDir: '<rootDir>/packages/pong-client',
+      testMatch: ['**/*.test.ts'],
+    },
+    {
+      ...commonConfig,
+      displayName: 'pong-server',
+      rootDir: '<rootDir>/packages/pong-server',
+      testMatch: ['**/*.test.ts'],
+    },
+    {
+      ...commonConfig,
+      displayName: 'users-account-app',
+      rootDir: '<rootDir>/services/users-account/app',
+      testMatch: ['**/*.test.ts'],
+    },
+  ],
+};
 
-export default config
+export default config;
