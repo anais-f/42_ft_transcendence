@@ -4,7 +4,7 @@
 	"description": "Shared code for the pong game",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
-  "type": "module",
+	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
 		"test": "jest",
