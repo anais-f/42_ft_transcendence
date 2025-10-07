@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { UserAuthDTO, PublicUserListDTO, PublicUserListSchema } from '../../models/UsersDTO.js'
+import { UserAuthSchema, PublicUserListDTO, PublicUserListSchema } from '../../models/UsersDTO.js'
 import {UserId} from "../../models/Users.js"
 
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi

@@ -33,6 +33,9 @@ services:
     depends_on:
       - nginx
       - front-app
+      - authentication
+    networks:
+
   authentication:
     restart: on-failure
     container_name: authentication
@@ -44,4 +47,6 @@ services:
       - front-app
 networks:
   pong:
+    driver: bridge
+  backend:
     driver: bridge

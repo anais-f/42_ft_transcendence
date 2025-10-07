@@ -7,7 +7,7 @@ const commonConfig: Partial<Config.InitialProjectOptions> = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@packages/(.*)$': '<rootDir>/packages/$1',
-    '^@services/(.*)$': '<rootDir>/usecases/$1',
+    '^@services/(.*)$': '<rootDir>/services/$1',
   },
   transform: {
     '^.+\\.tsx?$': [
@@ -44,7 +44,7 @@ const config: Config.InitialOptions = {
     {
       ...commonConfig,
       displayName: 'users-account-app',
-      rootDir: '<rootDir>/usecases/users-account/app',
+      rootDir: '<rootDir>/services/users-account/app',
       testMatch: ['**/*.test.ts'],
     },
   ],
