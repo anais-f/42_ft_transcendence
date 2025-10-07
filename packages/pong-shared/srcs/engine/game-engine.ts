@@ -13,7 +13,7 @@ class TPS_MANAGER {
 
 export enum GameState {
 	Paused,
-	Started,
+	Started
 }
 export class GameEngine {
 	private isClientSide: boolean

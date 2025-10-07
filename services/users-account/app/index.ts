@@ -9,7 +9,7 @@ db.exec(
 )
 
 const app = Fastify({
-	logger: false,
+	logger: false
 })
 
 const start = async () => {

@@ -13,7 +13,7 @@ export class Rectangle extends Polygon {
 				new Vector2(0, 0),
 				new Vector2(w, 0),
 				new Vector2(w, h),
-				new Vector2(0, h),
+				new Vector2(0, h)
 			],
 			origin
 		)
