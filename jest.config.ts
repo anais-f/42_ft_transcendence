@@ -1,59 +1,53 @@
-import type { Config } from '@jest/types'
+import type { Config } from '@jest/types';
+
+const commonConfig: Partial<Config.InitialProjectOptions> = {
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@packages/(.*)$': '<rootDir>/packages/$1',
+    '^@services/(.*)$': '<rootDir>/services/$1',
+  },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: true,
+      },
+    ],
+  },
+};
 
 const config: Config.InitialOptions = {
+  rootDir: './',
   projects: [
     {
+      ...commonConfig,
       displayName: 'pong-shared',
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/packages/pong-shared/**/*.test.ts'],
-      rootDir: './',
+      rootDir: '<rootDir>/packages/pong-shared',
+      testMatch: ['**/*.test.ts'],
     },
     {
+      ...commonConfig,
       displayName: 'pong-client',
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/packages/pong-client/**/*.test.ts'],
-      rootDir: './',
+      rootDir: '<rootDir>/packages/pong-client',
+      testMatch: ['**/*.test.ts'],
     },
     {
+      ...commonConfig,
       displayName: 'pong-server',
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/packages/pong-server/**/*.test.ts'],
-      rootDir: './',
+      rootDir: '<rootDir>/packages/pong-server',
+      testMatch: ['**/*.test.ts'],
     },
     {
-      displayName: 'pong-server-app',
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
-      rootDir: './',
-    },
-    // ESM + TS only for users-account-app
-    {
+      ...commonConfig,
       displayName: 'users-account-app',
-      preset: 'ts-jest/presets/default-esm',
-      testEnvironment: 'node',
-      testMatch: ['<rootDir>/services/users-account/app/**/*.test.ts'],
-      rootDir: './',
-      extensionsToTreatAsEsm: ['.ts'],
-      moduleNameMapper: {
-        '^(\\.{1,2}/.*)\\.js$': '$1',
-        '^@packages/(.*)$': '<rootDir>/packages/$1',
-        '^@services/(.*)$': '<rootDir>/services/$1',
-      },
-      transform: {
-        '^.+\\.tsx?$': [
-          'ts-jest',
-          {
-            useESM: true,
-            tsconfig: '<rootDir>/services/users-account/app/tsconfig.json',
-          },
-        ],
-      },
-    }
+      rootDir: '<rootDir>/services/users-account/app',
+      testMatch: ['**/*.test.ts'],
+    },
   ],
-}
+};
 
-export default config
+export default config;
