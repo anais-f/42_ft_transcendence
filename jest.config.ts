@@ -35,23 +35,24 @@ const config: Config.InitialOptions = {
       displayName: 'users-account-app',
       preset: 'ts-jest/presets/default-esm',
       testEnvironment: 'node',
-      extensionsToTreatAsEsm: ['.ts'],
       testMatch: ['<rootDir>/services/users-account/app/**/*.test.ts'],
       rootDir: './',
+      extensionsToTreatAsEsm: ['.ts'],
       moduleNameMapper: {
-        // Allow source/tests to import ESM paths with ".js" while resolving to ".ts"
         '^(\\.{1,2}/.*)\\.js$': '$1',
         '^@packages/(.*)$': '<rootDir>/packages/$1',
         '^@services/(.*)$': '<rootDir>/services/$1',
       },
-      globals: {
-        'ts-jest': {
-          useESM: true,
-          tsconfig: '<rootDir>/services/users-account/app/tsconfig.json',
-          // optional: isolatedModules: true,
-        },
+      transform: {
+        '^.+\\.tsx?$': [
+          'ts-jest',
+          {
+            useESM: true,
+            tsconfig: '<rootDir>/services/users-account/app/tsconfig.json',
+          },
+        ],
       },
-    },
+    }
   ],
 }
 
