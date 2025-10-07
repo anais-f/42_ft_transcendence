@@ -2,7 +2,6 @@ import { UsersServices } from '../usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js'
 import { UserIdDTO, UserProfileSchema } from '../models/UsersDTO.js'
-import { z } from 'zod'
 
 /**
  * Handle user creation via webhook
@@ -37,7 +36,7 @@ export async function handleUserCreated(
 	}
 }
 
-export async function getPublicUser(
+export async function getUser(
     req: FastifyRequest<{ Params: { id: string } }>,
     res: FastifyReply
 ): Promise<FastifyReply> {
@@ -52,9 +51,15 @@ export async function getPublicUser(
     if (isNaN(idNumber) || idNumber <= 0)
       return res.status(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID });
 
-    const userProfile = await UsersServices.getUserProfile({ id_user: idNumber })
+    const rawProfile = await UsersServices.getUserProfile({ id_user: idNumber })
 
-    return res.status(200).send(userProfile)
+    const parsed = UserProfileSchema.safeParse(rawProfile)
+    if (!parsed.success) {
+      console.error('UserProfile validation failed:', parsed.error)
+      return res.status(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+    }
+
+    return res.status(200).send(parsed.data)
   } catch (error) {
     if (error instanceof Error && error.message === ERROR_MESSAGES.USER_NOT_FOUND) {
       return res.status(404).send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND });
