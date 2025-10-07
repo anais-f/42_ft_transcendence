@@ -31,18 +31,13 @@ export class AuthApi {
    * @param id The ID of the user to fetch the username for
    */
   static async getUsernameById(id: UserId): Promise<string> {
-    try {
-      const response = await fetch(`http://localhost:3001/users/${id.id_user}`)
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    const response = await fetch(`http://localhost:3001/users/${id.id_user}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
-      const data = (await response.json()) as UserAuthDTO
-      if (!data || typeof data.username !== 'string')
-        throw new Error('Invalid response shape from auth service')
+    const data = (await response.json()) as UserAuthDTO
+    if (!data || typeof data.username !== 'string')
+      throw new Error('Invalid response shape from auth service')
 
-      return data.username
-    } catch (error) {
-      console.error('Error fetching username from auth service:', error)
-      throw error
-    }
+    return data.username
   }
 }
