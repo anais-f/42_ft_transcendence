@@ -4,11 +4,10 @@ import type {
 	UserConnection,
 	UserAvatar,
 	UserId,
-} from '../models/Users'
-import { UsersRepository } from '../repositories/usersRepository'
-import { ERROR_MESSAGES } from '../utils/utils'
-import { UserIdDTO } from '../models/UsersDTO'
-import { AuthApi } from './internalApi/AuthApi'
+} from '../models/Users.js'
+import { UsersRepository } from '../repositories/usersRepository.js'
+import { ERROR_MESSAGES } from '../utils/utils.js'
+import { AuthApi } from './internalApi/AuthApi.js'
 
 export class UsersServices {
 	/**

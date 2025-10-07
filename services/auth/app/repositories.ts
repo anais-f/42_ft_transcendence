@@ -3,7 +3,7 @@ import { db } from './index.js';
 export const AuthRepository = {
   // Récupérer tous les utilisateurs pour l'export vers users-account
   getAllUsers: () => {
-    return db.prepare('SELECT id_user FROM users').all();
+    return db.prepare('SELECT id_user, username FROM users').all() as { id_user: number; username: string }[];
   },
 
   // Créer un nouvel utilisateur

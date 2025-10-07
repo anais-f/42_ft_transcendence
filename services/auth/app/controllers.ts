@@ -5,8 +5,8 @@ export const AuthController = {
   // Exporter les données utilisateurs pour users-account
   getAllUsers: async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const users = AuthRepository.getAllUsers();
-      reply.send({ users });
+      const users = await AuthRepository.getAllUsers();
+      reply.send(users);
     } catch (err) {
       reply.status(500).send({ error: 'Erreur lors de la récupération des utilisateurs' });
     }

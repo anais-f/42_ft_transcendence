@@ -9,6 +9,7 @@
 		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
 	},
 	"dependencies": {
-		"better-sqlite3": "^12.4.1"
+		"better-sqlite3": "^12.4.1",
+		"tsx": "^4.20.6"
 	}
 }
