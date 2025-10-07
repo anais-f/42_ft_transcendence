@@ -27,9 +27,6 @@ export async function loginController(
 	const parsed = LoginSchema.safeParse(request.body)
 	if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
 	const { username, password } = parsed.data
-	if (!username || !password) {
-		return reply.code(400).send({ error: 'Missing username or password' })
-	}
 	const res = await loginUser(username, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })
 	return reply.send(res)
