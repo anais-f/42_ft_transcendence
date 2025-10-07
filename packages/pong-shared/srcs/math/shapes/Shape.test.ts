@@ -14,7 +14,7 @@ describe('Shape', () => {
 			const p = new Polygon([
 				new Vector2(0, 0),
 				new Vector2(1, 1),
-				new Vector2(1, 0),
+				new Vector2(1, 0)
 			])
 			expect(p instanceof Shape).toBe(true)
 		})
