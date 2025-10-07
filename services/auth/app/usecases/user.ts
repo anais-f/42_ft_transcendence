@@ -1,9 +1,9 @@
-import { listUsers, findUserById } from '../repositories/userRepository.js'
+import { listPublicUsers, findPublicUserById } from '../repositories/userRepository.js'
 
-export function getUsers() {
-	return listUsers()
+export function getPublicUsers() {
+	return listPublicUsers()
 }
 
-export function getUser(id: number) {
-	return findUserById(id)
+export function getPublicUser(id: number) {
+	return findPublicUserById(id)
 }

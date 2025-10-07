@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginSchema } from '../models/authDTO.js'
+import {findPublicUserByUsername} from "../repositories/userRepository.js";
 
 export async function registerController(
 	request: FastifyRequest,
@@ -11,6 +12,25 @@ export async function registerController(
 	const { username, password } = parsed.data
 	try {
 		await registerUser(username, password)
+    const newUser = findPublicUserByUsername(parsed.data.username)
+
+    // Webhook SYNCHRONE - doit réussir pour valider la création -> donc pas de onResponse de fastify, ni de preHandler à cause du id_user généré à la création
+    const webhookUrl = 'http://localhost:3000/users/webhookNewUser';
+    const webhookResponse = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser),
+    });
+
+    if (!webhookResponse.ok) {
+      // Si le webhook échoue, on annule la création en supprimant l'utilisateur
+      // AuthRepository.deleteUser(userId.id_user);
+      reply.status(400).send({
+        error: `Erreur synchronisation users-account: ${webhookResponse.statusText}`
+      });
+      return;
+    }
+
 		return reply.send({ success: true })
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {

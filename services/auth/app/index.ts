@@ -1,15 +1,14 @@
 import Fastify from 'fastify'
 import { runMigrations } from './database/connection.js'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { ENV } from './config/env.js'
 
 const app = Fastify({ logger: true })
 
 async function runServer() {
 	runMigrations()
 	await registerRoutes(app)
-	await app.listen({ port: ENV.PORT, host: ENV.HOST })
-	app.log.info(`Auth service running on http://${ENV.HOST}:${ENV.PORT}`)
+	await app.listen({ port: 3001, host: '0.0.0.0' })
+	app.log.info(`Auth service running on http://localhost:3001`)
 }
 
 runServer().catch((err) => {

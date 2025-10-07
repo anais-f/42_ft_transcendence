@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import {
-	listUsersController,
-	getUserController,
+	listPublicUsersController,
+	getPublicUserController,
 } from '../controllers/userController.js'
 
 export async function userRoutes(app: FastifyInstance) {
-	app.get('/users', listUsersController)
-	app.get('/users/:id', getUserController)
+	app.get('/users', listPublicUsersController)
+	app.get('/users/:id', getPublicUserController)
 }
