@@ -14,7 +14,6 @@ services:
       - '3000:3000'
     depends_on:
       - nginx
-
   pong-server:
     restart: on-failure
     container_name: pong-server
@@ -25,7 +24,24 @@ services:
       - nginx
       - front-app
 
-
+  users-account:
+    restart: on-failure
+    container_name: users-account
+    build:
+      context: .
+      dockerfile: ./services/users-account/Dockerfile
+    depends_on:
+      - nginx
+      - front-app
+  authentication:
+    restart: on-failure
+    container_name: authentication
+    build:
+      context: .
+      dockerfile: ./services/auth/Dockerfile
+    depends_on:
+      - nginx
+      - front-app
 networks:
   pong:
     driver: bridge
