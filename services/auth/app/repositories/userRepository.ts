@@ -1,5 +1,5 @@
 import { getDb } from '../database/connection.js'
-import { UserRow } from '../models/userModels.js'
+import { IUserRow } from '../models/userModels.js'
 
 const db = () => getDb()
 
@@ -12,7 +12,7 @@ export function createUser(username: string, passwordHash: string) {
 
 export function findUserByUsername(username: string) {
 	const stmt = db().prepare('SELECT * FROM users WHERE username = ?')
-	return stmt.get(username) as UserRow | undefined
+	return stmt.get(username) as IUserRow | undefined
 }
 
 export function findPublicUserByUsername(username: string) {
