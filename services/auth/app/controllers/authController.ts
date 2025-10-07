@@ -14,8 +14,7 @@ export async function registerController(
 	try {
 		await registerUser(username, password)
 		const PublicUser = findUserByUsername(parsed.data.username)
-		if (PublicUser == undefined)
-			return reply.code(500).send({ error: 'Database error' })
+		if (PublicUser == undefined) return reply.code(500).send({ error: 'Database error' })
 		const url = 'http://localhost:3000/users/webhookNewUser'
 		const response = await fetch(url, {
 			method: 'POST',
@@ -28,9 +27,7 @@ export async function registerController(
 		}
 		return reply.send({ success: true })
 	} catch (e: any) {
-		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-			return reply.code(409).send({ error: 'Username already exists' })
-		}
+		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') return reply.code(409).send({ error: 'Username already exists' })
 		return reply.code(500).send({ error: 'Database error' })
 	}
 }
