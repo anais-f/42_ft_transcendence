@@ -8,6 +8,7 @@ import type {
 import { UsersRepository } from '../repositories/usersRepository.js'
 import { ERROR_MESSAGES } from '../utils/utils.js'
 import { AuthApi } from './internalApi/AuthApi.js'
+import {UserProfileDTO} from "@services/users-account/app/models/UsersDTO.js";
 
 export class UsersServices {
 	/**
@@ -38,6 +39,27 @@ export class UsersServices {
 		}
 	}
 
+  /**
+   * @description Get user profile by id with enrichissement from Auth service
+   * @returns UserProfileDTO
+   * @throws Error if user not found
+   * @param userId
+   */
+  static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
+    const localUser = UsersRepository.getUserById({ id_user: user.id_user });
+    if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+
+    const username = await AuthApi.getUsernameById({ id_user: user.id_user });
+    return {
+      id_user: localUser.id_user,
+      username,
+      avatar: localUser.avatar,
+      status: localUser.status,
+      last_connection: localUser.last_connection
+    };
+  }
+
+
 
 	// // ✅ Récupération avec enrichissement
 	// static async getUserWithProfile(id_user: number): Promise<UserWithProfile> {
@@ -56,7 +78,7 @@ export class UsersServices {
 
 /*
   Wrapper of UsersRepository
-  Can add business logic if needed
+  Can add business usecases if needed
 */
 export class UsersServicesRequests {
 	static existsById(user: UserId): boolean {

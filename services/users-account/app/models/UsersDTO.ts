@@ -20,8 +20,9 @@ export const UserAuthSchema = z.object({
  * They can be used in Fastify routes as follows:
  * app.get('/user/:id', { schema: { response: { 200: UserResponseSchema } } }, (req, res) => { ... })
  */
-export const UserResponseSchema = z.object({
+export const UserProfileSchema = z.object({
 	id_user: z.number(),
+  username: z.string(),
 	avatar: z.string(),
 	status: z.number(),
 	last_connection: z.string(),
@@ -34,7 +35,7 @@ export const UsersListResponseSchema = z.object({
 export const SuccessResponseSchema = z.object({
 	success: z.literal(true),
 	message: z.string().optional(),
-}).strict()
+})
 
 export const ErrorResponseSchema = z.object({
 	success: z.boolean().optional(),
@@ -46,7 +47,7 @@ export const ErrorResponseSchema = z.object({
   to be used in the codebase.
   Ex: function getUser(id: number): UserResponseDTO { ... }
 */
-export type UserResponseDTO = z.infer<typeof UserResponseSchema>
+export type UserProfileDTO = z.infer<typeof UserProfileSchema>
 export type UsersListResponseDTO = z.infer<typeof UsersListResponseSchema>
 export type UserIdDTO = z.infer<typeof UserIdSchema>
 export type UserAuthDTO = z.infer<typeof UserAuthSchema>

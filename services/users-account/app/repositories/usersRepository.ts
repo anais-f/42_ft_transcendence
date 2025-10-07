@@ -7,11 +7,7 @@ import type {
 	UserId,
 } from '../models/Users.js'
 
-// TODO: changer l'adresse de l'avatar par defaut
-// TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
-// TODO: get username (from auth service) -> internalApi
-// TODO: get all users avec le username (from auth service) -> internalApi partiellement
-
+//TODO: change default avatar path
 const defaultAvatar: string = '../img.png' // default avatar path
 
 /**
