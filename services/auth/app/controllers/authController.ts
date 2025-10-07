@@ -9,9 +9,6 @@ export async function registerController(
 	const parsed = RegisterSchema.safeParse(request.body)
 	if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
 	const { username, password } = parsed.data
-	if (!username || !password) {
-		return reply.code(400).send({ error: 'Missing username or password' })
-	}
 	try {
 		await registerUser(username, password)
 		return reply.send({ success: true })
