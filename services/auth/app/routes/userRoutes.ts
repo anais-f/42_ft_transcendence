@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import {
 	listPublicUsersController,
 	getPublicUserController,
-	deleteUser,
+	deleteUser
 } from '../controllers/userController.js'
 
 export async function userRoutes(app: FastifyInstance) {

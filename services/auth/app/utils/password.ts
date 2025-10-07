@@ -5,7 +5,7 @@ export async function hashPassword(password: string) {
 		type: argon2id,
 		memoryCost: 65536,
 		timeCost: 2,
-		parallelism: 1,
+		parallelism: 1
 	})
 }
 
