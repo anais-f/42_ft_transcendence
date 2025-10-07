@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 
 const app = Fastify({
-	logger: false,
+	logger: false
 })
 
 const start = async () => {
