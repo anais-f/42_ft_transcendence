@@ -7,13 +7,13 @@ import { z } from 'zod'
  */
 export const UserIdSchema = z.object({
 	id_user: z.number().int().positive(),
-}).strict()
+})
 
 // TODO : reprendre le schéma de l'auth -> DTO commun in progress
 export const UserAuthSchema = z.object({
   id_user: z.number().int().positive(),
-  username: z.string().min(3).max(30),
-}).strict()
+  username: z.string(),
+})
 
 /**
  * These schemas validate outgoing responses.
@@ -42,6 +42,11 @@ export const ErrorResponseSchema = z.object({
 	error: z.string(),
 }).strict()
 
+export const PublicUserListSchema = z
+    .object({
+      users: z.array(UserAuthSchema),
+    })
+
 /**
   Typescript types inferred from zod schemas
   to be used in the codebase.
@@ -51,6 +56,7 @@ export type UserProfileDTO = z.infer<typeof UserProfileSchema>
 export type UsersListResponseDTO = z.infer<typeof UsersListResponseSchema>
 export type UserIdDTO = z.infer<typeof UserIdSchema>
 export type UserAuthDTO = z.infer<typeof UserAuthSchema>
+export type PublicUserListDTO = z.infer<typeof PublicUserListSchema>
 export type SuccessResponseDTO = z.infer<typeof SuccessResponseSchema>
 export type ErrorResponseDTO = z.infer<typeof ErrorResponseSchema>
 // export type UserIdDTO = z.infer<typeof UserIdSchema>

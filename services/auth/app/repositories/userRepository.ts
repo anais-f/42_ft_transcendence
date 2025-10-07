@@ -15,12 +15,17 @@ export function findUserByUsername(username: string): UserRow | undefined {
 	return stmt.get(username) as UserRow | undefined
 }
 
-export function findUserById(id: number) {
-	const stmt = db().prepare('SELECT id, username FROM users WHERE id = ?')
-	return stmt.get(id) as { id: number; username: string } | undefined
+export function findPublicUserByUsername(username: string) {
+  const stmt = db().prepare('SELECT id_user, username FROM users WHERE username = ?')
+  return stmt.get(username) as { id_user: number; username: string } | undefined
 }
 
-export function listUsers() {
-	const stmt = db().prepare('SELECT id, username FROM users')
-	return stmt.all() as { id: number; username: string }[]
+export function findPublicUserById(id: number) {
+	const stmt = db().prepare('SELECT id_user, username FROM users WHERE id_user = ?')
+	return stmt.get(id) as { id_user: number; username: string } | undefined
+}
+
+export function listPublicUsers() {
+	const stmt = db().prepare('SELECT id_user, username FROM users')
+	return stmt.all() as { id_user: number; username: string }[]
 }
