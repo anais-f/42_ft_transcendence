@@ -34,10 +34,16 @@ export class AuthApi {
     const response = await fetch(`http://localhost:3001/users/${id.id_user}`)
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
-    const data = (await response.json()) as UserAuthDTO
-    if (!data || typeof data.username !== 'string')
-      throw new Error('Invalid response shape from auth service')
+    const raw = await response.json().catch(() => {
+      throw new Error('Invalid JSON from auth service')
+    })
 
-    return data.username
+    const parsed = UserAuthSchema.safeParse(raw)
+    if (!parsed.success) {
+      console.error('Invalid username response shape from auth service:', parsed.error)
+      throw new Error('Invalid response shape from auth service')
+    }
+
+    return parsed.data.username
   }
 }
