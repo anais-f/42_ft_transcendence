@@ -7,15 +7,6 @@
 		"test": "node --experimental-vm-modules ../../../node_modules/.bin/jest --config ../../../jest.config.ts --rootDir . ./**/*.test.ts",
 		"build": "tsc",
 		"start": "node dist/index.js",
-		"devv": "tsx watch index.ts",
 		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
-	},
-	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"jest": "^30.2.0",
-		"ts-jest": "^29.4.4"
-	},
-	"dependencies": {
-		"tsx": "^4.20.6"
 	}
 }
