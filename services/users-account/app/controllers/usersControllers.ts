@@ -1,4 +1,4 @@
-import { UsersServices } from '@services/users-account/app/usecases/usersServices.js'
+import { UsersServices } from '../usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js'
 import { UserIdDTO } from '../models/UsersDTO.js'
@@ -36,12 +36,21 @@ export async function handleUserCreated(
 	}
 }
 
-export async function getUser(req: FastifyRequest<{ Body: UserIdDTO }>, res: FastifyReply): Promise<FastifyReply> {
+export async function getUser(
+    req: FastifyRequest<{ Params: { id: string } }>,
+    res: FastifyReply
+): Promise<FastifyReply> {
   try {
-    const id = req.body as UserIdDTO;
+    const { id } = req.params
+    if (!id)
+      return res.status(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 
-    const userProfile = await UsersServices.getUserProfile(id);
-    return res.status(200).send({ success: true, data: userProfile });
+    const idNumber = Number(id);
+    if (isNaN(idNumber) || idNumber <= 0)
+      return res.status(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID });
+
+    const userProfile = await UsersServices.getUserProfile({ id_user: idNumber })
+    return res.status(200).send({ success: true, data: userProfile })
   } catch (error) {
     if (error instanceof Error && error.message === ERROR_MESSAGES.USER_NOT_FOUND) {
       return res.status(404).send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND });
