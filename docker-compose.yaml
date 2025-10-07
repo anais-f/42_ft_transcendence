@@ -34,7 +34,6 @@ services:
       - nginx
       - front-app
       - authentication
-    networks:
 
   authentication:
     restart: on-failure
