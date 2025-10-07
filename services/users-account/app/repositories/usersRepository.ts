@@ -1,11 +1,11 @@
-import { db } from '../database/usersDatabase'
+import { db } from '../database/usersDatabase.js'
 import type {
 	User,
 	UserStatus,
 	UserConnection,
 	UserAvatar,
 	UserId,
-} from '../models/Users'
+} from '../models/Users.js'
 
 // TODO: changer l'adresse de l'avatar par defaut
 // TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
