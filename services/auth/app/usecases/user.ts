@@ -1,4 +1,8 @@
-import { listPublicUsers, findPublicUserById, findPublicUserByUsername } from '../repositories/userRepository.js'
+import {
+	listPublicUsers,
+	findPublicUserById,
+	findPublicUserByUsername,
+} from '../repositories/userRepository.js'
 
 export function getPublicUsers() {
 	return listPublicUsers()
