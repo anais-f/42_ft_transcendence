@@ -4,7 +4,6 @@ let UsersRepository: any
 let db: any
 
 beforeAll(async () => {
-  // Mock exactly the path used by the repository (with ".js")
   await jest.unstable_mockModule('../database/usersDatabase.js', () => ({
     db: {
       prepare: jest.fn(),

@@ -1,25 +1,4 @@
-/* Example Users Controller
-
-import { UserServices } from '../services/userServices';
-import { UserSchema } from '../models/UsersDTO';
-
-export const getUsers = async (req, res) => {
-  const users = await UserServices.getAllUsers();
-  res.send(users);
-};
-
-export const createUser = async (req, res) => {
-  const parse = UserSchema.safeParse(req.body);
-  if (!parse.success) {
-    return res.status(400).send({ error: 'Invalid data' });
-  }
-  await UserServices.createUser(parse.data);
-  res.send({ success: true });
-};
-
- */
-
-import { UsersServices } from '../services/usersServices.js'
+import { UsersServices } from '@services/users-account/app/usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js'
 import { UserIdDTO } from '../models/UsersDTO.js'
@@ -57,7 +36,17 @@ export async function handleUserCreated(
 	}
 }
 
-export async function getUser(req: FastifyRequest, res: FastifyReply) {
-	return res.status(200).send({ success: true })
-	// TODO: implement get user with enrichissement from auth service
+export async function getUser(req: FastifyRequest<{ Body: UserIdDTO }>, res: FastifyReply): Promise<FastifyReply> {
+  try {
+    const id = req.body as UserIdDTO;
+
+    const userProfile = await UsersServices.getUserProfile(id);
+    return res.status(200).send({ success: true, data: userProfile });
+  } catch (error) {
+    if (error instanceof Error && error.message === ERROR_MESSAGES.USER_NOT_FOUND) {
+      return res.status(404).send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND });
+    }
+    return res.status(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR });
+  }
 }
+

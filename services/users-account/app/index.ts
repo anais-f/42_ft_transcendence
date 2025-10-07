@@ -6,7 +6,7 @@ import {
 	serializerCompiler,
 } from 'fastify-type-provider-zod'
 import { usersRoutes } from './routes/usersRoutes.js'
-import { UsersServices } from './services/usersServices.js'
+import { UsersServices } from '@services/users-account/app/usecases/usersServices.js'
 
 const app = Fastify({
 	logger: false,
