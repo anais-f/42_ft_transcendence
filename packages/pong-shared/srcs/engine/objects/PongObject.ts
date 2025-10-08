@@ -56,7 +56,7 @@ export class PongObject {
 		return PongObject.clone(this)
 	}
 
-	public intersect(other: PongObject): boolean {
+	public intersect(other: PongObject): Vector2[] | null {
 		const createAbsHitbox = (hitbox: AShape, origin: Vector2) => {
 			const clonedHitbox = hitbox.clone()
 			clonedHitbox.addToOrigin(origin.clone())
@@ -70,13 +70,20 @@ export class PongObject {
 			.getHitbox()
 			.map((h) => createAbsHitbox(h, other.getOrigin()))
 
+		let hitpoints: Vector2[] = []
 		for (let localObj of absLocalHitbox) {
 			for (let otherObj of absOtherHitbox) {
-				if (otherObj.intersect(localObj)) {
-					return true
+				const hp = otherObj.intersect(localObj)
+				if (hp instanceof Array) {
+					hitpoints = [...hitpoints, ...hp]
 				}
 			}
 		}
-		return false
+		if (hitpoints.length === 0) {
+			return null
+		}
+		return hitpoints.filter(
+			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+		)
 	}
 }
