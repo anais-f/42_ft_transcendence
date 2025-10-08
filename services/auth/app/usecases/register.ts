@@ -1,6 +1,6 @@
 import {
 	createUser,
-	findUserByUsername,
+	findUserByUsername
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
