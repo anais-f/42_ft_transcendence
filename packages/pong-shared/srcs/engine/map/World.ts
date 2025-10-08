@@ -5,7 +5,7 @@ import { Vector2 } from '../../math/Vector2'
 import { PongMap } from './Map'
 
 export enum WorldShape {
-	Rectangle,
+	Rectangle
 }
 
 export class World {

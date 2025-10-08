@@ -214,7 +214,7 @@ describe('WorldRect', () => {
 				test('inside', () => {
 					const seg: Segment[] = [
 						new Segment(MM, TL),
-						new Segment(MM, new Vector2(6, 3)),
+						new Segment(MM, new Vector2(6, 3))
 					]
 					seg.forEach((s) => {
 						expect(w.isInside(s)).toBe(true)
@@ -237,7 +237,7 @@ describe('WorldRect', () => {
 						new Vector2(0, 15),
 						new Vector2(0, -15),
 						new Vector2(-25, -15),
-						new Vector2(25, 15),
+						new Vector2(25, 15)
 					]
 					const s: Segment[] = []
 					outsidePoints.forEach((a, i) =>
@@ -252,7 +252,7 @@ describe('WorldRect', () => {
 						new Vector2(-25, 0),
 						new Vector2(25, 0),
 						new Vector2(0, 15),
-						new Vector2(0, -15),
+						new Vector2(0, -15)
 					]
 					insidePoints.forEach((a) => {
 						outsidePoints.forEach((b) => {
@@ -282,7 +282,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-10, 0),
 					new Vector2(0, 5),
-					new Vector2(10, 0),
+					new Vector2(10, 0)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -291,7 +291,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-10, 0),
 					new Vector2(0, 5),
-					new Vector2(30, 0),
+					new Vector2(30, 0)
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -301,7 +301,7 @@ describe('WorldRect', () => {
 					new Vector2(-20, -10),
 					new Vector2(20, -10),
 					new Vector2(20, 10),
-					new Vector2(-20, 10),
+					new Vector2(-20, 10)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -310,7 +310,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(50, 50),
 					new Vector2(60, 60),
-					new Vector2(70, 50),
+					new Vector2(70, 50)
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -321,7 +321,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-10, 0),
 					new Vector2(0, 5),
-					new Vector2(10, 0),
+					new Vector2(10, 0)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -330,7 +330,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-25, 0), // outside
 					new Vector2(-10, 5), // inside
-					new Vector2(-10, -5), // inside
+					new Vector2(-10, -5) // inside
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -340,7 +340,7 @@ describe('WorldRect', () => {
 					new Vector2(-20, -10),
 					new Vector2(20, -10),
 					new Vector2(20, 10),
-					new Vector2(-20, 10),
+					new Vector2(-20, 10)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -349,7 +349,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-10, 0),
 					new Vector2(10, 0),
-					new Vector2(21, 0), // outside
+					new Vector2(21, 0) // outside
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -359,7 +359,7 @@ describe('WorldRect', () => {
 					new Vector2(-19.999, -9.999),
 					new Vector2(19.999, -9.999),
 					new Vector2(19.999, 9.999),
-					new Vector2(-19.999, 9.999),
+					new Vector2(-19.999, 9.999)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -369,7 +369,7 @@ describe('WorldRect', () => {
 					new Vector2(100, 100),
 					new Vector2(110, 100),
 					new Vector2(110, 110),
-					new Vector2(100, 110),
+					new Vector2(100, 110)
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -379,7 +379,7 @@ describe('WorldRect', () => {
 					new Vector2(-20, -10),
 					new Vector2(20, -10),
 					new Vector2(20, 10),
-					new Vector2(-20, 10),
+					new Vector2(-20, 10)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -397,7 +397,7 @@ describe('WorldRect', () => {
 					new Vector2(-2, -5),
 					new Vector2(0, -3),
 					new Vector2(2, -5),
-					new Vector2(5, -2),
+					new Vector2(5, -2)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -406,7 +406,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(0, -10.001), // outside top
 					new Vector2(5, 0), // inside
-					new Vector2(0, 5), // inside
+					new Vector2(0, 5) // inside
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
@@ -415,7 +415,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-10, 0),
 					new Vector2(0, 0),
-					new Vector2(10, 0),
+					new Vector2(10, 0)
 				])
 				expect(w.isInside(poly)).toBe(true)
 			})
@@ -424,7 +424,7 @@ describe('WorldRect', () => {
 				const poly = new Polygon([
 					new Vector2(-30, 0), // outside
 					new Vector2(0, 0), // inside
-					new Vector2(30, 0), // outside
+					new Vector2(30, 0) // outside
 				])
 				expect(w.isInside(poly)).toBe(false)
 			})
