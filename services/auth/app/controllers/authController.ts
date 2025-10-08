@@ -11,23 +11,22 @@ export async function registerController(
 	const parsed = RegisterSchema.safeParse(request.body)
 	if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
 	const { username, password } = parsed.data
-try {
-	await registerUser(username, password)
-	const PublicUser = findUserByUsername(parsed.data.username)
-	if (PublicUser == undefined)
-		return reply.code(500).send({ error: 'Database error' })
-	const url =  'http://localhost:3000/users/webhookNewUser'
-	const response = await fetch(url, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify(PublicUser)
-	})
-	if (response.ok == false)
-	{
-		deleteUserById(PublicUser.id)
-		return reply.code(400).send({ error: 'Synchronisation user db' })
-	}
-	return reply.send({ success: true })
+	try {
+		await registerUser(username, password)
+		const PublicUser = findUserByUsername(parsed.data.username)
+		if (PublicUser == undefined)
+			return reply.code(500).send({ error: 'Database error' })
+		const url = 'http://localhost:3000/users/webhookNewUser'
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(PublicUser),
+		})
+		if (response.ok == false) {
+			deleteUserById(PublicUser.id)
+			return reply.code(400).send({ error: 'Synchronisation user db' })
+		}
+		return reply.send({ success: true })
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
 			return reply.code(409).send({ error: 'Username already exists' })

@@ -27,10 +27,7 @@ export async function getPublicUserController(
 	return reply.send(PublicUserSchema.parse(user))
 }
 
-export async function deleteUser(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
+export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {
 	const { id } = request.params as { id?: string }
 	if (!id) return reply.code(400).send({ error: 'Missing id' })
 	const idNum = Number(id)
@@ -39,5 +36,5 @@ export async function deleteUser(
 	}
 	const ok = deleteUserById(idNum)
 	if (!ok) return reply.code(404).send({ error: 'User not found' })
-	return reply.code(204).send({success: true })
+	return reply.code(204).send({ success: true })
 }
