@@ -8,19 +8,22 @@
 		"declaration": true,
 		"sourceMap": true,
 		"forceConsistentCasingInFileNames": true,
+		"types": ["jest", "node"],
 		"skipLibCheck": true,
 		"baseUrl": ".",
 		"isolatedModules": true,
 		"composite": true,
 		"paths": {
-			"@packages/*": ["packages/*"]
+			"@packages/*": ["packages/*"],
+			"@services/*": ["services/*"]
 		}
 	},
 	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
 	"references": [
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
-		{ "path": "./packages/pong-server" }
+		{ "path": "./packages/pong-server" },
+		{ "path": "./services/users-account" }
 	],
 	"ts-node": {
 		"esm": true
