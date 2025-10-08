@@ -60,7 +60,9 @@ export class Polygon extends AShape {
 			}
 		}
 		if (hps.length !== 0) {
-			return hps
+			return hps.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
 		}
 
 		if (this.containsPoint(other.getPos())) {
@@ -84,6 +86,14 @@ export class Polygon extends AShape {
 			return null
 		}
 		return hps
+			.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
+			.sort(
+				(a, b) =>
+					Vector2.squaredDist(this.origin, a) -
+					Vector2.squaredDist(this.origin, b)
+			)
 	}
 
 	private intersectPolygon(other: Polygon): Vector2[] | null {
@@ -100,19 +110,26 @@ export class Polygon extends AShape {
 			}
 		}
 		if (res.length !== 0) {
-			return res
+			return res.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
 		}
+		// bad polygon clipping implementation
+		/*
 		if (this.containsPoint(otherAbSeg[0].getP1())) {
 			res.push(otherAbSeg[0].getP1())
 		}
 		if (other.containsPoint(localAbSeg[0].getP1())) {
 			res.push(localAbSeg[0].getP1())
 		}
-
+		*/
 		if (res.length === 0) {
 			return null
 		}
-		return res
+
+		return res.filter(
+			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+		)
 	}
 
 	public containsPoint(point: Vector2): boolean {
@@ -155,7 +172,11 @@ export class Polygon extends AShape {
 		for (const seg of this.getAbsoluteSegments()) {
 			const hp = seg.intersect(other)
 			if (Array.isArray(hp)) {
-				hps = [...hps, ...hp]
+				for (const point of hp) {
+					if (!hps.some((e) => e.equals(point))) {
+						hps.push(point)
+					}
+				}
 			}
 		}
 		if (hps.length === 0) {

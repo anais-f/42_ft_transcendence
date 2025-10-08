@@ -40,15 +40,16 @@ export class Segment {
 	}
 
 	private intersectSeg(other: Segment): Vector2[] | null {
+		const [a1, a2] = [this.p1, this.p2]
+		const [b1, b2] = other.getPoints()
+
 		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
-		const [p3, p4] = other.getPoints()
-
-		const d1 = direction(p3, p4, this.p1)
-		const d2 = direction(p3, p4, this.p2)
-		const d3 = direction(this.p1, this.p2, p3)
-		const d4 = direction(this.p1, this.p2, p4)
+		const d1 = direction(b1, b2, a1)
+		const d2 = direction(b1, b2, a2)
+		const d3 = direction(a1, a2, b1)
+		const d4 = direction(a1, a2, b2)
 
 		if (
 			((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
@@ -56,27 +57,48 @@ export class Segment {
 		) {
 			const t = d1 / (d1 - d2)
 			const intersectionPoint = Vector2.add(
-				this.p1,
-				Vector2.subtract(this.p2, this.p1).multiply(t)
+				a1,
+				Vector2.subtract(a2, a1).multiply(t)
 			)
 			return [intersectionPoint]
 		}
 
-		if (
-			(d1 === 0 && Segment.pointIsOnSeg(p3, p4, this.p1)) ||
-			(d2 === 0 && Segment.pointIsOnSeg(p3, p4, this.p2)) ||
-			(d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) ||
-			(d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4))
-		) {
-			const points = [this.p1, this.p2, p3, p4]
+		let points: Vector2[] = []
+		if (a1.equals(b1) || a1.equals(b2)) {
+			points.push(a1)
+		}
+		if (a2.equals(b1) || a2.equals(b2)) {
+			points.push(a2)
+		}
 
-			points.sort((a, b) =>
-				a.getX() !== b.getX() ? a.getX() - b.getX() : a.getY() - b.getY()
-			)
+		const colinear =
+			Math.abs(direction(a1, a2, b1)) < EPSILON &&
+			Math.abs(direction(a1, a2, b2)) < EPSILON
+		if (colinear) {
+			const allPoints = [a1, a2, b1, b2]
+			const overlap: Vector2[] = []
+			for (let pt of allPoints) {
+				if (
+					Segment.pointIsOnSeg(a1, a2, pt) &&
+					Segment.pointIsOnSeg(b1, b2, pt)
+				) {
+					if (!overlap.some((p) => p.equals(pt))) {
+						overlap.push(pt)
+					}
+				}
+			}
+			if (overlap.length >= 2) {
+				overlap.sort((p1, p2) =>
+					p1.getX() !== p2.getX()
+						? p1.getX() - p2.getX()
+						: p1.getY() - p2.getY()
+				)
+				return overlap
+			}
+		}
 
-			const overlapStart = points[1]
-
-			return [overlapStart] // or [(overlapStart + overlapEnd [point2]) / 2]
+		if (points.length > 0) {
+			return points
 		}
 
 		return null
