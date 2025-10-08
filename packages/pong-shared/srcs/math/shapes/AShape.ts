@@ -12,19 +12,19 @@ export abstract class AShape {
 	abstract clone(): AShape
 	abstract getNormalAt(point: Vector2): Vector2
 
-	protected setOrigin(o: Vector2): void {
+	public setOrigin(o: Vector2): void {
 		this.origin = o
 	}
 
-	protected addToOrigin(v: Vector2): void {
+	public addToOrigin(v: Vector2): void {
 		this.origin.add(v)
 	}
 
-	protected getOrigin(): Vector2 {
+	public getOrigin(): Vector2 {
 		return this.origin
 	}
 
-	protected getAbsoluteCoord(origin: Vector2): Vector2 {
+	public getAbsoluteCoord(origin: Vector2): Vector2 {
 		return Vector2.add(origin, this.getOrigin())
 	}
 }
