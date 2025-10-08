@@ -33,7 +33,15 @@ services:
     depends_on:
       - nginx
       - front-app
-
+  authentication:
+    restart: on-failure
+    container_name: authentication
+    build:
+      context: .
+      dockerfile: ./services/authentication/Dockerfile
+    depends_on:
+      - nginx
+      - front-app
 networks:
   pong:
     driver: bridge
