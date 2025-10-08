@@ -1,8 +1,11 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../services/authService.js'
+import { RegisterSchema, LoginSchema } from '../models/authDTO.js'
 
 export async function registerController(request: FastifyRequest, reply: FastifyReply) {
-  const { username, password } = request.body as { username?: string; password?: string }
+  const parsed = RegisterSchema.safeParse(request.body)
+  if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
+  const { username, password } = parsed.data
   if (!username || !password) {
     return reply.code(400).send({ error: 'Missing username or password' })
   }
@@ -18,7 +21,9 @@ export async function registerController(request: FastifyRequest, reply: Fastify
 }
 
 export async function loginController(request: FastifyRequest, reply: FastifyReply) {
-  const { username, password } = request.body as { username?: string; password?: string }
+  const parsed = LoginSchema.safeParse(request.body)
+  if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
+  const { username, password } = parsed.data
   if (!username || !password) {
     return reply.code(400).send({ error: 'Missing username or password' })
   }
