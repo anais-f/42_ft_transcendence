@@ -38,7 +38,7 @@ services:
     container_name: authentication
     build:
       context: .
-      dockerfile: ./services/authentication/Dockerfile
+      dockerfile: ./services/auth/Dockerfile
     depends_on:
       - nginx
       - front-app
