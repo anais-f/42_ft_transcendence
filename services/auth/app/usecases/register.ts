@@ -7,7 +7,7 @@ import { signToken } from '../utils/jwt.js'
 
 export async function registerUser(username: string, password: string) {
 	const hashed = await hashPassword(password)
-	createUser(username, hashed)
+	await createUser(username, hashed)
 	return { success: true }
 }
 
