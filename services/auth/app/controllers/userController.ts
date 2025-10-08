@@ -1,8 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getUsers, getUser } from '../services/userService.js'
+import { PublicUserSchema, PublicUserListSchema } from '../models/usersDTO.js'
 
 export async function listUsersController(_req: FastifyRequest, reply: FastifyReply) {
-  return reply.send({ users: getUsers() })
+  const users = getUsers()
+  return reply.send(PublicUserListSchema.parse({ users }))
 }
 
 export async function getUserController(request: FastifyRequest, reply: FastifyReply) {
@@ -14,5 +16,5 @@ export async function getUserController(request: FastifyRequest, reply: FastifyR
   }
   const user = getUser(idNum)
   if (!user) return reply.code(404).send({ error: 'User not found' })
-  return reply.send({ user })
+  return reply.send(PublicUserSchema.parse(user))
 }
