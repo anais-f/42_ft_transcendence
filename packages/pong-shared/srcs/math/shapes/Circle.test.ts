@@ -234,7 +234,7 @@ describe('Circle', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
-				expect(res?.some(e => e.equals(new Vector2(3.4995, 0.5497))))
+				expect(res?.some((e) => e.equals(new Vector2(3.4995, 0.5497))))
 			})
 
 			test('intersect with ray starting at circle edge', () => {
@@ -244,19 +244,18 @@ describe('Circle', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
-				expect(res?.some(e => e.equals(new Vector2(0, 5))))
+				expect(res?.some((e) => e.equals(new Vector2(0, 5))))
 			})
 
-			test ('tangent', () => {
-				const circle = new Circle(new Vector2(1,0), 7)
+			test('tangent', () => {
+				const circle = new Circle(new Vector2(1, 0), 7)
 				const ray = new Ray(new Vector2(-150, 7), new Vector2(1, 0))
 				const res = circle.intersect(ray)
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
-				expect(res?.some(e => e.equals(new Vector2(1, 7))))
+				expect(res?.some((e) => e.equals(new Vector2(1, 7))))
 			})
-
 		})
 	})
 

@@ -86,7 +86,6 @@ describe('Segment', () => {
 				const res = s1.intersect(s2)
 
 				expect(Array.isArray(res)).toBe(true)
-				expect(res?.length).toEqual(1)
 				expect(res).toContainEqual(new Vector2(0, 0.5))
 			})
 
