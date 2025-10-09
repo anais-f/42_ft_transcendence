@@ -8,7 +8,7 @@ RUN apk add --no-cache nginx \
 COPY conf/default.conf /etc/nginx/http.d/default.conf
 COPY avatar/img_default.png /usr/share/nginx/html/avatars/img_default.png
 
-RUN chown -R node:node /usr/share/nginx/html/avatars \
+RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \
     && chmod -R 755 /usr/share/nginx/html/avatars
 
 EXPOSE 8080
