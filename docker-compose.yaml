@@ -39,6 +39,10 @@ services:
       - auth
     networks:
       - backend
+    volumes:
+      - db_users_data:/data
+    environment:
+      - DB_PATH=/data/db-users.sqlite
 
   auth:
     restart: on-failure
@@ -51,9 +55,15 @@ services:
       - frontend
     networks:
       - backend
+    volumes:
+      - db_auth_data:/data
 
 networks:
   pong:
     driver: bridge
   backend:
     driver: bridge
+
+volumes:
+  db_auth_data:
+  db_users_data:

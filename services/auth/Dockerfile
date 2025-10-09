@@ -10,7 +10,7 @@ RUN apk add --no-cache python3 make g++
 RUN npm install
 
 COPY tsconfig.json ./
-COPY services ./services/
+COPY services/auth ./services/auth
 
 EXPOSE 3000
 

@@ -9,7 +9,7 @@ COPY services/users-account/app/package.json ./services/users-account/app/
 RUN npm install
 
 COPY tsconfig.json ./
-COPY services ./services/
+COPY services/users-account/ ./services/users-account/
 
 EXPOSE 3000
 
