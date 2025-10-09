@@ -14,7 +14,7 @@ export class AuthApi {
    * @throws Error if the request fails
    */
   static async getAllUsers() {
-    const response = await fetch('http://localhost:3001/users')
+    const response = await fetch('http://auth:3000/users')
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
     const raw = (await response.json()) as PublicUserListDTO
@@ -31,7 +31,7 @@ export class AuthApi {
    * @param id The ID of the user to fetch the username for
    */
   static async getUsernameById(id: UserId): Promise<string> {
-    const response = await fetch(`http://localhost:3001/users/${id.id_user}`)
+    const response = await fetch(`http://auth:3000/users/${id.id_user}`)
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
     const raw = await response.json().catch(() => {
