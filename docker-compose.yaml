@@ -7,6 +7,8 @@ services:
       - '8080:8080'
     networks:
       - backend
+    volumes:
+      - avatars:/usr/share/nginx/html/avatars:ro
 
   frontend:
     restart: on-failure
@@ -32,13 +34,16 @@ services:
     container_name: users
     build:
       context: .
-      dockerfile: ./services/users-account/Dockerfile
+      dockerfile: services/users/Dockerfile
     depends_on:
       - nginx
       - frontend
       - auth
     networks:
       - backend
+    volumes:
+      - avatars:/user/src/app/public/avatars
+      - users_db:/user/src/app
 
   auth:
     restart: on-failure
@@ -57,3 +62,7 @@ networks:
     driver: bridge
   backend:
     driver: bridge
+
+volumes:
+  avatars:
+  users_db:
