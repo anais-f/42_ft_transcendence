@@ -43,7 +43,7 @@ export class UsersServices {
    * @description Get user profile by id with enrichissement from Auth service
    * @returns UserProfileDTO
    * @throws Error if user not found
-   * @param userId
+   * @param user userId
    */
   static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
     const localUser = UsersRepository.getUserById({ id_user: user.id_user });
@@ -58,22 +58,6 @@ export class UsersServices {
       last_connection: localUser.last_connection
     };
   }
-
-
-
-	// // ✅ Récupération avec enrichissement
-	// static async getUserWithProfile(id_user: number): Promise<UserWithProfile> {
-	//   const localUser = UsersRepository.getUserById({ id_user });
-	//   if (!localUser) throw new Error('User not found');
-	//
-	//   // Enrichir avec data du service auth si nécessaire
-	//   const username = await AuthApi.getUsernameById(id_user);
-	//
-	//   return {
-	//     ...localUser,
-	//     username
-	//   };
-	// }
 }
 
 /*

@@ -8,7 +8,8 @@ import type {
 } from '../models/Users.js'
 
 //TODO: change default avatar path
-const defaultAvatar: string = '../img.png' // default avatar path
+// const defaultAvatar: string = '../img.png' // default avatar path
+const defaultAvatar: string = '/avatars/img_default.png'
 
 /**
  * @description Repository for users table

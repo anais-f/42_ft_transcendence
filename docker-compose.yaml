@@ -42,8 +42,7 @@ services:
     networks:
       - backend
     volumes:
-      - avatars:/user/src/app/public/avatars
-      - users_db:/user/src/app
+      - avatars:/app/avatars
 
   auth:
     restart: on-failure
@@ -65,4 +64,3 @@ networks:
 
 volumes:
   avatars:
-  users_db:

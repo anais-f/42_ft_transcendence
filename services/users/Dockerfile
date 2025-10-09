@@ -9,7 +9,7 @@ COPY services/users/app/package.json ./services/user/app/
 RUN npm install
 
 COPY tsconfig.json ./
-COPY services ./services/
+COPY services/users ./services/users
 
 EXPOSE 3000
 
@@ -20,6 +20,8 @@ RUN npm run build --workspace=users
 FROM node:22-alpine
 
 WORKDIR /app
+
+RUN mkdir -p /app/avatars
 
 COPY --from=build-app /build/services/users/app/dist ./dist
 COPY --from=build-app /build/services/users/app/package.json ./
