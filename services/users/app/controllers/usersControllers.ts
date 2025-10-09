@@ -37,34 +37,46 @@ export async function handleUserCreated(
 }
 
 export async function getUser(
-    req: FastifyRequest<{ Params: { id: string } }>,
-    res: FastifyReply
+	req: FastifyRequest<{ Params: { id: string } }>,
+	res: FastifyReply
 ): Promise<FastifyReply> {
-  try {
-    const { id } = req.params
-    console.log("Fetching user with id:", id)
-    if (!id)
-      return res.status(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+	try {
+		const { id } = req.params
+		console.log('Fetching user with id:', id)
+		if (!id)
+			return res
+				.status(400)
+				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 
-    const idNumber = Number(id);
-    console.log("Fetching user with id number:", idNumber)
-    if (isNaN(idNumber) || idNumber <= 0)
-      return res.status(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID });
+		const idNumber = Number(id)
+		console.log('Fetching user with id number:', idNumber)
+		if (isNaN(idNumber) || idNumber <= 0)
+			return res
+				.status(400)
+				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 
-    const rawProfile = await UsersServices.getUserProfile({ id_user: idNumber })
+		const rawProfile = await UsersServices.getUserProfile({ id_user: idNumber })
 
-    const parsed = UserProfileSchema.safeParse(rawProfile)
-    if (!parsed.success) {
-      console.error('UserProfile validation failed:', parsed.error)
-      return res.status(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-    }
+		const parsed = UserProfileSchema.safeParse(rawProfile)
+		if (!parsed.success) {
+			console.error('UserProfile validation failed:', parsed.error)
+			return res
+				.status(500)
+				.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+		}
 
-    return res.status(200).send(parsed.data)
-  } catch (error) {
-    if (error instanceof Error && error.message === ERROR_MESSAGES.USER_NOT_FOUND) {
-      return res.status(404).send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND });
-    }
-    return res.status(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR });
-  }
+		return res.status(200).send(parsed.data)
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			error.message === ERROR_MESSAGES.USER_NOT_FOUND
+		) {
+			return res
+				.status(404)
+				.send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND })
+		}
+		return res
+			.status(500)
+			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	}
 }
-

@@ -3,12 +3,12 @@ import type {
 	UserStatus,
 	UserConnection,
 	UserAvatar,
-	UserId,
+	UserId
 } from '../models/Users.js'
 import { UsersRepository } from '../repositories/usersRepository.js'
 import { ERROR_MESSAGES } from '../utils/utils.js'
 import { AuthApi } from './internalApi/AuthApi.js'
-import {UserProfileDTO} from "../models/UsersDTO.js";
+import { UserProfileDTO } from '../models/UsersDTO.js'
 
 export class UsersServices {
 	/**
@@ -25,10 +25,10 @@ export class UsersServices {
 		console.log(`User ${newUser.id_user} created`)
 	}
 
-  /**
-   * @description Sync all users from Auth service to local database
-   * @returns void
-   */
+	/**
+	 * @description Sync all users from Auth service to local database
+	 * @returns void
+	 */
 	static async syncAllUsersFromAuth(): Promise<void> {
 		const authUsers = await AuthApi.getAllUsers()
 
@@ -39,25 +39,25 @@ export class UsersServices {
 		}
 	}
 
-  /**
-   * @description Get user profile by id with enrichissement from Auth service
-   * @returns UserProfileDTO
-   * @throws Error if user not found
-   * @param user userId
-   */
-  static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
-    const localUser = UsersRepository.getUserById({ id_user: user.id_user });
-    if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+	/**
+	 * @description Get user profile by id with enrichissement from Auth service
+	 * @returns UserProfileDTO
+	 * @throws Error if user not found
+	 * @param user userId
+	 */
+	static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
+		const localUser = UsersRepository.getUserById({ id_user: user.id_user })
+		if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND)
 
-    const username = await AuthApi.getUsernameById({ id_user: user.id_user });
-    return {
-      id_user: localUser.id_user,
-      username,
-      avatar: localUser.avatar,
-      status: localUser.status,
-      last_connection: localUser.last_connection
-    };
-  }
+		const username = await AuthApi.getUsernameById({ id_user: user.id_user })
+		return {
+			id_user: localUser.id_user,
+			username,
+			avatar: localUser.avatar,
+			status: localUser.status,
+			last_connection: localUser.last_connection
+		}
+	}
 }
 
 /*

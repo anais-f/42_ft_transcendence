@@ -6,13 +6,13 @@ import { z } from 'zod'
   app.post('/user/status', { schema: { body: UserStatusSchema } }, (req, res) => { ... })
  */
 export const UserIdSchema = z.object({
-	id_user: z.number().int().positive(),
+	id_user: z.number().int().positive()
 })
 
 // TODO : reprendre le schéma de l'auth -> DTO commun in progress
 export const UserAuthSchema = z.object({
-  id_user: z.number().int().positive(),
-  username: z.string(),
+	id_user: z.number().int().positive(),
+	username: z.string()
 })
 
 /**
@@ -22,30 +22,33 @@ export const UserAuthSchema = z.object({
  */
 export const UserProfileSchema = z.object({
 	id_user: z.number(),
-  username: z.string(),
+	username: z.string(),
 	avatar: z.string(),
 	status: z.number(),
-	last_connection: z.string(),
+	last_connection: z.string()
 })
 
-export const UsersListResponseSchema = z.object({
-	users: z.array(UserProfileSchema),
-}).strict()
+export const UsersListResponseSchema = z
+	.object({
+		users: z.array(UserProfileSchema)
+	})
+	.strict()
 
 export const SuccessResponseSchema = z.object({
 	success: z.literal(true),
-	message: z.string().optional(),
+	message: z.string().optional()
 })
 
-export const ErrorResponseSchema = z.object({
-	success: z.boolean().optional(),
-	error: z.string(),
-}).strict()
+export const ErrorResponseSchema = z
+	.object({
+		success: z.boolean().optional(),
+		error: z.string()
+	})
+	.strict()
 
-export const PublicUserListSchema = z
-    .object({
-      users: z.array(UserAuthSchema),
-    })
+export const PublicUserListSchema = z.object({
+	users: z.array(UserAuthSchema)
+})
 
 /**
   Typescript types inferred from zod schemas

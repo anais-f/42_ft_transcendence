@@ -4,7 +4,7 @@ import type {
 	UserStatus,
 	UserConnection,
 	UserAvatar,
-	UserId,
+	UserId
 } from '../models/Users.js'
 
 //TODO: change default avatar path
