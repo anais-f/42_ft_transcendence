@@ -13,7 +13,7 @@ COPY services ./services/
 
 EXPOSE 3000
 
-RUN npm run build --workspace=users-app
+RUN npm run build --workspace=users
 
 #-------------------------------------------------------------#
 # prod
