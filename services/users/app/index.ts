@@ -1,19 +1,32 @@
+import './database/usersDatabase.js'
 import Fastify from 'fastify'
-import DatabaseConstructor from 'better-sqlite3'
-import type { Database } from 'better-sqlite3'
-
-const db: Database = new DatabaseConstructor('db.sqlite')
-
-db.exec(
-	'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, login TEXT UNIQUE, name TEXT, password TEXT)'
-)
+import {
+	ZodTypeProvider,
+	validatorCompiler,
+	serializerCompiler
+} from 'fastify-type-provider-zod'
+import { usersRoutes } from './routes/usersRoutes.js'
+import { UsersServices } from './usecases/usersServices.js'
 
 const app = Fastify({
 	logger: false
-})
+}).withTypeProvider<ZodTypeProvider>()
+
+app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler)
+
+// Register routes
+app.register(usersRoutes)
+
+const initializeUsers = async () => {
+	console.log('Initializing users from auth service...')
+	await UsersServices.syncAllUsersFromAuth()
+	console.log('User initialization complete.')
+}
 
 const start = async () => {
 	try {
+		await initializeUsers()
 		await app.listen({ port: 3000, host: '0.0.0.0' })
 		console.log('Listening on port 3000')
 	} catch (err) {
