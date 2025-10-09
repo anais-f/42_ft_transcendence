@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import {
 	registerController,
-	loginController,
+	loginController
 } from '../controllers/authController.js'
 
 export async function authRoutes(app: FastifyInstance) {
