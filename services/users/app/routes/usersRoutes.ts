@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import {
   SuccessResponseSchema,
   ErrorResponseSchema,
-  UserIdSchema, UserProfileSchema,
+  UserAuthSchema, UserProfileSchema,
 } from '../models/UsersDTO.js'
 import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
 
@@ -12,7 +12,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/users/webhookNewUser',
 		{
 			schema: {
-				body: UserIdSchema,
+				body: UserAuthSchema, 
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
