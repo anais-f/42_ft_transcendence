@@ -23,7 +23,11 @@
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" },
-		{ "path": "./services/users-account" }
+		{ "path": "./services/users-account" },
+		{ "path": "./services/auth" },
+		{ "path": "./services/frontend" },
+		{ "path": "./services/nginx" },
+		{ "path": "./services/pong-server" }
 	],
 	"ts-node": {
 		"esm": true

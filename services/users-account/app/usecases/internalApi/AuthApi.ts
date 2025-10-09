@@ -16,7 +16,6 @@ export class AuthApi {
   static async getAllUsers() {
     const response = await fetch('http://auth:3000/users')
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-
     const raw = (await response.json()) as PublicUserListDTO
     const parsed = PublicUserListSchema.safeParse(raw)
     if (!parsed.success) throw new Error('Invalid response shape from auth service: ' + parsed.error.message)

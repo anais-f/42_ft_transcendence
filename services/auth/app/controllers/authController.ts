@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginSchema } from '../models/authDTO.js'
-import { findUserByUsername } from '../repositories/userRepository.js'
+import { findPublicUserByUsername } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 
 export async function registerController(
@@ -13,10 +13,11 @@ export async function registerController(
 	const { username, password } = parsed.data
 	try {
 		await registerUser(username, password)
-		const PublicUser = findUserByUsername(parsed.data.username)
+		const PublicUser = findPublicUserByUsername(parsed.data.username)
 		if (PublicUser == undefined)
-			return reply.code(500).send({ error: 'Database error' })
-		const url = 'http://localhost:3000/users/webhookNewUser'
+			return reply.code(500).send({ error: 'Database error1' })
+		console.log('PublicUser', PublicUser)
+		const url = 'http://users:3000/users/webhookNewUser'
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
@@ -30,7 +31,7 @@ export async function registerController(
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			return reply.code(409).send({ error: 'Username already exists' })
-		return reply.code(500).send({ error: 'Database error' })
+		return reply.code(500).send({ error: 'Database error2' })
 	}
 }
 

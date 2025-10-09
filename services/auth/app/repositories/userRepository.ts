@@ -31,6 +31,7 @@ export function findPublicUserById(id: number) {
 
 export function listPublicUsers() {
 	const stmt = db().prepare('SELECT id_user, username FROM users')
+	console.log('stmt', stmt.all())
 	return stmt.all() as { id: number; username: string }[]
 }
 
