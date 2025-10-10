@@ -1,8 +1,8 @@
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
-import { Circle } from './Circle'
-import { Segment } from '../Segment'
-import { Ray } from '../Ray'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
+import { Circle } from './Circle.js'
+import { Segment } from '../Segment.js'
+import { Ray } from '../Ray.js'
 
 describe('Polygon', () => {
 	describe('getAbsolutePoints', () => {

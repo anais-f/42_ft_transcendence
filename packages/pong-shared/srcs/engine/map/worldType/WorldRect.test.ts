@@ -1,8 +1,8 @@
-import { Polygon } from '../../../math/shapes/Polygon'
-import { Circle } from '../../../math/shapes/Circle'
-import { Segment } from '../../../math/Segment'
-import { Vector2 } from '../../../math/Vector2'
-import { WorldRect } from './WorldRect'
+import { Polygon } from '../../../math/shapes/Polygon.js'
+import { Circle } from '../../../math/shapes/Circle.js'
+import { Segment } from '../../../math/Segment.js'
+import { Vector2 } from '../../../math/Vector2.js'
+import { WorldRect } from './WorldRect.js'
 
 describe('WorldRect', () => {
 	test('WorldRect init', () => {

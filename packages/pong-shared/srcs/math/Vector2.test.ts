@@ -1,4 +1,4 @@
-import { Vector2 } from './Vector2'
+import { Vector2 } from './Vector2.js'
 
 describe('Vector2', () => {
 	test('create a vector with x and y coord', () => {
