@@ -40,7 +40,7 @@ describe('UsersRepository', () => {
 		expect(db.prepare).toHaveBeenCalledWith(
 			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
 		)
-		expect(run).toHaveBeenCalledWith(42, '../img.png', 1, expect.any(String))
+		expect(run).toHaveBeenCalledWith(42, '/avatars/img_default.png', 1, expect.any(String))
 	})
 
 	test('insertManyUsers inserts multiple users in a transaction', () => {
@@ -58,14 +58,14 @@ describe('UsersRepository', () => {
 		expect(run).toHaveBeenNthCalledWith(
 			1,
 			1,
-			'../img.png',
+			'/avatars/img_default.png',
 			1,
 			expect.any(String)
 		)
 		expect(run).toHaveBeenNthCalledWith(
 			2,
 			2,
-			'../img.png',
+			'/avatars/img_default.png',
 			1,
 			expect.any(String)
 		)
@@ -104,7 +104,7 @@ describe('UsersRepository', () => {
 	test('getUserById returns user when found', () => {
 		const fake = {
 			id_user: 1,
-			avatar: 'img.png',
+			avatar: 'img_default.png',
 			status: 1,
 			last_connection: 'now'
 		}
