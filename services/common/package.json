@@ -1,0 +1,11 @@
+{
+	"name": "@ft_transcendence/common",
+	"version": "0.0.1",
+	"description": "Shared code for backend",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"scripts": {
+		"build": "tsc --project tsconfig.json"
+	}
+}
