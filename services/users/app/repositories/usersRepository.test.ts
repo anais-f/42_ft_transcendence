@@ -40,7 +40,12 @@ describe('UsersRepository', () => {
 		expect(db.prepare).toHaveBeenCalledWith(
 			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
 		)
-		expect(run).toHaveBeenCalledWith(42, '/avatars/img_default.png', 1, expect.any(String))
+		expect(run).toHaveBeenCalledWith(
+			42,
+			'/avatars/img_default.png',
+			1,
+			expect.any(String)
+		)
 	})
 
 	test('insertManyUsers inserts multiple users in a transaction', () => {
