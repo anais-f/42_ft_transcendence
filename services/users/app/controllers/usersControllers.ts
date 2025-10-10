@@ -1,7 +1,11 @@
 import { UsersServices } from '../usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/utils.js'
-import {UserAuthDTO, UserIdDTO, UserProfileSchema} from '../models/UsersDTO.js'
+import {
+	UserAuthDTO,
+	UserIdDTO,
+	UserProfileSchema
+} from '../models/UsersDTO.js'
 
 /**
  * Handle user creation via webhook
@@ -16,8 +20,7 @@ export async function handleUserCreated(
 ): Promise<FastifyReply> {
 	try {
 		const newUser: UserAuthDTO = req.body
-    const idUser: UserIdDTO = { id_user: newUser.id_user }
-
+		const idUser: UserIdDTO = { id_user: newUser.id_user }
 
 		await UsersServices.createUser(idUser)
 		return res
