@@ -21,7 +21,7 @@ export class UsersServices {
 		if (UsersRepository.existsById({ id_user: newUser.id_user }))
 			throw new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
 
-		UsersRepository.insertUser({ id_user: newUser.id_user })
+		await UsersRepository.insertUser({ id_user: newUser.id_user })
 		console.log(`User ${newUser.id_user} created`)
 	}
 
