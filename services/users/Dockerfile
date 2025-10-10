@@ -5,7 +5,7 @@ FROM node:22-alpine AS build-app
 WORKDIR /build
 
 COPY package.json package-lock.json ./
-COPY services/users/app/package.json ./services/user/app/
+COPY services/users/app/package.json ./services/users/app/
 RUN npm install
 
 COPY tsconfig.json ./
