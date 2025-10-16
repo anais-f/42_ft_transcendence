@@ -18,20 +18,6 @@ export const ERRORS = {
   INTERNAL: { status: 500, message: 'Internal server error' },
 } as const
 
-
-class AppError extends Error {
-  constructor(code, details) {
-    const errorInfo = ERRORS[code] || ERRORS.INTERNAL;
-    super(errorInfo.message);
-    this.name = this.constructor.name;
-    this.status = errorInfo.status;
-    this.code = code;
-    this.details = details; // optionnel, info internes pour logger
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
-
 export const SUCCESS = {
   USER_CREATED: { status: 200, message: 'User created successfully' },
   USER_UPDATED: { status: 200, message: 'User updated successfully' },
@@ -47,19 +33,29 @@ export const SUCCESS = {
   GAME_ENDED: { status: 200, message: 'Game ended successfully' }
 } as const
 
-
 export function mapSqliteError(e: any): keyof typeof ERRORS {
   if (e.code === 'SQLITE_CONSTRAINT') {
-	if (e.message.includes('UNIQUE constraint failed')) {
-	  return 'DUPLICATE_ENTRY';
-	}
-	return 'CONFLICT';
+    if (e.message.includes('UNIQUE constraint failed')) {
+      return 'DUPLICATE_ENTRY';
+    }
+    return 'CONFLICT';
   }
   if (e.code === 'SQLITE_BUSY') {
-	return 'DB_TIMEOUT';
+    return 'DB_TIMEOUT';
   }
   if (e.code === 'SQLITE_MISUSE') {
-	return 'DB_QUERY';
+    return 'DB_QUERY';
   }
   return 'INTERNAL';
+}
+
+export type Result<T> = | { success: true; data: T } | { success: false; error: string; status?: number }
+
+export function ok<T>(data: T): Result<T> {
+  return { success: true, data }
+}
+
+export function err<T = never>(code: keyof typeof ERRORS): Result<T> {
+  const e = ERRORS[code]
+  return { success: false, error: e.message, status: e.status }
 }
