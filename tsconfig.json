@@ -23,7 +23,9 @@
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" },
-		{ "path": "./services/users" }
+		{ "path": "./packages/common" },
+		{ "path": "./services/users" },
+		{ "path": "./services/auth" }
 	],
 	"ts-node": {
 		"esm": true

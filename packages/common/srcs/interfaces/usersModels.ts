@@ -28,10 +28,12 @@ export interface IFullUser {
  * Types for specific user fields
  * Used in function parameters and return types
  */
-export type IUserUA = Pick<IFullUser, 'id_user' | 'avatar' | 'status' | 'last_connection'>
+export type IUserUA = Pick<
+	IFullUser,
+	'id_user' | 'avatar' | 'status' | 'last_connection'
+>
 export type IUserId = Pick<IFullUser, 'id_user'>
 export type IUserStatus = Pick<IFullUser, 'id_user' | 'status'>
 export type IUserConnection = Pick<IFullUser, 'id_user' | 'last_connection'>
 export type IUserAvatar = Pick<IFullUser, 'id_user' | 'avatar'>
 export type IPublicPageUser = Pick<IFullUser, 'id_user' | 'username' | 'avatar'>
-

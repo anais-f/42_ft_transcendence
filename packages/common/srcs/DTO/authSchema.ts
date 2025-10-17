@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { UsernameSchema } from './usersSchema'
+import { UsernameSchema } from './usersSchema.js'
 
 export const RegisterSchema = z
 	.object({

@@ -15,17 +15,14 @@
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
 		"build:pong:client": "npm run build --workspace=packages/pong-client",
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
+		"build:common": "npm run build --workspace=packages/common",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
 	},
 	"workspaces": [
-		"packages/pong-shared",
-		"packages/pong-client",
-		"packages/pong-server",
-		"services/pong-server/app",
-		"services/users/app",
-		"services/auth/app"
+		"packages/*",
+		"services/*/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",
@@ -42,6 +39,7 @@
 		"nodemon": "^3.1.10",
 		"prettier": "^3.6.2",
 		"ts-node": "^10.9.2",
+		"tsc-alias": "^1.8.16",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.39.0"
 	},

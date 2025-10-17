@@ -19,22 +19,20 @@ export const PublicUserSchema = z
 	})
 	.strict()
 
-
 export const PublicUserListSchema = z
 	.object({
 		users: z.array(PublicUserSchema)
 	})
 	.strict()
-	
 
 export const UserAccountSchema = z
-  .object({
-    id_user: z.number().int().positive(),
-    avatar: z.string(),
-    status: z.number().int().min(0).max(1),
-    last_connection: z.string()
-  })
-  .strict() 
+	.object({
+		id_user: z.number().int().positive(),
+		avatar: z.string(),
+		status: z.number().int().min(0).max(1),
+		last_connection: z.string()
+	})
+	.strict()
 
 export const UserProfileSchema = z.object({
 	id_user: z.number(),
@@ -49,7 +47,6 @@ export const UserProfileListSchema = z
 		users: z.array(UserProfileSchema)
 	})
 	.strict()
-
 
 // WEEBHOOKS TYPE
 // Webhooks (auth -> users)

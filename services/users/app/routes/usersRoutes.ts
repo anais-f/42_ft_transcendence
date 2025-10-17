@@ -1,11 +1,11 @@
 import { FastifyPluginAsync } from 'fastify'
+import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
 import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
-	UserAuthSchema,
+	PublicUserSchema,
 	UserProfileSchema
-} from '../models/UsersDTO.js'
-import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
+} from '@ft_transcendence/common'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
@@ -13,7 +13,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/users/webhookNewUser',
 		{
 			schema: {
-				body: UserAuthSchema,
+				body: PublicUserSchema,
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
