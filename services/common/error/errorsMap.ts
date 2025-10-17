@@ -1,19 +1,14 @@
 export const ERRORS = {
   INVALID_INPUT: { status: 400, message: 'Invalid input' },
   MISSING_FIELD: { status: 400, message: 'Missing field' },
-
   UNAUTHORIZED: { status: 401, message: 'Unauthorized' },
   FORBIDDEN: { status: 403, message: 'Forbidden' },
-
   NOT_FOUND: { status: 404, message: 'Not found' },
-
   CONFLICT: { status: 409, message: 'Conflict' },
   DUPLICATE_ENTRY: { status: 409, message: 'Duplicate entry' },
-
   DB_QUERY: { status: 500, message: 'Database query error' },
   DB_CONNECTION: { status: 500, message: 'Database connection error' },
   DB_TIMEOUT: { status: 500, message: 'Database timeout' },
-
   EXTERNAL_ERROR: { status: 502, message: 'External service error' },
   INTERNAL: { status: 500, message: 'Internal server error' },
 } as const
@@ -35,17 +30,14 @@ export const SUCCESS = {
 
 export function mapSqliteError(e: any): keyof typeof ERRORS {
   if (e.code === 'SQLITE_CONSTRAINT') {
-    if (e.message.includes('UNIQUE constraint failed')) {
-      return 'DUPLICATE_ENTRY';
-    }
+    if (e.message.includes('UNIQUE constraint failed'))
+      return 'DUPLICATE_ENTRY'
     return 'CONFLICT';
   }
-  if (e.code === 'SQLITE_BUSY') {
+  if (e.code === 'SQLITE_BUSY')
     return 'DB_TIMEOUT';
-  }
-  if (e.code === 'SQLITE_MISUSE') {
+  if (e.code === 'SQLITE_MISUSE')
     return 'DB_QUERY';
-  }
   return 'INTERNAL';
 }
 
