@@ -9,7 +9,6 @@ export const UserIdSchema = z.object({
 	id_user: z.number().int().positive()
 })
 
-// TODO : reprendre le schéma de l'auth -> DTO commun in progress
 export const UserAuthSchema = z.object({
 	id_user: z.number().int().positive(),
 	username: z.string()

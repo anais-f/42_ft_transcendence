@@ -2,8 +2,8 @@
 FROM alpine:3.19.4
 
 WORKDIR /app
-RUN apk add --no-cache nginx \
-    && mkdir -p /usr/share/nginx/html/avatars
+RUN apk add --no-cache nginx
+RUN mkdir -p /usr/share/nginx/html/avatars
 
 COPY conf/default.conf /etc/nginx/http.d/default.conf
 COPY avatar/img_default.png /usr/share/nginx/html/avatars/img_default.png
