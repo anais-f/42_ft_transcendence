@@ -1,4 +1,19 @@
 #-------------------------------------------------------------#
+# Build packages
+FROM node:22-alpine AS build-packages
+
+WORKDIR /build
+
+COPY package.json package-lock.json ./
+COPY packages/common/package.json ./packages/common/
+
+RUN npm install
+
+COPY tsconfig.json ./
+COPY packages/ ./packages/
+
+RUN npm run build --workspace=packages/common
+#-------------------------------------------------------------#
 # Build app
 FROM node:22-alpine AS build-app
 
@@ -6,10 +21,14 @@ WORKDIR /build
 
 COPY package.json package-lock.json ./
 COPY services/users/app/package.json ./services/users/app/
+COPY packages/common/package.json ./packages/common/
 RUN npm install
 
 COPY tsconfig.json ./
-COPY services/users ./services/users
+COPY packages/ ./packages/
+COPY services/ ./services/
+
+COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 
 EXPOSE 3000
 

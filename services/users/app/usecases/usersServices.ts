@@ -1,14 +1,15 @@
-import type {
-	User,
-	UserStatus,
-	UserConnection,
-	UserAvatar,
-	UserId
-} from '../models/Users.js'
 import { UsersRepository } from '../repositories/usersRepository.js'
-import { ERROR_MESSAGES } from '../utils/utils.js'
-import { AuthApi } from './internalApi/AuthApi.js'
-import { UserProfileDTO } from '../models/UsersDTO.js'
+import { AuthApi } from './AuthApi.js'
+import {
+	IUserId,
+	IUserUA,
+	IFullUser,
+	IUserStatus,
+	IUserConnection,
+	IUserAvatar,
+	AppError,
+	ERROR_MESSAGES
+} from '@ft_transcendence/common'
 
 export class UsersServices {
 	/**
@@ -17,9 +18,9 @@ export class UsersServices {
 	 * @throws Error if user already exists
 	 * @returns void
 	 */
-	static async createUser(newUser: UserId): Promise<void> {
+	static async createUser(newUser: IUserId): Promise<void> {
 		if (UsersRepository.existsById({ id_user: newUser.id_user }))
-			throw new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
+			throw new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
 
 		await UsersRepository.insertUser({ id_user: newUser.id_user })
 		console.log(`User ${newUser.id_user} created`)
@@ -33,9 +34,8 @@ export class UsersServices {
 		const authUsers = await AuthApi.getAllUsers()
 
 		for (const authUser of authUsers) {
-			if (!UsersRepository.existsById({ id_user: authUser.id_user })) {
+			if (!UsersRepository.existsById({ id_user: authUser.id_user }))
 				UsersRepository.insertUser({ id_user: authUser.id_user })
-			}
 		}
 	}
 
@@ -45,9 +45,12 @@ export class UsersServices {
 	 * @throws Error if user not found
 	 * @param user userId
 	 */
-	static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
+	static async getUserProfile(user: IUserId): Promise<IFullUser> {
+		if (!user?.id_user || user.id_user <= 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+
 		const localUser = UsersRepository.getUserById({ id_user: user.id_user })
-		if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND)
+		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 
 		const username = await AuthApi.getUsernameById({ id_user: user.id_user })
 		return {
@@ -65,59 +68,55 @@ export class UsersServices {
   Can add business usecases if needed
 */
 export class UsersServicesRequests {
-	static existsById(user: UserId): boolean {
+	static existsById(user: IUserId): boolean {
 		return UsersRepository.existsById(user)
 	}
 
 	// INSERT methods
-	static insertManyUsers(users: UserId[]): void {
-		UsersRepository.insertManyUsers(users)
-	}
-
-	static insertUser(user: UserId): void {
+	static insertUser(user: IUserId): void {
 		UsersRepository.insertUser(user)
 	}
 
 	// SET / UPDATE methods
-	static updateUserStatus(user: UserStatus): void {
+	static updateUserStatus(user: IUserStatus): void {
 		UsersRepository.updateUserStatus(user)
 	}
 
-	static updateLastConnection(user: UserConnection): void {
+	static updateLastConnection(user: IUserConnection): void {
 		UsersRepository.updateLastConnection(user)
 	}
 
-	static setUserAvatar(user: UserAvatar): void {
+	static setUserAvatar(user: IUserAvatar): void {
 		UsersRepository.updateUserAvatar(user)
 	}
 
 	// GET methods
-	static getUserById(user: UserId): User | undefined {
+	static getUserById(user: IUserId): IUserUA | undefined {
 		return UsersRepository.getUserById(user)
 	}
 
-	static getAllUsers(): User[] {
+	static getAllUsers(): IUserUA[] {
 		return UsersRepository.getAllUsers()
 	}
 
-	static getOnlineUsers(): User[] {
+	static getOnlineUsers(): IUserUA[] {
 		return UsersRepository.getOnlineUsers()
 	}
 
-	static getStatusById(user: UserId): number {
+	static getStatusById(user: IUserId): number {
 		return UsersRepository.getStatusById(user)
 	}
 
-	static getAvatarById(user: UserId): string {
+	static getAvatarById(user: IUserId): string {
 		return UsersRepository.getAvatarById(user)
 	}
 
-	static getLastConnectionById(user: UserId): string {
+	static getLastConnectionById(user: IUserId): string {
 		return UsersRepository.getLastConnectionById(user)
 	}
 
 	// DELETE methods
-	static deleteUserById(user: UserId): void {
+	static deleteUserById(user: IUserId): void {
 		UsersRepository.deleteUserById(user)
 	}
 }

@@ -11,4 +11,4 @@ db.exec(`  CREATE TABLE IF NOT EXISTS users (
     last_connection TEXT NOT NULL
   )`)
 
-console.log('DB created')
+console.log('DB users created')

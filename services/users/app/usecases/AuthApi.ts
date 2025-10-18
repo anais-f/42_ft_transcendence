@@ -1,10 +1,11 @@
 import fetch from 'node-fetch'
 import {
-	UserAuthSchema,
 	PublicUserListDTO,
-	PublicUserListSchema
-} from '../../models/UsersDTO.js'
-import { UserId } from '../../models/Users.js'
+	PublicUserListSchema,
+	PublicUserSchema,
+	AppError,
+	IUserId
+} from '@ft_transcendence/common'
 
 // TODO: update password and username via auth service
 // TODO: error handling with try/catch and custom errors
@@ -21,8 +22,9 @@ export class AuthApi {
 		const raw = (await response.json()) as PublicUserListDTO
 		const parsed = PublicUserListSchema.safeParse(raw)
 		if (!parsed.success)
-			throw new Error(
-				'Invalid response shape from auth service: ' + parsed.error.message
+			throw new AppError(
+				'Invalid response shape from auth service: ' + parsed.error.message,
+				500
 			)
 
 		return parsed.data.users.map((u) => ({ id_user: u.id_user }))
@@ -34,21 +36,22 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 * @param id The ID of the user to fetch the username for
 	 */
-	static async getUsernameById(id: UserId): Promise<string> {
+	static async getUsernameById(id: IUserId): Promise<string> {
 		const response = await fetch(`http://auth:3000/users/${id.id_user}`)
-		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+		if (!response.ok)
+			throw new AppError(`HTTP error! status: ${response.status}`, 500)
 
 		const raw = await response.json().catch(() => {
-			throw new Error('Invalid JSON from auth service')
+			throw new AppError('Invalid JSON from auth service', 500)
 		})
 
-		const parsed = UserAuthSchema.safeParse(raw)
+		const parsed = PublicUserSchema.safeParse(raw)
 		if (!parsed.success) {
 			console.error(
 				'Invalid username response shape from auth service:',
 				parsed.error
 			)
-			throw new Error('Invalid response shape from auth service')
+			throw new AppError('Invalid response shape from auth service', 500)
 		}
 
 		return parsed.data.username

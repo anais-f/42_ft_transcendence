@@ -13,3 +13,6 @@ package-lock.json
 *.sqlite
 
 TODO
+*.js
+*.d.ts
+*.js.map
