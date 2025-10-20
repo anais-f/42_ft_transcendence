@@ -5,7 +5,6 @@ import {
 	AppError,
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
-	UserPublicProfileSchema,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 

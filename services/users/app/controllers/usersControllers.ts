@@ -2,7 +2,6 @@ import { UsersServices } from '../usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
-	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
 	AppError,
 	ERROR_MESSAGES,
