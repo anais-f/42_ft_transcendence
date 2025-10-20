@@ -7,9 +7,8 @@ import {
 	IUserId
 } from '@ft_transcendence/common'
 
-// TODO: pouvoir changer le username -> call avec l'auth pour la modif -> internalApi
-// TODO: pouvoir changer le mot de passe -> call avec l'auth pour la modif -> internalApi
-// TODO: gérer les erreurs (try/catch) + logger
+// TODO: update password and username via auth service
+// TODO: error handling with try/catch and custom errors
 
 export class AuthApi {
 	/**

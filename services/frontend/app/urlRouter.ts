@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		return
 	}
 
-	// Références non-null pour les callbacks
 	const content = contentDiv as HTMLElement
 	const menu = dynamicMenu as HTMLElement
 
