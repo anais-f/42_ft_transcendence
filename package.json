@@ -9,7 +9,7 @@
 		"test:pong:shared": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-shared",
 		"test:pong:client": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-client",
 		"test:pong:server": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-server",
-		"test:users-account": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=users-account-app",
+		"test:users": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=users-app",
 		"build": "npm run build --workspaces --if-present",
 		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
@@ -24,7 +24,7 @@
 		"packages/pong-client",
 		"packages/pong-server",
 		"services/pong-server/app",
-		"services/users-account/app",
+		"services/users/app",
 		"services/auth/app"
 	],
 	"devDependencies": {

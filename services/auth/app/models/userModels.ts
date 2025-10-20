@@ -1,10 +1,10 @@
 export interface IUserRow {
-	id: number
+	id_user: number
 	username: string
 	password: string
 }
 
 export interface IPublicUser {
-	id: number
+	id_user: number
 	username: string
 }

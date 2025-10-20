@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { ENV } from '../config/env.js'
 
 export function signToken(payload: { userId: number; username: string }) {
-	return jwt.sign(payload, ENV.JWT_SECRET, { expiresIn: '1h' })
+	return jwt.sign(payload, 'TO_CHANGE_WITH_SECRET', { expiresIn: '1h' })
 }

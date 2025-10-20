@@ -1,8 +1,8 @@
-import { Vector2 } from '../Vector2'
-import { Circle } from './Circle'
-import { Polygon } from './Polygon'
-import { Shape } from './Shape'
-import { Rectangle } from './Rectangle'
+import { Vector2 } from '../Vector2.js'
+import { Circle } from './Circle.js'
+import { Polygon } from './Polygon.js'
+import { Shape } from './Shape.js'
+import { Rectangle } from './Rectangle.js'
 
 describe('Shape', () => {
 	describe('Shapes instanceof test', () => {

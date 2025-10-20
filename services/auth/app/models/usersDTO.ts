@@ -10,7 +10,7 @@ export const UsernameSchema = z
 
 export const PublicUserSchema = z
 	.object({
-		id: z.number().positive().min(1),
+		id_user: z.number().positive().min(1),
 		username: UsernameSchema
 	})
 	.strict()
