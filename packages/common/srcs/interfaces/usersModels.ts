@@ -11,7 +11,6 @@ export interface IUserAuth {
 
 export type IPublicUserAuth = Omit<IUserAuth, 'password'>
 
-
 /**
  * Comprehensive user model for application use
  * Every information from users table
@@ -35,4 +34,7 @@ export type IUsernameId = Pick<IPrivateUser, 'user_id' | 'username'>
 export type IUserStatus = Pick<IPrivateUser, 'user_id' | 'status'>
 export type IUserConnection = Pick<IPrivateUser, 'user_id' | 'last_connection'>
 export type IUserAvatar = Pick<IPrivateUser, 'user_id' | 'avatar'>
-export type IPublicProfileUser = Pick<IPrivateUser, 'user_id' | 'username' | 'avatar' | 'status'>
+export type IPublicProfileUser = Pick<
+	IPrivateUser,
+	'user_id' | 'username' | 'avatar' | 'status'
+>

@@ -2,10 +2,12 @@ import { db } from '../database/usersDatabase.js'
 import {
 	IUserId,
 	IUsernameId,
-  IUsername,
+	IUsername,
 	IUserConnection,
 	IUserAvatar,
-	IPrivateUser, IPublicUserAuth
+	IPrivateUser,
+	IPublicUserAuth,
+	UserPublicProfileDTO
 } from '@ft_transcendence/common'
 
 // const defaultAvatar: string = '../img.png' // default avatar path
@@ -43,7 +45,7 @@ export class UsersRepository {
 	/**
 	 * @description Update methods for user status, last connection or avatar
 	 */
-  //TODO: how status was setted?
+	//TODO: how status was setted?
 	// static updateUserStatus(user: IUserStatus): void {
 	// 	const updateStmt = db.prepare(
 	// 		'UPDATE users SET status = ? WHERE user_id = ?'
@@ -66,34 +68,34 @@ export class UsersRepository {
 		updateStmt.run(user.avatar, user.user_id)
 	}
 
-  static updateUsername(user: IUsernameId): void {
-    const updateStmt = db.prepare(
-      'UPDATE users SET username = ? WHERE user_id = ?'
-    )
-    updateStmt.run(user.username, user.user_id)
-  }
+	static updateUsername(user: IUsernameId): void {
+		const updateStmt = db.prepare(
+			'UPDATE users SET username = ? WHERE user_id = ?'
+		)
+		updateStmt.run(user.username, user.user_id)
+	}
 	/**
 	 * @description Some get methods according to the table fields
 	 */
-	static getUserById(user: IUserId): IPrivateUser | undefined {
+	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
 		)
-		return selectStmt.get(user.user_id) as IPrivateUser | undefined
+		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
-  static getUsernameById(user: IUserId): string {
-    const selectStmt = db.prepare('SELECT username FROM users WHERE user_id = ?')
-    const row = selectStmt.get(user.user_id) as { username: string }
-    return row.username
-  }
+	// static getUsernameById(user: IUserId): string {
+	//   const selectStmt = db.prepare('SELECT username FROM users WHERE user_id = ?')
+	//   const row = selectStmt.get(user.user_id) as { username: string }
+	//   return row.username
+	// }
 
-  static getUserByUsername(username: IUsername): IPrivateUser | undefined {
-    const selectStmt = db.prepare(
-      'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
-    )
-    return selectStmt.get(username) as IPrivateUser | undefined
-  }
+	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
+		const selectStmt = db.prepare(
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
+		)
+		return selectStmt.get(username) as IPrivateUser | undefined
+	}
 
 	static getStatusById(user: IUserId): number {
 		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
@@ -140,4 +142,3 @@ export class UsersRepository {
 		deleteStmt.run(user.user_id)
 	}
 }
-

@@ -27,7 +27,7 @@ const initializeUsers = async () => {
 const start = async () => {
 	try {
 		await initializeUsers()
-		await app.listen({ port: 3000, host: '0.0.0.0' })
+		await app.listen({ port: 3001, host: '0.0.0.0' })
 		console.log('Listening on port 3000')
 	} catch (err) {
 		console.error('Error starting server: ', err)

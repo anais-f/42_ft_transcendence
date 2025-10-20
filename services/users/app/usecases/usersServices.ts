@@ -2,11 +2,10 @@ import { UsersRepository } from '../repositories/usersRepository.js'
 import { AuthApi } from './AuthApi.js'
 import {
 	IUserId,
-	IPrivateUser,
-	IUserStatus,
-	IUserConnection,
-	IUserAvatar,
 	AppError,
+	PublicUserAuthDTO,
+	UserPublicProfileDTO,
+	UserPublicProfileSchema,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 
@@ -17,12 +16,15 @@ export class UsersServices {
 	 * @throws Error if user already exists
 	 * @returns void
 	 */
-	static async createUser(newUser: IUserId): Promise<void> {
+	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
 		if (UsersRepository.existsById({ user_id: newUser.user_id }))
 			throw new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
 
-		await UsersRepository.insertUser({ user_id: newUser.user_id })
-		console.log(`User ${newUser.user_id} created`)
+		await UsersRepository.insertUser({
+			user_id: newUser.user_id,
+			login: newUser.login
+		})
+		console.log(`User ${newUser.user_id} ${newUser.login} created`)
 	}
 
 	/**
@@ -34,7 +36,10 @@ export class UsersServices {
 
 		for (const authUser of authUsers) {
 			if (!UsersRepository.existsById({ user_id: authUser.user_id }))
-				UsersRepository.insertUser({ user_id: authUser.user_id })
+				UsersRepository.insertUser({
+					user_id: authUser.user_id,
+					login: authUser.login
+				})
 		}
 	}
 
@@ -44,21 +49,23 @@ export class UsersServices {
 	 * @throws Error if user not found
 	 * @param user userId
 	 */
-	static async getUserProfile(user: IUserId): Promise<IPrivateUser> {
+	static async getPublicUserProfile(
+		user: IUserId
+	): Promise<UserPublicProfileDTO> {
 		if (!user?.user_id || user.user_id <= 0)
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
 		const localUser = UsersRepository.getUserById({ user_id: user.user_id })
 		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 
-		const username = await AuthApi.getUsernameById({ user_id: user.user_id })
 		return {
 			user_id: localUser.user_id,
-			username,
+			username: localUser.username,
 			avatar: localUser.avatar,
 			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
-}
 
+	// static async getPrivateUserProfile
+}

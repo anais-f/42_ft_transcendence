@@ -1,9 +1,9 @@
 import { UsersServices } from '../usecases/usersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
-	PublicUserDTO,
-	UserIdDTO,
+	PublicUserAuthDTO,
 	UserPrivateProfileSchema,
+	UserPublicProfileSchema,
 	AppError,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
@@ -17,14 +17,13 @@ import {
  * @param res
  */
 export async function handleUserCreated(
-	req: FastifyRequest<{ Body: PublicUserDTO }>,
+	req: FastifyRequest<{ Body: PublicUserAuthDTO }>,
 	res: FastifyReply
 ): Promise<FastifyReply> {
 	try {
-		const newUser: PublicUserDTO = req.body
-		const idUser: UserIdDTO = { user_id: newUser.user_id }
+		const newUser: PublicUserAuthDTO = req.body
 
-		await UsersServices.createUser(idUser)
+		await UsersServices.createUser(newUser)
 		return res
 			.status(201)
 			.send({ success: true, message: SUCCESS_MESSAGES.USER_CREATED })
@@ -43,7 +42,7 @@ export async function handleUserCreated(
 	}
 }
 
-export async function getUser(
+export async function getPublicUser(
 	req: FastifyRequest<{ Params: { id: string } }>,
 	res: FastifyReply
 ): Promise<FastifyReply> {
@@ -55,35 +54,45 @@ export async function getUser(
 		if (!id || isNaN(idNumber) || idNumber <= 0)
 			return res
 				.status(400)
-				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+				.send({
+					success: false,
+					error: ERROR_MESSAGES.INVALID_USER_ID + 'id test'
+				})
 
-		const rawProfile = await UsersServices.getUserProfile({ user_id: idNumber })
+		const rawProfile = await UsersServices.getPublicUserProfile({
+			user_id: idNumber
+		})
 
-		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
+		const parsed = UserPublicProfileSchema.safeParse(rawProfile)
 		if (!parsed.success) {
 			console.error('UserProfile validation failed:', parsed.error)
 			return res
 				.status(500)
 				.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
 		}
-
-		// return res.status(200).send(parsed.data)
-		return res.status(200).send({ success: true, data: parsed.data })
+		return res.status(200).send(parsed.data)
 	} catch (error) {
 		if (error instanceof AppError) {
 			return res
 				.status(error.status)
 				.send({ success: false, error: error.message })
-			// return res
-			// 	.status(404)
-			// 	.send({ success: false, error: ERROR_MESSAGES.USER_NOT_FOUND })
 		}
-		console.error('Unexpected error in getUser:', error)
+		console.error('Unexpected error in getPublicUser:', error)
 		return res
 			.status(500)
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-		// return res
-		// 	.status(500)
-		// 	.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
 	}
 }
+
+//   async function getPrivateUser(
+//   req: FastifyRequest,
+//   res: FastifyReply
+// ): Promise<FastifyReply> {
+//     try {
+//       const id = req.params.id
+//
+//
+//       }
+//
+//   return ;
+// }

@@ -1,7 +1,4 @@
-import {
-	createUser,
-	findUserByLogin
-} from '../repositories/userRepository.js'
+import { createUser, findUserByLogin } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
 

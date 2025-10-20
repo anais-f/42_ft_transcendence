@@ -4,9 +4,7 @@ import { IUserAuth } from '@ft_transcendence/common'
 const db = () => getDb()
 
 export function createUser(login: string, passwordHash: string) {
-	const stmt = db().prepare(
-		'INSERT INTO users (login, password) VALUES (?, ?)'
-	)
+	const stmt = db().prepare('INSERT INTO users (login, password) VALUES (?, ?)')
 	stmt.run(login, passwordHash)
 }
 
@@ -16,9 +14,7 @@ export function findUserByLogin(login: string) {
 }
 
 export function findPublicUserByLogin(login: string) {
-	const stmt = db().prepare(
-		'SELECT user_id, login FROM users WHERE login = ?'
-	)
+	const stmt = db().prepare('SELECT user_id, login FROM users WHERE login = ?')
 	return stmt.get(login) as { id: number; login: string } | undefined
 }
 

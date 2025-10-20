@@ -9,7 +9,8 @@ export async function registerController(
 	reply: FastifyReply
 ) {
 	const parsed = RegisterSchema.safeParse(request.body)
-	if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
+	if (!parsed.success)
+		return reply.code(400).send({ error: 'Invalid payload - regidster' })
 	const { login, password } = parsed.data
 	try {
 		await registerUser(login, password)
@@ -17,7 +18,7 @@ export async function registerController(
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 		console.log('PublicUser', PublicUser)
-		const url = 'http://users:3000/users/webhookNewUser'
+		const url = 'http://localhost:3001/api/users/new-user'
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
@@ -40,7 +41,8 @@ export async function loginController(
 	reply: FastifyReply
 ) {
 	const parsed = LoginActionSchema.safeParse(request.body)
-	if (!parsed.success) return reply.code(400).send({ error: 'Invalid payload' })
+	if (!parsed.success)
+		return reply.code(400).send({ error: 'Invalid payload - login controller' })
 	const { login, password } = parsed.data
 	const res = await loginUser(login, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })

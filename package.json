@@ -22,10 +22,10 @@
 	},
 	"workspaces": [
 		"packages/common",
-    "packages/pong-shared",
-    "packages/pong-client",
-    "packages/pong-server",
-    "services/auth/app",
+		"packages/pong-shared",
+		"packages/pong-client",
+		"packages/pong-server",
+		"services/auth/app",
 		"services/users/app"
 	],
 	"devDependencies": {

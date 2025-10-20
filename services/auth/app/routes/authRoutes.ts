@@ -5,6 +5,6 @@ import {
 } from '../controllers/authController.js'
 
 export async function authRoutes(app: FastifyInstance) {
-	app.post('/register', registerController)
-	app.post('/login', loginController)
+	app.post('/api/register', registerController)
+	app.post('/api/login', loginController)
 }

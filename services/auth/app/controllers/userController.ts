@@ -1,6 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getPublicUsers, getPublicUser } from '../usecases/user.js'
-import { PublicUserAuthSchema, PublicUserListAuthSchema } from '@ft_transcendence/common'
+import {
+	PublicUserAuthSchema,
+	PublicUserListAuthSchema
+} from '@ft_transcendence/common'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { success } from 'zod'
 
