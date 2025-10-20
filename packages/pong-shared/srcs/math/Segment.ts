@@ -1,8 +1,8 @@
-import { EPSILON } from '../define'
-import { Ray } from './Ray'
-import { Vector2 } from './Vector2'
-import { Circle } from './shapes/Circle'
-import { Polygon } from './shapes/Polygon'
+import { EPSILON } from '../define.js'
+import { Ray } from './Ray.js'
+import { Vector2 } from './Vector2.js'
+import { Circle } from './shapes/Circle.js'
+import { Polygon } from './shapes/Polygon.js'
 
 export class Segment {
 	constructor(

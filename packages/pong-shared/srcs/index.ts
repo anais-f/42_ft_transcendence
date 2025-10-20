@@ -1,12 +1,12 @@
 // Math obj:
-export * from './math/Vector2'
-export * from './math/Ray'
-export * from './math/Segment'
+export * from './math/Vector2.js'
+export * from './math/Ray.js'
+export * from './math/Segment.js'
 
 // Shape
-export * from './math/shapes/Circle'
-export * from './math/shapes/Polygon'
-export * from './math/shapes/Rectangle'
+export * from './math/shapes/Circle.js'
+export * from './math/shapes/Polygon.js'
+export * from './math/shapes/Rectangle.js'
 
 // engine
-export * from './engine/game-engine'
+export * from './engine/game-engine.js'

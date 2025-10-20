@@ -1,10 +1,9 @@
-import { PongObject } from './objects/PongObject'
+import { PongObject } from './objects/PongObject.js'
 
 export class PhysicsEngine {
 	private objs: PongObject[] = []
 
-	public constructor() {
-	}
+	public constructor() {}
 
 	public addObj(obj: PongObject) {
 		this.objs.push(obj)
@@ -12,5 +11,6 @@ export class PhysicsEngine {
 
 	public playTick() {
 		// TODO: implement
+		console.log('hey')
 	}
 }

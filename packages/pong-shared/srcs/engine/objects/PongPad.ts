@@ -1,5 +1,5 @@
-import { Vector2 } from '../../math/Vector2'
-import { PongObject } from './PongObject'
+import { Vector2 } from '../../math/Vector2.js'
+import { PongObject } from './PongObject.js'
 
 export enum PadDirection {
 	Up,
@@ -24,7 +24,7 @@ export class PongPad {
 
 	public move(dir: PadDirection, incr: number, border: PongObject[]) {
 		const pos = this.obj.getOrigin()
-		switch (dir){
+		switch (dir) {
 			case PadDirection.Up:
 				this.obj.setOrigin(Vector2.add(pos, new Vector2(0, incr)))
 				break

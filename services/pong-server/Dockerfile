@@ -15,7 +15,7 @@ COPY packages/ ./packages/
 RUN npm run build --workspace=packages/pong-shared
 #-------------------------------------------------------------#
 # Build app
-FROM node:20-alpine AS build-app
+FROM node:22-alpine AS build-app
 
 WORKDIR /build
 
@@ -34,7 +34,7 @@ RUN npm run build --workspace=pong-server-app
 
 #-------------------------------------------------------------#
 # prod
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 

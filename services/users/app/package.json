@@ -1,0 +1,12 @@
+{
+	"name": "users",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"type": "module",
+	"scripts": {
+		"test": "node --experimental-vm-modules ./node_modules/.bin/jest --config ./jest.config.ts ./**/*.test.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
+	}
+}

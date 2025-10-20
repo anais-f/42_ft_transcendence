@@ -1,4 +1,4 @@
-import { EPSILON } from '../define'
+import { EPSILON } from '../define.js'
 
 export class Vector2 {
 	// init class fields

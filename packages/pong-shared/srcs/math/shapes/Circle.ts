@@ -1,8 +1,8 @@
-import { Ray } from '../Ray'
-import { Segment } from '../Segment'
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
-import { AShape } from './AShape'
+import { Ray } from '../Ray.js'
+import { Segment } from '../Segment.js'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
+import { AShape } from './AShape.js'
 
 export class Circle extends AShape {
 	private rad!: number

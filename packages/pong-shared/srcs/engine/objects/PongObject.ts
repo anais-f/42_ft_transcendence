@@ -1,5 +1,5 @@
-import { AShape } from '../../math/shapes/AShape'
-import { Vector2 } from '../../math/Vector2'
+import { AShape } from '../../math/shapes/AShape.js'
+import { Vector2 } from '../../math/Vector2.js'
 
 export class PongObject {
 	private origin: Vector2
