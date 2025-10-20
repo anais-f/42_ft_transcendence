@@ -1,10 +1,13 @@
 {
-	"extends": "../../../tsconfig.json",
-	"compilerOptions": {
-		"outDir": "dist",
-		"rootDir": "."
-	},
-	"ts-node": {
-		"esm": true
-	}
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./",
+    "moduleResolution": "nodenext"
+  },
+  "references": [{ "path": "../../../packages/common" }],
+  "include": ["./**/*"],
+  "ts-node": {
+    "esm": true
+  }
 }

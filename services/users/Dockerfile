@@ -45,6 +45,7 @@ RUN mkdir -p /app/avatars
 COPY --from=build-app /build/services/users/app/dist ./dist
 COPY --from=build-app /build/services/users/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
+COPY --from=build-app /build/packages/common/ ./packages/common/
 
 RUN chown -R node:node /app
 USER node

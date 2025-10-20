@@ -22,7 +22,7 @@ export async function handleUserCreated(
 ): Promise<FastifyReply> {
 	try {
 		const newUser: PublicUserDTO = req.body
-		const idUser: UserIdDTO = { id_user: newUser.id_user }
+		const idUser: UserIdDTO = { user_id: newUser.user_id }
 
 		await UsersServices.createUser(idUser)
 		return res
@@ -57,7 +57,7 @@ export async function getUser(
 				.status(400)
 				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 
-		const rawProfile = await UsersServices.getUserProfile({ id_user: idNumber })
+		const rawProfile = await UsersServices.getUserProfile({ user_id: idNumber })
 
 		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
 		if (!parsed.success) {

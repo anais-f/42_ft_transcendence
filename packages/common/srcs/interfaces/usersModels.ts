@@ -30,6 +30,8 @@ export interface IPrivateUser {
  * Used in function parameters and return types
  */
 export type IUserId = Pick<IPrivateUser, 'user_id'>
+export type IUsername = Pick<IPrivateUser, 'username'>
+export type IUsernameId = Pick<IPrivateUser, 'user_id' | 'username'>
 export type IUserStatus = Pick<IPrivateUser, 'user_id' | 'status'>
 export type IUserConnection = Pick<IPrivateUser, 'user_id' | 'last_connection'>
 export type IUserAvatar = Pick<IPrivateUser, 'user_id' | 'avatar'>

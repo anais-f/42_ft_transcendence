@@ -21,8 +21,12 @@
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
 	},
 	"workspaces": [
-		"packages/*",
-		"services/*/app"
+		"packages/common",
+    "packages/pong-shared",
+    "packages/pong-client",
+    "packages/pong-server",
+    "services/auth/app",
+		"services/users/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",

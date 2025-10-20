@@ -44,6 +44,7 @@ WORKDIR /app
 COPY --from=build-app /build/services/auth/app/dist ./dist
 COPY --from=build-app /build/services/auth/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
+COPY --from=build-app /build/packages/common/ ./packages/common/
 
 EXPOSE 3000
 
