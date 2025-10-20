@@ -507,7 +507,7 @@ describe('Polygon', () => {
 				const tri = new Polygon([
 					new Vector2(8, 4),
 					new Vector2(13, 0),
-					new Vector2(13, 6),
+					new Vector2(13, 6)
 				])
 				const res = tri.intersect(square)
 
@@ -616,7 +616,7 @@ describe('Polygon', () => {
 				new Vector2(),
 				new Vector2(0, 1),
 				new Vector2(1, 1),
-				new Vector2(1, 0),
+				new Vector2(1, 0)
 			])
 			const p2 = p1.clone()
 
@@ -627,7 +627,7 @@ describe('Polygon', () => {
 				new Vector2(),
 				new Vector2(0, 1),
 				new Vector2(1, 1),
-				new Vector2(1, 0),
+				new Vector2(1, 0)
 			])
 			const p2 = p1.clone()
 			p1.getSegment()[0].getP1().setX(6)
@@ -647,7 +647,7 @@ describe('Polygon', () => {
 			const vertices = [
 				new Vector2(0, 0),
 				new Vector2(5, 0),
-				new Vector2(2.5, 5),
+				new Vector2(2.5, 5)
 			]
 			polygon = new Polygon(vertices)
 		})

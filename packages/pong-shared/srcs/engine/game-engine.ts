@@ -22,7 +22,10 @@ export class GameEngine {
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
 
-	constructor(private physicsEngine: PhysicsEngine, TPS: number) {
+	constructor(
+		private physicsEngine: PhysicsEngine,
+		TPS: number
+	) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
 		this.isClientSide =
 			typeof performance !== 'undefined' &&
