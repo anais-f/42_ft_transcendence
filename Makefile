@@ -41,10 +41,14 @@ format-check:
 .PHONY: setup
 setup:
 	./hooks/install-hooks.sh
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
-    export NVM_DIR="$${HOME}/.nvm" && \
-    [ -s "$$NVM_DIR/nvm.sh" ] && \. "$$NVM_DIR/nvm.sh" && \
-    nvm install 22.20.0 && \
-	nvm use 22.20.0 && \
-	nvm alias default 22.20.0 && \
-    npm install -g ts-node
+	@bash -lc ' \
+	  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; \
+	  NVM_DIR="$${HOME}/.nvm"; \
+	  if [ -s "$$NVM_DIR/nvm.sh" ]; then \
+	    . "$$NVM_DIR/nvm.sh"; \
+	  fi; \
+	  nvm install 22.20.0; \
+	  nvm use 22.20.0; \
+	  nvm alias default 22.20.0; \
+	  npm install -g ts-node; \
+	'

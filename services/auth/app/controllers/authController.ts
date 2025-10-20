@@ -31,7 +31,7 @@ export async function registerController(
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			return reply.code(409).send({ error: 'Username already exists' })
-		return reply.code(500).send({ error: 'Database error2' })
+		return reply.code(500).send({ error: 'Database error2', message: e.message } )
 	}
 }
 

@@ -12,8 +12,6 @@ RUN npm install
 COPY tsconfig.json ./
 COPY services/auth ./services/auth
 
-EXPOSE 3000
-
 RUN npm run build --workspace=auth-server-app
 
 #-------------------------------------------------------------#
@@ -26,7 +24,12 @@ COPY --from=build-app /build/services/auth/app/dist ./dist
 COPY --from=build-app /build/services/auth/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
 
+# RUN chown -R node:node /app && \
+# 	mkdir -p /data && \
+# 	chown -R node:node /data
+
+# USER node
+
 EXPOSE 3000
 
 CMD ["node", "dist/index.js"]
-

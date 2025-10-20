@@ -3,12 +3,12 @@ import type {
 	UserStatus,
 	UserConnection,
 	UserAvatar,
-	UserId,
+	UserId
 } from '../models/Users.js'
 import { UsersRepository } from '../repositories/usersRepository.js'
 import { ERROR_MESSAGES } from '../utils/utils.js'
 import { AuthApi } from './internalApi/AuthApi.js'
-import {UserProfileDTO} from "../models/UsersDTO.js";
+import { UserProfileDTO } from '../models/UsersDTO.js'
 
 export class UsersServices {
 	/**
@@ -21,14 +21,14 @@ export class UsersServices {
 		if (UsersRepository.existsById({ id_user: newUser.id_user }))
 			throw new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
 
-		UsersRepository.insertUser({ id_user: newUser.id_user })
+		await UsersRepository.insertUser({ id_user: newUser.id_user })
 		console.log(`User ${newUser.id_user} created`)
 	}
 
-  /**
-   * @description Sync all users from Auth service to local database
-   * @returns void
-   */
+	/**
+	 * @description Sync all users from Auth service to local database
+	 * @returns void
+	 */
 	static async syncAllUsersFromAuth(): Promise<void> {
 		const authUsers = await AuthApi.getAllUsers()
 
@@ -39,41 +39,25 @@ export class UsersServices {
 		}
 	}
 
-  /**
-   * @description Get user profile by id with enrichissement from Auth service
-   * @returns UserProfileDTO
-   * @throws Error if user not found
-   * @param userId
-   */
-  static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
-    const localUser = UsersRepository.getUserById({ id_user: user.id_user });
-    if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+	/**
+	 * @description Get user profile by id with enrichissement from Auth service
+	 * @returns UserProfileDTO
+	 * @throws Error if user not found
+	 * @param user userId
+	 */
+	static async getUserProfile(user: UserId): Promise<UserProfileDTO> {
+		const localUser = UsersRepository.getUserById({ id_user: user.id_user })
+		if (!localUser) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND)
 
-    const username = await AuthApi.getUsernameById({ id_user: user.id_user });
-    return {
-      id_user: localUser.id_user,
-      username,
-      avatar: localUser.avatar,
-      status: localUser.status,
-      last_connection: localUser.last_connection
-    };
-  }
-
-
-
-	// // ✅ Récupération avec enrichissement
-	// static async getUserWithProfile(id_user: number): Promise<UserWithProfile> {
-	//   const localUser = UsersRepository.getUserById({ id_user });
-	//   if (!localUser) throw new Error('User not found');
-	//
-	//   // Enrichir avec data du service auth si nécessaire
-	//   const username = await AuthApi.getUsernameById(id_user);
-	//
-	//   return {
-	//     ...localUser,
-	//     username
-	//   };
-	// }
+		const username = await AuthApi.getUsernameById({ id_user: user.id_user })
+		return {
+			id_user: localUser.id_user,
+			username,
+			avatar: localUser.avatar,
+			status: localUser.status,
+			last_connection: localUser.last_connection
+		}
+	}
 }
 
 /*

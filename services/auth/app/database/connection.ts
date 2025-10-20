@@ -5,7 +5,7 @@ let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		db = new BetterSqlite3('/data/db-auth.sqlite')
+		db = new BetterSqlite3(process.env.DB_PATH || './db-auth.sqlite')
 	}
 	return db
 }

@@ -43,8 +43,8 @@ const config: Config.InitialOptions = {
 		},
 		{
 			...commonConfig,
-			displayName: 'users-account-app',
-			rootDir: '<rootDir>/services/users-account/app',
+			displayName: 'users',
+			rootDir: '<rootDir>/services/users/app',
 			testMatch: ['**/*.test.ts']
 		}
 	]

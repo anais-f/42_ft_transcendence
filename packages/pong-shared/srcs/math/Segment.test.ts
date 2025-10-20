@@ -1,7 +1,7 @@
-import { Vector2 } from './Vector2'
-import { Segment } from './Segment'
-import { Circle } from './shapes/Circle'
-import { Ray } from './Ray'
+import { Vector2 } from './Vector2.js'
+import { Segment } from './Segment.js'
+import { Circle } from './shapes/Circle.js'
+import { Ray } from './Ray.js'
 
 describe('Segment', () => {
 	test('getPoints returns endpoints', () => {
