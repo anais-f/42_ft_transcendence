@@ -1,4 +1,4 @@
-import { PhysicsEngine } from './physics-engine'
+import { PhysicsEngine } from './physics-engine.js'
 
 export class TPS_MANAGER {
 	public TPS_INTERVAL_MS: number
@@ -12,7 +12,7 @@ export class TPS_MANAGER {
 
 export enum GameState {
 	Paused,
-	Started,
+	Started
 }
 
 export class GameEngine {

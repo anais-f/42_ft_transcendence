@@ -1,5 +1,5 @@
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
 
 export class Rectangle extends Polygon {
 	private width: number
@@ -13,7 +13,7 @@ export class Rectangle extends Polygon {
 				new Vector2(0, 0),
 				new Vector2(w, 0),
 				new Vector2(w, h),
-				new Vector2(0, h),
+				new Vector2(0, h)
 			],
 			origin
 		)

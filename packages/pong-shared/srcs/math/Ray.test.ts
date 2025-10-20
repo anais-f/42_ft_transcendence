@@ -1,6 +1,6 @@
-import { Ray } from './Ray'
-import { Vector2 } from './Vector2'
-import { Segment } from './Segment'
+import { Ray } from './Ray.js'
+import { Vector2 } from './Vector2.js'
+import { Segment } from './Segment.js'
 
 describe('Ray', () => {
 	test('constructor and getters', () => {
@@ -113,6 +113,7 @@ describe('Ray', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
+				// @ts-ignore
 				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
 			})
 

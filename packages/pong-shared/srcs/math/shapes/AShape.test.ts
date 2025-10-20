@@ -1,8 +1,8 @@
-import { Vector2 } from '../Vector2'
-import { Circle } from './Circle'
-import { Polygon } from './Polygon'
-import { AShape } from './AShape'
-import { Rectangle } from './Rectangle'
+import { Vector2 } from '../Vector2.js'
+import { Circle } from './Circle.js'
+import { Polygon } from './Polygon.js'
+import { AShape } from './AShape.js'
+import { Rectangle } from './Rectangle.js'
 
 describe('Shape', () => {
 	describe('Shapes instanceof test', () => {
@@ -14,7 +14,7 @@ describe('Shape', () => {
 			const p = new Polygon([
 				new Vector2(0, 0),
 				new Vector2(1, 1),
-				new Vector2(1, 0),
+				new Vector2(1, 0)
 			])
 			expect(p instanceof AShape).toBe(true)
 		})

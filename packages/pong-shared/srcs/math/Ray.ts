@@ -1,7 +1,7 @@
-import { EPSILON } from '../define'
-import { Segment } from './Segment'
-import { Circle } from './shapes/Circle'
-import { Vector2 } from './Vector2'
+import { EPSILON } from '../define.js'
+import { Segment } from './Segment.js'
+import { Circle } from './shapes/Circle.js'
+import { Vector2 } from './Vector2.js'
 
 export class Ray {
 	private direction!: Vector2

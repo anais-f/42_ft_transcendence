@@ -1,5 +1,5 @@
-import { Vector2 } from '../../math/Vector2'
-import { PongObject } from './PongObject'
+import { Vector2 } from '../../math/Vector2.js'
+import { PongObject } from './PongObject.js'
 
 export enum PadDirection {
 	Up,

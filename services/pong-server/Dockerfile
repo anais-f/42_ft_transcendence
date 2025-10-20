@@ -15,7 +15,7 @@ COPY packages/ ./packages/
 RUN npm run build --workspace=packages/pong-shared
 #-------------------------------------------------------------#
 # Build app
-FROM node:20-alpine AS build-app
+FROM node:22-alpine AS build-app
 
 WORKDIR /build
 
@@ -34,12 +34,16 @@ RUN npm run build --workspace=pong-server-app
 
 #-------------------------------------------------------------#
 # prod
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY --from=build-app /build/services/pong-server/app/dist ./dist
+COPY --from=build-app /build/services/pong-server/app/dist/ ./dist
 COPY --from=build-app /build/services/pong-server/app/package.json ./
-COPY --from=build-app /build/node_modules ./node_modules
+COPY --from=build-app /build/node_modules/ ./node_modules
 
+# todo dist things
+COPY --from=build-app /build/packages/pong-shared/ ./packages/pong-shared/
+
+#CMD ["tail", "-f", "/dev/urandom"]
 CMD ["node", "dist/index.js"]

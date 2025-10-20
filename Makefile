@@ -37,3 +37,8 @@ format:
 .PHONY: format-check
 format-check:
 	npm run format:check
+
+.PHONY: setup
+setup:
+	./hooks/install-hooks.sh
+	./scripts/setup-node.sh

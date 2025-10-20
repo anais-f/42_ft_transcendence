@@ -1,8 +1,8 @@
-import { Vector2 } from '../Vector2'
-import { Circle } from './Circle'
-import { Ray } from '../Ray'
-import { Segment } from '../Segment'
-import { AShape } from './AShape'
+import { Vector2 } from '../Vector2.js'
+import { Circle } from './Circle.js'
+import { Ray } from '../Ray.js'
+import { Segment } from '../Segment.js'
+import { AShape } from './AShape.js'
 
 export class Polygon extends AShape {
 	private segments: Segment[] = []

@@ -1,8 +1,8 @@
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
-import { Circle } from './Circle'
-import { Segment } from '../Segment'
-import { Ray } from '../Ray'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
+import { Circle } from './Circle.js'
+import { Segment } from '../Segment.js'
+import { Ray } from '../Ray.js'
 
 describe('Polygon', () => {
 	describe('getAbsolutePoints', () => {
@@ -11,7 +11,7 @@ describe('Polygon', () => {
 			const relativePoints = [
 				new Vector2(1, 1),
 				new Vector2(2, 2),
-				new Vector2(3, 3),
+				new Vector2(3, 3)
 			]
 			const poly = new Polygon(relativePoints, origin)
 
@@ -20,7 +20,7 @@ describe('Polygon', () => {
 			expect(abs).toEqual([
 				new Vector2(6, 6), // 5 + 1, 5 + 1
 				new Vector2(7, 7), // 5 + 2, 5 + 2
-				new Vector2(8, 8), // 5 + 3, 5 + 3
+				new Vector2(8, 8) // 5 + 3, 5 + 3
 			])
 		})
 		test('negative origin', () => {
@@ -34,7 +34,7 @@ describe('Polygon', () => {
 			expect(abs).toEqual([
 				new Vector2(-10, -1),
 				new Vector2(-10, 0),
-				new Vector2(-9, 0),
+				new Vector2(-9, 0)
 			])
 		})
 	})
@@ -49,7 +49,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0), // bottom left
 						new Vector2(10, 0), // bottom right
 						new Vector2(10, 10), // top right
-						new Vector2(0, 10), // top left
+						new Vector2(0, 10) // top left
 					],
 					new Vector2(1, 2)
 				)
@@ -91,7 +91,7 @@ describe('Polygon', () => {
 				triangle = new Polygon([
 					new Vector2(0, 0), // bottom left
 					new Vector2(10, 0), // bottom right
-					new Vector2(5, 10), // top
+					new Vector2(5, 10) // top
 				])
 			})
 
@@ -120,7 +120,7 @@ describe('Polygon', () => {
 					new Vector2(10, 5), // middle right
 					new Vector2(5, 5), // middle middle
 					new Vector2(5, 10), // top middle
-					new Vector2(0, 10), // top left
+					new Vector2(0, 10) // top left
 				])
 			})
 
@@ -151,7 +151,7 @@ describe('Polygon', () => {
 					new Vector2(5, 0), // collinear with first and third
 					new Vector2(10, 0),
 					new Vector2(10, 10),
-					new Vector2(0, 10),
+					new Vector2(0, 10)
 				])
 
 				expect(polygon.containsPoint(new Vector2(5, 5))).toBe(true)
@@ -163,7 +163,7 @@ describe('Polygon', () => {
 					new Vector2(0, 0),
 					new Vector2(10, 0),
 					new Vector2(10, 0.1),
-					new Vector2(0, 0.1),
+					new Vector2(0, 0.1)
 				])
 
 				expect(thinPolygon.containsPoint(new Vector2(5, 0.05))).toBe(true)
@@ -178,7 +178,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(10, 0),
 						new Vector2(10, 10),
-						new Vector2(0, 10),
+						new Vector2(0, 10)
 					],
 					new Vector2(5, 10)
 				)
@@ -230,7 +230,7 @@ describe('Polygon', () => {
 						new Vector2(10, 5),
 						new Vector2(5, 5),
 						new Vector2(5, 10),
-						new Vector2(0, 10),
+						new Vector2(0, 10)
 					],
 					new Vector2(-7, -3)
 				)
@@ -260,7 +260,7 @@ describe('Polygon', () => {
 				new Vector2(0, 0), // bottom left
 				new Vector2(10, 0), // bottom right
 				new Vector2(10, 10), // top right
-				new Vector2(0, 10), // top left
+				new Vector2(0, 10) // top left
 			])
 		})
 
@@ -447,7 +447,7 @@ describe('Polygon', () => {
 					new Vector2(5, 5),
 					new Vector2(15, 5),
 					new Vector2(15, 15),
-					new Vector2(5, 15),
+					new Vector2(5, 15)
 				])
 				const res = square.intersect(polygon1)
 				expect(res).toBeInstanceOf(Array)
@@ -458,7 +458,7 @@ describe('Polygon', () => {
 					new Vector2(2, 2),
 					new Vector2(8, 2),
 					new Vector2(8, 8),
-					new Vector2(2, 8),
+					new Vector2(2, 8)
 				])
 				const res = square.intersect(polygon2)
 
@@ -470,7 +470,7 @@ describe('Polygon', () => {
 					new Vector2(-5, -5),
 					new Vector2(15, -5),
 					new Vector2(15, 15),
-					new Vector2(-5, 15),
+					new Vector2(-5, 15)
 				])
 				const res = square.intersect(polygon3)
 
@@ -485,7 +485,7 @@ describe('Polygon', () => {
 					new Vector2(15, 15),
 					new Vector2(20, 15),
 					new Vector2(20, 20),
-					new Vector2(15, 20),
+					new Vector2(15, 20)
 				])
 				const res1 = square.intersect(polygon1)
 				expect(res1).toBe(null)
@@ -495,7 +495,7 @@ describe('Polygon', () => {
 					new Vector2(10, 0),
 					new Vector2(20, 0),
 					new Vector2(20, 10),
-					new Vector2(10, 10),
+					new Vector2(10, 10)
 				])
 				const res2 = square.intersect(polygon2)
 				expect(res2).toBeInstanceOf(Array)
@@ -525,7 +525,7 @@ describe('Polygon', () => {
 					new Vector2(15, 15), // outside square
 					new Vector2(10, 15), // outside square
 					new Vector2(10, 10), // on square edge
-					new Vector2(5, 10), // inside square
+					new Vector2(5, 10) // inside square
 				])
 				const res = concavePolygon.intersect(square)
 				expect(res).toBeInstanceOf(Array)
@@ -541,7 +541,7 @@ describe('Polygon', () => {
 						new Vector2(-1, -1),
 						new Vector2(-1, 0),
 						new Vector2(0, 1),
-						new Vector2(1, 0),
+						new Vector2(1, 0)
 					],
 					new Vector2(-1, -1)
 				)
@@ -551,7 +551,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(1, 0),
 						new Vector2(1, 1),
-						new Vector2(0, 1),
+						new Vector2(0, 1)
 					],
 					new Vector2(-1.5, -1.5)
 				)
@@ -565,7 +565,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(10, 0),
 						new Vector2(10, 10),
-						new Vector2(0, 10),
+						new Vector2(0, 10)
 					],
 					new Vector2(0, 0)
 				)
@@ -575,7 +575,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(5, 0),
 						new Vector2(5, 5),
-						new Vector2(0, 5),
+						new Vector2(0, 5)
 					],
 					new Vector2(8, 8)
 				) // poly2 moved to (8,8)-(13,13)
@@ -590,7 +590,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(3, 0),
 						new Vector2(3, 3),
-						new Vector2(0, 3),
+						new Vector2(0, 3)
 					],
 					new Vector2(0, 0)
 				)
@@ -600,7 +600,7 @@ describe('Polygon', () => {
 						new Vector2(0, 0),
 						new Vector2(2, 0),
 						new Vector2(2, 2),
-						new Vector2(0, 2),
+						new Vector2(0, 2)
 					],
 					new Vector2(10, 10)
 				)

@@ -1,4 +1,4 @@
-import { PongObject } from './objects/PongObject'
+import { PongObject } from './objects/PongObject.js'
 
 export class PhysicsEngine {
 	private objs: PongObject[] = []

@@ -5,15 +5,20 @@ services:
     container_name: nginx
     ports:
       - '8080:8080'
+    networks:
+      - backend
+    volumes:
+      - avatars:/usr/share/nginx/html/avatars:ro
 
-  front-app:
+  frontend:
     restart: on-failure
-    build: services/front-app/
-    container_name: front-app
-    ports:
-      - '3000:3000'
+    build: services/frontend/
+    container_name: frontend
     depends_on:
       - nginx
+    networks:
+      - backend
+
   pong-server:
     restart: on-failure
     container_name: pong-server
@@ -22,8 +27,40 @@ services:
       dockerfile: ./services/pong-server/Dockerfile
     depends_on:
       - nginx
-      - front-app
+      - frontend
+
+  users:
+    restart: on-failure
+    container_name: users
+    build:
+      context: .
+      dockerfile: services/users/Dockerfile
+    depends_on:
+      - nginx
+      - frontend
+      - auth
+    networks:
+      - backend
+    volumes:
+      - avatars:/app/avatars
+
+  auth:
+    restart: on-failure
+    container_name: auth
+    build:
+      context: .
+      dockerfile: ./services/auth/Dockerfile
+    depends_on:
+      - nginx
+      - frontend
+    networks:
+      - backend
 
 networks:
   pong:
     driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  avatars:
