@@ -3,7 +3,7 @@ import { AuthApi } from './AuthApi.js'
 import {
 	IUserId,
 	IUserUA,
-	IFullUser,
+	IFullUserProfile,
 	IUserStatus,
 	IUserConnection,
 	IUserAvatar,
@@ -45,7 +45,7 @@ export class UsersServices {
 	 * @throws Error if user not found
 	 * @param user userId
 	 */
-	static async getUserProfile(user: IUserId): Promise<IFullUser> {
+	static async getUserProfile(user: IUserId): Promise<IFullUserProfile> {
 		if (!user?.id_user || user.id_user <= 0)
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 

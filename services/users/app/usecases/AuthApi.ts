@@ -1,8 +1,8 @@
 import fetch from 'node-fetch'
 import {
 	PublicUserListDTO,
-	PublicUserListSchema,
-	PublicUserSchema,
+	PublicUserListAuthSchema,
+	PublicUserAuthSchema,
 	AppError,
 	IUserId
 } from '@ft_transcendence/common'
@@ -20,7 +20,7 @@ export class AuthApi {
 		const response = await fetch('http://auth:3000/users')
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 		const raw = (await response.json()) as PublicUserListDTO
-		const parsed = PublicUserListSchema.safeParse(raw)
+		const parsed = PublicUserListAuthSchema.safeParse(raw)
 		if (!parsed.success)
 			throw new AppError(
 				'Invalid response shape from auth service: ' + parsed.error.message,
@@ -45,7 +45,7 @@ export class AuthApi {
 			throw new AppError('Invalid JSON from auth service', 500)
 		})
 
-		const parsed = PublicUserSchema.safeParse(raw)
+		const parsed = PublicUserAuthSchema.safeParse(raw)
 		if (!parsed.success) {
 			console.error(
 				'Invalid username response shape from auth service:',

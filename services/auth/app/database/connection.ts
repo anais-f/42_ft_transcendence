@@ -14,8 +14,8 @@ export function runMigrations() {
 	const db = getDb()
 	db.exec(`
     CREATE TABLE IF NOT EXISTS users (
-      id_user INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
+      user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      login TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL
     );
   `)

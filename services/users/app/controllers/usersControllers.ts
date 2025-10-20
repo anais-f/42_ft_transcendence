@@ -3,7 +3,7 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserDTO,
 	UserIdDTO,
-	UserProfileSchema,
+	UserPrivateProfileSchema,
 	AppError,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
@@ -59,7 +59,7 @@ export async function getUser(
 
 		const rawProfile = await UsersServices.getUserProfile({ id_user: idNumber })
 
-		const parsed = UserProfileSchema.safeParse(rawProfile)
+		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
 		if (!parsed.success) {
 			console.error('UserProfile validation failed:', parsed.error)
 			return res

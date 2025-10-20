@@ -1,7 +1,7 @@
 import {
 	listPublicUsers,
 	findPublicUserById,
-	findPublicUserByUsername
+	findPublicUserByLogin
 } from '../repositories/userRepository.js'
 
 export function getPublicUsers() {
@@ -12,6 +12,6 @@ export function getPublicUser(id: number) {
 	return findPublicUserById(id)
 }
 
-export function getPublicUserByUsername(username: string) {
-	return findPublicUserByUsername(username)
+export function getPublicUserByLogin(login: string) {
+	return findPublicUserByLogin(login)
 }

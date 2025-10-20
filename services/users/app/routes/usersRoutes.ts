@@ -3,8 +3,8 @@ import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
 import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
-	PublicUserSchema,
-	UserProfileSchema
+	PublicUserAuthSchema,
+	UserPrivateProfileSchema
 } from '@ft_transcendence/common'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
@@ -13,7 +13,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/users/webhookNewUser',
 		{
 			schema: {
-				body: PublicUserSchema,
+				body: PublicUserAuthSchema,
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
@@ -30,7 +30,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		{
 			schema: {
 				response: {
-					200: UserProfileSchema,
+					200: UserPrivateProfileSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
