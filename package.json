@@ -25,6 +25,7 @@
 		"packages/pong-shared",
 		"packages/pong-client",
 		"packages/pong-server",
+		"services/pong-server/app",
 		"services/auth/app",
 		"services/users/app"
 	],

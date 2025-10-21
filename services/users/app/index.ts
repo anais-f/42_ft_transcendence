@@ -11,17 +11,23 @@ import { UsersServices } from './usecases/usersServices.js'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
-import path from 'path'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+import { buildJsonSchemas } from 'fastify-zod-openapi'
+
+// resolve path relative to the compiled file in dist/
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const openapiPath = join(__dirname, 'openapiDTO.json')
+
+const openapiText = fs.readFileSync(openapiPath, 'utf8')
+const openapiDTO = JSON.parse(openapiText)
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-// Load OpenAPI schemas from common package
-const openapiSwagger = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), '../../../packages/common/openapiDTO.json'), 'utf-8')
-)
 
 // Configure Swagger to use the loaded schemas
 await app.register(Swagger as any, {
@@ -30,14 +36,14 @@ await app.register(Swagger as any, {
       title: 'API for Users Service',
       version: '1.0.0',
     },
-    servers: [{ url: 'http://localhost:3000', description: 'Serveur local' }],
-    components: openapiSwagger.components
+    servers: [{ url: 'http://localhost:8080' }],
+    components: openapiDTO.components
   },
   transform: jsonSchemaTransform
 })
 
 await app.register(SwaggerUI as any, {
-  routePrefix: '/docs',
+  routePrefix: '/users/docs',
 })
 
 app.register(usersRoutes, { prefix: '/api' })

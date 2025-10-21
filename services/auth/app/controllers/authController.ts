@@ -20,7 +20,7 @@ export async function registerController(
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 
-		const url = 'http://localhost:3000/api/users/new-user'
+		const url = 'http://users:3000/api/users/new-user'
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
