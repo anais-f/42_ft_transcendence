@@ -17,7 +17,9 @@
 		"./*": "./dist/*"
 	},
 	"scripts": {
-		"build": "tsc --project tsconfig.json"
+		"build": "tsc --project tsconfig.json",
+    "generate:openapi": "ts-node ./srcs/DTO/generateOpenApi.ts",
+    "generate:openapi:dist": "node ./dist/DTO/generateOpenApi.js"
 	},
 	"devDependencies": {
 		"typescript": "^5.1.6"
