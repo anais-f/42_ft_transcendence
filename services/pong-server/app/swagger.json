@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "app - API (auto-generated components)",
+    "version": "0.0.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "ErrorResponseSchema": {},
+      "SuccessResponseSchema": {},
+      "LoginActionSchema": {},
+      "RegisterSchema": {},
+      "LoginSchema": {},
+      "PublicUserAuthSchema": {},
+      "PublicUserListAuthSchema": {},
+      "UserCreatedWebhookSchema": {},
+      "UserIdSchema": {},
+      "UserPrivateProfileListSchema": {},
+      "UserPrivateProfileSchema": {},
+      "UserPublicProfileSchema": {},
+      "UsernameSchema": {},
+      "PublicUserListSchema": {},
+      "PublicUserSchema": {},
+      "UserAccountSchema": {},
+      "UserProfileListSchema": {},
+      "UserProfileSchema": {}
+    }
+  }
+}

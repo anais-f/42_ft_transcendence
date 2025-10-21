@@ -1,0 +1,1076 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "common - API (auto-generated components)",
+    "version": "0.0.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "ErrorResponseSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "success": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "optional",
+                "innerType": {
+                  "~standard": {
+                    "vendor": "zod",
+                    "version": 1
+                  },
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                }
+              },
+              "type": "optional"
+            },
+            "error": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string"
+              },
+              "type": "string",
+              "format": null,
+              "minLength": null,
+              "maxLength": null
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "SuccessResponseSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "success": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "literal",
+                "values": [
+                  true
+                ]
+              },
+              "type": "literal",
+              "values": {}
+            },
+            "message": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "optional",
+                "innerType": {
+                  "~standard": {
+                    "vendor": "zod",
+                    "version": 1
+                  },
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string",
+                  "format": null,
+                  "minLength": null,
+                  "maxLength": null
+                }
+              },
+              "type": "optional"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "LoginActionSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "login": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            },
+            "password": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": null,
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "RegisterSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "login": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            },
+            "password": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": null,
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "LoginSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "string",
+          "checks": [
+            {},
+            {},
+            {}
+          ]
+        },
+        "type": "string",
+        "format": "regex",
+        "minLength": 4,
+        "maxLength": 16
+      },
+      "PublicUserAuthSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "user_id": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": [
+                  {},
+                  {}
+                ]
+              },
+              "type": "number",
+              "minValue": 1,
+              "maxValue": null,
+              "isInt": false,
+              "isFinite": true,
+              "format": null
+            },
+            "login": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "PublicUserListAuthSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "users": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "array",
+                "element": {
+                  "~standard": {
+                    "vendor": "zod",
+                    "version": 1
+                  },
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "user_id": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "number",
+                          "checks": [
+                            {},
+                            {}
+                          ]
+                        },
+                        "type": "number",
+                        "minValue": 1,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      },
+                      "login": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "string",
+                          "checks": [
+                            {},
+                            {},
+                            {}
+                          ]
+                        },
+                        "type": "string",
+                        "format": "regex",
+                        "minLength": 4,
+                        "maxLength": 16
+                      }
+                    },
+                    "catchall": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "never"
+                      },
+                      "type": "never"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "array",
+              "element": {
+                "~standard": {
+                  "vendor": "zod",
+                  "version": 1
+                },
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "user_id": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "number",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "number",
+                      "minValue": 1,
+                      "maxValue": null,
+                      "isInt": false,
+                      "isFinite": true,
+                      "format": null
+                    },
+                    "login": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string",
+                      "format": "regex",
+                      "minLength": 4,
+                      "maxLength": 16
+                    }
+                  },
+                  "catchall": {
+                    "~standard": {
+                      "vendor": "zod",
+                      "version": 1
+                    },
+                    "def": {
+                      "type": "never"
+                    },
+                    "type": "never"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "UserCreatedWebhookSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "user_id": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": [
+                  {},
+                  {}
+                ]
+              },
+              "type": "number",
+              "minValue": 1,
+              "maxValue": null,
+              "isInt": false,
+              "isFinite": true,
+              "format": null
+            },
+            "login": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "UserIdSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "user_id": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": [
+                  {
+                    "~standard": {
+                      "vendor": "zod",
+                      "version": 1
+                    },
+                    "def": {
+                      "type": "number",
+                      "check": "number_format",
+                      "abort": false,
+                      "format": "safeint"
+                    },
+                    "type": "number",
+                    "minValue": -9007199254740991,
+                    "maxValue": 9007199254740991,
+                    "isInt": true,
+                    "isFinite": true,
+                    "format": "safeint"
+                  },
+                  {}
+                ]
+              },
+              "type": "number",
+              "minValue": 0,
+              "maxValue": 9007199254740991,
+              "isInt": true,
+              "isFinite": true,
+              "format": "safeint"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "UserPrivateProfileListSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "users": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "array",
+                "element": {
+                  "~standard": {
+                    "vendor": "zod",
+                    "version": 1
+                  },
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "user_id": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "number",
+                          "checks": [
+                            {
+                              "~standard": {
+                                "vendor": "zod",
+                                "version": 1
+                              },
+                              "def": {
+                                "type": "number",
+                                "check": "number_format",
+                                "abort": false,
+                                "format": "safeint"
+                              },
+                              "type": "number",
+                              "minValue": -9007199254740991,
+                              "maxValue": 9007199254740991,
+                              "isInt": true,
+                              "isFinite": true,
+                              "format": "safeint"
+                            },
+                            {}
+                          ]
+                        },
+                        "type": "number",
+                        "minValue": 0,
+                        "maxValue": 9007199254740991,
+                        "isInt": true,
+                        "isFinite": true,
+                        "format": "safeint"
+                      },
+                      "username": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "string",
+                          "checks": [
+                            {},
+                            {},
+                            {}
+                          ]
+                        },
+                        "type": "string",
+                        "format": "regex",
+                        "minLength": 4,
+                        "maxLength": 16
+                      },
+                      "avatar": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      },
+                      "status": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "minValue": null,
+                        "maxValue": null,
+                        "isInt": false,
+                        "isFinite": true,
+                        "format": null
+                      },
+                      "last_connection": {
+                        "~standard": {
+                          "vendor": "zod",
+                          "version": 1
+                        },
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string",
+                        "format": null,
+                        "minLength": null,
+                        "maxLength": null
+                      }
+                    },
+                    "catchall": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "never"
+                      },
+                      "type": "never"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "array",
+              "element": {
+                "~standard": {
+                  "vendor": "zod",
+                  "version": 1
+                },
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "user_id": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "number",
+                        "checks": [
+                          {
+                            "~standard": {
+                              "vendor": "zod",
+                              "version": 1
+                            },
+                            "def": {
+                              "type": "number",
+                              "check": "number_format",
+                              "abort": false,
+                              "format": "safeint"
+                            },
+                            "type": "number",
+                            "minValue": -9007199254740991,
+                            "maxValue": 9007199254740991,
+                            "isInt": true,
+                            "isFinite": true,
+                            "format": "safeint"
+                          },
+                          {}
+                        ]
+                      },
+                      "type": "number",
+                      "minValue": 0,
+                      "maxValue": 9007199254740991,
+                      "isInt": true,
+                      "isFinite": true,
+                      "format": "safeint"
+                    },
+                    "username": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string",
+                      "format": "regex",
+                      "minLength": 4,
+                      "maxLength": 16
+                    },
+                    "avatar": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    },
+                    "status": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "minValue": null,
+                      "maxValue": null,
+                      "isInt": false,
+                      "isFinite": true,
+                      "format": null
+                    },
+                    "last_connection": {
+                      "~standard": {
+                        "vendor": "zod",
+                        "version": 1
+                      },
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string",
+                      "format": null,
+                      "minLength": null,
+                      "maxLength": null
+                    }
+                  },
+                  "catchall": {
+                    "~standard": {
+                      "vendor": "zod",
+                      "version": 1
+                    },
+                    "def": {
+                      "type": "never"
+                    },
+                    "type": "never"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "UserPrivateProfileSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "user_id": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": [
+                  {
+                    "~standard": {
+                      "vendor": "zod",
+                      "version": 1
+                    },
+                    "def": {
+                      "type": "number",
+                      "check": "number_format",
+                      "abort": false,
+                      "format": "safeint"
+                    },
+                    "type": "number",
+                    "minValue": -9007199254740991,
+                    "maxValue": 9007199254740991,
+                    "isInt": true,
+                    "isFinite": true,
+                    "format": "safeint"
+                  },
+                  {}
+                ]
+              },
+              "type": "number",
+              "minValue": 0,
+              "maxValue": 9007199254740991,
+              "isInt": true,
+              "isFinite": true,
+              "format": "safeint"
+            },
+            "username": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            },
+            "avatar": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string"
+              },
+              "type": "string",
+              "format": null,
+              "minLength": null,
+              "maxLength": null
+            },
+            "status": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": []
+              },
+              "type": "number",
+              "minValue": null,
+              "maxValue": null,
+              "isInt": false,
+              "isFinite": true,
+              "format": null
+            },
+            "last_connection": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string"
+              },
+              "type": "string",
+              "format": null,
+              "minLength": null,
+              "maxLength": null
+            }
+          },
+          "catchall": {
+            "~standard": {
+              "vendor": "zod",
+              "version": 1
+            },
+            "def": {
+              "type": "never"
+            },
+            "type": "never"
+          }
+        },
+        "type": "object"
+      },
+      "UserPublicProfileSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "object",
+          "shape": {
+            "user_id": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": [
+                  {
+                    "~standard": {
+                      "vendor": "zod",
+                      "version": 1
+                    },
+                    "def": {
+                      "type": "number",
+                      "check": "number_format",
+                      "abort": false,
+                      "format": "safeint"
+                    },
+                    "type": "number",
+                    "minValue": -9007199254740991,
+                    "maxValue": 9007199254740991,
+                    "isInt": true,
+                    "isFinite": true,
+                    "format": "safeint"
+                  },
+                  {}
+                ]
+              },
+              "type": "number",
+              "minValue": 0,
+              "maxValue": 9007199254740991,
+              "isInt": true,
+              "isFinite": true,
+              "format": "safeint"
+            },
+            "username": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {},
+                  {}
+                ]
+              },
+              "type": "string",
+              "format": "regex",
+              "minLength": 4,
+              "maxLength": 16
+            },
+            "avatar": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string"
+              },
+              "type": "string",
+              "format": null,
+              "minLength": null,
+              "maxLength": null
+            },
+            "status": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "number",
+                "checks": []
+              },
+              "type": "number",
+              "minValue": null,
+              "maxValue": null,
+              "isInt": false,
+              "isFinite": true,
+              "format": null
+            },
+            "last_connection": {
+              "~standard": {
+                "vendor": "zod",
+                "version": 1
+              },
+              "def": {
+                "type": "string"
+              },
+              "type": "string",
+              "format": null,
+              "minLength": null,
+              "maxLength": null
+            }
+          }
+        },
+        "type": "object"
+      },
+      "UsernameSchema": {
+        "~standard": {
+          "vendor": "zod",
+          "version": 1
+        },
+        "def": {
+          "type": "string",
+          "checks": [
+            {},
+            {},
+            {}
+          ]
+        },
+        "type": "string",
+        "format": "regex",
+        "minLength": 4,
+        "maxLength": 16
+      }
+    }
+  }
+}

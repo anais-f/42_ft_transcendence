@@ -15,7 +15,7 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		const response = await fetch('http://auth:3000/api/users')
+		const response = await fetch('http://localhost:3001/api/users')
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 		const raw = (await response.json()) as PublicUserListAuthDTO
 		const parsed = PublicUserListAuthSchema.safeParse(raw)
