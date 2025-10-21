@@ -43,7 +43,7 @@ export class UsersServices {
 	}
 
 	/**
-	 * @description Get user profile by id with enrichissement from Auth service
+	 * @description Get user profile by id
 	 * @returns UserProfileDTO
 	 * @throws Error if user not found
 	 * @param user userId
