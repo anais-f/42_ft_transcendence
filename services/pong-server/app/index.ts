@@ -1,8 +1,6 @@
-import { GameEngine, GameState } from '@packages/pong-shared'
-import { PhysicsEngine } from '@packages/pong-shared/srcs/engine/physics-engine'
+import { Vector2 } from '@ft_transcendence/pong-shared'
 
-// tempary main untils mutiple game instace + game creation
-const physicsEngine = new PhysicsEngine()
-const gameEngine = new GameEngine(physicsEngine, 20)
-
-gameEngine.setState(GameState.Started)
+while (1) {
+	let a = new Vector2()
+	console.log(a)
+}

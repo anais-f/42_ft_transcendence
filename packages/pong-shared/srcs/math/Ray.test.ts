@@ -113,6 +113,7 @@ describe('Ray', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
+				// @ts-ignore
 				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
 			})
 

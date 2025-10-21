@@ -4,6 +4,8 @@ DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 
 .PHONY: install
 install:
+	./hooks/install-hooks.sh
+	./scripts/setup-node.sh
 	npm install
 
 .PHONY: test
@@ -38,7 +40,3 @@ format:
 format-check:
 	npm run format:check
 
-.PHONY: setup
-setup:
-	./hooks/install-hooks.sh
-	./scripts/setup-node.sh
