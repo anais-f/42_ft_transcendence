@@ -42,15 +42,9 @@ const config: Config.InitialOptions = {
 			testMatch: ['**/*.test.ts']
 		},
 		{
-<<<<<<< HEAD
-			displayName: 'pong-server-app',
-			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
-			preset: 'ts-jest',
-=======
 			...commonConfig,
 			displayName: 'pong-server-app',
 			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
->>>>>>> b7c16fb5b4334923f4b4ca39a507309d17f20948
 			rootDir: './'
 		},
 		{
