@@ -5,6 +5,7 @@ import {
 	PublicUserListSchema
 } from '../../models/UsersDTO.js'
 import { UserId } from '../../models/Users.js'
+import { ENV } from '../../config/env.js'
 
 // TODO: update password and username via auth service
 // TODO: error handling with try/catch and custom errors
@@ -16,7 +17,8 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		const response = await fetch('http://auth:3000/users')
+		const response = await fetch(`${ENV.AUTH_API_BASE_URL}/users`)
+		console.log('Fetching all users from auth service:', response.url)
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 		const raw = (await response.json()) as PublicUserListDTO
 		const parsed = PublicUserListSchema.safeParse(raw)
@@ -24,7 +26,6 @@ export class AuthApi {
 			throw new Error(
 				'Invalid response shape from auth service: ' + parsed.error.message
 			)
-
 		return parsed.data.users.map((u) => ({ id_user: u.id_user }))
 	}
 
@@ -35,7 +36,7 @@ export class AuthApi {
 	 * @param id The ID of the user to fetch the username for
 	 */
 	static async getUsernameById(id: UserId): Promise<string> {
-		const response = await fetch(`http://auth:3000/users/${id.id_user}`)
+		const response = await fetch(`${ENV.AUTH_API_BASE_URL}/users/${id.id_user}`)
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
 		const raw = await response.json().catch(() => {

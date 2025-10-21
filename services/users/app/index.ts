@@ -7,6 +7,7 @@ import {
 } from 'fastify-type-provider-zod'
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
+import { ENV } from './config/env.js'
 
 const app = Fastify({
 	logger: false
@@ -27,8 +28,8 @@ const initializeUsers = async () => {
 const start = async () => {
 	try {
 		await initializeUsers()
-		await app.listen({ port: 3000, host: '0.0.0.0' })
-		console.log('Listening on port 3000')
+		await app.listen({ port: ENV.PORT, host: '0.0.0.0' })
+		console.log('Listening on port ', ENV.PORT)
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

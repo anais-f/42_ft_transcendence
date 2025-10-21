@@ -1,11 +1,12 @@
 import BetterSqlite3 from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
+import { ENV } from '../config/env.js'
 
 let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		db = new BetterSqlite3(process.env.DB_PATH || './db-auth.sqlite')
+		db = new BetterSqlite3(ENV.DB_PATH)
 	}
 	return db
 }

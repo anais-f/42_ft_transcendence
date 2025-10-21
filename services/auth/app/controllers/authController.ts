@@ -3,6 +3,7 @@ import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginSchema } from '../models/authDTO.js'
 import { findPublicUserByUsername } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
+import { ENV } from '../config/env.js'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -17,7 +18,7 @@ export async function registerController(
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 		console.log('PublicUser', PublicUser)
-		const url = 'http://users:3000/users/webhookNewUser'
+		const url = `${ENV.USERS_SERVICE_URL}/users/webhookNewUser`
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
