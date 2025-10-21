@@ -252,7 +252,6 @@ describe('Polygon', () => {
 			})
 		})
 	})
-
 	describe('intersect', () => {
 		let square: Polygon
 
@@ -266,129 +265,221 @@ describe('Polygon', () => {
 		})
 
 		describe('with Segment', () => {
-			test('should return true when segment intersects polygon edge', () => {
-				// Segment crossing one edge
-				const segment1 = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
-				expect(square.intersect(segment1)).toBe(true)
-
-				// Segment crossing two edges
-				const segment2 = new Segment(new Vector2(-5, 5), new Vector2(15, 5))
-				expect(square.intersect(segment2)).toBe(true)
-
-				// Segment entirely inside
-				const segment3 = new Segment(new Vector2(2, 2), new Vector2(8, 8))
-				expect(square.intersect(segment3)).toBe(true)
+			describe('polygon edge', () => {
+				test('Segment crossing one edge', () => {
+					const segment1 = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+					const res = square.intersect(segment1)
+					expect(res).toBeInstanceOf(Array)
+					expect(res?.some((e) => e.equals(new Vector2(0, 1))))
+					// alse have 5 5 ...
+				})
+				test('Segment crossing two edge', () => {
+					const segment2 = new Segment(new Vector2(-5, 5), new Vector2(15, 5))
+					const res = square.intersect(segment2)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2(0, 5))))
+					expect(res?.some((e) => e.equals(new Vector2(10, 5))))
+				})
+				test('Segment entirely inside', () => {
+					const segment3 = new Segment(new Vector2(2, 2), new Vector2(8, 8))
+					const res = square.intersect(segment3)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+				})
+			})
+			describe('do not intersect', () => {
+				test('completly outside', () => {
+					const segment1 = new Segment(new Vector2(-5, -5), new Vector2(-2, -2))
+					expect(square.intersect(segment1)).toBe(null)
+				})
+				test('parallel to edge but outside', () => {
+					const segment2 = new Segment(new Vector2(-5, -5), new Vector2(15, -5))
+					expect(square.intersect(segment2)).toBe(null)
+				})
 			})
 
-			test('should return false when segment does not intersect polygon', () => {
-				// Segment completely outside
-				const segment1 = new Segment(new Vector2(-5, -5), new Vector2(-2, -2))
-				expect(square.intersect(segment1)).toBe(false)
+			describe('edge case', () => {
+				test('touching at a vertex', () => {
+					const segment1 = new Segment(new Vector2(-5, -5), new Vector2(0, 0))
+					const res = square.intersect(segment1)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(1)
+					expect(res?.some((e) => e.equals(new Vector2())))
+				})
 
-				// Segment parallel to edge but outside
-				const segment2 = new Segment(new Vector2(-5, -5), new Vector2(15, -5))
-				expect(square.intersect(segment2)).toBe(false)
+				test('along an edge', () => {
+					const segment2 = new Segment(new Vector2(0, 0), new Vector2(10, 0))
+					const res = square.intersect(segment2)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2())))
+					expect(res?.some((e) => e.equals(new Vector2(10, 0))))
+				})
 			})
 
-			test('should handle edge cases', () => {
-				// Segment touching at a vertex
-				const segment1 = new Segment(new Vector2(-5, -5), new Vector2(0, 0))
-				expect(square.intersect(segment1)).toBe(true)
+			describe('random tests', () => {
+				test('test 1', () => {
+					const seg = new Segment(new Vector2(1, 1), new Vector2(7, -3))
+					const res = square.intersect(seg)
 
-				// Segment along an edge
-				const segment2 = new Segment(new Vector2(0, 0), new Vector2(10, 0))
-				expect(square.intersect(segment2)).toBe(true)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2(2.5, 0))))
+					expect(res?.some((e) => e.equals(new Vector2(1, 1))))
+				})
+				test('test 2', () => {
+					const seg = new Segment(new Vector2(2, 14), new Vector2(7, -3))
+					const res = square.intersect(seg)
+
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2(6.12, 0))))
+					expect(res?.some((e) => e.equals(new Vector2(3.18, 10))))
+				})
 			})
 		})
 
 		describe('with Ray', () => {
-			test('should return true when ray intersects polygon', () => {
-				// Ray from outside pointing towards polygon
-				const ray1 = new Ray(new Vector2(-5, 5), new Vector2(1, 0))
-				expect(square.intersect(ray1)).toBe(true)
+			describe('hit cases', () => {
+				test('ray outside pointing towards polygon', () => {
+					const ray1 = new Ray(new Vector2(-5, 5), new Vector2(1, 0))
+					const res = square.intersect(ray1)
 
-				// Ray from inside pointing outwards
-				const ray2 = new Ray(new Vector2(5, 5), new Vector2(1, 0))
-				expect(square.intersect(ray2)).toBe(true)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res).toEqual([new Vector2(0, 5), new Vector2(10, 5)])
+				})
+
+				test('Ray from inside pointing outward', () => {
+					const ray2 = new Ray(new Vector2(5, 5), new Vector2(1, 0))
+					const res = square.intersect(ray2)
+
+					expect(res).toBeInstanceOf(Array)
+					expect(res?.some((e) => e.equals(new Vector2(10, 5)))).toBe(true)
+				})
+
+				test('edge', () => {
+					const ray = new Ray(new Vector2(10, -5), new Vector2(0, 1))
+					const res = square.intersect(ray)
+
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res).toEqual([new Vector2(10, 0), new Vector2(10, 10)])
+				})
 			})
 
-			test('should return false when ray does not intersect polygon', () => {
-				// Ray pointing away from polygon
-				const ray1 = new Ray(new Vector2(-5, 5), new Vector2(-1, 0))
-				expect(square.intersect(ray1)).toBe(false)
+			describe('no hit cases', () => {
+				test('Ray pointing away from polygo', () => {
+					//
+					const ray1 = new Ray(new Vector2(-5, 5), new Vector2(-1, 0))
+					const res = square.intersect(ray1)
 
-				// Ray parallel to edge but not intersecting
-				const ray2 = new Ray(new Vector2(-5, -5), new Vector2(1, 0))
-				expect(square.intersect(ray2)).toBe(false)
+					expect(res).toBe(null)
+				})
+				test('Ray parallel to edge but not intersecting', () => {
+					const ray2 = new Ray(new Vector2(-5, -5), new Vector2(1, 0))
+					const res = square.intersect(ray2)
+
+					expect(res).toBe(null)
+				})
 			})
 		})
 
 		describe('with Circle', () => {
-			test('should return true when circle intersects polygon edge', () => {
-				// Circle center outside, but intersecting an edge
-				const circle1 = new Circle(new Vector2(-2, 5), 3)
-				expect(square.intersect(circle1)).toBe(true)
+			describe('polygon edge', () => {
+				test('circle center outside, but intersecting an edge', () => {
+					const circle = new Circle(new Vector2(-2, 5), 3)
+					const res = square.intersect(circle)
 
-				// Circle entirely inside polygon
-				const circle2 = new Circle(new Vector2(5, 5), 2)
-				expect(square.intersect(circle2)).toBe(true)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2(0, 7.23606)))).toBe(true)
+					expect(res?.some((e) => e.equals(new Vector2(0, 2.76393)))).toBe(true)
+				})
+				test('circle entirely inside polygon', () => {
+					const circle = new Circle(new Vector2(5, 5), 2)
+					const res = square.intersect(circle)
 
-				// Circle center outside, partially overlapping
-				const circle3 = new Circle(new Vector2(12, 5), 3)
-				expect(square.intersect(circle3)).toBe(true)
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(1)
+					expect(res?.some((e) => e.equals(new Vector2(5, 5))))
+				})
+				test('circle center outside, partially overlapping', () => {
+					const circle = new Circle(new Vector2(12, 5), 3)
+					const res = square.intersect(circle)
+
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(2)
+					expect(res?.some((e) => e.equals(new Vector2(10, 7.23606)))).toBe(
+						true
+					)
+					expect(res?.some((e) => e.equals(new Vector2(10, 2.76393)))).toBe(
+						true
+					)
+				})
+				test('touching at a vertex', () => {
+					const circle = new Circle(new Vector2(-2, 0), 2)
+					const res = square.intersect(circle)
+
+					expect(res).toBeInstanceOf(Array)
+					expect(res).toHaveLength(1)
+					expect(res?.some((e) => e.equals(new Vector2())))
+				})
+				test('touching at en edge', () => {
+					const circle = new Circle(new Vector2(5, -3), 3)
+					const res = square.intersect(circle)
+
+					expect(res).toBeInstanceOf(Array)
+				})
 			})
+			test('circle does not intersect polygon', () => {
+				const circle = new Circle(new Vector2(-5, -5), 2)
+				const res = square.intersect(circle)
 
-			test('should return false when circle does not intersect polygon', () => {
-				// Circle completely outside
-				const circle1 = new Circle(new Vector2(-5, -5), 2)
-				expect(square.intersect(circle1)).toBe(false)
-			})
-
-			test('should handle edge cases', () => {
-				// Circle touching at a vertex
-				const circle1 = new Circle(new Vector2(-2, -2), 2 * Math.sqrt(2))
-				expect(square.intersect(circle1)).toBe(true)
-
-				// Circle touching at an edge
-				const circle2 = new Circle(new Vector2(5, -3), 3)
-				expect(square.intersect(circle2)).toBe(true)
+				expect(res).toBe(null)
 			})
 		})
 
 		describe('with Polygon', () => {
-			test('should return true when polygons overlap', () => {
-				// Second polygon overlapping first polygon
+			test('polygons overlap', () => {
 				const polygon1 = new Polygon([
 					new Vector2(5, 5),
 					new Vector2(15, 5),
 					new Vector2(15, 15),
 					new Vector2(5, 15)
 				])
-				expect(square.intersect(polygon1)).toBe(true)
-				expect(polygon1.intersect(square)).toBe(true)
+				const res = square.intersect(polygon1)
+				expect(res).toBeInstanceOf(Array)
+			})
 
-				// Second polygon entirely inside first
+			test('second polygon entirely inside first', () => {
 				const polygon2 = new Polygon([
 					new Vector2(2, 2),
 					new Vector2(8, 2),
 					new Vector2(8, 8),
 					new Vector2(2, 8)
 				])
-				expect(square.intersect(polygon2)).toBe(true)
-				expect(polygon2.intersect(square)).toBe(true)
+				const res = square.intersect(polygon2)
 
-				// First polygon entirely inside second
+				expect(res).toBe(null)
+			})
+
+			test('First polygon entirely inside second', () => {
 				const polygon3 = new Polygon([
 					new Vector2(-5, -5),
 					new Vector2(15, -5),
 					new Vector2(15, 15),
 					new Vector2(-5, 15)
 				])
-				expect(square.intersect(polygon3)).toBe(true)
-				expect(polygon3.intersect(square)).toBe(true)
+				const res = square.intersect(polygon3)
+
+				// no polygon clipping
+				//expect(res).toBeInstanceOf(Array)
+				expect(res).toBe(null)
 			})
 
-			test('should return false when polygons do not overlap', () => {
+			test('return false when polygons do not overlap', () => {
 				// Completely separate polygons
 				const polygon1 = new Polygon([
 					new Vector2(15, 15),
@@ -396,8 +487,8 @@ describe('Polygon', () => {
 					new Vector2(20, 20),
 					new Vector2(15, 20)
 				])
-				expect(square.intersect(polygon1)).toBe(false)
-				expect(polygon1.intersect(square)).toBe(false)
+				const res1 = square.intersect(polygon1)
+				expect(res1).toBe(null)
 
 				// Adjacent polygons without overlap
 				const polygon2 = new Polygon([
@@ -406,8 +497,24 @@ describe('Polygon', () => {
 					new Vector2(20, 10),
 					new Vector2(10, 10)
 				])
-				expect(square.intersect(polygon2)).toBe(true)
-				expect(polygon2.intersect(square)).toBe(true)
+				const res2 = square.intersect(polygon2)
+				expect(res2).toBeInstanceOf(Array)
+				expect(res2?.some((e) => e.equals(new Vector2(10, 0))))
+				expect(res2?.some((e) => e.equals(new Vector2(10, 10))))
+			})
+
+			test('none corner intersec', () => {
+				const tri = new Polygon([
+					new Vector2(8, 4),
+					new Vector2(13, 0),
+					new Vector2(13, 6)
+				])
+				const res = tri.intersect(square)
+
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(2)
+				expect(res?.some((e) => e.equals(new Vector2(10, 2.4))))
+				expect(res?.some((e) => e.equals(new Vector2(10, 4.8))))
 			})
 
 			test('should handle concave polygons', () => {
@@ -420,8 +527,11 @@ describe('Polygon', () => {
 					new Vector2(10, 10), // on square edge
 					new Vector2(5, 10) // inside square
 				])
-				expect(square.intersect(concavePolygon)).toBe(true)
-				expect(concavePolygon.intersect(square)).toBe(true)
+				const res = concavePolygon.intersect(square)
+				expect(res).toBeInstanceOf(Array)
+				expect(res?.some((e) => e.equals(new Vector2(10, 5))))
+				expect(res?.some((e) => e.equals(new Vector2(10, 10))))
+				expect(res?.some((e) => e.equals(new Vector2(5, 10))))
 			})
 		})
 		describe('with relative position (origin)', () => {
@@ -446,8 +556,8 @@ describe('Polygon', () => {
 					new Vector2(-1.5, -1.5)
 				)
 
-				expect(poly1.intersect(poly2)).toBe(true)
-				expect(poly2.intersect(poly1)).toBe(true)
+				const res = poly1.intersect(poly2)
+				expect(res).toBeInstanceOf(Array)
 			})
 			test('should detect intersection for two polygons with different origins', () => {
 				const poly1 = new Polygon(
@@ -470,8 +580,8 @@ describe('Polygon', () => {
 					new Vector2(8, 8)
 				) // poly2 moved to (8,8)-(13,13)
 
-				expect(poly1.intersect(poly2)).toBe(true)
-				expect(poly2.intersect(poly1)).toBe(true)
+				const res = poly1.intersect(poly2)
+				expect(res).toBeInstanceOf(Array)
 			})
 
 			test('should not detect intersection for separated polygons with origins', () => {
@@ -495,9 +605,81 @@ describe('Polygon', () => {
 					new Vector2(10, 10)
 				)
 
-				expect(poly1.intersect(poly2)).toBe(false)
-				expect(poly2.intersect(poly1)).toBe(false)
+				const res = poly1.intersect(poly2)
+				expect(res).toBe(null)
 			})
+		})
+	})
+	describe('clone', () => {
+		test('value', () => {
+			const p1 = new Polygon([
+				new Vector2(),
+				new Vector2(0, 1),
+				new Vector2(1, 1),
+				new Vector2(1, 0)
+			])
+			const p2 = p1.clone()
+
+			expect(p1).toEqual(p2)
+		})
+		test('deep copy', () => {
+			const p1 = new Polygon([
+				new Vector2(),
+				new Vector2(0, 1),
+				new Vector2(1, 1),
+				new Vector2(1, 0)
+			])
+			const p2 = p1.clone()
+			p1.getSegment()[0].getP1().setX(6)
+
+			expect(p1).not.toEqual(p2)
+
+			p1.setOrigin(new Vector2(8, 9))
+
+			expect(p2.getOrigin()).toEqual(new Vector2())
+		})
+	})
+
+	describe('normal', () => {
+		let polygon: Polygon
+
+		beforeEach(() => {
+			const vertices = [
+				new Vector2(0, 0),
+				new Vector2(5, 0),
+				new Vector2(2.5, 5)
+			]
+			polygon = new Polygon(vertices)
+		})
+
+		test('normal at point below the base', () => {
+			const point = new Vector2(2.5, -0.1)
+			const normal = polygon.getNormalAt(point)
+			expect(normal.getX()).toBeCloseTo(0)
+			expect(normal.getY()).toBeCloseTo(-1)
+		})
+
+		test('normal at point near left edge', () => {
+			const point = new Vector2(-0.1, 2.5)
+			const normal = polygon.getNormalAt(point)
+			const len = Math.sqrt(25 + 6.25)
+			expect(normal.getX()).toBeCloseTo(-5 / len)
+			expect(normal.getY()).toBeCloseTo(2.5 / len)
+		})
+
+		test('normal at point near right edge', () => {
+			const point = new Vector2(5.1, 2.5)
+			const normal = polygon.getNormalAt(point)
+			const expected = new Vector2(1.08, 0.54).normalize()
+			expect(normal.getX()).toBeCloseTo(expected.getX())
+			expect(normal.getY()).toBeCloseTo(expected.getY())
+		})
+
+		test('normal at point on a vertex (base left)', () => {
+			const point = new Vector2(0, 0)
+			const normal = polygon.getNormalAt(point)
+			expect(normal.getX()).toBeCloseTo(0)
+			expect(normal.getY()).toBeCloseTo(-1)
 		})
 	})
 })

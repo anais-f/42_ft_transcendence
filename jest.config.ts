@@ -43,6 +43,12 @@ const config: Config.InitialOptions = {
 		},
 		{
 			...commonConfig,
+			displayName: 'pong-server-app',
+			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
+			rootDir: './'
+		},
+		{
+			...commonConfig,
 			displayName: 'users',
 			rootDir: '<rootDir>/services/users/app',
 			testMatch: ['**/*.test.ts']

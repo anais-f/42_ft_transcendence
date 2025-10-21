@@ -1,6 +1,7 @@
-import { Segment } from './Segment'
-import { Circle } from './shapes/Circle'
-import { Vector2 } from './Vector2'
+import { EPSILON } from '../define.js'
+import { Segment } from './Segment.js'
+import { Circle } from './shapes/Circle.js'
+import { Vector2 } from './Vector2.js'
 
 export class Ray {
 	private direction!: Vector2
@@ -31,11 +32,11 @@ export class Ray {
 		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
-	intersect(other: Segment): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Circle): boolean
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Circle): Vector2[] | null
 
-	intersect(other: Segment | Circle | Ray): boolean {
+	intersect(other: Segment | Circle | Ray): Vector2[] | null {
 		if (other instanceof Segment) {
 			return this.intersectSegment(other)
 		} else if (other instanceof Ray) {
@@ -46,11 +47,11 @@ export class Ray {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): boolean {
+	private intersectRay(other: Ray): Vector2[] | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
-		if (Math.abs(crossProduct) < Number.EPSILON) {
-			return false
+		if (Math.abs(crossProduct) < EPSILON) {
+			return null
 		}
 
 		const t1 =
@@ -62,32 +63,57 @@ export class Ray {
 				this.getDirection()
 			) / crossProduct
 
-		return t1 >= 0 && t2 >= 0
+		if (t1 >= 0 && t2 >= 0) {
+			const intersectionPoint = Vector2.add(
+				this.getOrigin(),
+				this.getDirection().multiply(t1)
+			)
+			return [intersectionPoint]
+		}
+		return null
 	}
 
-	private intersectSegment(other: Segment): boolean {
-		const [start, end]: Vector2[] = other.getPoints()
-		const segV = Vector2.subtract(end, start)
+	private intersectSegment(other: Segment): Vector2[] | null {
+		const O = this.getOrigin()
+		const D = this.getDirection()
+		const A = other.getP1()
+		const B = other.getP2()
 
-		const crossProduct = this.getDirection().cross(segV)
+		const v1 = Vector2.subtract(O, A)
+		const v2 = Vector2.subtract(B, A)
+		const denom = Vector2.cross(D, v2)
 
-		if (Math.abs(crossProduct) < Number.EPSILON) {
-			const v1 = Vector2.subtract(start, this.getOrigin())
-			if (Math.abs(v1.cross(this.getDirection())) < Number.EPSILON) {
-				const t0 =
-					Vector2.dot(v1, this.getDirection()) /
-					this.getDirection().squaredLength()
-				return t0 >= 0
+		if (Math.abs(denom) < EPSILON) {
+			const dDot = Vector2.dot(D, D)
+			if (
+				dDot < EPSILON ||
+				Math.abs(Vector2.cross(Vector2.subtract(A, O), D)) > EPSILON
+			) {
+				return null
 			}
-			return false
+
+			const tA = Vector2.dot(Vector2.subtract(A, O), D) / dDot
+			const tB = Vector2.dot(Vector2.subtract(B, O), D) / dDot
+			const tMin = Math.min(tA, tB)
+			const tMax = Math.max(tA, tB)
+			const tOverlapStart = Math.max(0, tMin)
+			const tOverlapEnd = tMax
+
+			if (tOverlapStart > tOverlapEnd) {
+				return null
+			}
+
+			const hitPoint = Vector2.add(O, D.clone().multiply(tOverlapStart))
+			return [hitPoint]
+		}
+		const t1 = Vector2.cross(v2, v1) / denom
+		const t2 = Vector2.cross(D, v1) / denom
+
+		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
+			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1))
+			return [intersectionPoint]
 		}
 
-		const t1 =
-			Vector2.subtract(start, this.getOrigin()).cross(segV) / crossProduct
-		const t2 =
-			Vector2.subtract(start, this.getOrigin()).cross(this.getDirection()) /
-			crossProduct
-
-		return t1 >= 0 && t2 >= 0 && t2 <= 1
+		return null
 	}
 }
