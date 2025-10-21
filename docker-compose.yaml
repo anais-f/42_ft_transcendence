@@ -46,6 +46,8 @@ services:
       - db_users_data:/data
     environment:
       - DB_PATH=/data/db-users.sqlite
+      - AUTH_API_BASE_URL=http://auth:3000
+      - PORT=3000
   auth:
     restart: on-failure
     container_name: auth
@@ -61,6 +63,8 @@ services:
       - db_auth_data:/data
     environment:
       - DB_PATH=/data/db-auth.sqlite
+      - USERS_SERVICE_URL=http://users:3000
+      - PORT=3000
 
 networks:
   pong:
