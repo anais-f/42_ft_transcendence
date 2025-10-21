@@ -1,0 +1,485 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API for Users Service",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {
+      "UserCreatedWebhookSchema": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "number",
+            "minimum": 1
+          },
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          }
+        },
+        "required": [
+          "id_user",
+          "username"
+        ],
+        "additionalProperties": false
+      },
+      "UserProfileSchema": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "number"
+          },
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "status": {
+            "type": "number"
+          },
+          "last_connection": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_user",
+          "username",
+          "avatar",
+          "status",
+          "last_connection"
+        ]
+      },
+      "UsernameSchema": {
+        "type": "string",
+        "minLength": 4,
+        "maxLength": 16,
+        "pattern": "^[A-Za-z0-9_-]{4,16}$"
+      },
+      "UserProfileSchemaOutput": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "number"
+          },
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "status": {
+            "type": "number"
+          },
+          "last_connection": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_user",
+          "username",
+          "avatar",
+          "status",
+          "last_connection"
+        ],
+        "additionalProperties": false
+      },
+      "PublicUserListSchema": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserCreatedWebhookSchema"
+            }
+          }
+        },
+        "required": [
+          "users"
+        ],
+        "additionalProperties": false
+      },
+      "PublicUserSchema": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "number",
+            "minimum": 1
+          },
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          }
+        },
+        "required": [
+          "id_user",
+          "username"
+        ],
+        "additionalProperties": false
+      },
+      "UserAccountSchema": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "last_connection": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_user",
+          "avatar",
+          "status",
+          "last_connection"
+        ],
+        "additionalProperties": false
+      },
+      "UserIdSchema": {
+        "type": "object",
+        "properties": {
+          "id_user": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id_user"
+        ],
+        "additionalProperties": false
+      },
+      "UserProfileListSchema": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserProfileSchemaOutput"
+            }
+          }
+        },
+        "required": [
+          "users"
+        ],
+        "additionalProperties": false
+      },
+      "ErrorResponseSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "SuccessResponseSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "additionalProperties": false
+      },
+      "LoginSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "RegisterSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "$ref": "#/components/schemas/UsernameSchema"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "paths": {
+    "/users/api/users/new-user": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Public user authentication schema",
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "number",
+                    "minimum": 1
+                  },
+                  "login": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 16,
+                    "pattern": "^[A-Za-z0-9_-]{4,16}$"
+                  }
+                },
+                "required": [
+                  "user_id",
+                  "login"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true,
+          "description": "Public user authentication schema"
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/api/users/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public user profile schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Public user profile schema",
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991
+                    },
+                    "username": {
+                      "type": "string",
+                      "minLength": 4,
+                      "maxLength": 16,
+                      "pattern": "^[A-Za-z0-9_-]{4,16}$"
+                    },
+                    "avatar": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "number"
+                    },
+                    "last_connection": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "username",
+                    "avatar",
+                    "status",
+                    "last_connection"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur local"
+    }
+  ]
+}

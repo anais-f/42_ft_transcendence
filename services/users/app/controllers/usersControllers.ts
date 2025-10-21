@@ -21,8 +21,9 @@ export async function handleUserCreated(
 ): Promise<FastifyReply> {
 	try {
 		const newUser: PublicUserAuthDTO = req.body
-
+    console.log("HERE")
 		await UsersServices.createUser(newUser)
+    console.log("HERE 2")
 		return res
 			.status(201)
 			.send({ success: true, message: SUCCESS_MESSAGES.USER_CREATED })
@@ -31,10 +32,12 @@ export async function handleUserCreated(
 			error instanceof Error &&
 			error.message === ERROR_MESSAGES.USER_ALREADY_EXISTS
 		) {
+      console.log("HERE 3")
 			return res
 				.status(200)
 				.send({ success: true, message: ERROR_MESSAGES.USER_ALREADY_EXISTS })
 		}
+    console.log("HERE 4")
 		return res
 			.status(500)
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })

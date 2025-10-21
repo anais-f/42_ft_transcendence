@@ -12,25 +12,18 @@ import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import path from 'path'
-import {
-  UserPublicProfileSchema,
-  SuccessResponseSchema,
-  ErrorResponseSchema,
-  PublicUserAuthSchema,
-  PublicUserListAuthSchema,
-} from '@ft_transcendence/common'
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-// Charger le JSON OpenAPI généré depuis common
+// Load OpenAPI schemas from common package
 const openapiSwagger = JSON.parse(
     fs.readFileSync(path.join(process.cwd(), '../../../packages/common/openapiDTO.json'), 'utf-8')
 )
 
-// Configure Swagger pour générer la doc OpenAPI
+// Configure Swagger to use the loaded schemas
 await app.register(Swagger as any, {
   openapi: {
     info: {
@@ -49,15 +42,15 @@ await app.register(SwaggerUI as any, {
 })
 
 // Enregistre tes routes
-app.register(usersRoutes, { prefix: '/users' })
+app.register(usersRoutes, { prefix: '/api' })
 
 await app.ready()
 
 // Exporte la documentation OpenAPI au format JSON
-import { writeFileSync } from 'node:fs'
-const openapiDoc = app.swagger()
-writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
-console.log('Documentation OpenAPI écrite dans openapi.json')
+// import { writeFileSync } from 'node:fs'
+// const openapiDoc = app.swagger()
+// writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
+// console.log('Documentation OpenAPI écrite dans openapi.json')
 
 // Initialisation métiers et démarrage serveur
 const initializeUsers = async () => {
