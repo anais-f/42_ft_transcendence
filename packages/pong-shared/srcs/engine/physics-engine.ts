@@ -11,5 +11,6 @@ export class PhysicsEngine {
 
 	public playTick() {
 		// TODO: implement
+		console.log('hey')
 	}
 }

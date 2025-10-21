@@ -13,12 +13,6 @@ jobs:
       - name: Run unit tests via Makefile
         run: |
           # Install npm for test
-          if make setup; then
-            echo "make setup ok"
-          else
-            echo "make setup failed."
-            exit 1
-          fi
           if make install; then
             echo "Npm installed succesfully."
           else
