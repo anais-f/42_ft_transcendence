@@ -31,28 +31,26 @@ await app.register(Swagger as any, {
       version: '1.0.0',
     },
     servers: [{ url: 'http://localhost:3000', description: 'Serveur local' }],
-    components: openapiSwagger.components  // Récupère les schemas du JSON
+    components: openapiSwagger.components
   },
-  transform: jsonSchemaTransform  // IMPORTANT : convertit les schemas Zod en JSON Schema
+  transform: jsonSchemaTransform
 })
 
-// Enregistre Swagger UI sur /docs
 await app.register(SwaggerUI as any, {
   routePrefix: '/docs',
 })
 
-// Enregistre tes routes
 app.register(usersRoutes, { prefix: '/api' })
 
 await app.ready()
 
-// Exporte la documentation OpenAPI au format JSON
+// Export documentation to a file
 // import { writeFileSync } from 'node:fs'
 // const openapiDoc = app.swagger()
 // writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
 // console.log('Documentation OpenAPI écrite dans openapi.json')
 
-// Initialisation métiers et démarrage serveur
+
 const initializeUsers = async () => {
   console.log('Initializing users from auth service...')
   await UsersServices.syncAllUsersFromAuth()

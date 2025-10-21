@@ -5,7 +5,6 @@ import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import path from 'path'
-
 import {
   ZodTypeProvider,
   validatorCompiler,
@@ -34,9 +33,9 @@ async function runServer() {
         version: '1.0.0',
       },
       servers: [{ url: 'http://localhost:3001', description: 'Serveur local' }],
-      components: openapiSwagger.components  // Récupère les schemas du JSON
+      components: openapiSwagger.components
     },
-    transform: jsonSchemaTransform  // IMPORTANT : convertit les schemas Zod en JSON Schema
+    transform: jsonSchemaTransform
   })
   await app.register(SwaggerUI as any, {
     routePrefix: '/docs',
