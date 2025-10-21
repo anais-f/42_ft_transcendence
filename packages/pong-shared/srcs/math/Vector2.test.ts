@@ -102,6 +102,29 @@ describe('Vector2', () => {
 		expect(v.getY()).toBe(2)
 	})
 
+	describe('equals', () => {
+		test('self', () => {
+			const v = new Vector2(5, 7)
+			expect(v.equals(v)).toBe(true)
+			expect(Vector2.equals(v, v)).toBe(true)
+		})
+
+		test('diff', () => {
+			const v1 = new Vector2()
+			const v2 = new Vector2(4, 1)
+			const v3 = new Vector2(0, 1)
+			const v4 = new Vector2(7, 0)
+
+			expect(v2.equals(v1)).toBe(false)
+			expect(v1.equals(v3)).toBe(false)
+			expect(v1.equals(v4)).toBe(false)
+
+			expect(Vector2.equals(v2, v1)).toBe(false)
+			expect(Vector2.equals(v1, v3)).toBe(false)
+			expect(Vector2.equals(v1, v4)).toBe(false)
+		})
+	})
+
 	describe('Vector2 squaredDist and dist', () => {
 		test('static squaredDist returns correct squared distance', () => {
 			const v1 = new Vector2(1, 2)
@@ -136,6 +159,73 @@ describe('Vector2', () => {
 			const v2 = new Vector2(-1, 9)
 			expect(Vector2.dist(v1, v2)).toBeCloseTo(Vector2.dist(v2, v1))
 			expect(v1.dist(v2)).toBeCloseTo(v2.dist(v1))
+		})
+	})
+	describe('Vector2 reflect', () => {
+		test('reflect vector across a normal vector pointing up', () => {
+			const v = new Vector2(3, 4)
+			const normal = new Vector2(0, 1)
+			const expected = new Vector2(3, -4)
+			expect(Vector2.reflect(v, normal)).toEqual(expected)
+			expect(v.reflect(normal)).toEqual(expected)
+		})
+
+		test('reflect vector across a normal vector pointing right', () => {
+			const v = new Vector2(3, 4)
+			const normal = new Vector2(1, 0)
+			const expected = new Vector2(-3, 4)
+			expect(Vector2.reflect(v, normal)).toEqual(expected)
+			expect(v.reflect(normal)).toEqual(expected)
+		})
+
+		test('reflect vector across a diagonal normal vector', () => {
+			const v = new Vector2(1, 1)
+			const normal = new Vector2(1, 1).normalize()
+			const expected = new Vector2(-1, -1)
+			expect(Vector2.reflect(v, normal).getX()).toBeCloseTo(expected.getX())
+			expect(Vector2.reflect(v, normal).getY()).toBeCloseTo(expected.getY())
+			expect(v.reflect(normal).getX()).toBeCloseTo(expected.getX())
+			expect(v.reflect(normal).getY()).toBeCloseTo(expected.getY())
+		})
+
+		test('reflect vector across a normal vector pointing down', () => {
+			const v = new Vector2(5, 3)
+			const normal = new Vector2(0, -1)
+			const expected = new Vector2(5, -3)
+			expect(Vector2.reflect(v, normal)).toEqual(expected)
+			expect(v.reflect(normal)).toEqual(expected)
+		})
+
+		test('reflect vector across a normal vector pointing left', () => {
+			const v = new Vector2(-4, 2)
+			const normal = new Vector2(-1, 0)
+			const expected = new Vector2(4, 2)
+			expect(Vector2.reflect(v, normal)).toEqual(expected)
+			expect(v.reflect(normal)).toEqual(expected)
+		})
+
+		test('reflect vector across a zero vector normal', () => {
+			const v = new Vector2(3, 4)
+			const normal = new Vector2(0, 0).normalize()
+			const expected = new Vector2(3, 4)
+			expect(Vector2.reflect(v, normal)).toEqual(expected)
+			expect(v.reflect(normal)).toEqual(expected)
+		})
+	})
+
+	describe('min / max', () => {
+		test('max', () => {
+			const v1 = new Vector2(-4, 7)
+			const v2 = new Vector2(6, 1)
+
+			expect(Vector2.max(v1, v2).equals(new Vector2(6, 7))).toBe(true)
+		})
+
+		test('min', () => {
+			const v1 = new Vector2(-4, 7)
+			const v2 = new Vector2(6, 1)
+
+			expect(Vector2.min(v1, v2).equals(new Vector2(-4, 1))).toBe(true)
 		})
 	})
 })

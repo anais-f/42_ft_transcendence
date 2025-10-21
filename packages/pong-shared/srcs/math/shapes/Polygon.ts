@@ -1,10 +1,10 @@
-import { Vector2 } from '../Vector2'
-import { Circle } from './Circle'
-import { Ray } from '../Ray'
-import { Segment } from '../Segment'
-import { Shape } from './Shape'
+import { Vector2 } from '../Vector2.js'
+import { Circle } from './Circle.js'
+import { Ray } from '../Ray.js'
+import { Segment } from '../Segment.js'
+import { AShape } from './AShape.js'
 
-export class Polygon extends Shape {
+export class Polygon extends AShape {
 	private segments: Segment[] = []
 	private relativePoints: Vector2[]
 
@@ -32,12 +32,12 @@ export class Polygon extends Shape {
 		)
 	}
 
-	public intersect(other: Circle): boolean
-	public intersect(other: Polygon): boolean
-	public intersect(other: Ray): boolean
-	public intersect(other: Segment): boolean
+	public intersect(other: Circle): Vector2[] | null
+	public intersect(other: Polygon): Vector2[] | null
+	public intersect(other: Ray): Vector2[] | null
+	public intersect(other: Segment): Vector2[] | null
 
-	public intersect(other: Circle | Ray | Polygon | Segment): boolean {
+	public intersect(other: Circle | Ray | Polygon | Segment): Vector2[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Ray) {
@@ -50,46 +50,86 @@ export class Polygon extends Shape {
 		throw 'Invalid intersect'
 	}
 
-	private intersectCircle(other: Circle): boolean {
+	private intersectCircle(other: Circle): Vector2[] | null {
 		const AS = this.getAbsoluteSegments()
+		let hps: Vector2[] = []
 		for (const seg of AS) {
-			if (seg.intersect(other)) {
-				return true
+			const hp = seg.intersect(other)
+			if (Array.isArray(hp)) {
+				hps = [...hps, ...hp]
+			}
+		}
+		if (hps.length !== 0) {
+			return hps.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
+		}
+
+		if (this.containsPoint(other.getPos())) {
+			return [other.getPos()]
+		}
+		return null
+	}
+
+	private intersectRay(other: Ray): Vector2[] | null {
+		const AS = this.getAbsoluteSegments()
+		let hps: Vector2[] = []
+
+		for (const seg of AS) {
+			let hp: Vector2[] | null = other.intersect(seg)
+			if (Array.isArray(hp)) {
+				hps.push(hp[0])
 			}
 		}
 
-		return this.containsPoint(other.getPos())
-	}
-
-	private intersectRay(other: Ray): boolean {
-		const AS = this.getAbsoluteSegments()
-		for (const seg of AS) {
-			if (other.intersect(seg)) {
-				return true
-			}
+		if (hps.length === 0) {
+			return null
 		}
-		return false
+		return hps
+			.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
+			.sort(
+				(a, b) =>
+					Vector2.squaredDist(this.origin, a) -
+					Vector2.squaredDist(this.origin, b)
+			)
 	}
 
-	private intersectPolygon(other: Polygon): boolean {
+	private intersectPolygon(other: Polygon): Vector2[] | null {
 		const localAbSeg = this.getAbsoluteSegments()
 		const otherAbSeg = other.getAbsoluteSegments()
+
+		let res: Vector2[] = []
 		for (const seg1 of localAbSeg) {
 			for (const seg2 of otherAbSeg) {
-				if (seg1.intersect(seg2)) {
-					return true
+				const t: Vector2[] | null = seg1.intersect(seg2)
+				if (Array.isArray(t)) {
+					res = [...res, ...t]
 				}
 			}
 		}
-
+		if (res.length !== 0) {
+			return res.filter(
+				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			)
+		}
+		// bad polygon clipping implementation
+		/*
 		if (this.containsPoint(otherAbSeg[0].getP1())) {
-			return true
+			res.push(otherAbSeg[0].getP1())
 		}
 		if (other.containsPoint(localAbSeg[0].getP1())) {
-			return true
+			res.push(localAbSeg[0].getP1())
+		}
+		*/
+		if (res.length === 0) {
+			return null
 		}
 
-		return false
+		return res.filter(
+			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+		)
 	}
 
 	public containsPoint(point: Vector2): boolean {
@@ -120,23 +160,75 @@ export class Polygon extends Shape {
 		return inside
 	}
 
-	private intersectSeg(other: Segment) {
-		if (
-			this.containsPoint(other.getP1()) ||
-			this.containsPoint(other.getP2())
-		) {
-			return true
+	private intersectSeg(other: Segment): Vector2[] | null {
+		let hps: Vector2[] = []
+		if (this.containsPoint(other.getP1())) {
+			hps.push(other.getP1())
+		}
+		if (this.containsPoint(other.getP2())) {
+			hps.push(other.getP2())
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {
-			if (seg.intersect(other)) {
-				return true
+			const hp = seg.intersect(other)
+			if (Array.isArray(hp)) {
+				for (const point of hp) {
+					if (!hps.some((e) => e.equals(point))) {
+						hps.push(point)
+					}
+				}
 			}
 		}
-		return false
+		if (hps.length === 0) {
+			return null
+		}
+		return hps
 	}
 
 	public getSegment(): Segment[] {
 		return this.segments
+	}
+
+	public clone(): Polygon {
+		const points = this.segments.map((seg) => seg.getP1().clone())
+		return new Polygon(points, this.origin)
+	}
+
+	private getCentroid(): Vector2 {
+		const vertices = this.getAbsolutePoints()
+		const xSum = vertices.reduce((sum, v) => sum + v.getX(), 0)
+		const ySum = vertices.reduce((sum, v) => sum + v.getY(), 0)
+		const count = vertices.length
+		return new Vector2(xSum / count, ySum / count)
+	}
+
+	public getNormalAt(point: Vector2): Vector2 {
+		const segments = this.getAbsoluteSegments()
+
+		let minDist = Infinity
+		let closestSeg: Segment | null = null
+
+		for (const seg of segments) {
+			const dist = seg.distanceToPoint(point)
+			if (dist < minDist) {
+				minDist = dist
+				closestSeg = seg
+			}
+		}
+
+		if (!closestSeg) {
+			throw new Error('No segment found for normal calculation')
+		}
+
+		let normal = closestSeg.getNormal()
+
+		const centroid = this.getCentroid()
+		const dirToCentroid = Vector2.subtract(centroid, point)
+
+		if (Vector2.dot(normal, dirToCentroid) > 0) {
+			normal.negate()
+		}
+
+		return normal.normalize()
 	}
 }

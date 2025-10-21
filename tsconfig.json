@@ -16,7 +16,8 @@
 		"paths": {
 			"@packages/*": ["packages/*"],
 			"@services/*": ["services/*"]
-		}
+		},
+		"isolatedModules": true
 	},
 	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
 	"references": [

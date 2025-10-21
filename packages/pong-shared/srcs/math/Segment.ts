@@ -1,7 +1,8 @@
-import { Ray } from './Ray'
-import { Vector2 } from './Vector2'
-import { Circle } from './shapes/Circle'
-import { Polygon } from './shapes/Polygon'
+import { EPSILON } from '../define.js'
+import { Ray } from './Ray.js'
+import { Vector2 } from './Vector2.js'
+import { Circle } from './shapes/Circle.js'
+import { Polygon } from './shapes/Polygon.js'
 
 export class Segment {
 	constructor(
@@ -16,15 +17,16 @@ export class Segment {
 	getP1() {
 		return this.p1
 	}
+
 	getP2() {
 		return this.p2
 	}
 
-	intersect(other: Circle): boolean
-	intersect(other: Segment): boolean
-	intersect(other: Polygon): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Circle | Segment | Polygon | Ray): boolean {
+	intersect(other: Circle): Vector2[] | null
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Polygon): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Circle | Segment | Polygon | Ray): Vector2[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
@@ -37,48 +39,117 @@ export class Segment {
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(other: Segment): boolean {
+	private intersectSeg(other: Segment): Vector2[] | null {
+		const [a1, a2] = [this.p1, this.p2]
+		const [b1, b2] = other.getPoints()
+
 		function direction(p: Vector2, q: Vector2, r: Vector2): number {
 			return Vector2.cross(Vector2.subtract(q, p), Vector2.subtract(r, p))
 		}
-
-		const [p3, p4] = other.getPoints()
-
-		const d1 = direction(p3, p4, this.p1)
-		const d2 = direction(p3, p4, this.p2)
-		const d3 = direction(this.p1, this.p2, p3)
-		const d4 = direction(this.p1, this.p2, p4)
+		const d1 = direction(b1, b2, a1)
+		const d2 = direction(b1, b2, a2)
+		const d3 = direction(a1, a2, b1)
+		const d4 = direction(a1, a2, b2)
 
 		if (
 			((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
-			return true
+			const t = d1 / (d1 - d2)
+			const intersectionPoint = Vector2.add(
+				a1,
+				Vector2.subtract(a2, a1).multiply(t)
+			)
+			return [intersectionPoint]
 		}
 
-		if (d1 === 0 && Segment.pointIsOnSeg(p3, p4, this.p1)) return true
-		if (d2 === 0 && Segment.pointIsOnSeg(p3, p4, this.p2)) return true
-		if (d3 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p3)) return true
-		if (d4 === 0 && Segment.pointIsOnSeg(this.p1, this.p2, p4)) return true
+		let points: Vector2[] = []
+		if (a1.equals(b1) || a1.equals(b2)) {
+			points.push(a1)
+		}
+		if (a2.equals(b1) || a2.equals(b2)) {
+			points.push(a2)
+		}
 
-		return false
+		const colinear =
+			Math.abs(direction(a1, a2, b1)) < EPSILON &&
+			Math.abs(direction(a1, a2, b2)) < EPSILON
+		if (colinear) {
+			const allPoints = [a1, a2, b1, b2]
+			const overlap: Vector2[] = []
+			for (let pt of allPoints) {
+				if (
+					Segment.pointIsOnSeg(a1, a2, pt) &&
+					Segment.pointIsOnSeg(b1, b2, pt)
+				) {
+					if (!overlap.some((p) => p.equals(pt))) {
+						overlap.push(pt)
+					}
+				}
+			}
+			if (overlap.length >= 2) {
+				overlap.sort((p1, p2) =>
+					p1.getX() !== p2.getX()
+						? p1.getX() - p2.getX()
+						: p1.getY() - p2.getY()
+				)
+				return overlap
+			}
+		}
+
+		if (points.length > 0) {
+			return points
+		}
+
+		return null
 	}
 
-	private intersectCircle(other: Circle): boolean {
-		const segVector = Vector2.subtract(this.p2, this.p1)
-		const segLengthSq = segVector.squaredLength()
+	intersectCircle(other: Circle): Vector2[] | null {
+		const a = this.p1
+		const b = this.p2
+		const center = other.getPos()
+		const radius = other.getRad()
 
-		const p1ToCircle = Vector2.subtract(other.getPos(), this.p1)
-		const t = Math.max(
-			0,
-			Math.min(1, Vector2.dot(p1ToCircle, segVector) / segLengthSq)
-		)
+		const aIn = Vector2.subtract(a, center).squaredLength() <= radius * radius
+		const bIn = Vector2.subtract(b, center).squaredLength() <= radius * radius
 
-		const closestP = Vector2.add(this.p1, segVector.multiply(t))
+		if (aIn && bIn) {
+			return [a.clone(), b.clone()]
+		}
 
-		const distToCircle = Vector2.subtract(closestP, other.getPos()).magnitude()
+		const d = Vector2.subtract(b, a)
+		const f = Vector2.subtract(a, center)
 
-		return distToCircle <= other.getRad()
+		const aCoeff = Vector2.dot(d, d)
+		const bCoeff = 2 * Vector2.dot(f, d)
+		const cCoeff = Vector2.dot(f, f) - radius * radius
+
+		const discriminant = bCoeff * bCoeff - 4 * aCoeff * cCoeff
+		if (discriminant < 0) {
+			return null
+		}
+
+		const sqrtDiscriminant = Math.sqrt(discriminant)
+		const t1 = (-bCoeff - sqrtDiscriminant) / (2 * aCoeff)
+		const t2 = (-bCoeff + sqrtDiscriminant) / (2 * aCoeff)
+
+		const points: Vector2[] = []
+		if (t1 >= 0 && t1 <= 1) {
+			points.push(Vector2.add(a, Vector2.multiply(d, t1)))
+		}
+		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
+			points.push(Vector2.add(a, Vector2.multiply(d, t2)))
+		}
+
+		if ((aIn || bIn) && points.length === 1) {
+			return [/*aIn ? a : b,*/ points[0]]
+		}
+
+		if (points.length > 0) {
+			return points
+		}
+
+		return null
 	}
 
 	static pointIsOnSeg(p1: Vector2, p2: Vector2, point: Vector2): boolean {
@@ -86,7 +157,7 @@ export class Segment {
 			(point.getY() - p1.getY()) * (p2.getX() - p1.getX()) -
 			(point.getX() - p1.getX()) * (p2.getY() - p1.getY())
 
-		if (Math.abs(crossProduct) > Number.EPSILON) {
+		if (Math.abs(crossProduct) > EPSILON) {
 			return false
 		}
 
@@ -102,7 +173,39 @@ export class Segment {
 		return Segment.pointIsOnSeg(s.getP1(), s.getP2(), p)
 	}
 
-	contain(p: Vector2): boolean {
+	public contain(p: Vector2): boolean {
 		return Segment.pointIsOnSeg(this.p1, this.p2, p)
+	}
+
+	public distanceToPoint(point: Vector2): number {
+		const closestPoint = this.closestPointToPoint(point)
+		return point.dist(closestPoint)
+	}
+
+	public closestPointToPoint(point: Vector2): Vector2 {
+		const segmentVector = Vector2.subtract(this.p2, this.p1)
+		const segmentLengthSquared = segmentVector.squaredLength()
+
+		if (segmentLengthSquared === 0) {
+			return this.p1.clone()
+		}
+
+		const pointVector = Vector2.subtract(point, this.p1)
+		const projection =
+			Vector2.dot(pointVector, segmentVector) / segmentLengthSquared
+
+		if (projection <= 0) return this.p1.clone()
+		if (projection >= 1) return this.p2.clone()
+
+		const segmentVectorClone = segmentVector.clone()
+		return Vector2.add(this.p1, segmentVectorClone.multiply(projection))
+	}
+
+	public getNormal(): Vector2 {
+		const dx = this.p2.getX() - this.p1.getX()
+		const dy = this.p2.getY() - this.p1.getY()
+		const normal = new Vector2(-dy, dx)
+
+		return normal.normalize()
 	}
 }

@@ -1,5 +1,5 @@
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
 
 export class Rectangle extends Polygon {
 	private width: number
@@ -31,5 +31,12 @@ export class Rectangle extends Polygon {
 
 	public getHeight(): number {
 		return this.height
+	}
+
+	public clone(): Rectangle {
+		return new Rectangle(
+			this.origin,
+			new Vector2(this.getWidth(), this.getHeight())
+		)
 	}
 }

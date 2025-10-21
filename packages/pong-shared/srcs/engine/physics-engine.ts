@@ -1,14 +1,9 @@
-import { WorldRect } from './map/worldType/WorldRect'
-import { PongObject } from './objects/PongObject'
-import { World } from './map/World'
+import { PongObject } from './objects/PongObject.js'
 
 export class PhysicsEngine {
 	private objs: PongObject[] = []
-	private world: World
 
-	public constructor() {
-		this.world = new WorldRect()
-	}
+	public constructor() {}
 
 	public addObj(obj: PongObject) {
 		this.objs.push(obj)
@@ -16,5 +11,6 @@ export class PhysicsEngine {
 
 	public playTick() {
 		// TODO: implement
+		console.log('hey')
 	}
 }
