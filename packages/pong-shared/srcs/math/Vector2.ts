@@ -1,3 +1,5 @@
+import { EPSILON } from '../define.js'
+
 export class Vector2 {
 	// init class fields
 	private x: number
@@ -136,5 +138,42 @@ export class Vector2 {
 		this.x = result.getX()
 		this.y = result.getY()
 		return this
+	}
+
+	public static reflect(v: Vector2, normal: Vector2): Vector2 {
+		const dot = this.dot(v, normal)
+		return new Vector2(
+			v.getX() - 2 * dot * normal.getX(),
+			v.getY() - 2 * dot * normal.getY()
+		)
+	}
+
+	public reflect(normal: Vector2): Vector2 {
+		return Vector2.reflect(this, normal)
+	}
+
+	public equals(other: Vector2): boolean {
+		return Vector2.equals(this, other)
+	}
+
+	public static equals(v1: Vector2, v2: Vector2): boolean {
+		return (
+			Math.abs(v1.getX() - v2.getX()) < EPSILON &&
+			Math.abs(v1.getY() - v2.getY()) < EPSILON
+		)
+	}
+
+	public static min(v1: Vector2, v2: Vector2): Vector2 {
+		return new Vector2(
+			Math.min(v1.getX(), v2.getX()),
+			Math.min(v1.getY(), v2.getY())
+		)
+	}
+
+	public static max(v1: Vector2, v2: Vector2): Vector2 {
+		return new Vector2(
+			Math.max(v1.getX(), v2.getX()),
+			Math.max(v1.getY(), v2.getY())
+		)
 	}
 }

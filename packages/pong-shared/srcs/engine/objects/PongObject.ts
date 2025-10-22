@@ -1,13 +1,13 @@
-import { Shape } from '../../math/shapes/Shape'
-import { Vector2 } from '../../math/Vector2'
+import { AShape } from '../../math/shapes/AShape.js'
+import { Vector2 } from '../../math/Vector2.js'
 
 export class PongObject {
 	private origin: Vector2
 	private velocity: Vector2
-	private hitbox: Shape[] = []
+	private hitbox: AShape[] = []
 
-	constructor(
-		hitbox: Shape | Shape[],
+	public constructor(
+		hitbox: AShape | AShape[],
 		origin: Vector2 = new Vector2(),
 		velocity: Vector2 = new Vector2()
 	) {
@@ -20,23 +20,70 @@ export class PongObject {
 		this.velocity = velocity
 	}
 
-	getVelocity(): Vector2 {
+	public applyVelo() {
+		this.origin.setXY(
+			this.origin.getX() + this.velocity.getX(),
+			this.origin.getY() + this.velocity.getY()
+		)
+	}
+
+	public getVelocity(): Vector2 {
 		return this.velocity
 	}
 
-	getHitbox(): Shape[] {
+	public getHitbox(): AShape[] {
 		return this.hitbox
 	}
 
-	getOrigin(): Vector2 {
+	public getOrigin(): Vector2 {
 		return this.origin
 	}
 
-	static clone(obj: PongObject) {
-		return new PongObject(obj.getHitbox(), obj.getOrigin(), obj.getVelocity())
+	public setOrigin(o: Vector2) {
+		this.origin = o
 	}
 
-	clone() {
+	public static clone(obj: PongObject): PongObject {
+		const dupHitbox = obj.getHitbox().map((h) => h.clone())
+		return new PongObject(
+			dupHitbox,
+			obj.getOrigin().clone(),
+			obj.getVelocity().clone()
+		)
+	}
+
+	public clone() {
 		return PongObject.clone(this)
+	}
+
+	public intersect(other: PongObject): Vector2[] | null {
+		const createAbsHitbox = (hitbox: AShape, origin: Vector2) => {
+			const clonedHitbox = hitbox.clone()
+			clonedHitbox.addToOrigin(origin.clone())
+			return clonedHitbox
+		}
+
+		const absLocalHitbox = this.hitbox.map((h) =>
+			createAbsHitbox(h, this.origin)
+		)
+		const absOtherHitbox = other
+			.getHitbox()
+			.map((h) => createAbsHitbox(h, other.getOrigin()))
+
+		let hitpoints: Vector2[] = []
+		for (let localObj of absLocalHitbox) {
+			for (let otherObj of absOtherHitbox) {
+				const hp = otherObj.intersect(localObj)
+				if (hp instanceof Array) {
+					hitpoints = [...hitpoints, ...hp]
+				}
+			}
+		}
+		if (hitpoints.length === 0) {
+			return null
+		}
+		return hitpoints.filter(
+			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+		)
 	}
 }

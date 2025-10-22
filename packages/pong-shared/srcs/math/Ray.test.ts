@@ -39,42 +39,69 @@ describe('Ray', () => {
 
 	describe('intersection tests', () => {
 		describe('Ray Intersection', () => {
-			it('should return true for intersecting rays', () => {
+			test('should return true for intersecting rays', () => {
 				const ray1 = new Ray(new Vector2(0, 0), new Vector2(1, 1).normalize())
 				const ray2 = new Ray(new Vector2(1, 0), new Vector2(-1, 1).normalize())
+				const res = ray1.intersect(ray2)
 
-				expect(ray1.intersect(ray2)).toBe(true)
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(0.5, 0.5))).toBe(true)
 			})
 
-			it('should return false for parallel rays', () => {
+			test('should return null for parallel rays', () => {
 				const ray1 = new Ray(new Vector2(0, 0), new Vector2(1, 0).normalize())
 				const ray2 = new Ray(new Vector2(0, 1), new Vector2(1, 0).normalize())
+				const res = ray1.intersect(ray2)
 
-				expect(ray1.intersect(ray2)).toBe(false)
+				expect(res).not.toBeInstanceOf(Array)
 			})
 
-			it('should return false for rays pointing away from each other', () => {
+			test('should return null for rays pointing away from each other', () => {
 				const ray1 = new Ray(new Vector2(0, 0), new Vector2(1, 0).normalize())
 				const ray2 = new Ray(new Vector2(2, 0), new Vector2(-1, 0).normalize())
+				const res = ray1.intersect(ray2)
 
-				expect(ray1.intersect(ray2)).toBe(false)
+				expect(res).not.toBeInstanceOf(Array)
 			})
 
-			it('should correctly handle rays at various angles', () => {
+			test('should correctly handle rays at various angles', () => {
 				const ray1 = new Ray(new Vector2(0, 0), new Vector2(1, 1).normalize())
 				const ray2 = new Ray(new Vector2(1, 0), new Vector2(-1, 2).normalize())
+				const res = ray1.intersect(ray2)
+				const expected = 0.6666666666666666666667
 
-				expect(ray1.intersect(ray2)).toBe(true)
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(expected, expected))).toBe(true)
 			})
 
-			it('should handle near-parallel rays correctly', () => {
+			test('should handle near-parallel rays correctly', () => {
 				const ray1 = new Ray(new Vector2(0, 0), new Vector2(1, 0).normalize())
 				const ray2 = new Ray(
 					new Vector2(0, 0),
 					new Vector2(1, 0.0001).normalize()
 				)
 
-				expect(ray1.intersect(ray2)).toBe(true)
+				const res = ray1.intersect(ray2)
+
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2())).toBe(true)
+			})
+
+			test('random test', () => {
+				const r1 = new Ray(new Vector2(), new Vector2(2, 1).normalize())
+				const r2 = new Ray(new Vector2(1, -1), new Vector2(7, 4).normalize())
+				const res = r1.intersect(r2)
+
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(22, 11))).toBe(true)
 			})
 		})
 
@@ -82,29 +109,40 @@ describe('Ray', () => {
 			test('ray intersecting segment', () => {
 				const ray = new Ray(new Vector2(0, 0), new Vector2(1, 0))
 				const segment = new Segment(new Vector2(2, -1), new Vector2(2, 1))
+				const res = ray.intersect(segment)
 
-				expect(ray.intersect(segment)).toBe(true)
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
 			})
 
 			test('ray directly intersecting segment', () => {
 				const ray = new Ray(new Vector2(0, 0), new Vector2(1, 0))
 				const segment = new Segment(new Vector2(2, 0), new Vector2(3, 0))
-
-				expect(ray.intersect(segment)).toBe(true)
+				const res = ray.intersect(segment)
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
 			})
 
 			test('ray parallel to segment', () => {
 				const ray = new Ray(new Vector2(0, 0), new Vector2(1, 0))
 				const segment = new Segment(new Vector2(0, 1), new Vector2(5, 1))
 
-				expect(ray.intersect(segment)).toBe(false)
+				expect(ray.intersect(segment)).not.toBeInstanceOf(Array)
 			})
 
 			test('ray intersecting segment at endpoint', () => {
 				const ray = new Ray(new Vector2(0, 0), new Vector2(1, 0))
 				const segment = new Segment(new Vector2(1, 0), new Vector2(2, 0))
+				const res = ray.intersect(segment)
 
-				expect(ray.intersect(segment)).toBe(true)
+				expect(res).toBeInstanceOf(Array)
+				expect(res).toHaveLength(1)
+				// @ts-ignore
+				expect(res[0].equals(new Vector2(1, 0))).toBe(true)
 			})
 		})
 

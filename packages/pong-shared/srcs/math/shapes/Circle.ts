@@ -1,10 +1,10 @@
-import { Ray } from '../Ray'
-import { Segment } from '../Segment'
-import { Vector2 } from '../Vector2'
-import { Polygon } from './Polygon'
-import { Shape } from './Shape'
+import { Ray } from '../Ray.js'
+import { Segment } from '../Segment.js'
+import { Vector2 } from '../Vector2.js'
+import { Polygon } from './Polygon.js'
+import { AShape } from './AShape.js'
 
-export class Circle extends Shape {
+export class Circle extends AShape {
 	private rad!: number
 
 	constructor(origin: Vector2 = new Vector2(), rad: number) {
@@ -20,10 +20,6 @@ export class Circle extends Shape {
 		return this.rad
 	}
 
-	public setPos(pos: Vector2): void {
-		this.origin = pos
-	}
-
 	setRad(rad: number): void {
 		if (rad <= 0) {
 			throw 'Invlalid Radius'
@@ -31,12 +27,12 @@ export class Circle extends Shape {
 		this.rad = rad
 	}
 
-	intersect(other: Segment): boolean
-	intersect(other: Circle): boolean
-	intersect(other: Ray): boolean
-	intersect(other: Polygon): boolean
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Circle): Vector2[] | null
+	intersect(other: Ray): Vector2[] | null
+	intersect(other: Polygon): Vector2[] | null
 
-	intersect(other: Segment | Ray | Polygon | Circle): boolean {
+	intersect(other: Segment | Ray | Polygon | Circle): Vector2[] | null {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
@@ -49,44 +45,107 @@ export class Circle extends Shape {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): boolean {
-		const rayOrigin = other.getOrigin()
-		const rayDirection = other.getDirection()
-
-		const squaredDistanceToCenter = Vector2.squaredDist(
-			rayOrigin,
-			this.getPos()
-		)
-		const squaredRadius = this.getRad() * this.getRad()
-
-		if (squaredDistanceToCenter <= squaredRadius) {
-			return true
+	private intersectRay(other: Ray): Vector2[] | null {
+		function getHitPoint(ray: Ray, t: number): Vector2 {
+			return Vector2.add(
+				ray.getOrigin(),
+				Vector2.multiply(ray.getDirection(), t)
+			)
 		}
 
-		const toCircle = Vector2.subtract(this.getPos(), rayOrigin)
-		const projection = Vector2.dot(toCircle, rayDirection)
+		const op = Vector2.subtract(this.getOrigin(), other.getOrigin())
+		const squaredRad = this.getRad() ** 2
+		const dotOp = Vector2.dot(op, op)
 
-		if (projection < 0) {
-			return false
+		const D = Vector2.dot(other.getDirection(), op)
+		const H2 = dotOp - D ** 2
+
+		if (H2 > squaredRad) {
+			return null
 		}
 
-		const scaledDirection = Vector2.multiply(rayDirection, projection)
-		const closestPoint = Vector2.add(rayOrigin, scaledDirection)
-		const squaredDistanceToClosest = Vector2.squaredDist(
-			closestPoint,
-			this.getPos()
-		)
+		const K = Math.sqrt(squaredRad - H2)
 
-		return squaredDistanceToClosest <= squaredRadius
+		if (dotOp <= squaredRad) {
+			const t = D + K
+			return [getHitPoint(other, t)]
+		}
+
+		const t1 = D - K
+		const t2 = D + K
+
+		if (t1 < 0) {
+			return null
+		}
+
+		const p1 = getHitPoint(other, t1)
+		const p2 = getHitPoint(other, t2)
+
+		if (p1.equals(p2)) {
+			return [p1]
+		}
+		return [p1, p2]
 	}
 
-	private intersectCircle(other: Circle): boolean {
-		const sqDistance: number = this.origin.squaredDist(other.getPos())
-		return sqDistance <= (this.rad + other.getRad()) ** 2
+	private intersectCircle(other: Circle): Vector2[] | null {
+		let d = Vector2.subtract(other.getPos(), this.origin)
+		const sqDistance = d.squaredLength()
+		const radiusSum = this.rad + other.getRad()
+		d.normalize()
+
+		if (sqDistance > radiusSum ** 2) {
+			return null
+		}
+
+		// weird fix
+		if (sqDistance <= 0) {
+			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+		}
+
+		const distance = Math.sqrt(sqDistance)
+
+		if (distance === radiusSum) {
+			return [Vector2.add(this.origin, d.multiply(this.rad))]
+		}
+
+		const a =
+			(this.rad ** 2 - other.getRad() ** 2 + sqDistance) / (2 * distance)
+		const h = Math.sqrt(this.rad ** 2 - a ** 2)
+
+		const p2 = Vector2.add(this.origin, d.multiply(a))
+
+		const t1 = new Vector2(
+			p2.getX() + (h * (other.getPos().getY() - this.origin.getY())) / distance,
+			p2.getY() - (h * (other.getPos().getX() - this.origin.getX())) / distance
+		)
+
+		const t2 = new Vector2(
+			p2.getX() - (h * (other.getPos().getY() - this.origin.getY())) / distance,
+			p2.getY() + (h * (other.getPos().getX() - this.origin.getX())) / distance
+		)
+
+		// weird fix
+		if (
+			isNaN(t1.getX()) ||
+			isNaN(t2.getX()) ||
+			isNaN(t1.getY()) ||
+			isNaN(t2.getY())
+		) {
+			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+		}
+		return [t1, t2]
 	}
 
 	public containsPoint(point: Vector2): boolean {
 		const sqDistance: number = this.getPos().squaredDist(point)
 		return sqDistance <= this.getRad() ** 2
+	}
+
+	public clone(): Circle {
+		return new Circle(this.getPos().clone(), this.rad)
+	}
+
+	public getNormalAt(point: Vector2): Vector2 {
+		return Vector2.subtract(point, this.getOrigin()).normalize()
 	}
 }
