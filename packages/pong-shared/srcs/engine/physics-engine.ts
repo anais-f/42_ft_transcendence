@@ -1,6 +1,7 @@
 import { PongObject } from './objects/PongObject.js'
 
 export class PhysicsEngine {
+	public tickCount = 0
 	private objs: PongObject[] = []
 
 	public constructor() {}
@@ -10,7 +11,7 @@ export class PhysicsEngine {
 	}
 
 	public playTick() {
-		// TODO: implement
-		console.log('hey')
+		++this.tickCount
+		console.log(this.tickCount)
 	}
 }

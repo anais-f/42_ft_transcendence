@@ -16,24 +16,18 @@ export enum GameState {
 }
 
 export class GameEngine {
-	private isClientSide: boolean
-	private offset: number = 0
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
+	public	packets: Uint8Array[] = []
+	public startTime
 
 	constructor(
 		private physicsEngine: PhysicsEngine,
 		TPS: number
 	) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
-		this.isClientSide =
-			typeof performance !== 'undefined' &&
-			typeof performance.now === 'function'
-
-		if (this.isClientSide) {
-			this.offset = Date.now() - performance.now()
-		}
+		this.startTime = Date.now()
 	}
 
 	private startGame() {
@@ -62,28 +56,31 @@ export class GameEngine {
 		}
 	}
 
+	private playTick() {
+		this.physicsEngine.playTick()
+		console.log(`[${(Date.now() / 1000).toFixed(2)}]\t[${(this.TPS_DATA.previousTime_MS / 1000).toFixed(2)}]`)
+//		const _C01: C01Move
+//		const _C03: C03BallBase
+
+
+	}
+
 	private startTickLoop() {
 		const tickInterval = this.TPS_DATA.TPS_INTERVAL_MS
 		this.tickTimer = this.scheduleTick((now: number) => {
 			if (this.currentState !== GameState.Started) {
 				return
 			}
-			this.physicsEngine.playTick()
+			this.playTick()
 			this.TPS_DATA.previousTime_MS = now
 		}, tickInterval)
 	}
 
 	public getSyncedTimeMs(): number {
-		if (this.isClientSide) {
-			return performance.now() + this.offset
-		}
 		return Date.now()
 	}
 
 	protected getTimeMs(): number {
-		if (this.isClientSide) {
-			return performance.now()
-		}
 		return Date.now()
 	}
 

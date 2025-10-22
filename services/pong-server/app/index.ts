@@ -1,6 +1,6 @@
-import { Vector2 } from '@ft_transcendence/pong-shared'
+import { GameEngine, GameState } from '@ft_transcendence/pong-shared'
+import { PhysicsEngine } from '@ft_transcendence/pong-shared/engine/physics-engine.js'
 
-while (1) {
-	let a = new Vector2()
-	console.log(a)
-}
+let PE = new PhysicsEngine()
+let GE = new GameEngine(PE, 20)
+GE.setState(GameState.Started)

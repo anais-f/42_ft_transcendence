@@ -10,3 +10,6 @@ export * from './math/shapes/Rectangle.js'
 
 // engine
 export * from './engine/game-engine.js'
+
+// CPackets
+export * from './network/Packet/Client/CPackets.js'
