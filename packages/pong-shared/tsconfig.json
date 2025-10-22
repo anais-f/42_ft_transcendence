@@ -10,7 +10,6 @@
 		"module": "NodeNext",
 		"target": "ES2020",
 		"moduleResolution": "NodeNext",
-		"isolatedModules": true,
 		"skipLibCheck": true
 	},
 	"include": ["srcs/**/*"]
