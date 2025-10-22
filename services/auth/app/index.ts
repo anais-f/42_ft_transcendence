@@ -36,7 +36,7 @@ async function runServer() {
         title: 'API for Auth Service',
         version: '1.0.0',
       },
-      servers: [{ url: 'http://localhost:8080', description: 'Serveur local' }],
+      servers: [{ url: 'http://localhost:8080/auth', description: 'Serveur local' }],
       components: openapiSwagger.components
     },
     transform: jsonSchemaTransform
@@ -44,34 +44,11 @@ async function runServer() {
 
   await app.register(SwaggerUI as any, {
     routePrefix: '/docs',
-    staticCSP: true,
-    transformStaticCSP: (header: any) => header,
     uiConfig: {
       docExpansion: 'list',
-    },
+      deepLinking: false
+    }
   })
-
-
-// // resolve path relative to the compiled file in dist/
-//   const __filename = fileURLToPath(import.meta.url)
-//   const __dirname = dirname(__filename)
-//   const openapiPath = join(__dirname, 'openapiDTO.json')
-//   const openapiText = fs.readFileSync(openapiPath, 'utf8')
-//   const openapiDTO = JSON.parse(openapiText)
-//   await app.register(Swagger as any, {
-//     openapi: {
-//       info: {
-//         title: 'API for Auth Service',
-//         version: '1.0.0',
-//       },
-//       servers: [{ url: 'http://localhost:8080/auth' }],
-//       components: openapiDTO.components
-//     },
-//     transform: jsonSchemaTransform
-//   })
-//   await app.register(SwaggerUI as any, {
-//     routePrefix: '/auth/docs',
-//   })
 
 	await registerRoutes(app)
 	await app.listen({ port: 3000, host: '0.0.0.0' })

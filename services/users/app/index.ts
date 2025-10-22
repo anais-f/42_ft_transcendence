@@ -32,7 +32,7 @@ await app.register(Swagger as any, {
       title: 'API for Users Service',
       version: '1.0.0',
     },
-    servers: [{ url: 'http://localhost:8080', description: 'Serveur local' }],
+    servers: [{ url: 'http://localhost:8080/users', description: 'Serveur local' }],
     components: openapiSwagger.components
   },
   transform: jsonSchemaTransform
@@ -40,38 +40,11 @@ await app.register(Swagger as any, {
 
 await app.register(SwaggerUI as any, {
   routePrefix: '/docs',
+  uiConfig: {
+    docExpansion: 'list',
+    deepLinking: false
+  }
 })
-
-// // resolve path relative to the compiled file in dist/
-// const __filename = fileURLToPath(import.meta.url)
-// const __dirname = dirname(__filename)
-// const openapiPath = join(__dirname, 'openapiDTO.json')
-//
-// const openapiText = fs.readFileSync(openapiPath, 'utf8')
-// const openapiDTO = JSON.parse(openapiText)
-//
-// // Configure Swagger to use the loaded schemas
-// await app.register(Swagger as any, {
-//   openapi: {
-//     info: {
-//       title: 'API for Users Service',
-//       version: '1.0.0',
-//     },
-//     servers: [{ url: 'http://localhost:8080/users' }],
-//     components: openapiDTO.components
-//   },
-//   transform: jsonSchemaTransform,
-//   exposeRoute: true,
-//   routePrefix: '/docs',
-// })
-//
-// await app.register(SwaggerUI as any, {
-//   routePrefix: '/docs',
-//   swagger: {
-//     url: '/users/openapi.json'
-//   }
-//
-// })
 
 app.register(usersRoutes)
 
@@ -95,7 +68,7 @@ const start = async () => {
     await initializeUsers()
     await app.listen({ port: 3000, host: '0.0.0.0' })
     console.log('Listening on port 3000')
-    console.log('Swagger UI available at http://localhost:3000/docs')
+    console.log('Swagger UI available at http://localhost:3000/users/docs')
   } catch (err) {
     console.error('Error starting server: ', err)
     process.exit(1)
