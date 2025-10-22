@@ -5,21 +5,21 @@ import * as authSchemas from './authSchema.js'
 import { writeFileSync } from 'node:fs'
 
 const schemas = {
-  ...usersSchemas,
-  ...responseSchemas,
-  ...authSchemas,
+	...usersSchemas,
+	...responseSchemas,
+	...authSchemas
 }
 
 const openApiDoc = createDocument({
-  openapi: '3.1.0',
-  info: {
-    title: 'My API',
-    version: '1.0.0',
-    description: 'API documentation',
-  },
-  components: {
-    schemas,
-  },
+	openapi: '3.1.0',
+	info: {
+		title: 'My API',
+		version: '1.0.0',
+		description: 'API documentation'
+	},
+	components: {
+		schemas
+	}
 })
 
 writeFileSync('./openapiDTO.json', JSON.stringify(openApiDoc, null, 2))

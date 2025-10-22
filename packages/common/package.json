@@ -18,8 +18,8 @@
 	},
 	"scripts": {
 		"build": "tsc --project tsconfig.json && npm run generate:openapi",
-    "generate:openapi": "ts-node ./srcs/DTO/generateOpenApi.ts",
-    "generate:openapi:dist": "node ./dist/DTO/generateOpenApi.js"
+		"generate:openapi": "ts-node ./srcs/DTO/generateOpenApi.ts",
+		"generate:openapi:dist": "node ./dist/DTO/generateOpenApi.js"
 	},
 	"devDependencies": {
 		"typescript": "^5.1.6"

@@ -1,6 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
-import { RegisterSchema, LoginActionSchema, PublicUserAuthDTO } from '@ft_transcendence/common'
+import {
+	RegisterSchema,
+	LoginActionSchema,
+	PublicUserAuthDTO
+} from '@ft_transcendence/common'
 import { findPublicUserByLogin } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 
@@ -15,8 +19,10 @@ export async function registerController(
 
 	try {
 		await registerUser(login, password)
-		const PublicUser = await findPublicUserByLogin(parsed.data.login) as PublicUserAuthDTO | undefined
-    console.log("Pulic user = ", PublicUser)
+		const PublicUser = (await findPublicUserByLogin(parsed.data.login)) as
+			| PublicUserAuthDTO
+			| undefined
+		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 

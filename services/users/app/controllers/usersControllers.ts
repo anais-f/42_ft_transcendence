@@ -50,12 +50,10 @@ export async function getPublicUser(
 		const idNumber = Number(id)
 		console.log('Fetching user with id number:', idNumber)
 		if (!id || isNaN(idNumber) || idNumber <= 0)
-			return res
-				.status(400)
-				.send({
-					success: false,
-					error: ERROR_MESSAGES.INVALID_USER_ID + 'id test'
-				})
+			return res.status(400).send({
+				success: false,
+				error: ERROR_MESSAGES.INVALID_USER_ID + 'id test'
+			})
 
 		const rawProfile = await UsersServices.getPublicUserProfile({
 			user_id: idNumber
