@@ -10,14 +10,9 @@
 		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
 	},
 	"dependencies": {
-		"@fastify/swagger": "^9.5.2",
-		"@fastify/swagger-ui": "^5.2.3",
-		"@ft_transcendence/common": "*",
-		"fastify": "^5.6.1"
+		"@ft_transcendence/common": "*"
 	},
 	"devDependencies": {
-		"@types/node": "^24.9.1",
-		"tsc-alias": "^1.8.16",
-		"typescript": "^5.9.3"
+		"@types/node": "^24.9.1"
 	}
 }

@@ -11,7 +11,6 @@ import {
 } from '@ft_transcendence/common'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
 	fastify.post(
 		'/api/users/new-user',
 		{
@@ -28,7 +27,6 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handleUserCreated
 	)
 
-	// TODO : GET /users/:id - Récupérer le profil public d'un utilisateur par son ID
 	fastify.get(
 		'/api/users/:id',
 		{
@@ -43,7 +41,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		getPublicUser
 	)
 
-	// TODO: GET /users/me - Récupérer le profil privé de l'utilisateur authentifié
+	// TODO: GET /users/me - Private profile of the authenticated user
 	// fastify.get('/users/me', {
 	//       schema: {
 	//         response: {

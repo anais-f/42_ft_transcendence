@@ -11,8 +11,6 @@ import {
   serializerCompiler,
   jsonSchemaTransform
 } from 'fastify-type-provider-zod'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
 
 const app = Fastify({
   logger: true
@@ -36,7 +34,7 @@ async function runServer() {
         title: 'API for Auth Service',
         version: '1.0.0',
       },
-      servers: [{ url: 'http://localhost:8080/auth', description: 'Serveur local' }],
+      servers: [{ url: 'http://localhost:8080/auth', description: 'Local server' }],
       components: openapiSwagger.components
     },
     transform: jsonSchemaTransform
@@ -44,10 +42,6 @@ async function runServer() {
 
   await app.register(SwaggerUI as any, {
     routePrefix: '/docs',
-    uiConfig: {
-      docExpansion: 'list',
-      deepLinking: false
-    }
   })
 
 	await registerRoutes(app)
