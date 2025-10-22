@@ -13,7 +13,7 @@ import {
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
 	fastify.post(
-		'/users/new-user',
+		'/api/users/new-user',
 		{
 			schema: {
 				body: PublicUserAuthSchema,
@@ -30,7 +30,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 
 	// TODO : GET /users/:id - Récupérer le profil public d'un utilisateur par son ID
 	fastify.get(
-		'/users/:id',
+		'/api/users/:id',
 		{
 			schema: {
 				response: {
