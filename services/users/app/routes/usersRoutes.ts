@@ -9,9 +9,14 @@ import {
 	PublicUserAuthSchema,
 	UserPublicProfileSchema
 } from '@ft_transcendence/common'
+import { z } from 'zod'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-	fastify.post(
+  const server = fastify.withTypeProvider<ZodTypeProvider>()
+
+	server.post(
 		'/api/users/new-user',
 		{
 			schema: {
@@ -27,12 +32,16 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handleUserCreated
 	)
 
-	fastify.get(
+	server.get(
 		'/api/users/:id',
 		{
 			schema: {
+        params: z.object({
+          id: z.coerce.number().int().positive()
+        }),
 				response: {
-					200: UserPublicProfileSchema,
+					200: SuccessResponseSchema,
+          400: ErrorResponseSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
@@ -42,7 +51,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	)
 
 	// TODO: GET /users/me - Private profile of the authenticated user
-	// fastify.get('/users/me', {
+	// server.get('/users/me', {
 	//       schema: {
 	//         response: {
 	//           200: UserPrivateProfileSchema,
