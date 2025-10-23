@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-const LOGIN_REGEX = /^[A-Za-z0-9_-]{4,16}$/
-const USERNAME_REGEX = /^[A-Za-z0-9_-]{4,16}$/
+const LOGIN_REGEX = /^[\w-]{4,16}$/
+const USERNAME_REGEX = /^[\w-]{4,16}$/
 
 export const LoginSchema = z
 	.string()
