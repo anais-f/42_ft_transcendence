@@ -28,6 +28,9 @@ COPY tsconfig.json ./
 COPY packages/ ./packages/
 COPY services/ ./services/
 
+# also bring the generated openapiDTO.json produced during build-packages
+COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
+# bring the compiled common package from the build-packages stage
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 
 EXPOSE 3000
