@@ -1,12 +1,11 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { Config } from '@jest/types'
 
 const __filename = fileURLToPath(import.meta.url)
 const repoRoot = path.dirname(__filename)
-const COMMON_SRC = path.join(repoRoot, 'packages/common/src/index.ts')
+const COMMON_DIST = path.join(repoRoot, 'packages/common/dist/index.js')
 
-const commonConfig: Partial<Config.InitialProjectOptions> = {
+const commonConfig= {
 	preset: 'ts-jest/presets/default-esm',
 	testEnvironment: 'node',
 	extensionsToTreatAsEsm: ['.ts'],
@@ -15,7 +14,7 @@ const commonConfig: Partial<Config.InitialProjectOptions> = {
 		'^(\\.{1,2}/.*)\\.js$': '$1',
 		'^@packages/(.*)$': '<rootDir>/packages/$1',
 		'^@services/(.*)$': '<rootDir>/services/$1',
-		'^@ft_transcendence/common$': COMMON_SRC
+		'^@ft_transcendence/common$': COMMON_DIST
 	},
 	transform: {
 		'^.+\\.tsx?$': [
@@ -28,7 +27,7 @@ const commonConfig: Partial<Config.InitialProjectOptions> = {
 	}
 }
 
-const config: Config.InitialOptions = {
+const config = {
 	rootDir: './',
 	projects: [
 		{
