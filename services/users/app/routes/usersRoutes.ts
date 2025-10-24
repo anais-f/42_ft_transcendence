@@ -12,9 +12,8 @@ import {
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-  const server = fastify.withTypeProvider<ZodTypeProvider>()
+	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
 	server.post(
 		'/api/users/new-user',
@@ -36,12 +35,12 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/api/users/:id',
 		{
 			schema: {
-        params: z.object({
-          id: z.coerce.number().int().positive()
-        }),
+				params: z.object({
+					id: z.coerce.number().int().positive()
+				}),
 				response: {
 					200: UserPublicProfileSchema,
-          400: ErrorResponseSchema,
+					400: ErrorResponseSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
