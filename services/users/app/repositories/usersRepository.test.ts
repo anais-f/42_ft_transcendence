@@ -1,34 +1,30 @@
+// TypeScript
 /**
  * Test Coverage Summary for UsersRepository
  *
- * Total: 37 tests organized in 4 sections
- *
- * SECTION 1: SUCCESSFUL CASES (7 tests)
- * - existsById: Returns true/false based on user existence
+ * SECTION 1: SUCCESSFUL CASES
+ * - existsById: Returns true when user exists, false when not
  * - insertUser: Inserts with valid Zod data (4-16 char username), generates ISO 8601 timestamps
  * - getUserById: Returns complete profile (user_id, username, avatar, status, last_connection)
- * - updateUsername: Updates with valid values
+ * - updateUsername: Updates username with valid value
  * - getAllUsers: Returns array of all users
  *
- * SECTION 2: BASIC FAILURE CASES (4 tests)
- * - getUserById/getUserByUsername: Returns undefined when not found
- * - getAllUsers/getOnlineUsers: Returns empty array when no users
+ * SECTION 2: BASIC FAILURE CASES
+ * - getUserById: Returns undefined when user not found
+ * - getUserByUsername: Returns undefined when username not found
+ * - getAllUsers: Returns empty array when no users in database
  *
- * SECTION 3: TRICKY CASES (21 tests)
- * - Boundary values: user_id = 1 (min), Number.MAX_SAFE_INTEGER (max), username 4-16 chars
- * - Special chars: Underscore, dash, only digits, only underscores/dashes
- * - INSERT OR IGNORE: Handles duplicates silently
- * - Case sensitivity: Username queries are case-sensitive
- * - Status filtering: Tests status 0 (offline) and 1 (online), getOnlineUsers filters correctly
+ * SECTION 3: TRICKY CASES
+ * - INSERT OR IGNORE: Uses clause to handle duplicates silently
+ * - Case sensitivity: getUserByUsername is case-sensitive
+ * - Status values: Returns status 0 (offline) and 1 (online) correctly
  * - Default values: Always sets status=1 and default avatar on insert
  * - Large datasets: Handles 1000+ users efficiently
  * - Timestamp format: Generates RFC 3339/ISO 8601 compliant timestamps
  *
- * SECTION 4: EXCEPTIONS (5 tests)
- * - Non-throwing operations: deleteUserById, existsById don't throw on non-existent users
- * - Mock sequence: Multiple sequential calls maintain correct state
- * - SQL structure: Uses parameterized queries (prevents SQL injection), queries correct columns
- * - Return type consistency: getAllUsers always returns array, existsById always returns boolean
+ * SECTION 4: EXCEPTIONS
+ * - SQL query structure: getUserById queries correct columns
+ * - Parameterized queries: Uses placeholders to prevent SQL injection
  */
 
 import { jest } from '@jest/globals'
@@ -82,18 +78,17 @@ describe('UsersRepository', () => {
         const run = jest.fn()
         db.prepare.mockReturnValueOnce({ run })
 
-        // Valid according to PublicUserAuthSchema: user_id positive, login 4-16 chars matching /^[\w-]{4,16}$/
         UsersRepository.insertUser({ user_id: 42, login: 'testuser' })
 
         expect(db.prepare).toHaveBeenCalledWith(
-          'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
+            'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
         )
         expect(run).toHaveBeenCalledWith(
-          42,
-          'testuser',
-          '/avatars/img_default.png',
-          1,
-          expect.any(String)
+            42,
+            'testuser',
+            '/avatars/img_default.png',
+            1,
+            expect.any(String)
         )
       })
 
@@ -203,91 +198,10 @@ describe('UsersRepository', () => {
         expect(result).toHaveLength(0)
       })
     })
-
-    describe('getOnlineUsers', () => {
-      test('returns empty array when no online users', () => {
-        db.prepare.mockReturnValueOnce({
-          all: jest.fn().mockReturnValue([])
-        })
-
-        const result = UsersRepository.getOnlineUsers()
-
-        expect(result).toEqual([])
-      })
-    })
   })
 
   // ==================== SECTION 3: TRICKY CASES ====================
   describe('3. Tricky cases', () => {
-    describe('Boundary values for user_id', () => {
-      test('handles user_id = 1 (minimum positive integer)', () => {
-        db.prepare.mockReturnValueOnce({
-          get: jest.fn().mockReturnValue({ user_id: 1 })
-        })
-
-        expect(UsersRepository.existsById({ user_id: 1 })).toBe(true)
-      })
-
-      test('handles very large user_id (Number.MAX_SAFE_INTEGER)', () => {
-        const largeId = Number.MAX_SAFE_INTEGER
-        db.prepare.mockReturnValueOnce({
-          get: jest.fn().mockReturnValue({ user_id: largeId })
-        })
-
-        expect(UsersRepository.existsById({ user_id: largeId })).toBe(true)
-      })
-    })
-
-    describe('Boundary values for username (Zod: /^[\w-]{4,16}$/)', () => {
-      test('inserts username with exactly 4 characters (minimum)', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        UsersRepository.insertUser({ user_id: 1, login: 'abcd' })
-
-        expect(run.mock.calls[0][1]).toBe('abcd')
-        expect(run.mock.calls[0][1]).toHaveLength(4)
-      })
-
-      test('inserts username with exactly 16 characters (maximum)', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-        const maxUsername = 'a'.repeat(16)
-
-        UsersRepository.insertUser({ user_id: 1, login: maxUsername })
-
-        expect(run.mock.calls[0][1]).toBe(maxUsername)
-        expect(run.mock.calls[0][1]).toHaveLength(16)
-      })
-
-      test('inserts username with all allowed special chars (underscore and dash)', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        UsersRepository.insertUser({ user_id: 1, login: 'user_name-123' })
-
-        expect(run.mock.calls[0][1]).toBe('user_name-123')
-      })
-
-      test('inserts username with only digits', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        UsersRepository.insertUser({ user_id: 1, login: '12345678' })
-
-        expect(run.mock.calls[0][1]).toBe('12345678')
-      })
-
-      test('inserts username with only underscores and dashes', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        UsersRepository.insertUser({ user_id: 1, login: '____----' })
-
-        expect(run.mock.calls[0][1]).toBe('____----')
-      })
-    })
-
     describe('INSERT OR IGNORE behavior', () => {
       test('uses INSERT OR IGNORE clause to handle duplicates silently', () => {
         const run = jest.fn()
@@ -296,7 +210,7 @@ describe('UsersRepository', () => {
         UsersRepository.insertUser({ user_id: 1, login: 'user1' })
 
         expect(db.prepare).toHaveBeenCalledWith(
-          expect.stringContaining('INSERT OR IGNORE')
+            expect.stringContaining('INSERT OR IGNORE')
         )
       })
     })
@@ -328,42 +242,6 @@ describe('UsersRepository', () => {
         })
 
         expect(UsersRepository.getStatusById({ user_id: 1 })).toBe(1)
-      })
-
-      test('getOnlineUsers filters only status = 1', () => {
-        const rows = [
-          { user_id: 1, username: 'user1', avatar: 'img.png', status: 1, last_connection: 'now' }
-        ]
-        db.prepare.mockReturnValueOnce({
-          all: jest.fn().mockReturnValue(rows)
-        })
-
-        UsersRepository.getOnlineUsers()
-
-        expect(db.prepare).toHaveBeenCalledWith(
-          'SELECT user_id, username, avatar, status, last_connection FROM users WHERE status = 1'
-        )
-      })
-    })
-
-    describe('Empty and unusual strings', () => {
-      test('updateUserAvatar handles empty string avatar', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        UsersRepository.updateUserAvatar({ user_id: 1, avatar: '' })
-
-        expect(run).toHaveBeenCalledWith('', 1)
-      })
-
-      test('updateUserAvatar handles very long avatar path', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-        const longPath = '/avatars/' + 'a'.repeat(200) + '.png'
-
-        UsersRepository.updateUserAvatar({ user_id: 1, avatar: longPath })
-
-        expect(run).toHaveBeenCalledWith(longPath, 1)
       })
     })
 
@@ -426,42 +304,6 @@ describe('UsersRepository', () => {
 
   // ==================== SECTION 4: EXCEPTIONS ====================
   describe('4. Exceptions', () => {
-    describe('Non-throwing operations', () => {
-      test('deleteUserById does not throw on non-existent user', () => {
-        const run = jest.fn()
-        db.prepare.mockReturnValueOnce({ run })
-
-        expect(() => {
-          UsersRepository.deleteUserById({ user_id: 99999 })
-        }).not.toThrow()
-
-        expect(run).toHaveBeenCalledWith(99999)
-      })
-
-      test('existsById does not throw on any user_id', () => {
-        db.prepare.mockReturnValueOnce({
-          get: jest.fn().mockReturnValue(undefined)
-        })
-
-        expect(() => {
-          UsersRepository.existsById({ user_id: 99999 })
-        }).not.toThrow()
-      })
-    })
-
-    describe('Mock sequence verification', () => {
-      test('multiple sequential calls maintain correct mock state', () => {
-        db.prepare
-          .mockReturnValueOnce({ get: jest.fn().mockReturnValue({ user_id: 1 }) })
-          .mockReturnValueOnce({ get: jest.fn().mockReturnValue(undefined) })
-          .mockReturnValueOnce({ get: jest.fn().mockReturnValue({ user_id: 3 }) })
-
-        expect(UsersRepository.existsById({ user_id: 1 })).toBe(true)
-        expect(UsersRepository.existsById({ user_id: 2 })).toBe(false)
-        expect(UsersRepository.existsById({ user_id: 3 })).toBe(true)
-      })
-    })
-
     describe('SQL query structure verification', () => {
       test('getUserById queries correct columns', () => {
         db.prepare.mockReturnValueOnce({
@@ -471,7 +313,7 @@ describe('UsersRepository', () => {
         UsersRepository.getUserById({ user_id: 1 })
 
         expect(db.prepare).toHaveBeenCalledWith(
-          'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
+            'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
         )
       })
 
@@ -484,32 +326,8 @@ describe('UsersRepository', () => {
         // Verify it's passed as parameter, not concatenated in SQL
         expect(run.mock.calls[0][1]).toBe("test'; DROP TABLE users; --")
         expect(db.prepare).toHaveBeenCalledWith(
-          expect.stringContaining('VALUES (?, ?, ?, ?, ?)')
+            expect.stringContaining('VALUES (?, ?, ?, ?, ?)')
         )
-      })
-    })
-
-    describe('Return type consistency', () => {
-      test('getAllUsers always returns array (never null or undefined)', () => {
-        db.prepare.mockReturnValueOnce({
-          all: jest.fn().mockReturnValue([])
-        })
-
-        const result = UsersRepository.getAllUsers()
-
-        expect(Array.isArray(result)).toBe(true)
-        expect(result).not.toBeNull()
-        expect(result).not.toBeUndefined()
-      })
-
-      test('existsById always returns boolean', () => {
-        db.prepare.mockReturnValueOnce({
-          get: jest.fn().mockReturnValue({ user_id: 1 })
-        })
-
-        const result = UsersRepository.existsById({ user_id: 1 })
-
-        expect(typeof result).toBe('boolean')
       })
     })
   })

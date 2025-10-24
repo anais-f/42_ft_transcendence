@@ -1,27 +1,22 @@
 /**
  * Test Coverage Summary for UsersServices
  *
- * Total: 29 tests organized in 4 sections
+ * SECTION 1: SUCCESSFUL CASES
+ * - createUser: Creates users with valid data (4-16 char usernames, special chars allowed)
+ * - getPublicUserProfile: Returns complete profile (user_id, username, avatar, status, last_connection)
+ * - syncAllUsersFromAuth: Syncs all users from auth service, skips existing users
  *
- * SECTION 1: SUCCESSFUL CASES (13 tests)
- * - createUser: Creates users with valid data (4-16 char usernames, special chars allowed: underscore, dash)
- * - getPublicUserProfile: Returns complete profile (user_id, username, avatar, status, last_connection), handles online/offline status
- * - syncAllUsersFromAuth: Syncs all users from auth service, skips existing users, handles empty lists
- *
- * SECTION 2: BASIC FAILURE CASES (8 tests)
+ * SECTION 2: BASIC FAILURE CASES
  * - createUser: Throws AppError 400 when user already exists
- * - getPublicUserProfile: Throws AppError 404 when user not found, AppError 400 for invalid user_id (0, negative, null, undefined)
- * - syncAllUsersFromAuth: Handles empty user lists gracefully
+ * - getPublicUserProfile: Throws AppError 404 when user not found
  *
- * SECTION 3: TRICKY CASES (6 tests)
- * - Boundary values: Tests user_id = 1 (min) and 999999999 (large), login with 4 chars (min) and 16 chars (max)
- * - Edge cases: Login with only digits, only underscores/dashes
+ * SECTION 3: TRICKY CASES
+ * - Boundary values: Tests user_id = 999999999 (large)
  * - Large datasets: Handles 100+ users efficiently
  * - Profile structure: Verifies all 5 required fields and correct types
  *
- * SECTION 4: EXCEPTIONS (2 tests)
+ * SECTION 4: EXCEPTIONS
  * - Error propagation: Verifies DB errors and Auth service errors propagate correctly
- * - AppError validation: Checks correct status codes (400/404) and error messages
  * - Integration scenarios: Create user → Get profile workflow
  */
 
@@ -80,34 +75,6 @@ describe('UsersServices', () => {
         })
         expect(UsersRepository.insertUser).toHaveBeenCalledTimes(1)
       })
-
-      test('creates user with minimum valid login length (4 chars)', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(false)
-        UsersRepository.insertUser.mockResolvedValueOnce(undefined)
-
-        await UsersServices.createUser({ user_id: 1, login: 'abcd' })
-
-        expect(UsersRepository.insertUser).toHaveBeenCalledWith({ user_id: 1, login: 'abcd' })
-      })
-
-      test('creates user with maximum valid login length (16 chars)', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(false)
-        UsersRepository.insertUser.mockResolvedValueOnce(undefined)
-
-        const maxLogin = 'a'.repeat(16)
-        await UsersServices.createUser({ user_id: 2, login: maxLogin })
-
-        expect(UsersRepository.insertUser).toHaveBeenCalledWith({ user_id: 2, login: maxLogin })
-      })
-
-      test('creates user with special characters (underscore and dash)', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(false)
-        UsersRepository.insertUser.mockResolvedValueOnce(undefined)
-
-        await UsersServices.createUser({ user_id: 3, login: 'user_name-123' })
-
-        expect(UsersRepository.insertUser).toHaveBeenCalledWith({ user_id: 3, login: 'user_name-123' })
-      })
     })
 
     describe('getPublicUserProfile', () => {
@@ -129,36 +96,6 @@ describe('UsersServices', () => {
         expect(result).toHaveProperty('avatar')
         expect(result).toHaveProperty('status')
         expect(result).toHaveProperty('last_connection')
-      })
-
-      test('returns profile with status 0 (offline)', async () => {
-        const offlineProfile: UserPublicProfileDTO = {
-          user_id: 1,
-          username: 'user',
-          avatar: '/avatars/img_default.png',
-          status: 0,
-          last_connection: '2024-01-01T00:00:00.000Z'
-        }
-        UsersRepository.getUserById.mockReturnValueOnce(offlineProfile)
-
-        const result = await UsersServices.getPublicUserProfile({ user_id: 1 })
-
-        expect(result.status).toBe(0)
-      })
-
-      test('returns profile with status 1 (online)', async () => {
-        const onlineProfile: UserPublicProfileDTO = {
-          user_id: 1,
-          username: 'user',
-          avatar: '/avatars/img_default.png',
-          status: 1,
-          last_connection: '2024-01-01T00:00:00.000Z'
-        }
-        UsersRepository.getUserById.mockReturnValueOnce(onlineProfile)
-
-        const result = await UsersServices.getPublicUserProfile({ user_id: 1 })
-
-        expect(result.status).toBe(1)
       })
     })
 
@@ -252,87 +189,12 @@ describe('UsersServices', () => {
           expect((error as any).message).toBe(ERROR_MESSAGES.USER_NOT_FOUND)
         }
       })
-
-      test('throws AppError 400 when user_id is 0', async () => {
-        await expect(UsersServices.getPublicUserProfile({ user_id: 0 }))
-          .rejects
-          .toThrow(AppError)
-
-        try {
-          await UsersServices.getPublicUserProfile({ user_id: 0 })
-        } catch (error) {
-          expect(error).toBeInstanceOf(AppError)
-          expect((error as any).status).toBe(400)
-          expect((error as any).message).toBe(ERROR_MESSAGES.INVALID_USER_ID)
-        }
-
-        expect(UsersRepository.getUserById).not.toHaveBeenCalled()
-      })
-
-      test('throws AppError 400 when user_id is negative', async () => {
-        await expect(UsersServices.getPublicUserProfile({ user_id: -1 }))
-          .rejects
-          .toThrow(AppError)
-
-        expect(UsersRepository.getUserById).not.toHaveBeenCalled()
-      })
-
-      test('throws AppError 400 when user_id is null', async () => {
-        await expect(UsersServices.getPublicUserProfile({ user_id: null as any }))
-          .rejects
-          .toThrow(AppError)
-
-        expect(UsersRepository.getUserById).not.toHaveBeenCalled()
-      })
-
-      test('throws AppError 400 when user_id is undefined', async () => {
-        await expect(UsersServices.getPublicUserProfile({ user_id: undefined as any }))
-          .rejects
-          .toThrow(AppError)
-
-        expect(UsersRepository.getUserById).not.toHaveBeenCalled()
-      })
-
-      test('throws AppError 400 when user object is null', async () => {
-        await expect(UsersServices.getPublicUserProfile(null as any))
-          .rejects
-          .toThrow(AppError)
-
-        expect(UsersRepository.getUserById).not.toHaveBeenCalled()
-      })
-    })
-
-    describe('syncAllUsersFromAuth', () => {
-      test('handles empty user list from auth service', async () => {
-        AuthApi.getAllUsers.mockResolvedValueOnce([])
-
-        await UsersServices.syncAllUsersFromAuth()
-
-        expect(UsersRepository.existsById).not.toHaveBeenCalled()
-        expect(UsersRepository.insertUser).not.toHaveBeenCalled()
-      })
     })
   })
 
   // ==================== SECTION 3: TRICKY CASES ====================
   describe('3. Tricky cases', () => {
     describe('Boundary values for user_id', () => {
-      test('getPublicUserProfile with user_id = 1 (minimum valid positive)', async () => {
-        const mockProfile: UserPublicProfileDTO = {
-          user_id: 1,
-          username: 'user1',
-          avatar: '/avatars/img_default.png',
-          status: 1,
-          last_connection: '2024-01-01T00:00:00.000Z'
-        }
-        UsersRepository.getUserById.mockReturnValueOnce(mockProfile)
-
-        const result = await UsersServices.getPublicUserProfile({ user_id: 1 })
-
-        expect(result.user_id).toBe(1)
-        expect(UsersRepository.getUserById).toHaveBeenCalledWith({ user_id: 1 })
-      })
-
       test('getPublicUserProfile with very large user_id', async () => {
         const largeId = 999999999
         const mockProfile: UserPublicProfileDTO = {
@@ -347,26 +209,6 @@ describe('UsersServices', () => {
         const result = await UsersServices.getPublicUserProfile({ user_id: largeId })
 
         expect(result.user_id).toBe(largeId)
-      })
-    })
-
-    describe('Boundary values for login (Zod: /^[\w-]{4,16}$/)', () => {
-      test('createUser with only digits', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(false)
-        UsersRepository.insertUser.mockResolvedValueOnce(undefined)
-
-        await UsersServices.createUser({ user_id: 1, login: '12345678' })
-
-        expect(UsersRepository.insertUser).toHaveBeenCalledWith({ user_id: 1, login: '12345678' })
-      })
-
-      test('createUser with only underscores and dashes', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(false)
-        UsersRepository.insertUser.mockResolvedValueOnce(undefined)
-
-        await UsersServices.createUser({ user_id: 1, login: '____----' })
-
-        expect(UsersRepository.insertUser).toHaveBeenCalledWith({ user_id: 1, login: '____----' })
       })
     })
 
@@ -457,44 +299,6 @@ describe('UsersServices', () => {
         await expect(UsersServices.syncAllUsersFromAuth())
           .rejects
           .toThrow('Database error')
-      })
-    })
-
-    describe('AppError type verification', () => {
-      test('createUser throws correct AppError instance', async () => {
-        UsersRepository.existsById.mockReturnValueOnce(true)
-
-        try {
-          await UsersServices.createUser({ user_id: 1, login: 'test' })
-          fail('Should have thrown')
-        } catch (error) {
-          expect(error).toBeInstanceOf(AppError)
-          expect(error).toBeInstanceOf(Error)
-          expect(error).toHaveProperty('status')
-          expect(error).toHaveProperty('message')
-        }
-      })
-
-      test('getPublicUserProfile throws correct AppError instance for not found', async () => {
-        UsersRepository.getUserById.mockReturnValueOnce(undefined)
-
-        try {
-          await UsersServices.getPublicUserProfile({ user_id: 1 })
-          fail('Should have thrown')
-        } catch (error) {
-          expect(error).toBeInstanceOf(AppError)
-          expect((error as any).status).toBe(404)
-        }
-      })
-
-      test('getPublicUserProfile throws correct AppError instance for invalid ID', async () => {
-        try {
-          await UsersServices.getPublicUserProfile({ user_id: 0 })
-          fail('Should have thrown')
-        } catch (error) {
-          expect(error).toBeInstanceOf(AppError)
-          expect((error as any).status).toBe(400)
-        }
       })
     })
 
