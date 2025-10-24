@@ -102,12 +102,10 @@ describe('usersRoutes', () => {
 			test('returns 200 when user already exists', async () => {
 				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
-						return reply
-							.code(200)
-							.send({
-								success: true,
-								message: ERROR_MESSAGES.USER_ALREADY_EXISTS
-							})
+						return reply.code(200).send({
+							success: true,
+							message: ERROR_MESSAGES.USER_ALREADY_EXISTS
+						})
 					}
 				)
 
