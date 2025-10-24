@@ -29,23 +29,23 @@ let AppError: any
 let mockFetch: any
 
 beforeAll(async () => {
-  mockFetch = jest.fn()
+	mockFetch = jest.fn()
 
-  await jest.unstable_mockModule('node-fetch', () => ({
-    default: mockFetch
-  }))
+	await jest.unstable_mockModule('node-fetch', () => ({
+		default: mockFetch
+	}))
 
-  const authApiModule = await import('./AuthApi.js')
-  AuthApi = authApiModule.AuthApi
+	const authApiModule = await import('./AuthApi.js')
+	AuthApi = authApiModule.AuthApi
 
-  try {
-    const common = await import('@ft_transcendence/common')
-    PublicUserListAuthSchema = common.PublicUserListAuthSchema
-    AppError = common.AppError
-  } catch (error) {
-    console.error('Failed to import @ft_transcendence/common:', error)
-    throw error
-  }
+	try {
+		const common = await import('@ft_transcendence/common')
+		PublicUserListAuthSchema = common.PublicUserListAuthSchema
+		AppError = common.AppError
+	} catch (error) {
+		console.error('Failed to import @ft_transcendence/common:', error)
+		throw error
+	}
 })
 
 describe('AuthApi', () => {
