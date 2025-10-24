@@ -19,15 +19,15 @@ services:
     networks:
       - backend
 
-  #  pong-server:
-  #    restart: on-failure
-  #    container_name: pong-server
-  #    build:
-  #      context: .
-  #      dockerfile: ./services/pong-server/Dockerfile
-  #    depends_on:
-  #      - nginx
-  #      - frontend
+  pong-server:
+    restart: on-failure
+    container_name: pong-server
+    build:
+      context: .
+      dockerfile: ./services/pong-server/Dockerfile
+    depends_on:
+      - nginx
+      - frontend
 
   users:
     restart: on-failure

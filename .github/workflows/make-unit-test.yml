@@ -15,10 +15,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
-      - name:  Build project
+          make install
+      - name: Build project
         run: |
-          npm run build
+          make build
       - name: Run unit tests
         run: |
-          npm test
+          make test
