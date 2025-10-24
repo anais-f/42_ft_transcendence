@@ -7,7 +7,8 @@ const commonConfig: Partial<Config.InitialProjectOptions> = {
 	moduleNameMapper: {
 		'^(\\.{1,2}/.*)\\.js$': '$1',
 		'^@packages/(.*)$': '<rootDir>/packages/$1',
-		'^@services/(.*)$': '<rootDir>/services/$1'
+		'^@services/(.*)$': '<rootDir>/services/$1',
+    '^@ft_transcendence/common$': '<rootDir>/../../../packages/common/dist/index.js'
 	},
 	transform: {
 		'^.+\\.tsx?$': [
