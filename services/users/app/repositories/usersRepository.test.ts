@@ -1,4 +1,3 @@
-// TypeScript
 /**
  * Test Coverage Summary for UsersRepository
  *
