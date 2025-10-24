@@ -19,6 +19,13 @@ jobs:
             echo "Npm installed failed."
             exit 1
           fi
+          # build workspace packages
+          if make build; then
+              echo "Build completed successfully."
+          else
+              echo "Build failed. Please fix the build errors before merging."
+              exit 1
+          fi
           # Run unit tests via Makefile
           if make test; then
             echo "All unit tests passed successfully."

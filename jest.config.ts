@@ -3,7 +3,7 @@ import type { Config } from '@jest/types'
 const commonConfig: Partial<Config.InitialProjectOptions> = {
 	preset: 'ts-jest/presets/default-esm',
 	testEnvironment: 'node',
-	extensionsToTreatAsEsm: ['.ts'],
+	extensionsToTreatAsEsm: ['.ts', '.js'],
 	moduleNameMapper: {
 		'^(\\.{1,2}/.*)\\.js$': '$1',
 		'^@packages/(.*)$': '<rootDir>/packages/$1',
