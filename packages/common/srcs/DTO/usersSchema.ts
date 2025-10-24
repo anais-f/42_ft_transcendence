@@ -17,13 +17,13 @@ export const UsernameSchema = z
 
 export const UserIdSchema = z
 	.object({
-		user_id: z.number().int().positive()
+		user_id: z.number().int().positive().min(1)
 	})
 	.meta({ description: 'User identifier schema' })
 
 export const PublicUserAuthSchema = z
 	.object({
-		user_id: z.number().positive().min(1),
+		user_id: z.number().int().positive().min(1),
 		login: LoginSchema
 	})
 	.strict()

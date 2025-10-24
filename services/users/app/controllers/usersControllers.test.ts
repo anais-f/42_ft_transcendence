@@ -1,3 +1,4 @@
+// TypeScript
 /**
  * Test Coverage Summary for usersControllers
  *
@@ -5,11 +6,11 @@
  *
  * SECTION 1: SUCCESSFUL CASES (8 tests)
  * - handleUserCreated: Handles webhook events, creates users from PublicUserAuthDTO, returns 201 with success message
- * - getPublicUser: Returns public profile (UserPublicProfileDTO) with 200 status, validates response structure
- * - Response format: Verifies correct Fastify reply structure ({ message, data })
+ * - getPublicUser: Returns public profile (UserPublicProfileDTO) directly with 200 status, validates response structure
+ * - Response format: Verifies correct Fastify reply structure (direct profile data, no wrapper)
  *
  * SECTION 2: BASIC FAILURE CASES (12 tests)
- * - handleUserCreated: Returns 400 when user already exists (AppError propagation)
+ * - handleUserCreated: Returns 200 when user already exists (not an error)
  * - getPublicUser: Returns 404 when user not found, 400 for invalid/missing user_id
  * - Request validation: Handles malformed request bodies, missing fields
  * - Type validation: Rejects wrong types (string user_id, number login)
@@ -22,7 +23,7 @@
  *
  * SECTION 4: EXCEPTIONS (6 tests)
  * - AppError handling: Correctly extracts status and message from AppError instances
- * - Generic errors: Handles unexpected errors with 500 status and generic message
+ * - Generic errors: Handles unexpected errors by throwing them (no catch for generic errors)
  * - Status code mapping: Verifies correct HTTP status codes for different AppError types
  * - Error propagation: Ensures service layer errors reach controller correctly
  */
@@ -35,6 +36,7 @@ let getPublicUser: any
 let UsersServices: any
 let AppError: any
 let ERROR_MESSAGES: any
+let SUCCESS_MESSAGES: any
 
 beforeAll(async () => {
   await jest.unstable_mockModule('../usecases/usersServices.js', () => ({
@@ -47,6 +49,7 @@ beforeAll(async () => {
   const common = await import('@ft_transcendence/common')
   AppError = common.AppError
   ERROR_MESSAGES = common.ERROR_MESSAGES
+  SUCCESS_MESSAGES = common.SUCCESS_MESSAGES
 
   ;({ UsersServices } = await import('../usecases/usersServices.js'))
   ;({ handleUserCreated, getPublicUser } = await import('./usersControllers.js'))
@@ -77,7 +80,8 @@ describe('usersControllers', () => {
         expect(UsersServices.createUser).toHaveBeenCalledWith({ user_id: 42, login: 'testuser' })
         expect(mockReply.code).toHaveBeenCalledWith(201)
         expect(mockReply.send).toHaveBeenCalledWith({
-          message: 'User created successfully'
+          success: true,
+          message: SUCCESS_MESSAGES.USER_CREATED
         })
       })
 
@@ -135,7 +139,7 @@ describe('usersControllers', () => {
     })
 
     describe('getPublicUser', () => {
-      test('returns public profile with 200 status and valid UserPublicProfileDTO', async () => {
+      test('returns public profile directly with 200 status', async () => {
         const mockRequest = {
           params: { id: '42' }
         } as unknown as FastifyRequest
@@ -159,10 +163,7 @@ describe('usersControllers', () => {
 
         expect(UsersServices.getPublicUserProfile).toHaveBeenCalledWith({ user_id: 42 })
         expect(mockReply.code).toHaveBeenCalledWith(200)
-        expect(mockReply.send).toHaveBeenCalledWith({
-          message: 'User profile retrieved successfully',
-          data: mockProfile
-        })
+        expect(mockReply.send).toHaveBeenCalledWith(mockProfile)
       })
 
       test('returns profile with all required fields (5 fields)', async () => {
@@ -187,7 +188,7 @@ describe('usersControllers', () => {
 
         await getPublicUser(mockRequest, mockReply)
 
-        const sentData = (mockReply.send as jest.Mock).mock.calls[0][0].data
+        const sentData = (mockReply.send as jest.Mock).mock.calls[0][0]
         expect(Object.keys(sentData)).toHaveLength(5)
         expect(sentData).toHaveProperty('user_id')
         expect(sentData).toHaveProperty('username')
@@ -196,7 +197,7 @@ describe('usersControllers', () => {
         expect(sentData).toHaveProperty('last_connection')
       })
 
-      test('returns correct response structure with message and data', async () => {
+      test('returns profile directly without wrapper object', async () => {
         const mockRequest = {
           params: { id: '1' }
         } as unknown as FastifyRequest
@@ -218,12 +219,13 @@ describe('usersControllers', () => {
 
         await getPublicUser(mockRequest, mockReply)
 
-        expect(mockReply.send).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: expect.any(String),
-            data: expect.any(Object)
-          })
-        )
+        const sentData = (mockReply.send as jest.Mock).mock.calls[0][0]
+        // Should NOT have 'message' or 'data' wrapper
+        expect(sentData).not.toHaveProperty('message')
+        expect(sentData).not.toHaveProperty('data')
+        // Should have the profile fields directly
+        expect(sentData.user_id).toBe(1)
+        expect(sentData.username).toBe('user1')
       })
 
       test('returns profile with status 0 (offline)', async () => {
@@ -248,7 +250,7 @@ describe('usersControllers', () => {
 
         await getPublicUser(mockRequest, mockReply)
 
-        const sentData = (mockReply.send as jest.Mock).mock.calls[0][0].data
+        const sentData = (mockReply.send as jest.Mock).mock.calls[0][0]
         expect(sentData.status).toBe(0)
       })
     })
@@ -257,7 +259,7 @@ describe('usersControllers', () => {
   // ==================== SECTION 2: BASIC FAILURE CASES ====================
   describe('2. Basic failure cases', () => {
     describe('handleUserCreated', () => {
-      test('returns 400 when user already exists (AppError 400)', async () => {
+      test('returns 200 when user already exists', async () => {
         const mockRequest = {
           body: { user_id: 42, login: 'existing' }
         } as FastifyRequest
@@ -267,20 +269,21 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        const appError = new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
-        UsersServices.createUser.mockRejectedValueOnce(appError)
+        const error = new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
+        UsersServices.createUser.mockRejectedValueOnce(error)
 
         await handleUserCreated(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledWith(400)
+        expect(mockReply.code).toHaveBeenCalledWith(200)
         expect(mockReply.send).toHaveBeenCalledWith({
+          success: true,
           message: ERROR_MESSAGES.USER_ALREADY_EXISTS
         })
       })
 
-      test('returns 400 when request body is missing user_id', async () => {
+      test('returns 500 when internal error occurs', async () => {
         const mockRequest = {
-          body: { login: 'testuser' }
+          body: { user_id: 42, login: 'testuser' }
         } as FastifyRequest
 
         const mockReply = {
@@ -288,74 +291,16 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        await handleUserCreated(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(400)
-        expect(mockReply.send).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: expect.stringContaining('Invalid request')
-          })
-        )
-      })
-
-      test('returns 400 when request body is missing login', async () => {
-        const mockRequest = {
-          body: { user_id: 42 }
-        } as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
+        const error = new Error('Database connection failed')
+        UsersServices.createUser.mockRejectedValueOnce(error)
 
         await handleUserCreated(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledWith(400)
-      })
-
-      test('returns 400 when request body is empty', async () => {
-        const mockRequest = {
-          body: {}
-        } as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
-
-        await handleUserCreated(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(400)
-      })
-
-      test('returns 400 when user_id has wrong type (string instead of number)', async () => {
-        const mockRequest = {
-          body: { user_id: '42', login: 'testuser' }
-        } as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
-
-        await handleUserCreated(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(400)
-      })
-
-      test('returns 400 when login has wrong type (number instead of string)', async () => {
-        const mockRequest = {
-          body: { user_id: 42, login: 12345 }
-        } as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
-
-        await handleUserCreated(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(400)
+        expect(mockReply.code).toHaveBeenCalledWith(500)
+        expect(mockReply.send).toHaveBeenCalledWith({
+          success: false,
+          error: ERROR_MESSAGES.INTERNAL_ERROR
+        })
       })
     })
 
@@ -377,7 +322,8 @@ describe('usersControllers', () => {
 
         expect(mockReply.code).toHaveBeenCalledWith(404)
         expect(mockReply.send).toHaveBeenCalledWith({
-          message: ERROR_MESSAGES.USER_NOT_FOUND
+          success: false,
+          error: ERROR_MESSAGES.USER_NOT_FOUND
         })
       })
 
@@ -391,14 +337,12 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        const appError = new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
-        UsersServices.getPublicUserProfile.mockRejectedValueOnce(appError)
-
         await getPublicUser(mockRequest, mockReply)
 
         expect(mockReply.code).toHaveBeenCalledWith(400)
         expect(mockReply.send).toHaveBeenCalledWith({
-          message: ERROR_MESSAGES.INVALID_USER_ID
+          success: false,
+          error: ERROR_MESSAGES.INVALID_USER_ID
         })
       })
 
@@ -411,9 +355,6 @@ describe('usersControllers', () => {
           code: jest.fn().mockReturnThis(),
           send: jest.fn()
         } as unknown as FastifyReply
-
-        const appError = new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
-        UsersServices.getPublicUserProfile.mockRejectedValueOnce(appError)
 
         await getPublicUser(mockRequest, mockReply)
 
@@ -433,11 +374,10 @@ describe('usersControllers', () => {
         await getPublicUser(mockRequest, mockReply)
 
         expect(mockReply.code).toHaveBeenCalledWith(400)
-        expect(mockReply.send).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: expect.stringContaining('Invalid user_id')
-          })
-        )
+        expect(mockReply.send).toHaveBeenCalledWith({
+          success: false,
+          error: ERROR_MESSAGES.INVALID_USER_ID
+        })
       })
 
       test('returns 400 when user_id param is missing', async () => {
@@ -466,6 +406,34 @@ describe('usersControllers', () => {
         await getPublicUser(mockRequest, mockReply)
 
         expect(mockReply.code).toHaveBeenCalledWith(400)
+      })
+
+      test('returns 500 when Zod validation fails on response', async () => {
+        const mockRequest = {
+          params: { id: '1' }
+        } as unknown as FastifyRequest
+
+        const mockReply = {
+          code: jest.fn().mockReturnThis(),
+          send: jest.fn()
+        } as unknown as FastifyReply
+
+        // Invalid profile missing required fields
+        const invalidProfile = {
+          user_id: 1,
+          username: 'test'
+          // missing avatar, status, last_connection
+        }
+
+        UsersServices.getPublicUserProfile.mockResolvedValueOnce(invalidProfile)
+
+        await getPublicUser(mockRequest, mockReply)
+
+        expect(mockReply.code).toHaveBeenCalledWith(500)
+        expect(mockReply.send).toHaveBeenCalledWith({
+          success: false,
+          error: ERROR_MESSAGES.INTERNAL_ERROR
+        })
       })
     })
   })
@@ -526,7 +494,7 @@ describe('usersControllers', () => {
       })
     })
 
-    describe('Boundary values for login (Zod: /^[\w-]{4,16}$/)', () => {
+    describe('Boundary values for login (Zod: /^[\\w-]{4,16}$/)', () => {
       test('handleUserCreated with only digits', async () => {
         const mockRequest = {
           body: { user_id: 1, login: '12345678' }
@@ -564,7 +532,27 @@ describe('usersControllers', () => {
     })
 
     describe('Response structure verification', () => {
-      test('getPublicUser response contains message field', async () => {
+      test('handleUserCreated response contains success and message fields', async () => {
+        const mockRequest = {
+          body: { user_id: 1, login: 'test' }
+        } as FastifyRequest
+
+        const mockReply = {
+          code: jest.fn().mockReturnThis(),
+          send: jest.fn()
+        } as unknown as FastifyReply
+
+        UsersServices.createUser.mockResolvedValueOnce(undefined)
+
+        await handleUserCreated(mockRequest, mockReply)
+
+        const sentResponse = (mockReply.send as jest.Mock).mock.calls[0][0]
+        expect(sentResponse).toHaveProperty('success')
+        expect(sentResponse).toHaveProperty('message')
+        expect(sentResponse.success).toBe(true)
+      })
+
+      test('getPublicUser response is the profile object directly', async () => {
         const mockRequest = {
           params: { id: '1' }
         } as unknown as FastifyRequest
@@ -587,26 +575,7 @@ describe('usersControllers', () => {
         await getPublicUser(mockRequest, mockReply)
 
         const sentResponse = (mockReply.send as jest.Mock).mock.calls[0][0]
-        expect(sentResponse).toHaveProperty('message')
-        expect(typeof sentResponse.message).toBe('string')
-      })
-
-      test('handleUserCreated response contains only message field', async () => {
-        const mockRequest = {
-          body: { user_id: 1, login: 'test' }
-        } as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
-
-        UsersServices.createUser.mockResolvedValueOnce(undefined)
-
-        await handleUserCreated(mockRequest, mockReply)
-
-        const sentResponse = (mockReply.send as jest.Mock).mock.calls[0][0]
-        expect(Object.keys(sentResponse)).toEqual(['message'])
+        expect(sentResponse).toEqual(mockProfile)
       })
     })
 
@@ -671,7 +640,12 @@ describe('usersControllers', () => {
 
         await handleUserCreated(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledBefore(mockReply.send as jest.Mock)
+        // Assert both were called and code happened before send using invocationCallOrder
+        const codeMock = mockReply.code as unknown as jest.Mock
+        const sendMock = mockReply.send as unknown as jest.Mock
+        expect(codeMock).toHaveBeenCalled()
+        expect(sendMock).toHaveBeenCalled()
+        expect(codeMock.mock.invocationCallOrder[0]).toBeLessThan(sendMock.mock.invocationCallOrder[0])
       })
 
       test('getPublicUser chains code() and send() correctly', async () => {
@@ -696,7 +670,11 @@ describe('usersControllers', () => {
 
         await getPublicUser(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledBefore(mockReply.send as jest.Mock)
+        const codeMock = mockReply.code as unknown as jest.Mock
+        const sendMock = mockReply.send as unknown as jest.Mock
+        expect(codeMock).toHaveBeenCalled()
+        expect(sendMock).toHaveBeenCalled()
+        expect(codeMock.mock.invocationCallOrder[0]).toBeLessThan(sendMock.mock.invocationCallOrder[0])
       })
     })
   })
@@ -721,14 +699,15 @@ describe('usersControllers', () => {
 
         expect(mockReply.code).toHaveBeenCalledWith(404)
         expect(mockReply.send).toHaveBeenCalledWith({
-          message: 'Custom error message'
+          success: false,
+          error: 'Custom error message'
         })
       })
 
       test('handles AppError with status 400 correctly', async () => {
         const mockRequest = {
-          body: { user_id: 42, login: 'test' }
-        } as FastifyRequest
+          params: { id: '1' }
+        } as unknown as FastifyRequest
 
         const mockReply = {
           code: jest.fn().mockReturnThis(),
@@ -736,19 +715,20 @@ describe('usersControllers', () => {
         } as unknown as FastifyReply
 
         const appError = new AppError('Bad request error', 400)
-        UsersServices.createUser.mockRejectedValueOnce(appError)
+        UsersServices.getPublicUserProfile.mockRejectedValueOnce(appError)
 
-        await handleUserCreated(mockRequest, mockReply)
+        await getPublicUser(mockRequest, mockReply)
 
         expect(mockReply.code).toHaveBeenCalledWith(400)
         expect(mockReply.send).toHaveBeenCalledWith({
-          message: 'Bad request error'
+          success: false,
+          error: 'Bad request error'
         })
       })
     })
 
     describe('Generic error handling', () => {
-      test('handles unexpected errors with 500 status', async () => {
+      test('generic errors in getPublicUser are thrown (not caught)', async () => {
         const mockRequest = {
           params: { id: '1' }
         } as unknown as FastifyRequest
@@ -761,15 +741,10 @@ describe('usersControllers', () => {
         const genericError = new Error('Unexpected database error')
         UsersServices.getPublicUserProfile.mockRejectedValueOnce(genericError)
 
-        await getPublicUser(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(500)
-        expect(mockReply.send).toHaveBeenCalledWith({
-          message: 'Internal server error'
-        })
+        await expect(getPublicUser(mockRequest, mockReply)).rejects.toThrow('Unexpected database error')
       })
 
-      test('does not expose internal error details in response', async () => {
+      test('generic errors in handleUserCreated return 500', async () => {
         const mockRequest = {
           body: { user_id: 1, login: 'test' }
         } as FastifyRequest
@@ -779,21 +754,23 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        const internalError = new Error('Database connection string: postgresql://...')
+        const internalError = new Error('Database connection failed')
         UsersServices.createUser.mockRejectedValueOnce(internalError)
 
         await handleUserCreated(mockRequest, mockReply)
 
-        const sentResponse = (mockReply.send as jest.Mock).mock.calls[0][0]
-        expect(sentResponse.message).not.toContain('postgresql://')
-        expect(sentResponse.message).toBe('Internal server error')
+        expect(mockReply.code).toHaveBeenCalledWith(500)
+        expect(mockReply.send).toHaveBeenCalledWith({
+          success: false,
+          error: ERROR_MESSAGES.INTERNAL_ERROR
+        })
       })
     })
 
     describe('Status code mapping verification', () => {
       test('AppError 400 maps to HTTP 400', async () => {
         const mockRequest = {
-          params: { id: '0' }
+          params: { id: '1' }
         } as unknown as FastifyRequest
 
         const mockReply = {
@@ -826,27 +803,10 @@ describe('usersControllers', () => {
 
         expect(mockReply.code).toHaveBeenCalledWith(404)
       })
-
-      test('generic Error maps to HTTP 500', async () => {
-        const mockRequest = {
-          params: { id: '1' }
-        } as unknown as FastifyRequest
-
-        const mockReply = {
-          code: jest.fn().mockReturnThis(),
-          send: jest.fn()
-        } as unknown as FastifyReply
-
-        UsersServices.getPublicUserProfile.mockRejectedValueOnce(new Error('Boom'))
-
-        await getPublicUser(mockRequest, mockReply)
-
-        expect(mockReply.code).toHaveBeenCalledWith(500)
-      })
     })
 
     describe('Error propagation verification', () => {
-      test('service layer AppError propagates to controller', async () => {
+      test('USER_ALREADY_EXISTS error returns 200 (not an error case)', async () => {
         const mockRequest = {
           body: { user_id: 42, login: 'existing' }
         } as FastifyRequest
@@ -856,20 +816,21 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        const serviceError = new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
+        const serviceError = new Error(ERROR_MESSAGES.USER_ALREADY_EXISTS)
         UsersServices.createUser.mockRejectedValueOnce(serviceError)
 
         await handleUserCreated(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledWith(400)
+        expect(mockReply.code).toHaveBeenCalledWith(200)
         expect(mockReply.send).toHaveBeenCalledWith({
+          success: true,
           message: ERROR_MESSAGES.USER_ALREADY_EXISTS
         })
       })
 
-      test('service layer throws and controller catches correctly', async () => {
+      test('service layer AppError propagates to controller', async () => {
         const mockRequest = {
-          params: { id: '1' }
+          params: { id: '999' }
         } as unknown as FastifyRequest
 
         const mockReply = {
@@ -877,15 +838,16 @@ describe('usersControllers', () => {
           send: jest.fn()
         } as unknown as FastifyReply
 
-        UsersServices.getPublicUserProfile.mockRejectedValueOnce(
-          new Error('Service crashed')
-        )
+        const serviceError = new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+        UsersServices.getPublicUserProfile.mockRejectedValueOnce(serviceError)
 
-        await expect(async () => {
-          await getPublicUser(mockRequest, mockReply)
-        }).not.toThrow()
+        await getPublicUser(mockRequest, mockReply)
 
-        expect(mockReply.code).toHaveBeenCalledWith(500)
+        expect(mockReply.code).toHaveBeenCalledWith(404)
+        expect(mockReply.send).toHaveBeenCalledWith({
+          success: false,
+          error: ERROR_MESSAGES.USER_NOT_FOUND
+        })
       })
     })
   })

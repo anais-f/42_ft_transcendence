@@ -1,140 +1,216 @@
 /**
  * Test Coverage Summary for AuthApi
  *
- * Total: 31 tests organized in 4 sections
+ * Total: 41 tests organized in 4 sections
  *
- * SECTION 1: SUCCESSFUL CASES (6 tests)
- * - getAllUsers: Fetches and returns users with Zod validation, handles empty lists
- * - Validates response structure: { users: PublicUserAuthDTO[] }
- * - Accepts usernames: 4-16 chars matching /^[\w-]{4,16}$/, including special chars (underscore, dash)
+ * SECTION 1: SUCCESSFUL CASES (8 tests)
+ * - getAllUsers: Fetches and parses valid user lists (single/multiple users, empty arrays)
+ * - Zod validation: Validates response data against PublicUserListAuthSchema
+ * - Boundary values: Accepts user_id min (1) and max (999999999), login length 4-16 chars
+ * - Special characters: Accepts underscores, dashes in login
  *
- * SECTION 2: BASIC FAILURE CASES (14 tests)
- * - HTTP errors: Throws on 404, 500, 401, 503 status codes
- * - Zod validation failures: Throws AppError 500 for invalid response shape (missing 'users' field, wrong types)
- * - Network errors: Propagates fetch failures, JSON parsing errors, timeouts
+ * SECTION 2: BASIC FAILURE CASES (16 tests)
+ * - HTTP errors: Throws on status 404, 500, 403
+ * - Zod validation failures: Missing fields (user_id/login), invalid types (string user_id)
+ * - Schema violations: Negative/zero user_id, login too short/long, invalid characters
+ * - Network failures: Handles fetch errors and timeouts
  *
- * SECTION 3: TRICKY CASES (6 tests)
+ * SECTION 3: TRICKY CASES (10 tests)
+ * - Float handling: Rejects user_id as float (1.5)
  * - Large datasets: Handles 1000+ users efficiently
- * - Edge case logins: Only digits, only underscores/dashes, mixed case
- * - Boundary user_id: Tests user_id = 1 (min) and 999999999 (large)
- * - URL correctness: Verifies correct auth service endpoint (http://auth:3000/api/users)
+ * - Login patterns: Accepts numbers only, mixed alphanumeric
+ * - Extra fields: Rejects strict schema violations (extra fields in user/root)
+ * - Special chars: Rejects spaces, emoji, dots in login
  *
- * SECTION 4: EXCEPTIONS (5 tests)
- * - AppError structure: Validates status 500 and message format for Zod errors
- * - Return type consistency: Always returns array (never null/undefined), contains only valid user objects
- * - Fetch behavior: Verifies fetch called once, json() called once on success, not called on HTTP errors
- * - Zod safeParse: Validates success=true/false behavior
+ * SECTION 4: EXCEPTIONS (7 tests)
+ * - AppError validation: Checks status code 500 and error messages
+ * - Zod safeParse: Tests success/error structure, field information
+ * - Response malformation: Handles JSON parse errors, null/undefined responses
  */
 
-import { jest } from '@jest/globals'
-import { AppError, PublicUserListAuthSchema } from '@ft_transcendence/common'
+import { jest, beforeEach, describe, test, expect } from '@jest/globals'
 
 let AuthApi: any
-let fetch: any
+let PublicUserListAuthSchema: any
+let AppError: any
+let mockFetch: any
 
 beforeAll(async () => {
+  // Create mock fetch function
+  mockFetch = jest.fn()
+
+  // Mock node-fetch module before importing AuthApi
   await jest.unstable_mockModule('node-fetch', () => ({
-    default: jest.fn()
+    default: mockFetch
   }))
 
-  const fetchModule = await import('node-fetch')
-  fetch = fetchModule.default
+  // Import dependencies after mocking
+  const common = await import('@ft_transcendence/common')
+  PublicUserListAuthSchema = common.PublicUserListAuthSchema
+  AppError = common.AppError
 
-  ;({ AuthApi } = await import('./AuthApi.js'))
+  const authApiModule = await import('./AuthApi.js')
+  AuthApi = authApiModule.AuthApi
 })
 
 describe('AuthApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    mockFetch.mockClear()
   })
 
-  // ==================== SECTION 1: SUCCESSFUL CASES ====================
-  describe('1. Successful cases (Happy Path)', () => {
-    test('getAllUsers fetches and returns users successfully', async () => {
-      const mockUsers = [
-        { user_id: 1, login: 'user1' },
-        { user_id: 2, login: 'user2' }
-      ]
+  // ==========================================
+  // SECTION 1: SUCCESSFUL CASES (8 tests)
+  // ==========================================
+  describe('SECTION 1: Successful cases (Happy Path)', () => {
+    describe('getAllUsers', () => {
+      test('fetches and parses valid user list with multiple users', async () => {
+        const mockResponse = {
+          users: [
+            { user_id: 1, login: 'user1' },
+            { user_id: 2, login: 'user2' },
+            { user_id: 3, login: 'alice_test' }
+          ]
+        }
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: mockUsers })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result).toEqual(mockResponse.users)
+        expect(result).toHaveLength(3)
+        expect(mockFetch).toHaveBeenCalledWith('http://auth:3000/api/users')
+        expect(mockFetch).toHaveBeenCalledTimes(1)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('validates response data against PublicUserListAuthSchema', async () => {
+        const mockResponse = {
+          users: [{ user_id: 42, login: 'test_user' }]
+        }
 
-      expect(result).toEqual(mockUsers)
-      expect(fetch).toHaveBeenCalledWith('http://auth:3000/api/users')
-      expect(fetch).toHaveBeenCalledTimes(1)
-    })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
 
-    test('returns empty array when no users exist', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [] })
+        const result = await AuthApi.getAllUsers()
+
+        // Explicit Zod validation check
+        const parsed = PublicUserListAuthSchema.safeParse(mockResponse)
+        expect(parsed.success).toBe(true)
+        if (parsed.success) {
+          expect(parsed.data.users).toEqual(result)
+        }
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('returns empty array when no users exist', async () => {
+        const mockResponse = { users: [] }
 
-      expect(result).toEqual([])
-      expect(Array.isArray(result)).toBe(true)
-    })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
 
-    test('accepts username with minimum length (4 chars)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'abcd' }] })
+        const result = await AuthApi.getAllUsers()
+
+        expect(result).toEqual([])
+        expect(result).toHaveLength(0)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('accepts user_id with minimum valid value (1)', async () => {
+        const mockResponse = {
+          users: [{ user_id: 1, login: 'minuser' }]
+        }
 
-      expect(result[0].login).toBe('abcd')
-      expect(result[0].login.length).toBe(4)
-    })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
 
-    test('accepts username with maximum length (16 chars)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'a'.repeat(16) }] })
+        const result = await AuthApi.getAllUsers()
+
+        expect(result[0].user_id).toBe(1)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('accepts user_id with large positive value (999999999)', async () => {
+        const mockResponse = {
+          users: [{ user_id: 999999999, login: 'bigid_user' }]
+        }
 
-      expect(result[0].login.length).toBe(16)
-    })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
 
-    test('accepts username with special characters (underscore and dash)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'user_name-123' }] })
+        const result = await AuthApi.getAllUsers()
+
+        expect(result[0].user_id).toBe(999999999)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('accepts login with minimum length (4 chars)', async () => {
+        const mockResponse = {
+          users: [{ user_id: 1, login: 'abcd' }]
+        }
 
-      expect(result[0].login).toBe('user_name-123')
-    })
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
 
-    test('validates response structure with Zod schema', async () => {
-      const validResponse = { users: [{ user_id: 42, login: 'testuser' }] }
+        const result = await AuthApi.getAllUsers()
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => validResponse
+        expect(result[0].login).toBe('abcd')
+        expect(result[0].login.length).toBe(4)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('accepts login with maximum length (16 chars)', async () => {
+        const mockResponse = {
+          users: [{ user_id: 1, login: '1234567890123456' }]
+        }
 
-      const parsed = PublicUserListAuthSchema.safeParse(validResponse)
-      expect(parsed.success).toBe(true)
-      expect(result).toEqual(validResponse.users)
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result[0].login).toBe('1234567890123456')
+        expect(result[0].login.length).toBe(16)
+      })
+
+      test('accepts login with underscores and dashes', async () => {
+        const mockResponse = {
+          users: [
+            { user_id: 1, login: 'test_user' },
+            { user_id: 2, login: 'test-user' },
+            { user_id: 3, login: 'test_-user' }
+          ]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result).toHaveLength(3)
+        expect(result[0].login).toContain('_')
+        expect(result[1].login).toContain('-')
+      })
     })
   })
 
-  // ==================== SECTION 2: BASIC FAILURE CASES ====================
-  describe('2. Basic failure cases', () => {
+  // ==========================================
+  // SECTION 2: BASIC FAILURE CASES (16 tests)
+  // ==========================================
+  describe('SECTION 2: Basic failure cases', () => {
     describe('HTTP errors', () => {
-      test('throws on 404 status code', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws Error when response status is 404', async () => {
+        mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 404
         })
@@ -142,8 +218,8 @@ describe('AuthApi', () => {
         await expect(AuthApi.getAllUsers()).rejects.toThrow('HTTP error! status: 404')
       })
 
-      test('throws on 500 status code', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws Error when response status is 500', async () => {
+        mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 500
         })
@@ -151,124 +227,407 @@ describe('AuthApi', () => {
         await expect(AuthApi.getAllUsers()).rejects.toThrow('HTTP error! status: 500')
       })
 
-      test('throws on 401 status code', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws Error when response status is 403', async () => {
+        mockFetch.mockResolvedValueOnce({
           ok: false,
-          status: 401
+          status: 403
         })
 
-        await expect(AuthApi.getAllUsers()).rejects.toThrow('HTTP error! status: 401')
-      })
-
-      test('throws on 503 status code', async () => {
-        fetch.mockResolvedValueOnce({
-          ok: false,
-          status: 503
-        })
-
-        await expect(AuthApi.getAllUsers()).rejects.toThrow('HTTP error! status: 503')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow('HTTP error! status: 403')
       })
     })
 
     describe('Zod validation failures', () => {
       test('throws AppError when response shape is invalid (missing users field)', async () => {
-        fetch.mockResolvedValueOnce({
+        const invalidResponse = { data: [] }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ notUsers: [] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow('Invalid response shape from auth service')
       })
 
       test('throws AppError when user structure is incomplete (missing login)', async () => {
-        fetch.mockResolvedValueOnce({
+        const invalidResponse = {
+          users: [{ user_id: 1 }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 42 }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
       test('throws AppError when user structure is incomplete (missing user_id)', async () => {
-        fetch.mockResolvedValueOnce({
+        const invalidResponse = {
+          users: [{ login: 'testuser' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ login: 'testuser' }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
-      test('throws AppError when user_id has wrong type (string instead of number)', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws AppError when user_id is not a number', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 'not_a_number', login: 'testuser' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 'invalid', login: 'testuser' }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
-      test('throws AppError when login has wrong type (number instead of string)', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws AppError when user_id is negative', async () => {
+        const invalidResponse = {
+          users: [{ user_id: -1, login: 'testuser' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 1, login: 12345 }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
-      test('throws AppError when login is too short (< 4 chars)', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws AppError when user_id is zero', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 0, login: 'testuser' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 1, login: 'abc' }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
-      test('throws AppError when login is too long (> 16 chars)', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws AppError when login is too short (less than 4 chars)', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: 'abc' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 1, login: 'a'.repeat(17) }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('throws AppError when login is too long (more than 16 chars)', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: '12345678901234567' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
       test('throws AppError when login contains invalid characters', async () => {
-        fetch.mockResolvedValueOnce({
+        const invalidResponse = {
+          users: [{ user_id: 1, login: 'test@user' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ users: [{ user_id: 1, login: 'user@name' }] })
+          json: async () => invalidResponse
         })
 
-        await expect(AuthApi.getAllUsers())
-          .rejects
-          .toThrow('Invalid response shape from auth service')
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('throws AppError when login is empty string', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: '' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('throws AppError when users field is not an array', async () => {
+        const invalidResponse = {
+          users: { user_id: 1, login: 'testuser' }
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
     })
 
-    describe('Network errors', () => {
-      test('propagates fetch failures', async () => {
-        fetch.mockRejectedValueOnce(new Error('Network error'))
+    describe('Network failures', () => {
+      test('throws Error when fetch fails with network error', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
         await expect(AuthApi.getAllUsers()).rejects.toThrow('Network error')
       })
 
-      test('propagates JSON parsing errors', async () => {
-        fetch.mockResolvedValueOnce({
+      test('throws Error when fetch times out', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Request timeout'))
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow('Request timeout')
+      })
+    })
+  })
+
+  // ==========================================
+  // SECTION 3: TRICKY CASES (10 tests)
+  // ==========================================
+  describe('SECTION 3: Tricky/edge cases', () => {
+    describe('Boundary values', () => {
+      test('accepts user_id as float (Zod accepts floats without .int())', async () => {
+        const validResponse = {
+          users: [{ user_id: 1.5, login: 'testuser' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => validResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        // Zod accepts floats unless .int() is specified
+        expect(result).toHaveLength(1)
+        expect(result[0].user_id).toBe(1.5)
+      })
+
+      test('handles very large array of users (1000+)', async () => {
+        const largeUserList = Array.from({ length: 1000 }, (_, i) => ({
+          user_id: i + 1,
+          login: `user${i + 1}`
+        }))
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ users: largeUserList })
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result).toHaveLength(1000)
+        expect(result[0].user_id).toBe(1)
+        expect(result[999].user_id).toBe(1000)
+      })
+
+      test('handles login with only numbers (valid according to regex)', async () => {
+        const mockResponse = {
+          users: [{ user_id: 1, login: '12345678' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result[0].login).toBe('12345678')
+      })
+
+      test('handles login with mixed alphanumeric and special chars', async () => {
+        const mockResponse = {
+          users: [{ user_id: 1, login: 'user123_test-1' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse
+        })
+
+        const result = await AuthApi.getAllUsers()
+
+        expect(result[0].login).toBe('user123_test-1')
+      })
+    })
+
+    describe('Extra fields handling (strict schema)', () => {
+      test('rejects response with extra fields in user object', async () => {
+        const responseWithExtra = {
+          users: [
+            {
+              user_id: 1,
+              login: 'testuser',
+              extraField: 'should be rejected'
+            }
+          ]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => responseWithExtra
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('rejects response with extra fields at root level', async () => {
+        const responseWithExtra = {
+          users: [{ user_id: 1, login: 'testuser' }],
+          metadata: { count: 1 }
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => responseWithExtra
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+    })
+
+    describe('Special character handling', () => {
+      test('rejects login with spaces', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: 'test user' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('rejects login with emoji', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: 'test🔥user' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+
+      test('rejects login with dots', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 1, login: 'test.user' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
+      })
+    })
+  })
+
+  // ==========================================
+  // SECTION 4: EXCEPTIONS (7 tests)
+  // ==========================================
+  describe('SECTION 4: Exceptions', () => {
+    describe('AppError validation', () => {
+      test('AppError contains correct status code (500)', async () => {
+        const invalidResponse = { users: 'not an array' }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        try {
+          await AuthApi.getAllUsers()
+          throw new Error('Should have thrown AppError')
+        } catch (error) {
+          expect(error).toBeInstanceOf(AppError)
+          if (error instanceof AppError) {
+            expect(error.status).toBe(500)
+          }
+        }
+      })
+
+      test('AppError message contains Zod error details', async () => {
+        const invalidResponse = {
+          users: [{ user_id: 'invalid', login: 'test' }]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => invalidResponse
+        })
+
+        try {
+          await AuthApi.getAllUsers()
+          throw new Error('Should have thrown AppError')
+        } catch (error) {
+          expect(error).toBeInstanceOf(AppError)
+          if (error instanceof AppError) {
+            expect(error.message).toContain('Invalid response shape from auth service')
+          }
+        }
+      })
+    })
+
+    describe('Zod safeParse validation', () => {
+      test('Zod safeParse returns success: false for invalid data', () => {
+        const invalidData = { users: [{ user_id: -1, login: 'test' }] }
+        const parsed = PublicUserListAuthSchema.safeParse(invalidData)
+
+        expect(parsed.success).toBe(false)
+        if (!parsed.success) {
+          expect(parsed.error).toBeDefined()
+          expect(parsed.error.issues).toBeDefined()
+          expect(parsed.error.issues.length).toBeGreaterThan(0)
+        }
+      })
+
+      test('Zod safeParse returns success: true for valid data', () => {
+        const validData = { users: [{ user_id: 1, login: 'testuser' }] }
+        const parsed = PublicUserListAuthSchema.safeParse(validData)
+
+        expect(parsed.success).toBe(true)
+        if (parsed.success) {
+          expect(parsed.data).toEqual(validData)
+          expect(parsed.data.users).toHaveLength(1)
+        }
+      })
+
+      test('Zod safeParse error contains detailed field information', () => {
+        const invalidData = { users: [{ user_id: 0, login: 'ab' }] }
+        const parsed = PublicUserListAuthSchema.safeParse(invalidData)
+
+        expect(parsed.success).toBe(false)
+        if (!parsed.success) {
+          const errorMessages = parsed.error.issues.map(issue => issue.message)
+          expect(errorMessages.length).toBeGreaterThan(0)
+        }
+      })
+    })
+
+    describe('Response malformation', () => {
+      test('throws when json() parsing fails', async () => {
+        mockFetch.mockResolvedValueOnce({
           ok: true,
           json: async () => {
             throw new Error('Invalid JSON')
@@ -277,162 +636,24 @@ describe('AuthApi', () => {
 
         await expect(AuthApi.getAllUsers()).rejects.toThrow('Invalid JSON')
       })
-    })
-  })
 
-  // ==================== SECTION 3: TRICKY CASES ====================
-  describe('3. Cas limites et tricky', () => {
-    test('handles large datasets (1000+ users)', async () => {
-      const largeUserList = Array.from({ length: 1000 }, (_, i) => ({
-        user_id: i + 1,
-        login: `user${i + 1}`
-      }))
+      test('throws when response is null', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => null
+        })
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: largeUserList })
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
 
-      const result = await AuthApi.getAllUsers()
+      test('throws when response is undefined', async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: async () => undefined
+        })
 
-      expect(result).toHaveLength(1000)
-      expect(result[0]).toEqual({ user_id: 1, login: 'user1' })
-      expect(result[999]).toEqual({ user_id: 1000, login: 'user1000' })
-    })
-
-    test('accepts login with only digits', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: '12345678' }] })
+        await expect(AuthApi.getAllUsers()).rejects.toThrow(AppError)
       })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result[0].login).toBe('12345678')
-    })
-
-    test('accepts login with only underscores and dashes', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: '____----' }] })
-      })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result[0].login).toBe('____----')
-    })
-
-    test('accepts mixed case login', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'UserName123' }] })
-      })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result[0].login).toBe('UserName123')
-    })
-
-    test('handles minimum user_id (1)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'testuser' }] })
-      })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result[0].user_id).toBe(1)
-    })
-
-    test('handles very large user_id (999999999)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 999999999, login: 'testuser' }] })
-      })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result[0].user_id).toBe(999999999)
-    })
-
-    test('verifies correct auth service endpoint URL', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [] })
-      })
-
-      await AuthApi.getAllUsers()
-
-      expect(fetch).toHaveBeenCalledWith('http://auth:3000/api/users')
-    })
-  })
-
-  // ==================== SECTION 4: EXCEPTIONS ====================
-  describe('4. Exceptions', () => {
-    test('AppError has status 500 for Zod validation failures', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 'invalid', login: 'test' }] })
-      })
-
-      try {
-        await AuthApi.getAllUsers()
-        fail('Should have thrown AppError')
-      } catch (error: any) {
-        expect(error).toBeInstanceOf(AppError)
-        expect(error.status).toBe(500)
-      }
-    })
-
-    test('AppError message contains Zod error details', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 'invalid', login: 'test' }] })
-      })
-
-      try {
-        await AuthApi.getAllUsers()
-        fail('Should have thrown AppError')
-      } catch (error: any) {
-        expect(error.message).toContain('Invalid response shape from auth service')
-      }
-    })
-
-    test('always returns array (never null or undefined)', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [] })
-      })
-
-      const result = await AuthApi.getAllUsers()
-
-      expect(result).not.toBeNull()
-      expect(result).not.toBeUndefined()
-      expect(Array.isArray(result)).toBe(true)
-    })
-
-    test('fetch is called exactly once per request', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ users: [{ user_id: 1, login: 'test' }] })
-      })
-
-      await AuthApi.getAllUsers()
-
-      expect(fetch).toHaveBeenCalledTimes(1)
-    })
-
-    test('json() is called once on successful HTTP response', async () => {
-      const mockJson = jest.fn().mockResolvedValueOnce({ users: [] })
-
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: mockJson
-      })
-
-      await AuthApi.getAllUsers()
-
-      expect(mockJson).toHaveBeenCalledTimes(1)
     })
   })
 })

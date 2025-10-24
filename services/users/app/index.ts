@@ -14,8 +14,8 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 
-// const OPENAPI_FILE = path.join(process.cwd(), './dist/openapiDTO.json')
-const OPENAPI_FILE = path.join(process.cwd(), '../../../packages/common/openapiDTO.json')
+const OPENAPI_FILE = path.join(process.cwd(), './dist/openapiDTO.json')
+// const OPENAPI_FILE = path.join(process.cwd(), '../../../packages/common/openapiDTO.json')
 const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const PORT = 3000

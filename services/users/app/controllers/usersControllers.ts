@@ -25,7 +25,6 @@ export async function handleUserCreated(
     void reply
         .code(201)
         .send({ success: true, message: SUCCESS_MESSAGES.USER_CREATED })
-    return
   } catch (error) {
     if (
         error instanceof Error &&
@@ -66,7 +65,7 @@ export async function getPublicUser(
       return
     }
 
-    void reply.code(200).send({ success: true, data: parsed.data })
+    void reply.code(200).send(parsed.data)
   } catch (error: any) {
     if (error instanceof AppError) {
       void reply.code(error.status).send({ success: false, error: error.message })

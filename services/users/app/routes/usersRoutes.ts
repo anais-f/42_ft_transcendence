@@ -40,7 +40,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
           id: z.coerce.number().int().positive()
         }),
 				response: {
-					200: SuccessResponseSchema,
+					200: UserPublicProfileSchema,
           400: ErrorResponseSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
