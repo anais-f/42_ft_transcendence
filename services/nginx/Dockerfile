@@ -12,4 +12,5 @@ RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \
     && chmod -R 755 /usr/share/nginx/html/avatars
 
 EXPOSE 8080
+
 CMD ["nginx", "-g", "daemon off;"]
