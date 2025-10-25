@@ -29,7 +29,10 @@ export async function registerController(
 		const url = 'http://users:3000/api/users/new-user'
 		const response = await fetch(url, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json' },
+			headers: {
+				'content-type': 'application/json',
+				authorization: 'Bearer test'
+			},
 			body: JSON.stringify(PublicUser)
 		})
 

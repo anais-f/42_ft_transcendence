@@ -12,6 +12,8 @@ import {
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
+const API_AUTH_USERS = 'test'
+
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
@@ -23,8 +25,16 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
+					401: ErrorResponseSchema,
 					400: ErrorResponseSchema,
 					500: ErrorResponseSchema
+				}
+			},
+			preHandler(request, reply, done) {
+				if (request.headers['authorization'] !== API_AUTH_USERS) {
+					reply.code(401).send({ error: 'Unauthorized' })
+				} else {
+					done()
 				}
 			}
 		},
@@ -41,6 +51,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				response: {
 					200: UserPublicProfileSchema,
 					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
