@@ -1,9 +1,13 @@
 NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
+DOCKER_COMPOSE_FILE_DEV := ./docker-compose.override.yaml
 .DEFAULT_GOAL = up
+SERVICES := $(shell docker compose -f $(DOCKER_COMPOSE_FILE) config --services)
+COMPOSE := docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE)
 
 .PHONY: install
 install:
+	ln -s /goinfre/${USER}/docker/volumes ./local-volumes || true
 	./hooks/install-hooks.sh
 	./scripts/setup-node.sh
 	npm install
@@ -40,3 +44,11 @@ format:
 format-check:
 	npm run format:check
 
+.PHONY: dev-build
+dev-build:
+	npm run build
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
+
+.PHONY: dev-up
+dev-up:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up

@@ -1,6 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getPublicUsers, getPublicUser } from '../usecases/user.js'
-import { PublicUserSchema, PublicUserListSchema } from '../models/usersDTO.js'
+import {
+	PublicUserAuthSchema,
+	PublicUserListAuthSchema
+} from '@ft_transcendence/common'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { success } from 'zod'
 
@@ -9,7 +12,7 @@ export async function listPublicUsersController(
 	reply: FastifyReply
 ) {
 	const users = getPublicUsers()
-	return reply.send(PublicUserListSchema.parse({ users }))
+	return reply.send(PublicUserListAuthSchema.parse({ users }))
 }
 
 export async function getPublicUserController(
@@ -23,7 +26,7 @@ export async function getPublicUserController(
 		return reply.code(400).send({ error: 'Invalid id' })
 	const user = getPublicUser(idNum)
 	if (!user) return reply.code(404).send({ error: 'User not found' })
-	return reply.send(PublicUserSchema.parse(user))
+	return reply.send(PublicUserAuthSchema.parse(user))
 }
 
 export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {

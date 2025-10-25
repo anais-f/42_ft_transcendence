@@ -1,42 +1,38 @@
 import { getDb } from '../database/connection.js'
-import { IUserRow } from '../models/userModels.js'
+import { IUserAuth } from '@ft_transcendence/common'
 
 const db = () => getDb()
 
-export function createUser(username: string, passwordHash: string) {
-	const stmt = db().prepare(
-		'INSERT INTO users (username, password) VALUES (?, ?)'
-	)
-	stmt.run(username, passwordHash)
+export function createUser(login: string, passwordHash: string) {
+	const stmt = db().prepare('INSERT INTO users (login, password) VALUES (?, ?)')
+	stmt.run(login, passwordHash)
 }
 
-export function findUserByUsername(username: string) {
-	const stmt = db().prepare('SELECT * FROM users WHERE username = ?')
-	return stmt.get(username) as IUserRow | undefined
+export function findUserByLogin(login: string) {
+	const stmt = db().prepare('SELECT * FROM users WHERE login = ?')
+	return stmt.get(login) as IUserAuth | undefined
 }
 
-export function findPublicUserByUsername(username: string) {
-	const stmt = db().prepare(
-		'SELECT id_user, username FROM users WHERE username = ?'
-	)
-	return stmt.get(username) as { id: number; username: string } | undefined
+export function findPublicUserByLogin(login: string) {
+	const stmt = db().prepare('SELECT user_id, login FROM users WHERE login = ?')
+	return stmt.get(login) as { id: number; login: string } | undefined
 }
 
 export function findPublicUserById(id: number) {
 	const stmt = db().prepare(
-		'SELECT id_user, username FROM users WHERE id_user = ?'
+		'SELECT user_id, login FROM users WHERE user_id = ?'
 	)
-	return stmt.get(id) as { id: number; username: string } | undefined
+	return stmt.get(id) as { id: number; login: string } | undefined
 }
 
 export function listPublicUsers() {
-	const stmt = db().prepare('SELECT id_user, username FROM users')
+	const stmt = db().prepare('SELECT user_id, login FROM users')
 	console.log('stmt', stmt.all())
-	return stmt.all() as { id: number; username: string }[]
+	return stmt.all() as { id: number; login: string }[]
 }
 
 export function deleteUserById(id: number) {
-	const stmt = db().prepare('DELETE FROM users WHERE id_user = ?')
+	const stmt = db().prepare('DELETE FROM users WHERE user_id = ?')
 	const info = stmt.run(id)
 	return info.changes > 0
 }

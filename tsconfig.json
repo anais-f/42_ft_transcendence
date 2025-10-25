@@ -16,18 +16,16 @@
 		"paths": {
 			"@packages/*": ["packages/*"],
 			"@services/*": ["services/*"]
-		},
-		"isolatedModules": true
+		}
 	},
 	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
 	"references": [
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" },
+		{ "path": "./packages/common" },
 		{ "path": "./services/users" },
 		{ "path": "./services/auth" },
-		{ "path": "./services/frontend" },
-		{ "path": "./services/nginx" },
 		{ "path": "./services/pong-server" }
 	],
 	"ts-node": {

@@ -1,0 +1,27 @@
+{
+	"name": "@ft_transcendence/common",
+	"version": "0.0.1",
+	"description": "Shared code for backend",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"default": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./*": "./dist/*"
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.json && npm run generate:openapi",
+		"generate:openapi": "ts-node ./srcs/DTO/generateOpenApi.ts",
+		"generate:openapi:dist": "node ./dist/DTO/generateOpenApi.js"
+	},
+	"devDependencies": {
+		"typescript": "^5.1.6"
+	}
+}

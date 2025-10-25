@@ -5,11 +5,14 @@
 	"type": "module",
 	"scripts": {
 		"test": "node --experimental-vm-modules ./node_modules/.bin/jest --config ./jest.config.ts ./**/*.test.ts",
-		"build": "tsc",
+		"build": "tsc && tsc-alias",
 		"start": "node dist/index.js",
 		"dev": "nodemon --exec node --loader ts-node/esm --disable-warning=ExperimentalWarning --disable-warning=DeprecationWarning index.ts"
 	},
 	"dependencies": {
-		"dotenv": "^17.2.3"
+		"@ft_transcendence/common": "*"
+	},
+	"devDependencies": {
+		"@types/node": "^24.9.1"
 	}
 }

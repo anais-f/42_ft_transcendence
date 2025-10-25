@@ -1,0 +1,43 @@
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile.dev
+    container_name: auth-dev
+    volumes:
+      - ./:/usr/src/app
+      - auth_root_node_modules:/usr/src/app/node_modules
+      - auth_ws_node_modules:/usr/src/app/services/auth/app/node_modules
+      - auth_data:/usr/src/app/services/auth/app/data
+    environment:
+      - PORT=3042
+    restart: none
+
+  users:
+    build:
+      context: .
+      dockerfile: services/users/Dockerfile.dev
+    container_name: users-dev
+    volumes:
+      - ./:/usr/src/app
+      - users_root_node_modules:/usr/src/app/node_modules
+      - users_ws_node_modules:/usr/src/app/services/users/app/node_modules
+      - users_data:/usr/src/app/services/users/app/data
+    environment:
+      - PORT=3042
+    restart: none
+
+  nginx:
+    container_name: nginx-dev
+    build:
+      context: services/nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8042:8042'
+volumes:
+  auth_root_node_modules:
+  auth_ws_node_modules:
+  auth_data:
+  users_root_node_modules:
+  users_ws_node_modules:
+  users_data:

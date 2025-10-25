@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json* ./
+COPY packages/*/package*.json ./packages/
+COPY services/*/app/package*.json ./services/*/app/
+
+
+RUN npm ci --include=dev || npm i
+
+
+EXPOSE 3042
+
+CMD ["npm", "run", "dev", "--workspace=services/auth/app"]

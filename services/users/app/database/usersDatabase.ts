@@ -5,10 +5,11 @@ import { ENV } from '../config/env.js'
 export const db: Database = new DatabaseConstructor(ENV.DB_PATH)
 
 db.exec(`  CREATE TABLE IF NOT EXISTS users (
-    id_user INTEGER PRIMARY KEY,
+    user_id INTEGER PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
     avatar TEXT NOT NULL,
     status INTEGER NOT NULL,
     last_connection TEXT NOT NULL
   )`)
 
-console.log('DB created')
+console.log('DB users created')

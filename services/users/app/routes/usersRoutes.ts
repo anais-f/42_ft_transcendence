@@ -1,19 +1,21 @@
 import { FastifyPluginAsync } from 'fastify'
 import {
+	handleUserCreated,
+	getPublicUser
+} from '../controllers/usersControllers.js'
+import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
-	UserAuthSchema,
-	UserProfileSchema
-} from '../models/UsersDTO.js'
-import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
+	PublicUserAuthSchema,
+	UserPublicProfileSchema
+} from '@ft_transcendence/common'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
 	fastify.post(
-		'/users/webhookNewUser',
+		'/api/users/new-user',
 		{
 			schema: {
-				body: UserAuthSchema,
+				body: PublicUserAuthSchema,
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
@@ -26,16 +28,29 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	)
 
 	fastify.get(
-		'/users/:id',
+		'/api/users/:id',
 		{
 			schema: {
 				response: {
-					200: UserProfileSchema,
+					200: UserPublicProfileSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
 			}
 		},
-		getUser
+		getPublicUser
 	)
+
+	// TODO: GET /users/me - Private profile of the authenticated user
+	// fastify.get('/users/me', {
+	//       schema: {
+	//         response: {
+	//           200: UserPrivateProfileSchema,
+	//           404: ErrorResponseSchema,
+	//           500: ErrorResponseSchema
+	//         }
+	//       }
+	//     },
+	//     getPrivateUser
+	// )
 }
