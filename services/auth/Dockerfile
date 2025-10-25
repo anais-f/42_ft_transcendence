@@ -29,9 +29,8 @@ COPY tsconfig.json ./
 COPY packages/ ./packages/
 COPY services/ ./services/
 
+COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
-
-EXPOSE 3000
 
 RUN npm run build --workspace=auth-server-app
 

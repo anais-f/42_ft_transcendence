@@ -28,6 +28,7 @@ COPY tsconfig.json ./
 COPY packages/ ./packages/
 COPY services/ ./services/
 
+COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 
 RUN npm run build --workspace=users
@@ -38,18 +39,13 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+RUN mkdir -p /app/avatars
+
 COPY --from=build-app /build/services/users/app/dist ./dist
 COPY --from=build-app /build/services/users/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
 COPY --from=build-app /build/packages/common/ ./packages/common/
 COPY --from=build-app /build/packages/common/openapiDTO.json ./dist/openapiDTO.json
-
-# RUN mkdir -p /app/avatars && \
-# 	chown -R node:node /app && \
-# 	mkdir -p /data && \
-# 	chown -R node:node /data
-
-# USER node
 
 EXPOSE 3000
 
