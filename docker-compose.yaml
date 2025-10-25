@@ -12,7 +12,9 @@ services:
 
   frontend:
     restart: on-failure
-    build: services/frontend/
+    build:
+      context: .
+      dockerfile: services/frontend/Dockerfile
     container_name: frontend
     depends_on:
       - nginx
