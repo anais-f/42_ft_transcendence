@@ -1,9 +1,15 @@
+import '../style.css'
+import { WalerPage } from './pages/walers.js'
+import { HomePage } from './pages/homepage.js'
+import { AboutUsPage } from './pages/aboutUs.js'
+import { RegisterPage } from './pages/register.js'
+
 document.addEventListener('DOMContentLoaded', () => {
 	const contentDiv = document.getElementById('content')
 	const dynamicMenu = document.getElementById('menu')
 
 	if (!contentDiv || !dynamicMenu) {
-		console.error('Missing #content or #menu in DOM')
+		console.error('Missing #content or #menu in index.html')
 		return
 	}
 
@@ -11,29 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	const menu = dynamicMenu as HTMLElement
 
 	const pages = {
-		home: `
-      <h1>Welcome to Transcendence</h1>
-      <p>This is a single-page application example.</p>
-    `,
-		about: `
-      <h1>About Us</h1>
-      <p>We are dedicated to providing the best service.</p>
-    `,
-		register: `
-      <h1>Create account</h1>
-      <form id="register-form">
-        <label>
-          Username
-          <input id="reg-username" name="username" required minlength="4" maxlength="16" pattern="[A-Za-z0-9_-]{4,16}">
-        </label>
-        <label>
-          Password
-          <input id="reg-password" name="password" type="password" required minlength="8" maxlength="128">
-        </label>
-        <button type="submit">Register</button>
-      </form>
-      <p id="register-msg"></p>
-    `
+		home: HomePage(),
+		about: AboutUsPage(),
+		register: RegisterPage(),
+		wales: WalerPage()
 	} satisfies Record<string, string>
 
 	// Build menu
