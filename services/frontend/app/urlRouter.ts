@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <h1>Create account</h1>
       <form id="register-form">
         <label>
-          Username
-          <input id="reg-username" name="username" required minlength="4" maxlength="16" pattern="[A-Za-z0-9_-]{4,16}">
+          Login
+          <input id="reg-login" name="login" required minlength="4" maxlength="16" pattern="[A-Za-z0-9_-]{4,16}">
         </label>
         <label>
           Password
@@ -57,24 +57,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (!form || form.id !== 'register-form') return
 		e.preventDefault()
 
-		const username =
+		const login =
 			(
-				document.getElementById('reg-username') as HTMLInputElement
+				document.getElementById('reg-login') as HTMLInputElement
 			)?.value?.trim() ?? ''
 		const password =
 			(document.getElementById('reg-password') as HTMLInputElement)?.value ?? ''
 		const msg = document.getElementById('register-msg') as HTMLElement | null
 
-		if (!username || !password) {
-			if (msg) msg.textContent = 'Missing username or password'
+		if (!login || !password) {
+			if (msg) msg.textContent = 'Missing login or password'
 			return
 		}
 
 		try {
-			const res = await fetch('/auth/register', {
+			const res = await fetch('/auth/api/register', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ username, password })
+				body: JSON.stringify({ login, password })
 			})
 			if (!res.ok) {
 				const text = await res.text().catch(() => '')
