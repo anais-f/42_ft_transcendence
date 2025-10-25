@@ -21,13 +21,14 @@ app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
 async function runServer() {
+	console.log('Starting Auth service...')
 	await runMigrations()
 
-	// Load OpenAPI schemas from common package
+	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
-		fs.readFileSync(path.join(process.cwd(), './dist/openapiDTO.json'), 'utf-8')
+		fs.readFileSync(path.join(process.cwd(), ENV.OPEN_API_FILE), 'utf-8')
 	)
-
+	
 	// Configure Swagger to use the loaded schemas
 	await app.register(Swagger as any, {
 		openapi: {
@@ -42,15 +43,16 @@ async function runServer() {
 		},
 		transform: jsonSchemaTransform
 	})
-
+	
 	await app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-
+	
 	await registerRoutes(app)
 	await app.listen({ port: ENV.PORT, host: '0.0.0.0' })
 	console.log('Auth service running on http://localhost:', ENV.PORT)
 }
+
 runServer().catch((err) => {
 	app.log.error(err)
 	process.exit(1)
