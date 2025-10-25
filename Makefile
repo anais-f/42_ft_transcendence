@@ -7,7 +7,6 @@ COMPOSE := docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE)
 
 .PHONY: install
 install:
-	ln -s /goinfre/${USER}/docker/volumes ./local-volumes || true
 	./hooks/install-hooks.sh
 	./scripts/setup-node.sh
 	npm install
@@ -46,7 +45,7 @@ format-check:
 
 .PHONY: dev-build
 dev-build:
-	npm run build
+	rm -rf node_modules packages/*/node_modules services/*/app/node_modules
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
 
 .PHONY: dev-up

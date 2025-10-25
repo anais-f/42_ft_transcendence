@@ -1,4 +1,12 @@
 services:
+  install-dependencies:
+    container_name: install-dependencies
+    build:
+      context: .
+      dockerfile: .dev/Dockerfile.install
+    volumes:
+      - ./:/usr/src/app
+    command: npm install
   auth:
     build:
       context: .
@@ -6,12 +14,14 @@ services:
     container_name: auth-dev
     volumes:
       - ./:/usr/src/app
-      - auth_root_node_modules:/usr/src/app/node_modules
-      - auth_ws_node_modules:/usr/src/app/services/auth/app/node_modules
-      - auth_data:/usr/src/app/services/auth/app/data
     environment:
       - PORT=3042
+      - USERS_SERVICE_URL=http://users:3042
+      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
 
   users:
     build:
@@ -20,12 +30,14 @@ services:
     container_name: users-dev
     volumes:
       - ./:/usr/src/app
-      - users_root_node_modules:/usr/src/app/node_modules
-      - users_ws_node_modules:/usr/src/app/services/users/app/node_modules
-      - users_data:/usr/src/app/services/users/app/data
     environment:
       - PORT=3042
+      - AUTH_API_BASE_URL=http://auth:3042
+      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
 
   nginx:
     container_name: nginx-dev
