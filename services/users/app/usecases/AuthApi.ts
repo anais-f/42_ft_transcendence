@@ -4,6 +4,7 @@ import {
 	PublicUserListAuthSchema,
 	AppError
 } from '@ft_transcendence/common'
+import { ENV } from '../config/env.js'
 
 // TODO: update password via auth service
 // TODO: error handling with try/catch and custom errors
@@ -15,7 +16,8 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		const response = await fetch('http://auth:3000/api/users')
+		console.log(`${ENV.AUTH_API_BASE_URL}/api/users`)
+		const response = await fetch(`${ENV.AUTH_API_BASE_URL}/api/users`)
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 		const raw = (await response.json()) as PublicUserListAuthDTO
 		const parsed = PublicUserListAuthSchema.safeParse(raw)
