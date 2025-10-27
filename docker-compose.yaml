@@ -44,11 +44,11 @@ services:
     restart: on-failure
     container_name: pong-server
     build:
-       context: .
-       dockerfile: ./services/pong-server/Dockerfile
+      context: .
+      dockerfile: ./services/pong-server/Dockerfile
     depends_on:
-       frontend:
-          condition: service_healthy
+      frontend:
+        condition: service_healthy
 
   users:
     restart: on-failure
