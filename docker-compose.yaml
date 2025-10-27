@@ -71,6 +71,7 @@ services:
       - AUTH_API_BASE_URL=http://auth:3000
       - PORT=3000
       - OPEN_API_FILE=./dist/openapiDTO.json
+      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
     healthcheck:
       test:
         - CMD-SHELL
@@ -98,6 +99,7 @@ services:
       - USERS_SERVICE_URL=http://users:3000
       - PORT=3000
       - OPEN_API_FILE=./dist/openapiDTO.json
+      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
     healthcheck:
       test:
         - CMD-SHELL

@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <h1>Create account</h1>
       <form id="register-form">
         <label>
-          login
+          Login
           <input id="reg-login" name="login" required minlength="4" maxlength="16" pattern="[A-Za-z0-9_-]{4,16}">
         </label>
         <label>

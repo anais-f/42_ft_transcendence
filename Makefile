@@ -14,7 +14,7 @@ install:
 
 .PHONY: test
 test: down up
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
 
 .PHONY: build

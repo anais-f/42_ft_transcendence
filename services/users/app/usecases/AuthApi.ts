@@ -17,7 +17,11 @@ export class AuthApi {
 	 */
 	static async getAllUsers() {
 		console.log(`${ENV.AUTH_API_BASE_URL}/api/users`)
-		const response = await fetch(`${ENV.AUTH_API_BASE_URL}/api/users`)
+		const url = `${ENV.AUTH_API_BASE_URL}/api/users`
+		const headers = { 'content-type': 'application/json' }
+		const options = { method: 'GET', headers: headers }
+
+		const response = await fetch(url, options)
 		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 		const raw = (await response.json()) as PublicUserListAuthDTO
 		const parsed = PublicUserListAuthSchema.safeParse(raw)
@@ -30,3 +34,10 @@ export class AuthApi {
 		return parsed.data.users
 	}
 }
+
+/*const url = 'http://users:3000/api/users/new-user'
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', 'x-service-secret': 'ian' },
+			body: JSON.stringify(PublicUser)
+		})*/
