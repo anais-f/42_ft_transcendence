@@ -6,7 +6,6 @@ services:
       dockerfile: .dev/Dockerfile.install
     volumes:
       - ./:/usr/src/app
-    command: npm install
   auth:
     build:
       context: .
@@ -46,6 +45,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - '8042:8042'
+
 volumes:
   auth_root_node_modules:
   auth_ws_node_modules:
