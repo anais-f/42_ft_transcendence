@@ -23,6 +23,10 @@ build:
 up:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
+.PHONY: debug
+debug:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up
+
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
