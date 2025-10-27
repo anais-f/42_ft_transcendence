@@ -12,7 +12,7 @@ import {
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-const API_AUTH_USERS = 'test'
+const API_AUTH_USERS = process.env.API_AUTH_SECRET || 'test'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -32,15 +32,16 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			},
 			preHandler(request, reply, done) {
 				if (request.headers['authorization'] !== API_AUTH_USERS) {
-					reply.code(401).send({ error: 'Unauthorized' })
-				} else {
-					done()
+					void reply.code(401).send({ error: 'Unauthorized' })
+					return
 				}
+				done()
 			}
 		},
 		handleUserCreated
 	)
 
+	//TODO: protect routes with JWT
 	server.get(
 		'/api/users/:id',
 		{

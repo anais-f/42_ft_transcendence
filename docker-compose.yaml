@@ -43,6 +43,8 @@ services:
       - backend
     volumes:
       - avatars:/app/avatars
+    environment:
+      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
 
   auth:
     restart: on-failure
@@ -55,6 +57,8 @@ services:
       - frontend
     networks:
       - backend
+    environment:
+      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
 
 networks:
   pong:

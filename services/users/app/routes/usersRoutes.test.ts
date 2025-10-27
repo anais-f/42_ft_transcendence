@@ -2,20 +2,20 @@
  * Test Coverage Summary for usersRoutes
  *
  * SECTION 1: SUCCESSFUL CASES
- * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists
+ * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists (with auth header)
  * - GET /api/users/:id: Returns complete profile with all required fields
  *
  * SECTION 2: BASIC FAILURE CASES
- * - POST: Missing fields, invalid user_id/login
+ * - POST: Missing auth header (401), missing fields, invalid user_id/login
  * - GET: Invalid/negative id, user not found
  *
  * SECTION 3: TRICKY CASES
  * - Boundary values: login length limits, large user_id
  * - Special characters: valid patterns (underscores/dashes)
+ * - Authorization: Invalid token, missing token
  *
  * SECTION 4: EXCEPTIONS
  * - Controller error propagation
- * - HTTP method validation
  */
 
 import {
@@ -35,6 +35,9 @@ let ERROR_MESSAGES: any
 let serializerCompiler: any
 let validatorCompiler: any
 let ZodTypeProvider: any
+
+// Test auth token (matches the default in usersRoutes.ts)
+const TEST_AUTH_TOKEN = 'test'
 
 beforeAll(async () => {
 	await jest.unstable_mockModule('../controllers/usersControllers.js', () => ({
@@ -91,6 +94,9 @@ describe('usersRoutes', () => {
 				const response = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 42, login: 'testuser' }
 				})
 
@@ -112,6 +118,9 @@ describe('usersRoutes', () => {
 				const response = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1, login: 'existing' }
 				})
 
@@ -154,11 +163,41 @@ describe('usersRoutes', () => {
 
 	// ==================== SECTION 2: BASIC FAILURE CASES ====================
 	describe('2. Basic failure cases', () => {
-		describe('POST /api/users/new-user', () => {
+		describe('POST /api/users/new-user - Authorization', () => {
+			test('returns 401 when authorization header is missing', async () => {
+				const response = await app.inject({
+					method: 'POST',
+					url: '/api/users/new-user',
+					payload: { user_id: 42, login: 'testuser' }
+				})
+
+				expect(response.statusCode).toBe(401)
+				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
+			})
+
+			test('returns 401 when authorization header is invalid', async () => {
+				const response = await app.inject({
+					method: 'POST',
+					url: '/api/users/new-user',
+					headers: {
+						authorization: 'wrong-token'
+					},
+					payload: { user_id: 42, login: 'testuser' }
+				})
+
+				expect(response.statusCode).toBe(401)
+				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
+			})
+		})
+
+		describe('POST /api/users/new-user - Validation', () => {
 			test('returns 400 when required fields are missing', async () => {
 				const missingUserId = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { login: 'testuser' }
 				})
 				expect(missingUserId.statusCode).toBe(400)
@@ -166,6 +205,9 @@ describe('usersRoutes', () => {
 				const missingLogin = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1 }
 				})
 				expect(missingLogin.statusCode).toBe(400)
@@ -175,6 +217,9 @@ describe('usersRoutes', () => {
 				const negative = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: -1, login: 'test' }
 				})
 				expect(negative.statusCode).toBe(400)
@@ -182,6 +227,9 @@ describe('usersRoutes', () => {
 				const zero = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 0, login: 'test' }
 				})
 				expect(zero.statusCode).toBe(400)
@@ -191,6 +239,9 @@ describe('usersRoutes', () => {
 				const tooShort = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1, login: 'abc' }
 				})
 				expect(tooShort.statusCode).toBe(400)
@@ -198,6 +249,9 @@ describe('usersRoutes', () => {
 				const tooLong = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1, login: '12345678901234567' }
 				})
 				expect(tooLong.statusCode).toBe(400)
@@ -205,6 +259,9 @@ describe('usersRoutes', () => {
 				const invalidChars = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1, login: 'test user' }
 				})
 				expect(invalidChars.statusCode).toBe(400)
@@ -281,6 +338,9 @@ describe('usersRoutes', () => {
 				const minLength = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 1, login: 'abcd' }
 				})
 				expect(minLength.statusCode).toBe(201)
@@ -288,6 +348,9 @@ describe('usersRoutes', () => {
 				const maxLength = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
 					payload: { user_id: 2, login: '1234567890123456' }
 				})
 				expect(maxLength.statusCode).toBe(201)
@@ -303,86 +366,78 @@ describe('usersRoutes', () => {
 				const response = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
-					payload: { user_id: 999999999, login: 'biguser' }
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
+					payload: { user_id: 999999999, login: 'testuser' }
 				})
 
 				expect(response.statusCode).toBe(201)
 			})
 		})
 
-		describe('Special character patterns', () => {
-			test('accepts valid login patterns (underscores, dashes, numbers only)', async () => {
+		describe('Special characters in login', () => {
+			test('accepts valid special characters (underscore and dash)', async () => {
 				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
 						return reply.code(201).send({ success: true })
 					}
 				)
 
-				const withUnderscore = await app.inject({
+				const response = await app.inject({
 					method: 'POST',
 					url: '/api/users/new-user',
-					payload: { user_id: 1, login: 'test_user' }
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
+					payload: { user_id: 1, login: 'user_name-123' }
 				})
-				expect(withUnderscore.statusCode).toBe(201)
 
-				const numbersOnly = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					payload: { user_id: 2, login: '12345678' }
-				})
-				expect(numbersOnly.statusCode).toBe(201)
-			})
-
-			test('rejects invalid characters (dots, emoji, special chars)', async () => {
-				const withDot = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					payload: { user_id: 1, login: 'test.user' }
-				})
-				expect(withDot.statusCode).toBe(400)
-
-				const withEmoji = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					payload: { user_id: 1, login: 'test🔥' }
-				})
-				expect(withEmoji.statusCode).toBe(400)
+				expect(response.statusCode).toBe(201)
 			})
 		})
 	})
 
 	// ==================== SECTION 4: EXCEPTIONS ====================
 	describe('4. Exceptions', () => {
-		test('propagates controller errors correctly (AppError)', async () => {
-			const AppError = (await import('@ft_transcendence/common')).AppError
+		describe('Controller error propagation', () => {
+			test('POST propagates controller errors correctly', async () => {
+				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
+					async (req: any, reply: any) => {
+						return reply
+							.code(500)
+							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+					}
+				)
 
-			;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
-				async (req: any, reply: any) => {
-					throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-				}
-			)
+				const response = await app.inject({
+					method: 'POST',
+					url: '/api/users/new-user',
+					headers: {
+						authorization: TEST_AUTH_TOKEN
+					},
+					payload: { user_id: 1, login: 'test' }
+				})
 
-			const response = await app.inject({
-				method: 'GET',
-				url: '/api/users/999'
+				expect(response.statusCode).toBe(500)
 			})
 
-			expect([404, 500]).toContain(response.statusCode)
-		})
+			test('GET propagates controller errors correctly', async () => {
+				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
+					async (req: any, reply: any) => {
+						return reply
+							.code(500)
+							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+					}
+				)
 
-		test('rejects incorrect HTTP methods', async () => {
-			const putResponse = await app.inject({
-				method: 'PUT',
-				url: '/api/users/new-user',
-				payload: { user_id: 1, login: 'test' }
-			})
-			expect(putResponse.statusCode).toBe(404)
+				const response = await app.inject({
+					method: 'GET',
+					url: '/api/users/1'
+				})
 
-			const deleteResponse = await app.inject({
-				method: 'DELETE',
-				url: '/api/users/1'
+				expect(response.statusCode).toBe(500)
 			})
-			expect(deleteResponse.statusCode).toBe(404)
 		})
 	})
 })

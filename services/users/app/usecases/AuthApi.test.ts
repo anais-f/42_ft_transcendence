@@ -73,7 +73,10 @@ describe('AuthApi', () => {
 
 			expect(result).toEqual(mockResponse.users)
 			expect(result).toHaveLength(3)
-			expect(mockFetch).toHaveBeenCalledWith('http://auth:3000/api/users')
+			expect(mockFetch).toHaveBeenCalledWith('http://auth:3000/api/users', {
+				method: 'GET',
+				headers: { 'content-type': 'application/json' }
+			})
 		})
 
 		test('validates response data against PublicUserListAuthSchema', async () => {
@@ -106,16 +109,12 @@ describe('AuthApi', () => {
 			const result = await AuthApi.getAllUsers()
 
 			expect(result).toEqual([])
-			expect(result).toHaveLength(0)
+			expect(Array.isArray(result)).toBe(true)
 		})
 
-		test('accepts valid login patterns (alphanumeric, underscores, dashes)', async () => {
+		test('handles single user in array correctly', async () => {
 			const mockResponse = {
-				users: [
-					{ user_id: 1, login: 'user123' },
-					{ user_id: 2, login: 'test_user' },
-					{ user_id: 3, login: 'user-name' }
-				]
+				users: [{ user_id: 1, login: 'solo_user' }]
 			}
 
 			mockFetch.mockResolvedValueOnce({
@@ -125,8 +124,8 @@ describe('AuthApi', () => {
 
 			const result = await AuthApi.getAllUsers()
 
-			expect(result).toHaveLength(3)
-			expect(result[1].login).toBe('test_user')
+			expect(result).toHaveLength(1)
+			expect(result[0]).toEqual({ user_id: 1, login: 'solo_user' })
 		})
 	})
 
