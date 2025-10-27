@@ -16,9 +16,6 @@ jobs:
       - name: Install dependencies
         run: |
           make install
-      - name: Build project
-        run: |
-          npm run build
       - name: Run unit tests
         run: |
           make test
