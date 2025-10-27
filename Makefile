@@ -1,6 +1,7 @@
 NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 DOCKER_COMPOSE_FILE_DEV := ./docker-compose.override.yaml
+DOCKER_COMPOSE_FILE_TEST := ./docker-compose.test.yaml
 .DEFAULT_GOAL = up
 SERVICES := $(shell docker compose -f $(DOCKER_COMPOSE_FILE) config --services)
 COMPOSE := docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE)
@@ -12,8 +13,9 @@ install:
 	npm install
 
 .PHONY: test
-test:
-	npm test
+test: down up
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
 
 .PHONY: build
 build:
