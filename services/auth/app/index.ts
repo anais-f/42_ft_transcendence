@@ -1,6 +1,11 @@
 import Fastify, { FastifyRequest } from 'fastify'
 import { runMigrations } from './database/connection.js'
-import { ZodTypeProvider, validatorCompiler, serializerCompiler, jsonSchemaTransform } from 'fastify-type-provider-zod'
+import {
+	ZodTypeProvider,
+	validatorCompiler,
+	serializerCompiler,
+	jsonSchemaTransform
+} from 'fastify-type-provider-zod'
 import { registerRoutes } from './routes/registerRoutes.js'
 import { ENV } from './config/env.js'
 import Swagger from '@fastify/swagger'
@@ -9,7 +14,7 @@ import fs from 'fs'
 import path from 'path'
 
 const app = Fastify({
-    logger: true
+	logger: true
 }).withTypeProvider<ZodTypeProvider>()
 
 app.setValidatorCompiler(validatorCompiler)
@@ -23,7 +28,7 @@ async function runServer() {
 	const openapiSwagger = JSON.parse(
 		fs.readFileSync(path.join(process.cwd(), ENV.OPEN_API_FILE), 'utf-8')
 	)
-	
+
 	// Configure Swagger to use the loaded schemas
 	await app.register(Swagger as any, {
 		openapi: {
@@ -38,11 +43,11 @@ async function runServer() {
 		},
 		transform: jsonSchemaTransform
 	})
-	
+
 	await app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-	
+
 	await registerRoutes(app)
 	await app.listen({ port: ENV.PORT, host: '0.0.0.0' })
 	console.log('Auth service running on http://localhost:', ENV.PORT)
