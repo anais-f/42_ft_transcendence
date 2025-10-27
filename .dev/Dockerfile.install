@@ -2,4 +2,4 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-CMD [ "sh", "-c", "npm i  && echo 1 && npm run build && echo 2" ]
+CMD [ "sh", "-c", "npm i  && npm run build" ]
