@@ -20,23 +20,11 @@ const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const HOST = '0.0.0.0'
 
-function loadOpenAPISchema() {
-	try {
-		const schemaData = fs.readFileSync(OPENAPI_FILE, 'utf-8')
-		return JSON.parse(schemaData)
-	} catch (error) {
-		console.error('Error loading OpenAPI schema:', error)
-		return null
-	}
-}
-
 function createApp(): FastifyInstance {
 	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
-
 	const openapiSwagger = loadOpenAPISchema()
-
 	app.register(Swagger as any, {
 		openapi: {
 			info: {
@@ -48,13 +36,10 @@ function createApp(): FastifyInstance {
 		},
 		transform: jsonSchemaTransform
 	})
-
 	app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-
 	app.register(usersRoutes)
-
 	return app
 }
 
@@ -87,6 +72,16 @@ export async function start(): Promise<void> {
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)
+	}
+}
+
+function loadOpenAPISchema() {
+	try {
+		const schemaData = fs.readFileSync(OPENAPI_FILE, 'utf-8')
+		return JSON.parse(schemaData)
+	} catch (error) {
+		console.error('Error loading OpenAPI schema:', error)
+		return null
 	}
 }
 

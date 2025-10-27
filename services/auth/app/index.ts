@@ -1,20 +1,15 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyRequest } from 'fastify'
 import { runMigrations } from './database/connection.js'
+import { ZodTypeProvider, validatorCompiler, serializerCompiler, jsonSchemaTransform } from 'fastify-type-provider-zod'
 import { registerRoutes } from './routes/registerRoutes.js'
 import { ENV } from './config/env.js'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import path from 'path'
-import {
-	ZodTypeProvider,
-	validatorCompiler,
-	serializerCompiler,
-	jsonSchemaTransform
-} from 'fastify-type-provider-zod'
 
 const app = Fastify({
-	logger: true
+    logger: true
 }).withTypeProvider<ZodTypeProvider>()
 
 app.setValidatorCompiler(validatorCompiler)
