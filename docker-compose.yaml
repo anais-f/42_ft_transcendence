@@ -26,7 +26,6 @@ services:
        context: .
        dockerfile: ./services/pong-server/Dockerfile
      depends_on:
-       - nginx
        - frontend
 
   users:
@@ -36,7 +35,6 @@ services:
       context: .
       dockerfile: services/users/Dockerfile
     depends_on:
-      - nginx
       - frontend
       - auth
     networks:
@@ -56,7 +54,6 @@ services:
       context: .
       dockerfile: ./services/auth/Dockerfile
     depends_on:
-      - nginx
       - frontend
     networks:
       - backend
@@ -68,6 +65,32 @@ services:
       - PORT=3000
       - OPEN_API_FILE=./dist/openapiDTO.json
 
+  prometheus:
+    image: prom/prometheus:v3.7.2
+    container_name: prometheus
+    networks:
+      - backend
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./services/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - auth
+      - users
+
+  grafana:
+    image: grafana/grafana-oss:12.2.0-17142428006
+    container_name: grafana
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./services/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+
 networks:
   pong:
     driver: bridge
@@ -78,3 +101,4 @@ volumes:
   db_auth_data:
   db_users_data:
   avatars:
+  grafana_data:
