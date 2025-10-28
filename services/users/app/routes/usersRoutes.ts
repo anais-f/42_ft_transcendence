@@ -31,7 +31,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			},
 			preHandler(request, reply, done) {
 				if (request.headers['authorization'] !== process.env.USERS_API_SECRET) {
-					void reply.code(401).send({ error: ERROR_MESSAGES.UNAUTHORIZED });
+					reply.code(401).send({ success: false, error: ERROR_MESSAGES.UNAUTHORIZED })
 					return
 				}
 				done()

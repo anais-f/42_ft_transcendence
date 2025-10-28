@@ -1,5 +1,7 @@
 .secret
 .env
+.env.*
+
 
 #IDE
 .idea/

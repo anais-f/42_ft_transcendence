@@ -36,10 +36,14 @@ let serializerCompiler: any
 let validatorCompiler: any
 let ZodTypeProvider: any
 
-// Test auth token (matches the default in usersRoutes.ts)
-const TEST_AUTH_TOKEN = 'test'
+// Test auth token from environment (or fallback to 'test')
+const TEST_USERS_TOKEN = process.env.USERS_API_SECRET || 'test'
 
 beforeAll(async () => {
+	if (!process.env.USERS_API_SECRET) {
+		process.env.USERS_API_SECRET = 'test'
+	}
+
 	await jest.unstable_mockModule('../controllers/usersControllers.js', () => ({
 		handleUserCreated: jest.fn(),
 		getPublicUser: jest.fn()
@@ -95,7 +99,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 42, login: 'testuser' }
 				})
@@ -119,7 +123,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'existing' }
 				})
@@ -196,7 +200,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { login: 'testuser' }
 				})
@@ -206,7 +210,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1 }
 				})
@@ -218,7 +222,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: -1, login: 'test' }
 				})
@@ -228,7 +232,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 0, login: 'test' }
 				})
@@ -240,7 +244,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'abc' }
 				})
@@ -250,7 +254,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: '12345678901234567' }
 				})
@@ -260,7 +264,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'test user' }
 				})
@@ -339,7 +343,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'abcd' }
 				})
@@ -349,7 +353,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 2, login: '1234567890123456' }
 				})
@@ -367,7 +371,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 999999999, login: 'testuser' }
 				})
@@ -388,7 +392,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'user_name-123' }
 				})
@@ -414,7 +418,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'test' }
 				})
