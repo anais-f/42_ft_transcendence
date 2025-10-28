@@ -1,8 +1,7 @@
 import DatabaseConstructor from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
-import { ENV } from '../config/env.js'
 
-export const db: Database = new DatabaseConstructor(ENV.DB_PATH)
+export const db: Database = new DatabaseConstructor(process.env.USERS_DB_PATH)
 
 db.exec(`  CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,

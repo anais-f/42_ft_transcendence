@@ -12,7 +12,7 @@ import {
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-const API_AUTH_USERS = process.env.API_AUTH_SECRET || 'test'
+const API_AUTH_USERS = process.env.AUTH_API_SECRET as string
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()

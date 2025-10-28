@@ -7,7 +7,6 @@ import {
 	jsonSchemaTransform
 } from 'fastify-type-provider-zod'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { ENV } from './config/env.js'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
@@ -26,7 +25,7 @@ async function runServer() {
 
 	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
-		fs.readFileSync(path.join(process.cwd(), ENV.OPEN_API_FILE), 'utf-8')
+		fs.readFileSync(path.join(process.cwd(), process.env.OPEN_API_FILE as string), 'utf-8')
 	)
 
 	// Configure Swagger to use the loaded schemas
@@ -49,8 +48,8 @@ async function runServer() {
 	})
 
 	await registerRoutes(app)
-	await app.listen({ port: ENV.PORT, host: '0.0.0.0' })
-	console.log('Auth service running on http://localhost:', ENV.PORT)
+	await app.listen({ port: parseInt(process.env.PORT as string), host: '0.0.0.0' })
+	console.log('Auth service running on http://localhost:', process.env.PORT)
 }
 
 runServer().catch((err) => {

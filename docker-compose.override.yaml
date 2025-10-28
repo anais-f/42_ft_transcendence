@@ -40,7 +40,7 @@ services:
       - ./:/usr/src/app
     environment:
       - PORT=3042
-      - AUTH_API_BASE_URL=http://auth:3042
+      - AUTH_SERVICE_URL=http://auth:3042
       - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:

@@ -17,10 +17,10 @@ services:
       - backend
     environment:
       - DB_PATH=/data/db-users.sqlite
-      - AUTH_API_BASE_URL=http://auth:3000
+      - AUTH_SERVICE_URL=http://auth:3000
       - PORT=3000
       - OPEN_API_FILE=./dist/openapiDTO.json
-      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
+      - AUTH_API_SECRET=${AUTH_API_SECRET:-test}
     depends_on:
       install-dependencies:
         condition: service_completed_successfully

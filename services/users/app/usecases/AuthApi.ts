@@ -4,7 +4,6 @@ import {
 	PublicUserListAuthSchema,
 	AppError
 } from '@ft_transcendence/common'
-import { ENV } from '../config/env.js'
 
 // TODO: update password via auth service
 // TODO: error handling with try/catch and custom errors
@@ -16,8 +15,8 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		console.log(`${ENV.AUTH_API_BASE_URL}/api/users`)
-		const url = `${ENV.AUTH_API_BASE_URL}/api/users`
+		console.log(`${process.env.AUTH_SERVICE_URL}/api/users`)
+		const url = `${process.env.AUTH_SERVICE_URL}/api/users`
 		const headers = { 'content-type': 'application/json' }
 		const options = { method: 'GET', headers: headers }
 

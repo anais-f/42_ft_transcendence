@@ -66,12 +66,8 @@ services:
     volumes:
       - avatars:/app/avatars
       - db_users_data:/data
-    environment:
-      - DB_PATH=/data/db-users.sqlite
-      - AUTH_API_BASE_URL=http://auth:3000
-      - PORT=3000
-      - OPEN_API_FILE=./dist/openapiDTO.json
-      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
+    env_file:
+      - .env.test
     healthcheck:
       test:
         - CMD-SHELL
@@ -94,12 +90,8 @@ services:
       - backend
     volumes:
       - db_auth_data:/data
-    environment:
-      - DB_PATH=/data/db-auth.sqlite
-      - USERS_SERVICE_URL=http://users:3000
-      - PORT=3000
-      - OPEN_API_FILE=./dist/openapiDTO.json
-      - API_AUTH_SECRET=${API_AUTH_SECRET:-test}
+    env_file:
+      - .env.test
     healthcheck:
       test:
         - CMD-SHELL
