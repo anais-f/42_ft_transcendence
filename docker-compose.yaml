@@ -133,7 +133,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./services/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./services/monitoring/grafana:/etc/grafana/provisioning/datasources:ro
     depends_on:
       prometheus:
         condition: service_healthy
