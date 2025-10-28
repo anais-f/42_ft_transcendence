@@ -15,7 +15,6 @@ services:
       - ./:/usr/src/app
     environment:
       - PORT=3042
-      - USERS_SERVICE_URL=http://users:3042
       - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
@@ -29,7 +28,6 @@ services:
       timeout: 3s
       retries: 12
       start_period: 20s
-    
 
   users:
     build:
@@ -40,7 +38,6 @@ services:
       - ./:/usr/src/app
     environment:
       - PORT=3042
-      - AUTH_SERVICE_URL=http://auth:3042
       - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
@@ -54,7 +51,6 @@ services:
       timeout: 3s
       retries: 12
       start_period: 20s
-
 
   nginx:
     container_name: nginx-dev
