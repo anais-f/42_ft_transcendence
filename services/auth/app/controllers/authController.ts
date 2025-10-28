@@ -7,7 +7,6 @@ import {
 } from '@ft_transcendence/common'
 import { findPublicUserByLogin } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
-import { ENV } from '../config/env.js'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -26,11 +25,13 @@ export async function registerController(
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
-		console.log('PublicUser', PublicUser)
-		const url = `${ENV.USERS_SERVICE_URL}/api/users/new-user`
+		const url = `${process.env.USERS_SERVICE_URL}/api/users/new-user`
 		const response = await fetch(url, {
 			method: 'POST',
-			headers: { 'content-type': 'application/json' },
+			headers: {
+				'content-type': 'application/json',
+				authorization: process.env.AUTH_API_SECRET as string
+			},
 			body: JSON.stringify(PublicUser)
 		})
 

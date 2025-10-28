@@ -9,24 +9,46 @@ services:
       - backend
     volumes:
       - avatars:/usr/share/nginx/html/avatars:ro
+    depends_on:
+      frontend:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      users:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:8080 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   frontend:
     restart: on-failure
     build: services/frontend/
     container_name: frontend
-    depends_on:
-      - nginx
     networks:
       - backend
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
 
   pong-server:
-     restart: on-failure
-     container_name: pong-server
-     build:
-       context: .
-       dockerfile: ./services/pong-server/Dockerfile
-     depends_on:
-       - frontend
+    restart: on-failure
+    container_name: pong-server
+    build:
+      context: .
+      dockerfile: ./services/pong-server/Dockerfile
+    depends_on:
+      frontend:
+        condition: service_healthy
 
   users:
     restart: on-failure
@@ -35,18 +57,26 @@ services:
       context: .
       dockerfile: services/users/Dockerfile
     depends_on:
-      - frontend
-      - auth
+      frontend:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
     networks:
       - backend
     volumes:
       - avatars:/app/avatars
       - db_users_data:/data
-    environment:
-      - DB_PATH=/data/db-users.sqlite
-      - AUTH_API_BASE_URL=http://auth:3000
-      - PORT=3000
-      - OPEN_API_FILE=./dist/openapiDTO.json
+    env_file:
+      - .env.test
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
   auth:
     restart: on-failure
     container_name: auth
@@ -54,16 +84,22 @@ services:
       context: .
       dockerfile: ./services/auth/Dockerfile
     depends_on:
-      - frontend
+      frontend:
+        condition: service_healthy
     networks:
       - backend
     volumes:
       - db_auth_data:/data
-    environment:
-      - DB_PATH=/data/db-auth.sqlite
-      - USERS_SERVICE_URL=http://users:3000
-      - PORT=3000
-      - OPEN_API_FILE=./dist/openapiDTO.json
+    env_file:
+      - .env.test
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
 
   prometheus:
     image: prom/prometheus:v3.7.2
@@ -77,6 +113,14 @@ services:
     depends_on:
       - auth
       - users
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:9090 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   grafana:
     image: grafana/grafana-oss:12.2.0-17142428006
@@ -90,6 +134,14 @@ services:
       - ./services/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
       - prometheus
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:3000 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
 networks:
   pong:

@@ -8,21 +8,14 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Setup node.js
+        uses: actions/checkout@v4
+        with:
+          node-version: '22'
 
-      - name: Run unit tests via Makefile
+      - name: Install dependencies
         run: |
-          # Install npm for test
-          if make install; then
-            echo "Npm installed succesfully."
-          else
-            echo "Npm installed failed."
-            exit 1
-          fi
-          # Run unit tests via Makefile
-          if make test; then
-            echo "All unit tests passed successfully."
-          else
-            echo "Unit tests failed. Please fix the failing tests before merging."
-            exit 1
-          fi
+          make install
+      - name: Run unit tests
+        run: |
+          make test
