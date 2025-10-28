@@ -18,3 +18,5 @@ TODO
 *.js
 *.d.ts
 *.js.map
+openapi*.json
+

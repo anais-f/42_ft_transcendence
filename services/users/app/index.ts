@@ -14,13 +14,12 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 
-const OPENAPI_FILE = path.join(
-	process.cwd(),
-	process.env.DTO_OPEN_API_FILE as string
-)
+const DTO_OPEN_API_FILE_ENV =
+	process.env.DTO_OPEN_API_FILE || './dist/openapiDTO.json'
+const OPENAPI_FILE = path.join(process.cwd(), DTO_OPEN_API_FILE_ENV)
 const HOST = process.env.HOST || 'http://localhost:8080'
-const SWAGGER_TITTLE = 'API for Users Service'
-const SWAGGER_SERVER_URL = `${HOST}/users`
+// const SWAGGER_TITTLE = 'API for Users Service'
+// const SWAGGER_SERVER_URL = `${HOST}/users`
 
 function createApp(): FastifyInstance {
 	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
@@ -30,10 +29,10 @@ function createApp(): FastifyInstance {
 	app.register(Swagger as any, {
 		openapi: {
 			info: {
-				title: SWAGGER_TITTLE,
+				title: 'API for Users Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: SWAGGER_SERVER_URL, description: 'Local server' }],
+			servers: [{ url: `${HOST}/users`, description: 'Local server' }],
 			components: openapiSwagger.components
 		},
 		transform: jsonSchemaTransform
@@ -73,7 +72,7 @@ export async function start(): Promise<void> {
 			host: '0.0.0.0'
 		})
 		console.log('Listening on port ', process.env.PORT)
-		console.log(`Swagger UI available at ${SWAGGER_SERVER_URL}/docs`)
+		console.log(`Swagger UI available at ${HOST}/users/docs`)
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)
@@ -82,11 +81,18 @@ export async function start(): Promise<void> {
 
 function loadOpenAPISchema() {
 	try {
+		if (!fs.existsSync(OPENAPI_FILE)) {
+			console.warn(
+				`OpenAPI DTO file not found at ${OPENAPI_FILE} - continuing without OpenAPI components`
+			)
+			return { components: {} }
+		}
+
 		const schemaData = fs.readFileSync(OPENAPI_FILE, 'utf-8')
 		return JSON.parse(schemaData)
 	} catch (error) {
 		console.error('Error loading OpenAPI schema:', error)
-		return null
+		return { components: {} }
 	}
 }
 
