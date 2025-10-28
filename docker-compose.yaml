@@ -67,7 +67,7 @@ services:
       - avatars:/app/avatars
       - db_users_data:/data
     env_file:
-      - .env.dev
+      - .env.test
     healthcheck:
       test:
         - CMD-SHELL
@@ -91,7 +91,7 @@ services:
     volumes:
       - db_auth_data:/data
     env_file:
-      - .env.dev
+      - .env.test
     healthcheck:
       test:
         - CMD-SHELL

@@ -17,7 +17,10 @@ export class AuthApi {
 	static async getAllUsers() {
 		console.log(`${process.env.AUTH_SERVICE_URL}/api/users`)
 		const url = `${process.env.AUTH_SERVICE_URL}/api/users`
-		const headers = { 'content-type': 'application/json', 'authorizaton': process.env.AUTH_API_SECRET as string }
+		const headers = {
+			'content-type': 'application/json',
+			authorizaton: process.env.AUTH_API_SECRET as string
+		}
 		const options = { method: 'GET', headers: headers }
 
 		const response = await fetch(url, options)

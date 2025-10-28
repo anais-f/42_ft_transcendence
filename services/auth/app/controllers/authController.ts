@@ -30,7 +30,7 @@ export async function registerController(
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
-				'authorization': process.env.AUTH_API_SECRET as string
+				authorization: process.env.AUTH_API_SECRET as string
 			},
 			body: JSON.stringify(PublicUser)
 		})
