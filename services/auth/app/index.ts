@@ -26,7 +26,7 @@ async function runServer() {
 	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
 		fs.readFileSync(
-			path.join(process.cwd(), process.env.DTO_OPENAPI_FILE as string),
+			process.env.DTO_OPENAPI_FILE as string,
 			'utf-8'
 		)
 	)
