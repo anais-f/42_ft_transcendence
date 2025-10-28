@@ -14,12 +14,9 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 
-const DTO_OPEN_API_FILE_ENV =
-	process.env.DTO_OPEN_API_FILE || './dist/openapiDTO.json'
-const OPENAPI_FILE = path.join(process.cwd(), DTO_OPEN_API_FILE_ENV)
+
+const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
-// const SWAGGER_TITTLE = 'API for Users Service'
-// const SWAGGER_SERVER_URL = `${HOST}/users`
 
 function createApp(): FastifyInstance {
 	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()

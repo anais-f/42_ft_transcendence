@@ -5,17 +5,18 @@ services:
       context: .
       dockerfile: .dev/Dockerfile.install
     volumes:
-      - ./:/usr/src/app
+      - ./:/app
+
   auth:
     build:
       context: .
       dockerfile: services/auth/Dockerfile.dev
     container_name: auth-dev
     volumes:
-      - ./:/usr/src/app
+      - ./:/app
     environment:
       - PORT=3042
-      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:
@@ -35,10 +36,10 @@ services:
       dockerfile: services/users/Dockerfile.dev
     container_name: users-dev
     volumes:
-      - ./:/usr/src/app
+      - ./:/app
     environment:
       - PORT=3042
-      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:

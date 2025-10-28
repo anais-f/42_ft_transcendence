@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: .dev/Dockerfile.install
     volumes:
-      - ./:/usr/src/app
+      - ./:/app
 
   test:
     image: node:22-alpine
