@@ -7,12 +7,11 @@ import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
 	PublicUserAuthSchema,
-	UserPublicProfileSchema
+	UserPublicProfileSchema,
+  ERROR_MESSAGES
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-
-const API_AUTH_USERS = process.env.AUTH_API_SECRET as string
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -31,8 +30,8 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				}
 			},
 			preHandler(request, reply, done) {
-				if (request.headers['authorization'] !== API_AUTH_USERS) {
-					void reply.code(401).send({ error: 'Unauthorized' })
+				if (request.headers['authorization'] !== process.env.USERS_API_SECRET) {
+					void reply.code(401).send({ error: ERROR_MESSAGES.UNAUTHORIZED });
 					return
 				}
 				done()

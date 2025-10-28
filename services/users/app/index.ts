@@ -16,11 +16,11 @@ import { UsersServices } from './usecases/usersServices.js'
 
 const OPENAPI_FILE = path.join(
 	process.cwd(),
-	process.env.OPEN_API_FILE as string
+	process.env.DTO_OPEN_API_FILE as string
 )
+const HOST = process.env.HOST || 'http://localhost:8080'
 const SWAGGER_TITTLE = 'API for Users Service'
-const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
-const HOST = '0.0.0.0'
+const SWAGGER_SERVER_URL = `${HOST}/users`
 
 function createApp(): FastifyInstance {
 	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
@@ -48,7 +48,7 @@ function createApp(): FastifyInstance {
 async function dumpOpenAPISchema(app: FastifyInstance): Promise<void> {
 	const openapiDoc = app.swagger()
 	writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
-	console.log('Documentation OpenAPI écrite dans openapi.json')
+	console.log('Documentation OpenAPI writen in openapi.json')
 }
 
 async function initializeUsers(): Promise<void> {
