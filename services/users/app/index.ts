@@ -14,7 +14,10 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 
-const OPENAPI_FILE = path.join(process.cwd(), process.env.OPEN_API_FILE as string)
+const OPENAPI_FILE = path.join(
+	process.cwd(),
+	process.env.OPEN_API_FILE as string
+)
 const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const HOST = '0.0.0.0'
@@ -65,7 +68,10 @@ export async function start(): Promise<void> {
 		await app.ready()
 		await dumpOpenAPISchema(app)
 		await initializeUsers()
-		await app.listen({ port: parseInt(process.env.PORT as string), host: '0.0.0.0' })
+		await app.listen({
+			port: parseInt(process.env.PORT as string),
+			host: '0.0.0.0'
+		})
 		console.log('Listening on port ', process.env.PORT)
 		console.log(`Swagger UI available at ${SWAGGER_SERVER_URL}/docs`)
 	} catch (err) {

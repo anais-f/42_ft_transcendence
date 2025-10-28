@@ -25,7 +25,10 @@ async function runServer() {
 
 	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
-		fs.readFileSync(path.join(process.cwd(), process.env.OPEN_API_FILE as string), 'utf-8')
+		fs.readFileSync(
+			path.join(process.cwd(), process.env.OPEN_API_FILE as string),
+			'utf-8'
+		)
 	)
 
 	// Configure Swagger to use the loaded schemas
@@ -48,7 +51,10 @@ async function runServer() {
 	})
 
 	await registerRoutes(app)
-	await app.listen({ port: parseInt(process.env.PORT as string), host: '0.0.0.0' })
+	await app.listen({
+		port: parseInt(process.env.PORT as string),
+		host: '0.0.0.0'
+	})
 	console.log('Auth service running on http://localhost:', process.env.PORT)
 }
 
