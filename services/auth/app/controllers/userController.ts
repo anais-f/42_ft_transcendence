@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { getPublicUsers, getPublicUser } from '../usecases/user.js'
+import { listPublicUsers as getPublicUsers, findPublicUserById as getPublicUser } from '../repositories/userRepository.js'
 import {
 	PublicUserAuthSchema,
 	PublicUserListAuthSchema
