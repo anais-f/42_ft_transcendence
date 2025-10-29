@@ -2,9 +2,11 @@ import { Vector2 } from '@packages/pong-shared/srcs/math/Vector2.js'
 import { IC00PongBase } from './C00.js'
 
 export class C01Move implements IC00PongBase {
-	time: number
 	private dir: Vector2
-	constructor(coord: Vector2) {
+	constructor(
+		coord: Vector2,
+		public time = Date.now()
+	) {
 		this.time = Date.now()
 		this.dir = coord
 	}

@@ -1,7 +1,5 @@
 export class C03BallBase {
-	time: number
-
-	constructor(time: number) {
+	constructor(public time: number) {
 		this.time = time
 	}
 

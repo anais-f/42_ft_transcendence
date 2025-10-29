@@ -1,11 +1,7 @@
 import { IS00PongBase } from './S00.js'
 
 export class S01ServerTickConfirmation implements IS00PongBase {
-	time: number
-
-	constructor() {
-		this.time = Date.now()
-	}
+	constructor(public time: number = Date.now()) {}
 
 	getTime(): number {
 		return this.time

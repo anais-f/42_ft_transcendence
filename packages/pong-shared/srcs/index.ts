@@ -15,3 +15,4 @@ export * from './engine/game-engine.js'
 // CPackets
 export * from './network/Packet/Client/CPackets.js'
 export * from './network/Packet/Server/SPackets.js'
+export * from './network/Packet/packetBuilder.js'

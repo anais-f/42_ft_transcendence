@@ -8,8 +8,8 @@ export class C06BallVeloPos extends C03BallBase implements IC00PongBase {
 	private C05: C05BallPos
 	private C04: C04BallVelo
 
-	constructor(pos: Vector2, velo: Vector2) {
-		const C03 = C03BallBase.createC03()
+	constructor(pos: Vector2, velo: Vector2, ts: number | null = null) {
+		const C03 = ts === null ? C03BallBase.createC03() : new C03BallBase(ts)
 
 		super(C03.getTime())
 		this.C04 = new C04BallVelo(C03, velo)
