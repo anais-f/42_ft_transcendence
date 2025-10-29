@@ -2,8 +2,8 @@ import './database/usersDatabase.js'
 import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
+import fastifyJwt from '@fastify/jwt'
 import fs from 'fs'
-import path from 'path'
 import { writeFileSync } from 'node:fs'
 import {
 	ZodTypeProvider,
@@ -21,6 +21,15 @@ function createApp(): FastifyInstance {
 	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
+
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET environment variable is required')
+  }
+  app.register(fastifyJwt, {
+    secret: jwtSecret
+  })
+
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
 		openapi: {

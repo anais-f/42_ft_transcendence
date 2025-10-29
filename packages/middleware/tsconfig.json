@@ -1,0 +1,15 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"outDir": "dist",
+		"rootDir": "srcs",
+		"module": "NodeNext",
+		"target": "ES2020",
+		"moduleResolution": "NodeNext",
+		"skipLibCheck": true
+	},
+	"include": ["srcs/**/*"]
+}

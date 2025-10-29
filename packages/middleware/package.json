@@ -1,0 +1,25 @@
+{
+	"name": "@ft_transcendence/middleware",
+	"version": "0.0.1",
+	"description": "Shared validation code for backend",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"default": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./*": "./dist/*"
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.json"
+	},
+	"devDependencies": {
+		"typescript": "^5.1.6"
+	}
+}
