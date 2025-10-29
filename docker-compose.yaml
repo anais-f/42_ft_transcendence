@@ -49,6 +49,14 @@ services:
     depends_on:
       frontend:
         condition: service_healthy
+    healthcheck:
+      test: 
+        - CMD-SHELL
+        - "true"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
 
   users:
     restart: on-failure
