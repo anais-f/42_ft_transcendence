@@ -22,13 +22,13 @@ function createApp(): FastifyInstance {
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
-  const jwtSecret = process.env.JWT_SECRET
-  if (!jwtSecret) {
-    throw new Error('JWT_SECRET environment variable is required')
-  }
-  app.register(fastifyJwt, {
-    secret: jwtSecret
-  })
+	const jwtSecret = process.env.JWT_SECRET
+	if (!jwtSecret) {
+		throw new Error('JWT_SECRET environment variable is required')
+	}
+	app.register(fastifyJwt, {
+		secret: jwtSecret
+	})
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {

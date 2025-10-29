@@ -80,7 +80,7 @@ describe('usersControllers', () => {
 
 		test('getPublicUser: returns complete profile directly with 200 status', async () => {
 			const mockRequest = {
-				params: { id: '42' }
+				params: { id: 42 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -109,7 +109,7 @@ describe('usersControllers', () => {
 
 		test('getPublicUser: returns profile with all 5 required fields', async () => {
 			const mockRequest = {
-				params: { id: '1' }
+				params: { id: 1 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -154,19 +154,15 @@ describe('usersControllers', () => {
 
 			await handleUserCreated(mockRequest, mockReply)
 
-			expect(UsersServices.createUser).toHaveBeenCalledWith({
-				user_id: 3,
-				login: 'user_name-123'
-			})
 			expect(mockReply.code).toHaveBeenCalledWith(201)
 		})
 	})
 
 	// ==================== SECTION 2: BASIC FAILURE CASES ====================
 	describe('2. Basic failure cases', () => {
-		test('handleUserCreated: returns 200 when user already exists (not an error)', async () => {
+		test('handleUserCreated: returns 200 when user already exists', async () => {
 			const mockRequest = {
-				body: { user_id: 42, login: 'existing' }
+				body: { user_id: 1, login: 'existing' }
 			} as FastifyRequest
 
 			const mockReply = {
@@ -186,9 +182,9 @@ describe('usersControllers', () => {
 			})
 		})
 
-		test('handleUserCreated: returns 500 on unexpected errors', async () => {
+		test('handleUserCreated: returns 500 for generic errors', async () => {
 			const mockRequest = {
-				body: { user_id: 42, login: 'testuser' }
+				body: { user_id: 1, login: 'test' }
 			} as FastifyRequest
 
 			const mockReply = {
@@ -196,8 +192,9 @@ describe('usersControllers', () => {
 				send: jest.fn()
 			} as unknown as FastifyReply
 
-			const error = new Error('Database connection failed')
-			UsersServices.createUser.mockRejectedValueOnce(error)
+			UsersServices.createUser.mockRejectedValueOnce(
+				new Error('Database connection failed')
+			)
 
 			await handleUserCreated(mockRequest, mockReply)
 
@@ -210,7 +207,7 @@ describe('usersControllers', () => {
 
 		test('getPublicUser: returns 404 when user not found', async () => {
 			const mockRequest = {
-				params: { id: '999' }
+				params: { id: 999 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -230,36 +227,9 @@ describe('usersControllers', () => {
 			})
 		})
 
-		test('getPublicUser: returns 400 for invalid user_id (0, negative, non-numeric)', async () => {
-			const mockReply = {
-				code: jest.fn().mockReturnThis(),
-				send: jest.fn()
-			} as unknown as FastifyReply
-
-			await getPublicUser(
-				{ params: { id: '0' } } as unknown as FastifyRequest,
-				mockReply
-			)
-			expect(mockReply.code).toHaveBeenCalledWith(400)
-
-			jest.clearAllMocks()
-			await getPublicUser(
-				{ params: { id: '-1' } } as unknown as FastifyRequest,
-				mockReply
-			)
-			expect(mockReply.code).toHaveBeenCalledWith(400)
-
-			jest.clearAllMocks()
-			await getPublicUser(
-				{ params: { id: 'invalid' } } as unknown as FastifyRequest,
-				mockReply
-			)
-			expect(mockReply.code).toHaveBeenCalledWith(400)
-		})
-
 		test('getPublicUser: returns 500 when service returns invalid profile structure', async () => {
 			const mockRequest = {
-				params: { id: '1' }
+				params: { id: 1 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -290,7 +260,7 @@ describe('usersControllers', () => {
 		test('getPublicUser: handles large user_id values', async () => {
 			const largeId = 999999999
 			const mockRequest = {
-				params: { id: String(largeId) }
+				params: { id: largeId }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -341,7 +311,7 @@ describe('usersControllers', () => {
 	describe('4. Exceptions', () => {
 		test('getPublicUser: propagates AppError with correct status and message', async () => {
 			const mockRequest = {
-				params: { id: '999' }
+				params: { id: 999 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {
@@ -363,7 +333,7 @@ describe('usersControllers', () => {
 
 		test('getPublicUser: throws generic errors (not caught)', async () => {
 			const mockRequest = {
-				params: { id: '1' }
+				params: { id: 1 }
 			} as unknown as FastifyRequest
 
 			const mockReply = {

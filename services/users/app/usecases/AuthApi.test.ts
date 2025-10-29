@@ -143,7 +143,7 @@ describe('AuthApi', () => {
 			})
 
 			await expect(AuthApi.getAllUsers()).rejects.toThrow(
-				'HTTP error! status: 404'
+				'Auth service HTTP 404'
 			)
 		})
 
