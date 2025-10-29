@@ -19,7 +19,7 @@ export class GameEngine {
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
-	public	packets: Uint8Array[] = []
+	public packets: Uint8Array[] = []
 	public startTime
 
 	constructor(
@@ -58,11 +58,6 @@ export class GameEngine {
 
 	private playTick() {
 		this.physicsEngine.playTick()
-		console.log(`[${(Date.now() / 1000).toFixed(2)}]\t[${(this.TPS_DATA.previousTime_MS / 1000).toFixed(2)}]`)
-//		const _C01: C01Move
-//		const _C03: C03BallBase
-
-
 	}
 
 	private startTickLoop() {
@@ -93,5 +88,9 @@ export class GameEngine {
 
 	public getState(): GameState {
 		return this.currentState
+	}
+
+	public getPhysicsEngine(): PhysicsEngine {
+		return this.physicsEngine
 	}
 }

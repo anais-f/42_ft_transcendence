@@ -12,6 +12,5 @@ export class PhysicsEngine {
 
 	public playTick() {
 		++this.tickCount
-		console.log(this.tickCount)
 	}
 }

@@ -1,4 +1,3 @@
-
 export class S03BaseBall {
 	time: number
 
