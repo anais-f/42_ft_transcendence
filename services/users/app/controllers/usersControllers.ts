@@ -40,6 +40,7 @@ export async function getPublicUser(
 ): Promise<void> {
   const idNumber = req.params.id
   console.log('Fetching user with id number:', idNumber)
+  console.log("requete recu :", req.params)
 
   try {
     const rawProfile = await UsersServices.getPublicUserProfile({
@@ -73,6 +74,8 @@ export async function getPrivateUser(
 ): Promise<void> {
   try {
     const userId = req.user?.user_id
+    // console.log('Fetching user with id number:', idNumber)
+    console.log("requete recu :", req.params)
 
     if (userId === undefined || userId <= 0) {
       void reply.code(401).send({ success: false, error: ERROR_MESSAGES.UNAUTHORIZED })

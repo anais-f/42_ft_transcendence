@@ -34,11 +34,17 @@ export async function registerController(
 			},
 			body: JSON.stringify(PublicUser)
 		})
+    console.log("response", response)
 
-		if (response.ok == false) {
-			deleteUserById(PublicUser.user_id)
-			return reply.code(400).send({ error: 'Synchronisation user db' })
-		}
+    if (response.status === 401) {
+      deleteUserById(PublicUser.user_id)
+      return reply.code(500).send({ error: 'Unauthorized to create user in users service' })
+    }
+    else if (response.ok == false) {
+      deleteUserById(PublicUser.user_id)
+      return reply.code(400).send({ error: 'Synchronisation user db' })
+    }
+
 		return reply.send({ success: true })
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')

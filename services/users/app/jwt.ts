@@ -20,6 +20,7 @@ export function jwtAuthMiddleware(
   done: HookHandlerDoneFunction
 ): void {
   (request as any).jwtVerify((err: Error | null) => {
+    console.log("veirfying the request ", request.headers)
     if (err) {
       void reply.code(401).send({
         success: false,
