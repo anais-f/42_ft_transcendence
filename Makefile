@@ -14,8 +14,7 @@ install:
 
 .PHONY: test
 test: down build
-	docker rm -f install-dependencies >/dev/null 2>&1
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test 
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: build
@@ -28,11 +27,11 @@ up:
 
 .PHONY: debug
 debug:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
 
 .PHONY: down
 down:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: sh-%
 sh-%:
@@ -57,5 +56,4 @@ dev-build:
 
 .PHONY: dev-up
 dev-up:
-	docker rm -f install-dependencies >/dev/null 2>&1
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
