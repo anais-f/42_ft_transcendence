@@ -117,7 +117,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./services/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       auth:
         condition: service_healthy
@@ -141,7 +141,7 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./services/monitoring/grafana:/etc/grafana/provisioning/datasources:ro
+      - ./services/monitoring/grafana:/etc/grafana/provisioning:ro
     depends_on:
       prometheus:
         condition: service_healthy
