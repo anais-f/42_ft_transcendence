@@ -15,7 +15,19 @@ export class C04BallVelo extends C03BallBase implements IC00PongBase {
 	}
 
 	serialize(): ArrayBuffer {
-		// TODO: implement
-		return new ArrayBuffer
+		const fake = this.fserialize()
+		const buff = new ArrayBuffer(25)
+		const fakeUint8 = new Uint8Array(fake)
+		const buffUint8 = new Uint8Array(buff)
+
+		buffUint8.set(fakeUint8)
+
+		buffUint8[8] |= 0b1000
+
+		const view = new DataView(buff)
+		view.setFloat64(9, this.velo.getX(), true)
+		view.setFloat64(17, this.velo.getY(), true)
+
+		return buff
 	}
 }

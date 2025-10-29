@@ -1,4 +1,3 @@
-
 export interface IC00PongBase {
 	time: number
 
