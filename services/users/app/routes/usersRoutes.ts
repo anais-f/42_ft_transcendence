@@ -1,41 +1,76 @@
 import { FastifyPluginAsync } from 'fastify'
 import {
+	handleUserCreated,
+	getPublicUser
+} from '../controllers/usersControllers.js'
+import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
-	UserAuthSchema,
-	UserProfileSchema
-} from '../models/UsersDTO.js'
-import { handleUserCreated, getUser } from '../controllers/usersControllers.js'
+	PublicUserAuthSchema,
+	UserPublicProfileSchema
+} from '@ft_transcendence/common'
+import { z } from 'zod'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+
+const API_AUTH_USERS = process.env.AUTH_API_SECRET as string
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
-	// POST /users/webhookNewUser - Webhook pour créer un nouvel utilisateur quand je recois la notif de auth
-	fastify.post(
-		'/users/webhookNewUser',
+	const server = fastify.withTypeProvider<ZodTypeProvider>()
+
+	server.post(
+		'/api/users/new-user',
 		{
 			schema: {
-				body: UserAuthSchema,
+				body: PublicUserAuthSchema,
 				response: {
 					200: SuccessResponseSchema,
 					201: SuccessResponseSchema,
+					401: ErrorResponseSchema,
 					400: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
+			},
+			preHandler(request, reply, done) {
+				if (request.headers['authorization'] !== API_AUTH_USERS) {
+					void reply.code(401).send({ error: 'Unauthorized' })
+					return
+				}
+				done()
 			}
 		},
 		handleUserCreated
 	)
 
-	fastify.get(
-		'/users/:id',
+	//TODO: protect routes with JWT
+	server.get(
+		'/api/users/:id',
 		{
 			schema: {
+				params: z.object({
+					id: z.coerce.number().int().positive()
+				}),
 				response: {
-					200: UserProfileSchema,
+					200: UserPublicProfileSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
 					404: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
 			}
 		},
-		getUser
+		getPublicUser
 	)
+
+	// TODO: GET /users/me - Private profile of the authenticated user
+	// server.get('/users/me', {
+	//       schema: {
+	//         response: {
+	//           200: UserPrivateProfileSchema,
+	//           404: ErrorResponseSchema,
+	//           500: ErrorResponseSchema
+	//         }
+	//       }
+	//     },
+	//     getPrivateUser
+	// )
 }
