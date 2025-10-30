@@ -7,7 +7,6 @@ export class C01Move implements IC00PongBase {
 		coord: Vector2,
 		public time = Date.now()
 	) {
-		this.time = Date.now()
 		this.dir = coord
 	}
 
