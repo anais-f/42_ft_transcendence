@@ -17,8 +17,8 @@ import {
 } from './Server/SPackets.js'
 
 export enum CPacketsType {
-	C00 = 0b00000000,
-	C01 = 0b00000001,
+	C00 = 0b00000001,
+	C01 = 0b00000011,
 	C03 = 0b00000101,
 	C04 = 0b00001101,
 	C05 = 0b00010101,
@@ -26,19 +26,19 @@ export enum CPacketsType {
 }
 
 export enum SPacketsType {
-	S00 = 0b00000000,
-	S01 = 0b00000001,
-	S0A = 0b00000011,
+	S00 = 0b00000001,
+	S01 = 0b00000011,
+	S0A = 0b00100001,
 	S03 = 0b00000101,
 	S04 = 0b00001101,
 	S05 = 0b00010101,
 	S06 = 0b00011101,
-	S0B = 0b00100011
+	S0B = 0b01100011
 }
 export class packetBuilder {
 	private constructor() {}
 
-	public static deserializeC(buff: ArrayBuffer): C01 | C03 | null {
+	public static deserializeC(buff: ArrayBuffer): C01 | C03 | C04 | C05 | null {
 		const view = new DataView(buff)
 
 		try {
@@ -80,7 +80,7 @@ export class packetBuilder {
 		return null
 	}
 	
-	public static deserializeS(buff: ArrayBuffer): S01 | S03 | null {
+	public static deserializeS(buff: ArrayBuffer): S01 | S03 | S04 | S05 | null {
 		const view = new DataView(buff)
 
 		try {
