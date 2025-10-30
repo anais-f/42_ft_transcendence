@@ -2,15 +2,6 @@ import '@fastify/jwt'
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { ERROR_MESSAGES } from '@ft_transcendence/common'
 
-declare module '@fastify/jwt' {
-	interface FastifyJWT {
-		user: {
-			user_id: number
-			login: string
-		}
-	}
-}
-
 /**
  * @description Check valid JWT token
  * @use Routes accessible to authenticated users

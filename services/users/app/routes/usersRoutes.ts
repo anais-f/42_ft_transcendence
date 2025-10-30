@@ -2,7 +2,8 @@ import { FastifyPluginAsync } from 'fastify'
 import {
 	handleUserCreated,
 	getPublicUser,
-	getPrivateUser
+	getPrivateUser,
+  updateUsername
 } from '../controllers/usersControllers.js'
 import {
 	SuccessResponseSchema,
@@ -10,7 +11,7 @@ import {
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
-	UserProfileUpdateUsernameSchema
+  UserProfileUpdateUsernameSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
@@ -81,10 +82,11 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			schema: {
 				body: UserProfileUpdateUsernameSchema,
 				response: {
-					200: UserPrivateProfileSchema,
+					200: SuccessResponseSchema,
 					400: ErrorResponseSchema,
 					401: ErrorResponseSchema,
 					404: ErrorResponseSchema,
+          409: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
 			},

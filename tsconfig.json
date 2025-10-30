@@ -23,6 +23,7 @@
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" },
+    { "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users" },
 		{ "path": "./services/auth" },

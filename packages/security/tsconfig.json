@@ -11,5 +11,6 @@
 		"moduleResolution": "NodeNext",
 		"skipLibCheck": true
 	},
+
 	"include": ["srcs/**/*"]
 }

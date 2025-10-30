@@ -7,7 +7,9 @@ import {
 	IUserAvatar,
 	IPrivateUser,
 	IPublicUserAuth,
-	UserPublicProfileDTO
+	UserPublicProfileDTO,
+  ERROR_MESSAGES,
+  AppError
 } from '@ft_transcendence/common'
 
 // const defaultAvatar: string = '../img.png' // default avatar path
@@ -28,6 +30,12 @@ export class UsersRepository {
 		const row = selectStmt.get(user.user_id)
 		return !!row
 	}
+
+  static existsByUsername(username: IUsername): boolean {
+    const selectStmt = db.prepare('SELECT 1 FROM users WHERE username = ?')
+    const row = selectStmt.get(username.username)
+    return !!row
+  }
 
 	/**
 	 * @description Insert a new user with default values
@@ -68,12 +76,23 @@ export class UsersRepository {
 		updateStmt.run(user.avatar, user.user_id)
 	}
 
-	static updateUsername(user: IUsernameId): void {
-		const updateStmt = db.prepare(
-			'UPDATE users SET username = ? WHERE user_id = ?'
-		)
-		updateStmt.run(user.username, user.user_id)
-	}
+  static updateUsername(user: IUsernameId): void {
+    try {
+      const updateStmt = db.prepare(
+          'UPDATE users SET username = ? WHERE user_id = ?'
+      )
+      const info = updateStmt.run(user.username, user.user_id)
+      if (info.changes === 0) {
+        throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+      }
+    } catch (error: any) {
+      if (error?.code === 'SQLITE_CONSTRAINT' || error?.message?.includes('UNIQUE constraint failed')) {
+        throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
+      }
+      throw error
+    }
+  }
+
 	/**
 	 * @description Some get methods according to the table fields
 	 */

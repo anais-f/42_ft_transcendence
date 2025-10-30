@@ -77,13 +77,9 @@ export class UsersServices {
     if (!user?.user_id || user.user_id <= 0)
       throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-    if (await UsersRepository.existsByUsername({ username: newUsername }))
-      throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS, 409)
-
     await UsersRepository.updateUsername({
       user_id: user.user_id,
       username: newUsername
     })
   }
-
 }

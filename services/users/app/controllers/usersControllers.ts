@@ -3,8 +3,10 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
+  PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	AppError,
+  UserProfileUpdateUsernameSchema,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
@@ -75,7 +77,12 @@ export async function getPrivateUser(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const userId = req.user?.user_id as number
+		const user = req.user as { user_id?: number } | undefined
+		const userId = user?.user_id
+		if (!userId || userId <= 0) {
+		  void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+	  	return
+		}
 
 		const rawProfile = await UsersServices.getPrivateUserProfile({
 			user_id: userId
@@ -107,22 +114,31 @@ export async function getPrivateUser(
 
 export async function updateUsername(req: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
-    const userId = req.user?.user_id as number
+    const user = req.user as { user_id?: number } | undefined
+    const userId = user?.user_id
+    const { username } = req.body as { username?: string }
 
-    const username = req.body.username as string
-    const parsed = UserProfileUpdateUsernameSchema.safeParse(username)
-    if (!parsed.success) {
-      console.error('UserProfileUpdateUsername validation failed:', parsed.error)
-      void reply
-          .code(400)
-          .send({ success: false, error: ERROR_MESSAGES.INVALID_INPUT })
+    if (!userId || userId <= 0) {
+      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
       return
     }
 
-    const updatedProfile = await UsersServices.updateUsername({
-      user_id: userId,
-      username: parsed.data
-    })
-    void reply.code(200).send(updatedProfile)
+    const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
+    if (!parsed.success) {
+      console.error('UserProfileUpdateUsername validation failed:', parsed.error)
+      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_DATA })
+      return
+    }
+
+    await UsersServices.updateUsername({ user_id: userId }, parsed.data.username)
+
+    void reply.code(200).send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      void reply.code(error.status).send({ success: false, error: error.message })
+      return
+    }
+    console.error('Unexpected error in updateUsername:', error)
+    void reply.code(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
   }
 }
