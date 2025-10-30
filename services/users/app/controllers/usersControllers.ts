@@ -93,7 +93,6 @@ export async function getPrivateUser(
 		void reply.code(200).send(parsed.data)
 	} catch (error: any) {
 		if (error instanceof AppError) {
-			// 404 NOT FOUND : JWT valide mais utilisateur supprimé de la DB
 			void reply
 				.code(error.status)
 				.send({ success: false, error: error.message })
