@@ -64,6 +64,28 @@ export const UserPrivateProfileListSchema = z
 	.strict()
 	.meta({ description: 'List of private user profiles' })
 
+export const UserProfileUpdateUsernameSchema = z
+	.object({
+		username: UsernameSchema
+	})
+	.strict()
+	.meta({ description: 'Update username schema' })
+
+export const UserProfileUpdateAvatarSchema = z
+	.object({
+		avatar: z.string()
+	})
+	.strict()
+	.meta({ description: 'Update avatar schema' })
+
+export const UserProfileUpdateSchema = z
+	.object({
+		username: UsernameSchema.optional(),
+		avatar: z.string().optional()
+	})
+	.strict()
+	.meta({ description: 'Update private user profile schema' })
+
 // Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
 

@@ -9,14 +9,12 @@ import {
 	ErrorResponseSchema,
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
-	UserPublicProfileSchema
+	UserPublicProfileSchema,
+	UserProfileUpdateUsernameSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import {
-	jwtAuthMiddleware,
-	apiKeyMiddleware
-} from '@ft_transcendence/security'
+import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -74,5 +72,24 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			preHandler: jwtAuthMiddleware
 		},
 		getPrivateUser
+	)
+
+	// PATCH /api/users/me - Update private user profile (JWT protected - own profile only)
+	server.patch(
+		'/api/users/me',
+		{
+			schema: {
+				body: UserProfileUpdateUsernameSchema,
+				response: {
+					200: UserPrivateProfileSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
+					404: ErrorResponseSchema,
+					500: ErrorResponseSchema
+				}
+			},
+			preHandler: jwtAuthMiddleware
+		},
+		updateUsername
 	)
 }

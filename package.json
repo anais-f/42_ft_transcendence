@@ -24,10 +24,10 @@
 	"workspaces": [
 		"packages/common",
 		"packages/pong-shared",
-    "packages/pong-client",
-    "packages/pong-server",
-    "packages/security",
-    "services/pong-server/app",
+		"packages/pong-client",
+		"packages/pong-server",
+		"packages/security",
+		"services/pong-server/app",
 		"services/auth/app",
 		"services/users/app"
 	],

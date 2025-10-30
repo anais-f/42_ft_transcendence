@@ -93,7 +93,6 @@ export async function getPrivateUser(
 		void reply.code(200).send(parsed.data)
 	} catch (error: any) {
 		if (error instanceof AppError) {
-			// 404 NOT FOUND : JWT valide mais utilisateur supprimé de la DB
 			void reply
 				.code(error.status)
 				.send({ success: false, error: error.message })
@@ -104,4 +103,26 @@ export async function getPrivateUser(
 			.code(500)
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
 	}
+}
+
+export async function updateUsername(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+  try {
+    const userId = req.user?.user_id as number
+
+    const username = req.body.username as string
+    const parsed = UserProfileUpdateUsernameSchema.safeParse(username)
+    if (!parsed.success) {
+      console.error('UserProfileUpdateUsername validation failed:', parsed.error)
+      void reply
+          .code(400)
+          .send({ success: false, error: ERROR_MESSAGES.INVALID_INPUT })
+      return
+    }
+
+    const updatedProfile = await UsersServices.updateUsername({
+      user_id: userId,
+      username: parsed.data
+    })
+    void reply.code(200).send(updatedProfile)
+  }
 }
