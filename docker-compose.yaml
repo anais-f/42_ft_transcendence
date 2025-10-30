@@ -149,8 +149,6 @@ services:
     depends_on:
       prometheus:
         condition: service_healthy
-    volumes:
-      - alertmanager_data:/alertmanager
     secrets:
       - discord_webhook
     entrypoint: /entrypoint.sh
@@ -213,7 +211,6 @@ volumes:
   grafana_data:
   nginx_logs:
   prometheus_data:
-  alertmanager_data:
 
 secrets:
   discord_webhook:
