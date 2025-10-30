@@ -5,7 +5,6 @@ import {
 	PublicUserListAuthSchema
 } from '@ft_transcendence/common'
 import { deleteUserById } from '../repositories/userRepository.js'
-import { success } from 'zod'
 
 export async function listPublicUsersController(
 	_req: FastifyRequest,
