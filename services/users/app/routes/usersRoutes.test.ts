@@ -2,21 +2,14 @@
  * Test Coverage Summary for usersRoutes
  *
  * SECTION 1: SUCCESSFUL CASES
- * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists (with API key)
- * - GET /api/users/:id: Returns complete profile with all required fields (with JWT)
+ * - POST /api/users/new-user: Creates user with valid data (201), returns 200 if exists (with API key)
+ * - GET /api/users/:id: Returns complete profile with all 5 required fields (with JWT)
  * - GET /api/users/me: Returns private profile for authenticated user (with JWT)
  *
  * SECTION 2: BASIC FAILURE CASES
- * - POST: Missing/invalid API key (401), missing fields, invalid user_id/login
- * - GET: Invalid/negative id, user not found
- * - GET /me: Missing JWT (401), user not found (404)
- *
- * SECTION 3: TRICKY CASES
- * - Boundary values: login length limits, large user_id
- * - Special characters: valid patterns (underscores/dashes)
- *
- * SECTION 4: EXCEPTIONS
- * - Controller error propagation (500)
+ * - POST: Missing/invalid API key (401), missing/invalid fields (400)
+ * - GET /:id: Invalid id format (400), user not found (404), internal errors (500)
+ * - GET /me: Missing JWT (401), user not found (404), internal errors (500)
  */
 
 import {

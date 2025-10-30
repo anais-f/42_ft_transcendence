@@ -4,20 +4,20 @@
  * SECTION 1: SUCCESSFUL CASES
  * - handleUserCreated: Creates user with valid data, returns 201
  * - getPublicUser: Returns complete profile with 200, validates structure
- * - getPrivateUser: Returns private profile for authenticated user
+ * - getPrivateUser: Returns private profile for authenticated user (from JWT)
  *
  * SECTION 2: BASIC FAILURE CASES
  * - handleUserCreated: Handles existing user (200), internal errors (500)
- * - getPublicUser: Handles not found (404), invalid IDs (400), validation errors (500)
- * - getPrivateUser: Handles missing/invalid user_id from JWT, not found, validation errors
+ * - getPublicUser: Handles not found (404), validation errors (500)
+ * - getPrivateUser: Handles user not found (404), validation errors (500)
  *
  * SECTION 3: TRICKY CASES
  * - Boundary values: Minimum/maximum user_id, minimum login length
  * - Special characters: Valid login patterns
  *
  * SECTION 4: EXCEPTIONS
- * - AppError propagation from service to controller
- * - Generic error handling differences between functions
+ * - AppError propagation: getPublicUser and getPrivateUser propagate AppError correctly
+ * - Error handling: getPublicUser throws non-AppError exceptions, getPrivateUser catches all
  */
 
 import { jest } from '@jest/globals'
