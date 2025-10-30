@@ -30,7 +30,6 @@ describe('c05', () => {
 		const buff = new ArrayBuffer(25)
 		const view = new DataView(buff)
 
-
 		// Fill with example values
 		const timestamp = 123456.789
 		const type = 0b10101
@@ -39,9 +38,9 @@ describe('c05', () => {
 
 		// Write values to buffer
 		view.setFloat64(0, timestamp, true) // timestamp at offset 0
-		view.setUint8(8, type)              // type at offset 8
-		view.setFloat64(9, x, true)         // x at offset 9
-		view.setFloat64(17, y, true)        // y at offset 17
+		view.setUint8(8, type) // type at offset 8
+		view.setFloat64(9, x, true) // x at offset 9
+		view.setFloat64(17, y, true) // y at offset 17
 
 		const p = packetBuilder.deserializeC(buff)
 
@@ -51,7 +50,7 @@ describe('c05', () => {
 		if (p instanceof C05BallPos) {
 			expect(p?.getPos()?.equals(new Vector2(x, y))).toBe(true)
 		} else {
-			throw new Error("Packet is not C05BallPos")
+			throw new Error('Packet is not C05BallPos')
 		}
 	})
 })

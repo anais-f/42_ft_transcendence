@@ -79,7 +79,7 @@ export class packetBuilder {
 		}
 		return null
 	}
-	
+
 	public static deserializeS(buff: ArrayBuffer): S01 | S03 | S04 | S05 | null {
 		const view = new DataView(buff)
 

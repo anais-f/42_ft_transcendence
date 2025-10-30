@@ -18,17 +18,15 @@ describe('C03', () => {
 		const buff = new ArrayBuffer(9)
 		const view = new DataView(buff)
 
-
 		// Fill with example values
 		const timestamp = 123456.789
 		const type = 0b101
 
 		// Write values to buffer
 		view.setFloat64(0, timestamp, true) // timestamp at offset 0
-		view.setUint8(8, type)              // type at offset 8
+		view.setUint8(8, type) // type at offset 8
 
 		const p = packetBuilder.deserializeC(buff)
 		expect(p).toBeInstanceOf(C03BallBase)
 	})
-
 })

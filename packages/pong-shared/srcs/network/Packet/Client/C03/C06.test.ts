@@ -38,7 +38,6 @@ describe('c06', () => {
 		const buff = new ArrayBuffer(41)
 		const view = new DataView(buff)
 
-
 		// Fill with example values
 		const timestamp = 123456.789
 		const type = 0b11101
@@ -51,9 +50,9 @@ describe('c06', () => {
 
 		// Write values to buffer
 		view.setFloat64(0, timestamp, true) // timestamp at offset 0
-		view.setUint8(8, type)              // type at offset 8
-		view.setFloat64(9, vx, true)         // vx at offset 9
-		view.setFloat64(17, vy, true)        // vy at offset 17
+		view.setUint8(8, type) // type at offset 8
+		view.setFloat64(9, vx, true) // vx at offset 9
+		view.setFloat64(17, vy, true) // vy at offset 17
 		view.setFloat64(25, x, true)
 		view.setFloat64(33, y, true)
 
@@ -66,7 +65,7 @@ describe('c06', () => {
 			expect(p.getVelo().equals(velo)).toBe(true)
 			expect(p.getPos().equals(pos)).toBe(true)
 		} else {
-			throw new Error("Packet is not C05BallPos")
+			throw new Error('Packet is not C05BallPos')
 		}
 	})
 })

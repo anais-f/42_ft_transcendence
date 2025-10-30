@@ -43,7 +43,7 @@ describe('S04', () => {
 		if (p instanceof S04BallVeloChange) {
 			expect(p.getVelo().equals(v)).toBe(true)
 		} else {
-			throw new Error("Packet is not S04BallVeloChange")
+			throw new Error('Packet is not S04BallVeloChange')
 		}
 	})
 })

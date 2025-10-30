@@ -44,7 +44,7 @@ describe('S05', () => {
 		if (p instanceof S05BallPos) {
 			expect(p.getPos().equals(pos)).toBe(true)
 		} else {
-			throw new Error("Packet is not S05BallPos")
+			throw new Error('Packet is not S05BallPos')
 		}
 	})
 })

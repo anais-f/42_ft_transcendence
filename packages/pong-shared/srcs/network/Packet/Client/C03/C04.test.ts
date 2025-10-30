@@ -30,7 +30,6 @@ describe('c04', () => {
 		const buff = new ArrayBuffer(25)
 		const view = new DataView(buff)
 
-
 		// Fill with example values
 		const timestamp = 123456.789
 		const type = 0b1101
@@ -39,9 +38,9 @@ describe('c04', () => {
 
 		// Write values to buffer
 		view.setFloat64(0, timestamp, true) // timestamp at offset 0
-		view.setUint8(8, type)              // type at offset 8
-		view.setFloat64(9, vx, true)        // x at offset 9
-		view.setFloat64(17, vy, true)       // y at offset 17
+		view.setUint8(8, type) // type at offset 8
+		view.setFloat64(9, vx, true) // x at offset 9
+		view.setFloat64(17, vy, true) // y at offset 17
 
 		const p = packetBuilder.deserializeC(buff)
 		expect(p).toBeInstanceOf(C04BallVelo)
@@ -49,7 +48,7 @@ describe('c04', () => {
 		if (p instanceof C04BallVelo) {
 			expect(p.getVelo().equals(new Vector2(vx, vy))).toBe(true)
 		} else {
-			throw new Error("Packet is not C05BallPos")
+			throw new Error('Packet is not C05BallPos')
 		}
 	})
 })

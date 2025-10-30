@@ -38,7 +38,7 @@ describe('S06', () => {
 		const timestamp = 123456.789
 		const type = 0b11101
 		const v = new Vector2(324.32, -42)
-		const pos = new Vector2(32.3 , 3)
+		const pos = new Vector2(32.3, 3)
 
 		view.setFloat64(0, timestamp, true)
 		view.setUint8(8, type)
@@ -54,7 +54,7 @@ describe('S06', () => {
 			expect(p.getVelo().equals(v)).toBe(true)
 			expect(p.getPos().equals(pos)).toBe(true)
 		} else {
-			throw new Error("Packet is not S06BallSync")
+			throw new Error('Packet is not S06BallSync')
 		}
 	})
 })
