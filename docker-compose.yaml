@@ -116,8 +116,6 @@ services:
     restart: on-failure
     networks:
       - backend
-    ports:
-      - "9090:9090"
     volumes:
       - prometheus_data:/prometheus
       - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
@@ -144,8 +142,6 @@ services:
     container_name: alertmanager
     networks:
       - backend
-    ports:
-      - "9093:9093"
     depends_on:
       prometheus:
         condition: service_healthy
@@ -167,8 +163,6 @@ services:
     container_name: grafana
     networks:
       - backend
-    ports:
-      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./services/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -191,8 +185,6 @@ services:
     networks:
       - backend
     container_name: mtail
-    ports:
-      - "3903:3903"
     volumes:
       - nginx_logs:/var/log/nginx:ro
       - ./services/monitoring/mtail/nginx.mtail:/progs/nginx.mtail:ro
