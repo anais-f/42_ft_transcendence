@@ -1,4 +1,5 @@
 import { Vector2 } from '../../../../math/Vector2.js'
+import { packetBuilder } from '../../packetBuilder.js'
 import { C06BallVeloPos } from './C06.js'
 
 describe('c06', () => {
@@ -32,5 +33,40 @@ describe('c06', () => {
 
 		const py = view.getFloat64(33, true)
 		expect(py).toBeCloseTo(pos.getY())
+	})
+	test('deserialize', () => {
+		const buff = new ArrayBuffer(41)
+		const view = new DataView(buff)
+
+
+		// Fill with example values
+		const timestamp = 123456.789
+		const type = 0b11101
+		const vx = 7.54645
+		const vy = -0.5
+		const velo = new Vector2(vx, vy)
+		const x = 2342
+		const y = -34.6
+		const pos = new Vector2(x, y)
+
+		// Write values to buffer
+		view.setFloat64(0, timestamp, true) // timestamp at offset 0
+		view.setUint8(8, type)              // type at offset 8
+		view.setFloat64(9, vx, true)         // vx at offset 9
+		view.setFloat64(17, vy, true)        // vy at offset 17
+		view.setFloat64(25, x, true)
+		view.setFloat64(33, y, true)
+
+		const p = packetBuilder.deserializeC(buff)
+
+		expect(p).toBeInstanceOf(C06BallVeloPos)
+		expect(p?.time).toBeCloseTo(timestamp)
+		expect(p).toBeInstanceOf(C06BallVeloPos)
+		if (p instanceof C06BallVeloPos) {
+			expect(p.getVelo().equals(velo)).toBe(true)
+			expect(p.getPos().equals(pos)).toBe(true)
+		} else {
+			throw new Error("Packet is not C05BallPos")
+		}
 	})
 })

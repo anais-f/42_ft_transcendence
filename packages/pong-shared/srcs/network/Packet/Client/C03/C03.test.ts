@@ -1,4 +1,5 @@
 import { C03BallBase } from './C03'
+import { packetBuilder } from '../../packetBuilder.js'
 
 describe('C03', () => {
 	test('serialize returns correct buffer', () => {
@@ -13,4 +14,21 @@ describe('C03', () => {
 
 		expect(view.getUint8(8)).toBe(0b101)
 	})
+	test('deserialize', () => {
+		const buff = new ArrayBuffer(9)
+		const view = new DataView(buff)
+
+
+		// Fill with example values
+		const timestamp = 123456.789
+		const type = 0b101
+
+		// Write values to buffer
+		view.setFloat64(0, timestamp, true) // timestamp at offset 0
+		view.setUint8(8, type)              // type at offset 8
+
+		const p = packetBuilder.deserializeC(buff)
+		expect(p).toBeInstanceOf(C03BallBase)
+	})
+
 })
