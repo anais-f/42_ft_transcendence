@@ -10,6 +10,8 @@ services:
     volumes:
       - avatars:/usr/share/nginx/html/avatars:ro
       - nginx_logs:/var/log/nginx
+    secrets:
+      - admin_token
     depends_on:
       frontend:
         condition: service_healthy
@@ -111,15 +113,13 @@ services:
       start_period: 20s
 
   prometheus:
-    image: prom/prometheus:v3.7.2
+    build:
+      context: ./services/monitoring/prometheus
+      dockerfile: Dockerfile
     container_name: prometheus
     restart: on-failure
     networks:
       - backend
-    volumes:
-      - prometheus_data:/prometheus
-      - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-      - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules.yml:ro
     depends_on:
       auth:
         condition: service_healthy
@@ -170,6 +170,9 @@ services:
     depends_on:
       prometheus:
         condition: service_healthy
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:8080/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     healthcheck:
       test:
         - CMD-SHELL
@@ -202,8 +205,9 @@ volumes:
   avatars:
   grafana_data:
   nginx_logs:
-  prometheus_data:
 
 secrets:
   discord_webhook:
     file: ./.secret/discord_webhook.txt
+  admin_token:
+    file: ./.secret/admin_token.txt
