@@ -19,17 +19,25 @@ export function jwtAuthMiddleware(
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
-	;(request as any).jwtVerify((err: Error | null) => {
-		if (err) {
-			void reply.code(401).send({
-				success: false,
-				error: ERROR_MESSAGES.UNAUTHORIZED
-			})
-			return done()
-		}
-
-		return done()
-	})
+	try {
+		;(request as any).jwtVerify((err: Error | null) => {
+			if (err) {
+				void reply.code(401).send({
+					success: false,
+					error: ERROR_MESSAGES.UNAUTHORIZED
+				})
+				return
+			}
+			done()
+		})
+	} catch (err) {
+		// Handle synchronous errors (e.g., malformed token)
+		void reply.code(401).send({
+			success: false,
+			error: ERROR_MESSAGES.UNAUTHORIZED
+		})
+		// Important: Don't call done() here to prevent handler execution
+	}
 }
 
 /**

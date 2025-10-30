@@ -75,16 +75,7 @@ export async function getPrivateUser(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const userId = req.user?.user_id
-		// console.log('Fetching user with id number:', idNumber)
-		console.log('requete recu :', req.params)
-
-		if (userId === undefined || userId <= 0) {
-			void reply
-				.code(401)
-				.send({ success: false, error: ERROR_MESSAGES.UNAUTHORIZED })
-			return
-		}
+		const userId = req.user?.user_id as number
 
 		const rawProfile = await UsersServices.getPrivateUserProfile({
 			user_id: userId
@@ -102,6 +93,7 @@ export async function getPrivateUser(
 		void reply.code(200).send(parsed.data)
 	} catch (error: any) {
 		if (error instanceof AppError) {
+			// 404 NOT FOUND : JWT valide mais utilisateur supprimé de la DB
 			void reply
 				.code(error.status)
 				.send({ success: false, error: error.message })

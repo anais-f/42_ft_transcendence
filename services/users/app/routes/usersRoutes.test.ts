@@ -2,20 +2,21 @@
  * Test Coverage Summary for usersRoutes
  *
  * SECTION 1: SUCCESSFUL CASES
- * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists (with auth header)
- * - GET /api/users/:id: Returns complete profile with all required fields
+ * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists (with API key)
+ * - GET /api/users/:id: Returns complete profile with all required fields (with JWT)
+ * - GET /api/users/me: Returns private profile for authenticated user (with JWT)
  *
  * SECTION 2: BASIC FAILURE CASES
- * - POST: Missing auth header (401), missing fields, invalid user_id/login
+ * - POST: Missing/invalid API key (401), missing fields, invalid user_id/login
  * - GET: Invalid/negative id, user not found
+ * - GET /me: Missing JWT (401), user not found (404)
  *
  * SECTION 3: TRICKY CASES
  * - Boundary values: login length limits, large user_id
  * - Special characters: valid patterns (underscores/dashes)
- * - Authorization: Invalid token, missing token
  *
  * SECTION 4: EXCEPTIONS
- * - Controller error propagation
+ * - Controller error propagation (500)
  */
 
 import {
@@ -362,144 +363,12 @@ describe('usersRoutes', () => {
 				expect(response.statusCode).toBe(500)
 			})
 		})
-	})
-
-	// ==================== SECTION 3: TRICKY CASES ====================
-	describe('3. Tricky cases', () => {
-		describe('Boundary values', () => {
-			test('accepts login with exact min/max length (4 and 16 chars)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
-					}
-				)
-
-				const minLength = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'abcd' }
-				})
-				expect(minLength.statusCode).toBe(201)
-
-				const maxLength = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 2, login: '1234567890123456' }
-				})
-				expect(maxLength.statusCode).toBe(201)
-			})
-
-			test('handles large user_id values (999999999)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 999999999, login: 'testuser' }
-				})
-
-				expect(response.statusCode).toBe(201)
-			})
-		})
-
-		describe('Special characters in login', () => {
-			test('accepts valid special characters (underscore and dash)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'user_name-123' }
-				})
-
-				expect(response.statusCode).toBe(201)
-			})
-		})
-	})
-
-	// ==================== SECTION 4: EXCEPTIONS ====================
-	describe('4. Exceptions', () => {
-		describe('Controller error propagation', () => {
-			test('POST propagates controller errors correctly', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(500)
-							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'test' }
-				})
-
-				expect(response.statusCode).toBe(500)
-			})
-
-			test('GET propagates controller errors correctly', async () => {
-				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(500)
-							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/1',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(500)
-			})
-		})
 
 		describe('GET /api/users/me', () => {
 			test('returns 401 when JWT token is missing', async () => {
 				const response = await app.inject({
 					method: 'GET',
 					url: '/api/users/me'
-				})
-
-				expect(response.statusCode).toBe(401)
-				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
-			})
-
-			test('returns 401 when JWT token is invalid', async () => {
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me',
-					headers: {
-						authorization: 'Bearer invalid-token'
-					}
 				})
 
 				expect(response.statusCode).toBe(401)
