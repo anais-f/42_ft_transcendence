@@ -1,3 +1,4 @@
+import { packetBuilder } from '../packetBuilder.js'
 import { S01ServerTickConfirmation as S01TC } from './S01.js'
 describe('S01', () => {
 	test('serialize returns correct buffer', () => {
@@ -11,5 +12,19 @@ describe('S01', () => {
 
 		const type = view.getUint8(8)
 		expect(type).toBe(0b11)
+	})
+	test('deserialize', () => {
+		const buff = new ArrayBuffer(9)
+		const view = new DataView(buff)
+
+		const timestamp = 123456.789
+		const type = 0b11
+
+		view.setFloat64(0, timestamp, true)
+		view.setUint8(8, type)
+
+		const p = packetBuilder.deserializeS(buff)
+		expect(p).toBeInstanceOf(S01TC)
+		expect(p?.time).toBeCloseTo(timestamp)
 	})
 })
