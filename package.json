@@ -16,12 +16,14 @@
 		"build:pong:client": "npm run build --workspace=packages/pong-client",
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
 		"build:common": "npm run build --workspace=packages/common",
+		"build:middleware": "npm run build --workspace=packages/middleware",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
 	},
 	"workspaces": [
 		"packages/common",
+		"packages/middleware",
 		"packages/pong-shared",
 		"packages/pong-client",
 		"packages/pong-server",

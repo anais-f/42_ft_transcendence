@@ -9,12 +9,14 @@ import {
 	ErrorResponseSchema,
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
-	UserPublicProfileSchema,
-	ERROR_MESSAGES
+	UserPublicProfileSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { apiKeyMiddleware, jwtAuthMiddleware } from '../jwt.js'
+import {
+	jwtAuthMiddleware,
+	apiKeyMiddleware
+} from '@ft_transcendence/middleware'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
