@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"@ft_transcendence/common": "*",
-		"@ft_transcendence/middleware": "*"
+		"@ft_transcendence/security": "*"
 	},
 	"devDependencies": {
 		"@types/node": "^24.9.1"

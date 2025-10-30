@@ -1,5 +1,5 @@
 {
-	"name": "@ft_transcendence/middleware",
+	"name": "@ft_transcendence/security",
 	"version": "0.0.1",
 	"description": "Shared validation code for backend",
 	"main": "dist/index.js",

@@ -16,7 +16,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	jwtAuthMiddleware,
 	apiKeyMiddleware
-} from '@ft_transcendence/middleware'
+} from '@ft_transcendence/security'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
