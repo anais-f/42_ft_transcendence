@@ -54,9 +54,9 @@ export class UsersServices {
 	}
 
 	static async getPrivateUserProfile(
-		user: IUserId
+		user: { user_id: number }
 	): Promise<UserPrivateProfileDTO> {
-		if (!user?.user_id || user.user_id <= 0)
+		if (!user.user_id || user.user_id <= 0)
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
 		const localUser = await UsersRepository.getUserById({
@@ -73,8 +73,8 @@ export class UsersServices {
 		}
 	}
 
-  static async updateUsername(user: IUserId, newUsername: string): Promise<void> {
-    if (!user?.user_id || user.user_id <= 0)
+	static async updateUsername(user: { user_id: number }, newUsername: string): Promise<void> {
+    if (!user.user_id || user.user_id <= 0)
       throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
     await UsersRepository.updateUsername({

@@ -3,7 +3,6 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
-  PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	AppError,
   UserProfileUpdateUsernameSchema,
@@ -78,15 +77,13 @@ export async function getPrivateUser(
 ): Promise<void> {
 	try {
 		const user = req.user as { user_id?: number } | undefined
-		const userId = user?.user_id
+		const userId = Number(user?.user_id)
 		if (!userId || userId <= 0) {
-		  void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-	  	return
+			void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+			return
 		}
 
-		const rawProfile = await UsersServices.getPrivateUserProfile({
-			user_id: userId
-		})
+		const rawProfile = await UsersServices.getPrivateUserProfile({ user_id: userId })
 
 		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
 		if (!parsed.success) {
@@ -115,7 +112,7 @@ export async function getPrivateUser(
 export async function updateUsername(req: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
     const user = req.user as { user_id?: number } | undefined
-    const userId = user?.user_id
+    const userId = Number(user?.user_id)
     const { username } = req.body as { username?: string }
 
     if (!userId || userId <= 0) {
@@ -126,7 +123,7 @@ export async function updateUsername(req: FastifyRequest, reply: FastifyReply): 
     const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
     if (!parsed.success) {
       console.error('UserProfileUpdateUsername validation failed:', parsed.error)
-      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_DATA })
+      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_DATA + 'test' })
       return
     }
 
