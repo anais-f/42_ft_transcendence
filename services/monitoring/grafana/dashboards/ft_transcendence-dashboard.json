@@ -23,8 +23,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -127,8 +127,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -192,7 +192,32 @@
           },
           "unit": "ms"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "auth - /api/register"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -218,7 +243,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg_over_time(http_response_time_seconds_sum{job=\"auth\", method=\"POST\"}[$__interval]) / (avg_over_time(http_response_time_seconds_count{job=\"auth\", method=\"POST\"}[$__interval]))",
+          "expr": "avg_over_time(http_response_time_seconds_sum{job=\"auth\", method=\"POST\", status_code=~\"2..\"}[$__interval]) / (avg_over_time(http_response_time_seconds_count{job=\"auth\", method=\"POST\", status_code=~\"2..\"}[$__interval]))",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{job}} - {{route}}",
@@ -231,8 +256,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -335,8 +360,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -426,7 +451,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg_over_time(http_response_time_seconds_sum{job=\"users\", method=\"POST\"}[$__interval]) / (avg_over_time(http_response_time_seconds_count{job=\"user\", method=\"POST\"}[$__interval]))",
+          "expr": "avg_over_time(http_response_time_seconds_sum{job=\"users\", method=\"POST\", status_code=~\"4..\"}[$__interval]) / (avg_over_time(http_response_time_seconds_count{job=\"user\", method=\"POST\", status_code=~\"4..\"}[$__interval]))",
           "format": "heatmap",
           "instant": false,
           "legendFormat": "{{job}} - {{route}}",
@@ -439,8 +464,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -502,8 +527,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "name": "Prometheus"
+            "name": "Prometheus",
+            "type": "prometheus"
           },
           "editorMode": "builder",
           "expr": "rate(http_requests_total{method=\"GET\"}[$__rate_interval])",
@@ -518,8 +543,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "name": "Prometheus"
+        "name": "Prometheus",
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -581,8 +606,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "name": "Prometheus"
+            "name": "Prometheus",
+            "type": "prometheus"
           },
           "editorMode": "builder",
           "expr": "rate(http_requests_total{method=\"POST\"}[$__rate_interval])",
@@ -611,5 +636,5 @@
   "timezone": "browser",
   "title": "ft_transcendence",
   "uid": "95f33aac-d176-4e8b-a8fa-e2ee3e6af631",
-  "version": 2
+  "version": 1
 }
