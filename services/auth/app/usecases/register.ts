@@ -13,5 +13,5 @@ export async function loginUser(login: string, password: string) {
 	if (!user) return null
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
-	return { token: signToken({ userId: user.user_id, login: user.login }) }
+	return { token: signToken({ user_id: user.user_id, login: user.login }) }
 }

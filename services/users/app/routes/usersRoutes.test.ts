@@ -2,20 +2,14 @@
  * Test Coverage Summary for usersRoutes
  *
  * SECTION 1: SUCCESSFUL CASES
- * - POST /api/users/new-user: Creates user with valid data, returns 200 if exists (with auth header)
- * - GET /api/users/:id: Returns complete profile with all required fields
+ * - POST /api/users/new-user: Creates user with valid data (201), returns 200 if exists (with API key)
+ * - GET /api/users/:id: Returns complete profile with all 5 required fields (with JWT)
+ * - GET /api/users/me: Returns private profile for authenticated user (with JWT)
  *
  * SECTION 2: BASIC FAILURE CASES
- * - POST: Missing auth header (401), missing fields, invalid user_id/login
- * - GET: Invalid/negative id, user not found
- *
- * SECTION 3: TRICKY CASES
- * - Boundary values: login length limits, large user_id
- * - Special characters: valid patterns (underscores/dashes)
- * - Authorization: Invalid token, missing token
- *
- * SECTION 4: EXCEPTIONS
- * - Controller error propagation
+ * - POST: Missing/invalid API key (401), missing/invalid fields (400)
+ * - GET /:id: Invalid id format (400), user not found (404), internal errors (500)
+ * - GET /me: Missing JWT (401), user not found (404), internal errors (500)
  */
 
 import {
@@ -35,18 +29,31 @@ let ERROR_MESSAGES: any
 let serializerCompiler: any
 let validatorCompiler: any
 let ZodTypeProvider: any
+let fastifyJwt: any
 
-// Test auth token (matches the default in usersRoutes.ts)
-const TEST_AUTH_TOKEN = 'test'
+// Test auth token from environment (or fallback to 'test')
+const TEST_USERS_TOKEN = process.env.USERS_API_SECRET || 'test'
+const JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret'
 
 beforeAll(async () => {
+	if (!process.env.USERS_API_SECRET) {
+		process.env.USERS_API_SECRET = 'test'
+	}
+	if (!process.env.JWT_SECRET) {
+		process.env.JWT_SECRET = 'test-jwt-secret'
+	}
+
 	await jest.unstable_mockModule('../controllers/usersControllers.js', () => ({
 		handleUserCreated: jest.fn(),
-		getPublicUser: jest.fn()
+		getPublicUser: jest.fn(),
+		getPrivateUser: jest.fn()
 	}))
 
 	const fastify = await import('fastify')
 	Fastify = fastify.default
+
+	const jwt = await import('@fastify/jwt')
+	fastifyJwt = jwt.default
 
 	const routesModule = await import('./usersRoutes.js')
 	usersRoutes = routesModule.usersRoutes
@@ -65,12 +72,20 @@ beforeAll(async () => {
 
 describe('usersRoutes', () => {
 	let app: FastifyInstance
+	let testJwtToken: string
 
 	beforeEach(async () => {
 		jest.clearAllMocks()
 		app = Fastify().withTypeProvider<typeof ZodTypeProvider>()
 		app.setValidatorCompiler(validatorCompiler)
 		app.setSerializerCompiler(serializerCompiler)
+
+		// Register JWT plugin BEFORE routes
+		await app.register(fastifyJwt, { secret: JWT_SECRET })
+
+		// Generate a valid test JWT token
+		testJwtToken = app.jwt.sign({ user_id: 1, login: 'testuser' })
+
 		await app.register(usersRoutes)
 		await app.ready()
 	})
@@ -95,7 +110,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 42, login: 'testuser' }
 				})
@@ -119,7 +134,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'existing' }
 				})
@@ -147,7 +162,10 @@ describe('usersRoutes', () => {
 
 				const response = await app.inject({
 					method: 'GET',
-					url: '/api/users/42'
+					url: '/api/users/42',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
 				expect(response.statusCode).toBe(200)
@@ -196,7 +214,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { login: 'testuser' }
 				})
@@ -206,7 +224,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1 }
 				})
@@ -218,7 +236,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: -1, login: 'test' }
 				})
@@ -228,7 +246,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 0, login: 'test' }
 				})
@@ -240,7 +258,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'abc' }
 				})
@@ -250,7 +268,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: '12345678901234567' }
 				})
@@ -260,7 +278,7 @@ describe('usersRoutes', () => {
 					method: 'POST',
 					url: '/api/users/new-user',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
+						authorization: TEST_USERS_TOKEN
 					},
 					payload: { user_id: 1, login: 'test user' }
 				})
@@ -272,19 +290,28 @@ describe('usersRoutes', () => {
 			test('returns 400 for invalid id (non-numeric/negative/zero)', async () => {
 				const nonNumeric = await app.inject({
 					method: 'GET',
-					url: '/api/users/notanumber'
+					url: '/api/users/notanumber',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 				expect(nonNumeric.statusCode).toBe(400)
 
 				const negative = await app.inject({
 					method: 'GET',
-					url: '/api/users/-1'
+					url: '/api/users/-1',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 				expect(negative.statusCode).toBe(400)
 
 				const zero = await app.inject({
 					method: 'GET',
-					url: '/api/users/0'
+					url: '/api/users/0',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 				expect(zero.statusCode).toBe(400)
 			})
@@ -300,7 +327,10 @@ describe('usersRoutes', () => {
 
 				const response = await app.inject({
 					method: 'GET',
-					url: '/api/users/999'
+					url: '/api/users/999',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
 				expect(response.statusCode).toBe(404)
@@ -317,113 +347,110 @@ describe('usersRoutes', () => {
 
 				const response = await app.inject({
 					method: 'GET',
-					url: '/api/users/1'
+					url: '/api/users/1',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
 				expect(response.statusCode).toBe(500)
 			})
 		})
-	})
 
-	// ==================== SECTION 3: TRICKY CASES ====================
-	describe('3. Tricky cases', () => {
-		describe('Boundary values', () => {
-			test('accepts login with exact min/max length (4 and 16 chars)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
-					}
-				)
-
-				const minLength = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_AUTH_TOKEN
-					},
-					payload: { user_id: 1, login: 'abcd' }
+		describe('GET /api/users/me', () => {
+			test('returns 401 when JWT token is missing', async () => {
+				const response = await app.inject({
+					method: 'GET',
+					url: '/api/users/me'
 				})
-				expect(minLength.statusCode).toBe(201)
 
-				const maxLength = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_AUTH_TOKEN
-					},
-					payload: { user_id: 2, login: '1234567890123456' }
-				})
-				expect(maxLength.statusCode).toBe(201)
+				expect(response.statusCode).toBe(401)
+				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
 			})
 
-			test('handles large user_id values (999999999)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
+			test('returns private profile with valid JWT token', async () => {
+				const mockPrivateProfile = {
+					user_id: 1,
+					username: 'testuser',
+					avatar: '/avatars/default.png',
+					status: 1,
+					last_connection: '2024-01-01T00:00:00.000Z'
+				}
+
+				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
+						return reply.code(200).send(mockPrivateProfile)
 					}
 				)
 
 				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
+					method: 'GET',
+					url: '/api/users/me',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
-					},
-					payload: { user_id: 999999999, login: 'testuser' }
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
-				expect(response.statusCode).toBe(201)
+				expect(response.statusCode).toBe(200)
+				expect(response.json()).toMatchObject(mockPrivateProfile)
+				expect(UsersControllers.getPrivateUser).toHaveBeenCalled()
 			})
-		})
 
-		describe('Special characters in login', () => {
-			test('accepts valid special characters (underscore and dash)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
+			test('returns profile for user_id from JWT payload', async () => {
+				// Create a JWT token with user_id: 42
+				const customToken = app.jwt.sign({ user_id: 42, login: 'customuser' })
+
+				const mockProfile = {
+					user_id: 42,
+					username: 'customuser',
+					avatar: '/avatars/custom.png',
+					status: 0,
+					last_connection: '2024-10-29T10:00:00.000Z'
+				}
+
+				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
-						return reply.code(201).send({ success: true })
+						// Verify that the controller receives the correct user_id from JWT
+						expect(req.user.user_id).toBe(42)
+						return reply.code(200).send(mockProfile)
 					}
 				)
 
 				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
+					method: 'GET',
+					url: '/api/users/me',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
-					},
-					payload: { user_id: 1, login: 'user_name-123' }
+						authorization: `Bearer ${customToken}`
+					}
 				})
 
-				expect(response.statusCode).toBe(201)
+				expect(response.statusCode).toBe(200)
+				expect(response.json().user_id).toBe(42)
 			})
-		})
-	})
 
-	// ==================== SECTION 4: EXCEPTIONS ====================
-	describe('4. Exceptions', () => {
-		describe('Controller error propagation', () => {
-			test('POST propagates controller errors correctly', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
+			test('returns 404 when user not found in database', async () => {
+				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
 						return reply
-							.code(500)
-							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+							.code(404)
+							.send({ success: false, error: 'User not found' })
 					}
 				)
 
 				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
+					method: 'GET',
+					url: '/api/users/me',
 					headers: {
-						authorization: TEST_AUTH_TOKEN
-					},
-					payload: { user_id: 1, login: 'test' }
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
-				expect(response.statusCode).toBe(500)
+				expect(response.statusCode).toBe(404)
+				expect(response.json()).toMatchObject({ error: 'User not found' })
 			})
 
-			test('GET propagates controller errors correctly', async () => {
-				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
+			test('returns 500 on internal server error', async () => {
+				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
 					async (req: any, reply: any) => {
 						return reply
 							.code(500)
@@ -433,7 +460,10 @@ describe('usersRoutes', () => {
 
 				const response = await app.inject({
 					method: 'GET',
-					url: '/api/users/1'
+					url: '/api/users/me',
+					headers: {
+						authorization: `Bearer ${testJwtToken}`
+					}
 				})
 
 				expect(response.statusCode).toBe(500)

@@ -15,28 +15,38 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		console.log(`${process.env.AUTH_SERVICE_URL}/api/users`)
-		const url = `${process.env.AUTH_SERVICE_URL}/api/users`
-		const headers = { 'content-type': 'application/json' }
+		const base = process.env.AUTH_SERVICE_URL
+		const secret = process.env.AUTH_API_SECRET
+		if (!base || !secret)
+			throw new AppError('Missing AUTH_SERVICE_URL or AUTH_API_SECRET env', 500)
+
+		const url = `${base}/api/users`
+		const headers = {
+			'content-type': 'application/json',
+			authorization: secret
+		}
 		const options = { method: 'GET', headers: headers }
 
-		const response = await fetch(url, options)
-		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-		const raw = (await response.json()) as PublicUserListAuthDTO
-		const parsed = PublicUserListAuthSchema.safeParse(raw)
-		if (!parsed.success)
-			throw new AppError(
-				'Invalid response shape from auth service: ' + parsed.error.message,
-				500
-			)
+		try {
+			const response = await fetch(url, options)
+			if (!response.ok) {
+				throw new AppError(`Auth service HTTP ${response.status}`, 502)
+			}
+			const raw = (await response.json()) as PublicUserListAuthDTO
+			const parsed = PublicUserListAuthSchema.safeParse(raw)
+			if (!parsed.success)
+				throw new AppError(
+					'Invalid response shape from auth service: ' + parsed.error.message,
+					500
+				)
 
-		return parsed.data.users
+			return parsed.data.users
+		} catch (err) {
+			if (err instanceof AppError) throw err
+			throw new AppError(
+				'Failed to fetch users from auth: ' + (err as Error).message,
+				502
+			)
+		}
 	}
 }
-
-/*const url = 'http://users:3000/api/users/new-user'
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: { 'content-type': 'application/json', 'x-service-secret': 'ian' },
-			body: JSON.stringify(PublicUser)
-		})*/

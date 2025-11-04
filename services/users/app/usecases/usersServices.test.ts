@@ -4,11 +4,13 @@
  * SECTION 1: SUCCESSFUL CASES
  * - createUser: Creates users with valid data (4-16 char usernames, special chars allowed)
  * - getPublicUserProfile: Returns complete profile (user_id, username, avatar, status, last_connection)
+ * - getPrivateUserProfile: Returns private profile for authenticated user (from JWT)
  * - syncAllUsersFromAuth: Syncs all users from auth service, skips existing users
  *
  * SECTION 2: BASIC FAILURE CASES
  * - createUser: Throws AppError 400 when user already exists
  * - getPublicUserProfile: Throws AppError 404 when user not found
+ * - getPrivateUserProfile: Throws AppError 404 when authenticated user not found in DB
  *
  * SECTION 3: TRICKY CASES
  * - Boundary values: Tests user_id = 999999999 (large)
@@ -93,6 +95,30 @@ describe('UsersServices', () => {
 				const result = await UsersServices.getPublicUserProfile({ user_id: 42 })
 
 				expect(result).toEqual(mockProfile)
+				expect(result).toHaveProperty('user_id', 42)
+				expect(result).toHaveProperty('username', 'testuser')
+				expect(result).toHaveProperty('avatar')
+				expect(result).toHaveProperty('status')
+				expect(result).toHaveProperty('last_connection')
+			})
+		})
+
+		describe('getPrivateUserProfile', () => {
+			test('returns private profile for authenticated user', async () => {
+				const mockPrivateProfile = {
+					user_id: 42,
+					username: 'testuser',
+					avatar: '/avatars/img_default.png',
+					status: 1,
+					last_connection: '2024-01-01T00:00:00.000Z'
+				}
+				UsersRepository.getUserById.mockReturnValueOnce(mockPrivateProfile)
+
+				const result = await UsersServices.getPrivateUserProfile({
+					user_id: 42
+				})
+
+				expect(result).toEqual(mockPrivateProfile)
 				expect(result).toHaveProperty('user_id', 42)
 				expect(result).toHaveProperty('username', 'testuser')
 				expect(result).toHaveProperty('avatar')
@@ -197,6 +223,24 @@ describe('UsersServices', () => {
 				}
 			})
 		})
+
+		describe('getPrivateUserProfile', () => {
+			test('throws AppError 404 when authenticated user not found in DB', async () => {
+				UsersRepository.getUserById.mockReturnValueOnce(undefined)
+
+				await expect(
+					UsersServices.getPrivateUserProfile({ user_id: 999 })
+				).rejects.toThrow(AppError)
+
+				try {
+					await UsersServices.getPrivateUserProfile({ user_id: 999 })
+				} catch (error) {
+					expect(error).toBeInstanceOf(AppError)
+					expect((error as any).status).toBe(404)
+					expect((error as any).message).toBe(ERROR_MESSAGES.USER_NOT_FOUND)
+				}
+			})
+		})
 	})
 
 	// ==================== SECTION 3: TRICKY CASES ====================
@@ -286,6 +330,16 @@ describe('UsersServices', () => {
 
 				await expect(
 					UsersServices.getPublicUserProfile({ user_id: 1 })
+				).rejects.toThrow('Database connection failed')
+			})
+
+			test('getPrivateUserProfile propagates repository errors', async () => {
+				UsersRepository.getUserById.mockImplementationOnce(() => {
+					throw new Error('Database connection failed')
+				})
+
+				await expect(
+					UsersServices.getPrivateUserProfile({ user_id: 1 })
 				).rejects.toThrow('Database connection failed')
 			})
 		})

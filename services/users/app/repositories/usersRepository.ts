@@ -45,7 +45,7 @@ export class UsersRepository {
 	/**
 	 * @description Update methods for user status, last connection or avatar
 	 */
-	//TODO: how status was setted?
+	//TODO: how status was setted? with a websocket
 	// static updateUserStatus(user: IUserStatus): void {
 	// 	const updateStmt = db.prepare(
 	// 		'UPDATE users SET status = ? WHERE user_id = ?'
@@ -83,12 +83,6 @@ export class UsersRepository {
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
-
-	// static getUsernameById(user: IUserId): string {
-	//   const selectStmt = db.prepare('SELECT username FROM users WHERE user_id = ?')
-	//   const row = selectStmt.get(user.user_id) as { username: string }
-	//   return row.username
-	// }
 
 	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
 		const selectStmt = db.prepare(
