@@ -26,7 +26,8 @@
 		{ "path": "./packages/common" },
 		{ "path": "./services/users" },
 		{ "path": "./services/auth" },
-		{ "path": "./services/pong-server" }
+		{ "path": "./services/pong-server" },
+		{ "path": "./services/auth-google" }
 	],
 	"ts-node": {
 		"esm": true
