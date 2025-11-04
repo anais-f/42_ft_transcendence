@@ -9,25 +9,24 @@ describe('S04', () => {
 		const S03 = S03BaseBall.createS03()
 		const S04 = new S04BallVeloChange(S03, velo)
 		const buff = S04.serialize()
+
 		const view = new DataView(buff)
 
 		const ts = view.getFloat64(0, true)
+		const type = view.getUint8(8)
+		const x = view.getFloat64(9, true)
+		const y = view.getFloat64(17, true)
+
 		expect(typeof ts).toBe('number')
 		expect(ts).toBeCloseTo(S03.time)
 		expect(ts).toBeCloseTo(S04.time)
-
-		const type = view.getUint8(8)
 		expect(type).toBe(0b1101)
-
-		const x = view.getFloat64(9, true)
-		const y = view.getFloat64(17, true)
 		expect(x).toBeCloseTo(velo.getX())
 		expect(y).toBeCloseTo(velo.getY())
 	})
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(25)
 		const view = new DataView(buff)
-
 		const timestamp = 123456.789
 		const type = 0b1101
 		const v = new Vector2(324.32, -42)
@@ -42,6 +41,22 @@ describe('S04', () => {
 		expect(p?.time).toBeCloseTo(timestamp)
 		if (p instanceof S04BallVeloChange) {
 			expect(p.getVelo().equals(v)).toBe(true)
+		} else {
+			throw new Error('Packet is not S04BallVeloChange')
+		}
+	})
+	test('serialize + deserialize', () => {
+		const v = new Vector2(23, -2)
+		const S03 = S03BaseBall.createS03()
+		const S04 = new S04BallVeloChange(S03, v)
+		const buff = S04.serialize()
+		const S04Back = packetBuilder.deserializeS(buff)
+
+		expect(S04Back?.time).toEqual(S03.time)
+
+		expect(S04Back).toBeInstanceOf(S04BallVeloChange)
+		if (S04Back instanceof S04BallVeloChange) {
+			expect(S04Back.getVelo().equals(S04.getVelo())).toBe(true)
 		} else {
 			throw new Error('Packet is not S04BallVeloChange')
 		}

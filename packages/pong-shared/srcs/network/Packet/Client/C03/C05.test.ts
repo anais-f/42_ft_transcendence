@@ -63,7 +63,7 @@ describe('c05', () => {
 		expect(C03.getTime()).toEqual(CBack?.time)
 		expect(C05.getTime()).toEqual(CBack?.time)
 		if (CBack instanceof C05BallPos) {
-			expect(C05.getPos()).toEqual(CBack.getPos())
+			expect(C05.getPos().equals(CBack.getPos())).toBe(true)
 		} else {
 			throw new Error('Packet is not C05')
 		}

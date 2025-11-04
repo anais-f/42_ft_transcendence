@@ -77,7 +77,8 @@ describe('c06', () => {
 
 		expect(C06.getTime()).toEqual(CBack?.time)
 		if (CBack instanceof C06BallVeloPos) {
-			expect(C06.getVelo()).toEqual(CBack.getVelo())
+			expect(C06.getVelo().equals(CBack.getVelo())).toBe(true)
+			expect(C06.getPos().equals(CBack.getPos())).toBe(true)
 		} else {
 			throw new Error('Packet is not C06')
 		}

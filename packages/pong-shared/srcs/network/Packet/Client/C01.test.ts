@@ -61,7 +61,7 @@ describe('c01', () => {
 		expect(CBack?.getTime()).toEqual(C.getTime())
 		expect(CBack).toBeInstanceOf(C01Move)
 		if (CBack instanceof C01Move) {
-			expect(CBack.getDirection()).toEqual(C.getDirection())
+			expect(CBack.getDirection().equals(C.getDirection())).toBe(true)
 		} else {
 			throw new Error('Packet is not C01')
 		}

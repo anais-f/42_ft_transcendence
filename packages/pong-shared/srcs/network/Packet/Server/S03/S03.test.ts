@@ -30,4 +30,13 @@ describe('S03', () => {
 		expect(p).toBeInstanceOf(S03BaseBall)
 		expect(p?.time).toBeCloseTo(timestamp)
 	})
+
+	test('serialize + deserialize', () => {
+		const S03 = S03BaseBall.createS03()
+		// @ts-ignore
+		const buff = S03.fserialize()
+		const SBack = packetBuilder.deserializeS(buff)
+
+		expect(SBack?.getTime()).toBe(S03.time)
+	})
 })
