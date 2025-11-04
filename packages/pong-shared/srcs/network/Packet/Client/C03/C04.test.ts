@@ -48,7 +48,22 @@ describe('c04', () => {
 		if (p instanceof C04BallVelo) {
 			expect(p.getVelo().equals(new Vector2(vx, vy))).toBe(true)
 		} else {
-			throw new Error('Packet is not C05BallPos')
+			throw new Error('Packet is not C04')
+		}
+	})
+	test('serialize + deserialize', () => {
+		const C03 = new C03BallBase(Date.now())
+		const V = new Vector2(342, -0.34)
+		const C04 = new C04BallVelo(C03, V)
+		const buff = C04.serialize()
+		const CBack = packetBuilder.deserializeC(buff)
+
+		expect(C03.getTime()).toEqual(CBack?.time)
+		expect(C04.getTime()).toEqual(CBack?.time)
+		if (CBack instanceof C04BallVelo) {
+			expect(C04.getVelo()).toEqual(CBack.getVelo())
+		} else {
+			throw new Error('Packet is not C04')
 		}
 	})
 })

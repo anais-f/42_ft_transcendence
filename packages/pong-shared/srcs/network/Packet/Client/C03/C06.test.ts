@@ -65,7 +65,21 @@ describe('c06', () => {
 			expect(p.getVelo().equals(velo)).toBe(true)
 			expect(p.getPos().equals(pos)).toBe(true)
 		} else {
-			throw new Error('Packet is not C05BallPos')
+			throw new Error('Packet is not C06')
+		}
+	})
+	test('serialize + deserialize', () => {
+		const V = new Vector2(342, -0.34)
+		const pos = new Vector2(-3.42, -0.34)
+		const C06 = new C06BallVeloPos(pos, V)
+		const buff = C06.serialize()
+		const CBack = packetBuilder.deserializeC(buff)
+
+		expect(C06.getTime()).toEqual(CBack?.time)
+		if (CBack instanceof C06BallVeloPos) {
+			expect(C06.getVelo()).toEqual(CBack.getVelo())
+		} else {
+			throw new Error('Packet is not C06')
 		}
 	})
 })

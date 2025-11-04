@@ -50,7 +50,20 @@ describe('c01', () => {
 		if (p instanceof C01Move) {
 			expect(p?.getDirection()?.equals(new Vector2(x, y))).toBe(true)
 		} else {
-			throw new Error('Packet is not C05BallPos')
+			throw new Error('Packet is not C01')
+		}
+	})
+	test('serialize + deserialize', () => {
+		const dir = new Vector2(-213, 213)
+		const C = new C01Move(dir)
+		const buff = C.serialize()
+		const CBack = packetBuilder.deserializeC(buff)
+		expect(CBack?.getTime()).toEqual(C.getTime())
+		expect(CBack).toBeInstanceOf(C01Move)
+		if (CBack instanceof C01Move) {
+			expect(CBack.getDirection()).toEqual(C.getDirection())
+		} else {
+			throw new Error('Packet is not C01')
 		}
 	})
 })

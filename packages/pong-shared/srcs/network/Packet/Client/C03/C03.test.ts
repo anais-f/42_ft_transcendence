@@ -1,5 +1,6 @@
 import { C03BallBase } from './C03'
 import { packetBuilder } from '../../packetBuilder.js'
+import { Vector2 } from '../../../../math/Vector2.js'
 
 describe('C03', () => {
 	test('serialize returns correct buffer', () => {
@@ -28,5 +29,12 @@ describe('C03', () => {
 
 		const p = packetBuilder.deserializeC(buff)
 		expect(p).toBeInstanceOf(C03BallBase)
+	})
+	test('serialize + deserialize', () => {
+		const C = new C03BallBase(Date.now())
+		// @ts-ignore (jest can call private methode)
+		const buff = C.fserialize()
+		const CBack = packetBuilder.deserializeC(buff)
+		expect(C.getTime()).toEqual(CBack?.time)
 	})
 })

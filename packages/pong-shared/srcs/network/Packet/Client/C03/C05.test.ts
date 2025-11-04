@@ -53,4 +53,19 @@ describe('c05', () => {
 			throw new Error('Packet is not C05BallPos')
 		}
 	})
+	test('serialize + deserialize', () => {
+		const C03 = new C03BallBase(Date.now())
+		const pos = new Vector2(342, -0.34)
+		const C05 = new C05BallPos(C03, pos)
+		const buff = C05.serialize()
+		const CBack = packetBuilder.deserializeC(buff)
+
+		expect(C03.getTime()).toEqual(CBack?.time)
+		expect(C05.getTime()).toEqual(CBack?.time)
+		if (CBack instanceof C05BallPos) {
+			expect(C05.getPos()).toEqual(CBack.getPos())
+		} else {
+			throw new Error('Packet is not C05')
+		}
+	})
 })
