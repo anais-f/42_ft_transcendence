@@ -3,8 +3,7 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"rootDir": ".",
-		"moduleResolution": "nodenext",
-		"isolatedModules": true
+		"moduleResolution": "nodenext"
 	},
 	"references": [{ "path": "../../../packages/pong-shared" }],
 	"include": ["./**/*"]

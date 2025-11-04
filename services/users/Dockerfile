@@ -1,4 +1,19 @@
 #-------------------------------------------------------------#
+# Build packages
+FROM node:22-alpine AS build-packages
+
+WORKDIR /build
+
+COPY package.json package-lock.json ./
+COPY packages/common/package.json ./packages/common/
+
+RUN npm install
+
+COPY tsconfig.json ./
+COPY packages/ ./packages/
+
+RUN npm run build --workspace=packages/common
+#-------------------------------------------------------------#
 # Build app
 FROM node:22-alpine AS build-app
 
@@ -6,12 +21,15 @@ WORKDIR /build
 
 COPY package.json package-lock.json ./
 COPY services/users/app/package.json ./services/users/app/
+COPY packages/common/package.json ./packages/common/
 RUN npm install
 
 COPY tsconfig.json ./
-COPY services/users ./services/users
+COPY packages/ ./packages/
+COPY services/ ./services/
 
-EXPOSE 3000
+COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
+COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 
 RUN npm run build --workspace=users
 
@@ -26,9 +44,8 @@ RUN mkdir -p /app/avatars
 COPY --from=build-app /build/services/users/app/dist ./dist
 COPY --from=build-app /build/services/users/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
-
-RUN chown -R node:node /app
-USER node
+COPY --from=build-app /build/packages/common/ ./packages/common/
+COPY --from=build-app /build/packages/common/openapiDTO.json ./dist/openapiDTO.json
 
 EXPOSE 3000
 

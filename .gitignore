@@ -1,10 +1,10 @@
 .secret
 .env
+.env.localtest
 
 #IDE
 .idea/
 .vscode/
-
 
 **/dist/
 **/tsconfig.tsbuildinfo
@@ -13,3 +13,8 @@ package-lock.json
 *.sqlite
 
 TODO
+*.js
+*.d.ts
+*.js.map
+openapi*.json
+

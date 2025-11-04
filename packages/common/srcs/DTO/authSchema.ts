@@ -1,17 +1,16 @@
 import { z } from 'zod'
-
-import { UsernameSchema } from './usersDTO.js'
+import { LoginSchema } from './usersSchema.js'
 
 export const RegisterSchema = z
 	.object({
-		username: UsernameSchema,
+		login: LoginSchema,
 		password: z.string().min(8).max(128)
 	})
 	.strict()
 
-export const LoginSchema = z
+export const LoginActionSchema = z
 	.object({
-		username: UsernameSchema,
+		login: LoginSchema,
 		password: z.string().min(8).max(128)
 	})
 	.strict()

@@ -1,6 +1,5 @@
 import { Vector2 } from '@ft_transcendence/pong-shared'
 
-while (1) {
-	let a = new Vector2()
-	console.log(a)
-}
+console.log('Pong server is starting...')
+let a = new Vector2()
+console.log('Initial Vector2:', a)

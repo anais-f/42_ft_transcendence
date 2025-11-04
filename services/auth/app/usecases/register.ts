@@ -1,20 +1,17 @@
-import {
-	createUser,
-	findUserByUsername
-} from '../repositories/userRepository.js'
+import { createUser, findUserByLogin } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
 
-export async function registerUser(username: string, password: string) {
+export async function registerUser(login: string, password: string) {
 	const hashed = await hashPassword(password)
-	await createUser(username, hashed)
+	await createUser(login, hashed)
 	return { success: true }
 }
 
-export async function loginUser(username: string, password: string) {
-	const user = await findUserByUsername(username)
+export async function loginUser(login: string, password: string) {
+	const user = await findUserByLogin(login)
 	if (!user) return null
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
-	return { token: signToken({ userId: user.id_user, username: user.username }) }
+	return { token: signToken({ user_id: user.user_id, login: user.login }) }
 }
