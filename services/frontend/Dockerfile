@@ -9,8 +9,8 @@ COPY package.json package-lock.json ./
 COPY services/frontend/app/package.json ./services/frontend/app/package.json
 
 RUN npm install
-# Install dependencies (including devDependencies)
-RUN npm ci
+# Install dependencies (including devDependencies) (ci = clean-install)
+# RUN npm ci
 
 COPY tsconfig.json ./
 COPY services/frontend/app ./services/frontend/app
