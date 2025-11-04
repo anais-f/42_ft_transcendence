@@ -22,7 +22,7 @@ export const ERROR_MESSAGES = {
 export const SUCCESS_MESSAGES = {
 	USER_CREATED: 'User created',
 	USER_UPDATED: 'User updated',
-  USER_DELETED: 'User deleted',
+	USER_DELETED: 'User deleted'
 } as const
 
 // export const ERRORS = {

@@ -1,11 +1,11 @@
 import { UsersServices } from '../usecases/usersServices.js'
-import { FastifyRequest, FastifyReply } from 'fastify'
+import Fastify, {FastifyRequest, FastifyReply, FastifyError} from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
 	UserPrivateProfileSchema,
 	AppError,
-  UserProfileUpdateUsernameSchema,
+	UserProfileUpdateUsernameSchema,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
@@ -79,11 +79,15 @@ export async function getPrivateUser(
 		const user = req.user as { user_id?: number } | undefined
 		const userId = Number(user?.user_id)
 		if (!userId || userId <= 0) {
-			void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+			void reply
+				.code(400)
+				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 			return
 		}
 
-		const rawProfile = await UsersServices.getPrivateUserProfile({ user_id: userId })
+		const rawProfile = await UsersServices.getPrivateUserProfile({
+			user_id: userId
+		})
 
 		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
 		if (!parsed.success) {
@@ -109,33 +113,97 @@ export async function getPrivateUser(
 	}
 }
 
-export async function updateUsername(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  try {
-    const user = req.user as { user_id?: number } | undefined
-    const userId = Number(user?.user_id)
-    const { username } = req.body as { username?: string }
+export async function updateUsername(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const user = req.user as { user_id?: number } | undefined
+		const userId = Number(user?.user_id)
+		const { username } = req.body as { username?: string }
 
-    if (!userId || userId <= 0) {
-      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-      return
-    }
+		if (!userId || userId <= 0) {
+			void reply
+				.code(400)
+				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+			return
+		}
 
-    const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
-    if (!parsed.success) {
-      console.error('UserProfileUpdateUsername validation failed:', parsed.error)
-      void reply.code(400).send({ success: false, error: ERROR_MESSAGES.INVALID_USER_DATA + 'test' })
-      return
-    }
+		const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
+		if (!parsed.success) {
+			console.error(
+				'UserProfileUpdateUsername validation failed:',
+				parsed.error
+			)
+			void reply.code(400).send({
+				success: false,
+				error: ERROR_MESSAGES.INVALID_USER_DATA + 'test'
+			})
+			return
+		}
 
-    await UsersServices.updateUsername({ user_id: userId }, parsed.data.username)
+		await UsersServices.updateUsernameProfile(
+			{ user_id: userId },
+			parsed.data.username
+		)
 
-    void reply.code(200).send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-  } catch (error: any) {
-    if (error instanceof AppError) {
-      void reply.code(error.status).send({ success: false, error: error.message })
-      return
-    }
-    console.error('Unexpected error in updateUsername:', error)
-    void reply.code(500).send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+		void reply
+			.code(200)
+			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+	} catch (error: any) {
+		if (error instanceof AppError) {
+			void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+			return
+		}
+		console.error('Unexpected error in updateUsernameProfile:', error)
+		void reply
+			.code(500)
+			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	}
+
+  static async updateAvatar(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+    try {
+      const user = req.user as { user_id?: number } | undefined
+      const userId = Number(user?.user_id)
+
+      if (!userId || userId <= 0) {
+        void reply
+          .code(400)
+          .send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+        return
+      }
+
+      // verifie mon file -> taille, extenmtsion, mime type, etc
+      //body = string avatarUrl
   }
+
+    }
+    catch (error) {
+
+    }
+  }
+
+
+
+
+/*
+fastify.post('/upload-avatar', async (request, reply) => {
+const data = await request.file();
+const chunks = [];
+for await (const chunk of data.file) {
+  chunks.push(chunk);
+}
+const buffer = Buffer.concat(chunks);
+
+// Valide buffer (ex : taille, type, etc)
+
+// Si ok, sauvegarde sur disque (remplace ancien avatar)
+await fs.writeFile(`avatars/users/${userId}.png`, buffer);
+
+reply.send({ message: 'Upload validé et avatar remplacé' });
+});
+
+ */
 }

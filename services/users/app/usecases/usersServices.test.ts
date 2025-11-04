@@ -115,10 +115,10 @@ describe('UsersServices', () => {
 				UsersRepository.getUserById.mockReturnValueOnce(mockPrivateProfile)
 
 				const result = await UsersServices.getPrivateUserProfile({
-          user_id: 42
-        })
+					user_id: 42
+				})
 
-        expect(result).toEqual(mockPrivateProfile)
+				expect(result).toEqual(mockPrivateProfile)
 				expect(result).toHaveProperty('user_id', 42)
 				expect(result).toHaveProperty('username', 'testuser')
 				expect(result).toHaveProperty('avatar')
@@ -229,12 +229,12 @@ describe('UsersServices', () => {
 				UsersRepository.getUserById.mockReturnValueOnce(undefined)
 
 				await expect(
-					UsersServices.getPrivateUserProfile({user_id: 999})
-        ).rejects.toThrow(AppError)
+					UsersServices.getPrivateUserProfile({ user_id: 999 })
+				).rejects.toThrow(AppError)
 
 				try {
-					await UsersServices.getPrivateUserProfile({user_id: 999})
-        } catch (error) {
+					await UsersServices.getPrivateUserProfile({ user_id: 999 })
+				} catch (error) {
 					expect(error).toBeInstanceOf(AppError)
 					expect((error as any).status).toBe(404)
 					expect((error as any).message).toBe(ERROR_MESSAGES.USER_NOT_FOUND)
@@ -339,8 +339,8 @@ describe('UsersServices', () => {
 				})
 
 				await expect(
-					UsersServices.getPrivateUserProfile({user_id: 1})
-        ).rejects.toThrow('Database connection failed')
+					UsersServices.getPrivateUserProfile({ user_id: 1 })
+				).rejects.toThrow('Database connection failed')
 			})
 		})
 

@@ -5,7 +5,7 @@
  * - existsById: Returns true when user exists, false when not
  * - insertUser: Inserts with valid Zod data (4-16 char username), generates ISO 8601 timestamps
  * - getUserById: Returns complete profile (user_id, username, avatar, status, last_connection)
- * - updateUsername: Updates username with valid value
+ * - updateUsernameProfile: Updates username with valid value
  * - getAllUsers: Returns array of all users
  *
  * SECTION 2: BASIC FAILURE CASES

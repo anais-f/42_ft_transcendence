@@ -8,7 +8,7 @@ services:
     networks:
       - backend
     volumes:
-      - avatars:/app/share/nginx/html/avatars:ro
+      - avatars:/usr/share/nginx/html/avatars
     depends_on:
       frontend:
         condition: service_healthy

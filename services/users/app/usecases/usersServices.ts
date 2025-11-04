@@ -53,9 +53,9 @@ export class UsersServices {
 		}
 	}
 
-	static async getPrivateUserProfile(
-		user: { user_id: number }
-	): Promise<UserPrivateProfileDTO> {
+	static async getPrivateUserProfile(user: {
+		user_id: number
+	}): Promise<UserPrivateProfileDTO> {
 		if (!user.user_id || user.user_id <= 0)
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
@@ -73,13 +73,16 @@ export class UsersServices {
 		}
 	}
 
-	static async updateUsername(user: { user_id: number }, newUsername: string): Promise<void> {
-    if (!user.user_id || user.user_id <= 0)
-      throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+	static async updateUsernameProfile(
+		user: { user_id: number },
+		newUsername: string
+	): Promise<void> {
+		if (!user.user_id || user.user_id <= 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-    await UsersRepository.updateUsername({
-      user_id: user.user_id,
-      username: newUsername
-    })
-  }
+		await UsersRepository.updateUsername({
+			user_id: user.user_id,
+			username: newUsername
+		})
+	}
 }
