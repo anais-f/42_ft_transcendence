@@ -9,7 +9,7 @@
 		"test:pong:shared": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-shared",
 		"test:pong:client": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-client",
 		"test:pong:server": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-server",
-		"test:users": "dotenv -e .env.localtest -- node --experimental-vm-modules node_modules/.bin/jest --selectProjects=users-app",
+		"test:users": "dotenv -e .env.localtest -- node --experimental-vm-modules node_modules/.bin/jest --selectProjects=users",
 		"build": "npm run build --workspaces --if-present",
 		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",

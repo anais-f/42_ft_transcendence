@@ -3,8 +3,8 @@ import {
 	handleUserCreated,
 	getPublicUser,
 	getPrivateUser,
-  updateUsername,
-  updateAvatar
+	updateUsername,
+	updateAvatar
 } from '../controllers/usersControllers.js'
 import {
 	SuccessResponseSchema,
@@ -12,7 +12,7 @@ import {
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
-  UserProfileUpdateUsernameSchema
+	UserProfileUpdateUsernameSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
@@ -87,7 +87,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					400: ErrorResponseSchema,
 					401: ErrorResponseSchema,
 					404: ErrorResponseSchema,
-          409: ErrorResponseSchema,
+					409: ErrorResponseSchema,
 					500: ErrorResponseSchema
 				}
 			},
@@ -114,5 +114,4 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		updateAvatar
 	)
-
 }
