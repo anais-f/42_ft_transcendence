@@ -1,0 +1,25 @@
+services:
+  install-dependencies:
+    container_name: install-dependencies
+    build:
+      context: .
+      dockerfile: .dev/Dockerfile.install
+    volumes:
+      - ./:/app
+
+  test:
+    image: node:22-alpine
+    container_name: test
+    working_dir: /app
+    volumes:
+      - .:/app
+    networks:
+      - backend
+    env_file:
+      - .env.test
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+      nginx:
+        condition: service_healthy
+    command: sh -c "npm run test"
