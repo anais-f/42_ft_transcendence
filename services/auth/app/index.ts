@@ -47,6 +47,7 @@ async function runServer() {
 	console.log('Starting Auth service...')
 	await runMigrations()
 
+	await app.register(metricPlugin.default, { endpoint: '/metrics' });
 	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
 		fs.readFileSync(
@@ -54,7 +55,6 @@ async function runServer() {
 			'utf-8'
 		)
 	)
-	await app.register(metricPlugin.default, { endpoint: '/metrics' });
 	// Configure Swagger to use the loaded schemas
 	await app.register(Swagger as any, {
 		openapi: {

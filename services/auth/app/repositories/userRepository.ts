@@ -36,3 +36,16 @@ export function deleteUserById(id: number) {
 	const info = stmt.run(id)
 	return info.changes > 0
 }
+
+export function createGoogleUser(google_id: string) {
+	let login = `google-${google_id}`
+	const stmt = db().prepare(
+		'INSERT INTO users (login, google_id) VALUES (?, ?)'
+	)
+	stmt.run(login, google_id)
+}
+
+export function findUserByGoogleId(google_id: string) {
+	const stmt = db().prepare('SELECT * FROM users WHERE google_id = ?')
+	return stmt.get(google_id) as IUserAuth | undefined
+}

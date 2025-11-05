@@ -1,12 +1,14 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { registerUser, loginUser } from '../usecases/register.js'
+import { registerUser, loginUser, registerGoogleUser } from '../usecases/register.js'
 import {
 	RegisterSchema,
 	LoginActionSchema,
+	RegisterGoogleSchema,
 	PublicUserAuthDTO
 } from '@ft_transcendence/common'
-import { findPublicUserByLogin } from '../repositories/userRepository.js'
+import { findPublicUserByLogin, findUserByGoogleId } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
+import { signToken } from '../utils/jwt.js'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -14,7 +16,7 @@ export async function registerController(
 ) {
 	const parsed = RegisterSchema.safeParse(request.body)
 	if (!parsed.success)
-		return reply.code(400).send({ error: 'Invalid payload - regidster' })
+		return reply.code(400).send({ error: 'Invalid payload - register' })
 	const { login, password } = parsed.data
 
 	try {
@@ -58,4 +60,59 @@ export async function loginController(
 	const res = await loginUser(login, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })
 	return reply.send(res)
+}
+
+export async function registerGoogleController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	console.log('Register Google controller called')
+	const parsed = RegisterGoogleSchema.safeParse(request.body)
+	if (!parsed.success)
+	{
+		console.log('Invalid payload for Google registration:', parsed.error)
+		return reply.code(400).send({ error: 'Invalid payload - register' })
+	}
+	const { google_id } = parsed.data
+	console.log('Google ID received:', google_id)
+	const user = await findUserByGoogleId(google_id)
+	console.log('Existing user with this Google ID:', user)
+	if (user)
+	{
+		console.log('Google user already exists, logging in')
+		return { token: signToken({ userId: user.user_id, login: user.login }) }
+	}
+	try {
+		await registerGoogleUser(google_id)
+		const PublicUser = (await findPublicUserByLogin(`google-${google_id}`)) as
+			| PublicUserAuthDTO
+			| undefined
+		console.log('Pulic user = ', PublicUser)
+		if (PublicUser == undefined)
+			return reply.code(500).send({ error: 'Database error1' })
+		const url = `${process.env.USERS_SERVICE_URL}/api/users/new-user`
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				authorization: process.env.AUTH_API_SECRET as string
+			},
+			body: JSON.stringify(PublicUser)
+		})
+
+		if (response.ok == false) {
+			deleteUserById(PublicUser.user_id)
+			return reply.code(400).send({ error: 'Synchronisation user db' })
+		}
+		console.log('Registered google user successfully')
+		return reply.send({ success: true })
+	} catch (e: any) {
+		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
+		{
+			console.log('Google ID already exists....')
+			return reply.code(409).send({ error: 'Login already exists' })
+		}
+		console.log('Database error during Google registration:', e)
+		return reply.code(500).send({ error: 'Database error' })
+	}
 }

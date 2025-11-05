@@ -1,9 +1,11 @@
 import type { FastifyInstance } from 'fastify'
 import {
 	registerController,
-	loginController
+	loginController,
+	registerGoogleController
+
 } from '../controllers/authController.js'
-import { RegisterSchema, LoginActionSchema } from '@ft_transcendence/common'
+import { RegisterSchema, LoginActionSchema, RegisterGoogleSchema } from '@ft_transcendence/common'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(
@@ -23,5 +25,14 @@ export async function authRoutes(app: FastifyInstance) {
 			}
 		},
 		loginController
+	)
+	app.post(
+		'/api/register-google',
+		{
+			schema: {
+				body: RegisterGoogleSchema
+			}
+		},
+		registerGoogleController
 	)
 }
