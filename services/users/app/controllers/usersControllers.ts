@@ -1,5 +1,5 @@
 import { UsersServices } from '../usecases/usersServices.js'
-import Fastify, {FastifyRequest, FastifyReply, FastifyError} from 'fastify'
+import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
@@ -163,27 +163,27 @@ export async function updateUsername(
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
 	}
 
-  static async updateAvatar(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-    try {
-      const user = req.user as { user_id?: number } | undefined
-      const userId = Number(user?.user_id)
-
-      if (!userId || userId <= 0) {
-        void reply
-          .code(400)
-          .send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-        return
-      }
-
-      // verifie mon file -> taille, extenmtsion, mime type, etc
-      //body = string avatarUrl
-  }
-
-    }
-    catch (error) {
-
-    }
-  }
+  // static async updateAvatar(req: FastifyRequest, reply: FastifyReply): Promise<void> {
+  //   try {
+  //     const user = req.user as { user_id?: number } | undefined
+  //     const userId = Number(user?.user_id)
+  //
+  //     if (!userId || userId <= 0) {
+  //       void reply
+  //         .code(400)
+  //         .send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+  //       return
+  //     }
+  //
+  //     // verifie mon file -> taille, extenmtsion, mime type, etc
+  //     //body = string avatarUrl
+  // }
+  //
+  //   }
+  //   catch (error) {
+  //
+  //   }
+  // }
 
 
 
