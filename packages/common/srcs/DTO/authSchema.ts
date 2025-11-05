@@ -20,3 +20,7 @@ export const RegisterGoogleSchema = z
 		google_id: z.string().min(1)
 	})
 	.strict()
+
+export type RegisterDTO = z.infer<typeof RegisterSchema>
+export type LoginActionDTO = z.infer<typeof LoginActionSchema>
+export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>
