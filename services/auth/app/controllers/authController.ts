@@ -27,10 +27,13 @@ export async function registerController(
 	const { login, password } = parsed.data
 
 	try {
+		const authApiSecret = process.env.AUTH_API_SECRET
+		if (!authApiSecret) {
+			console.error('AUTH_API_SECRET is not defined in environment variables')
+			return reply.code(500).send({ error: 'Server configuration error' })
+		}
 		await registerUser(login, password)
-		const PublicUser = (await findPublicUserByLogin(parsed.data.login)) as
-			| PublicUserAuthDTO
-			| undefined
+		const PublicUser = (await findPublicUserByLogin(parsed.data.login))
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
@@ -39,7 +42,7 @@ export async function registerController(
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
-				authorization: process.env.AUTH_API_SECRET as string
+				authorization: authApiSecret
 			},
 			body: JSON.stringify(PublicUser)
 		})
@@ -88,10 +91,13 @@ export async function registerGoogleController(
 		return { token: signToken({ userId: user.user_id, login: user.login }) }
 	}
 	try {
+		const authApiSecret = process.env.AUTH_API_SECRET
+		if (!authApiSecret) {
+			console.error('AUTH_API_SECRET is not defined in environment variables')
+			return reply.code(500).send({ error: 'Server configuration error' })
+		}
 		await registerGoogleUser(google_id)
-		const PublicUser = (await findPublicUserByLogin(`google-${google_id}`)) as
-			| PublicUserAuthDTO
-			| undefined
+		const PublicUser = (await findPublicUserByLogin(`google-${google_id}`))
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
@@ -100,7 +106,7 @@ export async function registerGoogleController(
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
-				authorization: process.env.AUTH_API_SECRET as string
+				authorization: authApiSecret
 			},
 			body: JSON.stringify(PublicUser)
 		})
