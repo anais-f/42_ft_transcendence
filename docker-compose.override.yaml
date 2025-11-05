@@ -10,68 +10,37 @@ services:
     build:
       context: .
       dockerfile: services/auth/Dockerfile.dev
-    container_name: auth-dev
     volumes:
       - ./:/app
     environment:
-      - PORT=3042
       - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - node -e "require('net').connect(3042,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
-      interval: 5s
-      timeout: 3s
-      retries: 12
-      start_period: 20s
 
   users:
     build:
       context: .
       dockerfile: services/users/Dockerfile.dev
-    container_name: users-dev
     volumes:
       - ./:/app
     environment:
-      - PORT=3042
       - OPEN_API_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - node -e "require('net').connect(3042,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
-      interval: 5s
-      timeout: 3s
-      retries: 12
-      start_period: 20s
 
-  nginx:
-    container_name: nginx-dev
+  auth_google:
     build:
-      context: services/nginx
-      dockerfile: Dockerfile.dev
-    ports:
-      - '8042:8042'
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - wget -qS --spider http://127.0.0.1:8042 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
-      interval: 30s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-
-volumes:
-  auth_root_node_modules:
-  auth_ws_node_modules:
-  auth_data:
-  users_root_node_modules:
-  users_ws_node_modules:
-  users_data:
+      context: .
+      dockerfile: services/auth_google/Dockerfile.dev
+    volumes:
+      - ./:/app
+    environment:
+      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
