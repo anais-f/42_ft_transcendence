@@ -1,37 +1,38 @@
 import { getDb } from '../database/connection.js'
-import { IUserAuth } from '@ft_transcendence/common'
+import { IUserAuth, PublicUserAuthDTO, PublicUserListAuthDTO } from '@ft_transcendence/common'
 
 const db = () => getDb()
 
-export function createUser(login: string, passwordHash: string) {
+export function createUser(login: string, passwordHash: string){
 	const stmt = db().prepare('INSERT INTO users (login, password) VALUES (?, ?)')
 	stmt.run(login, passwordHash)
 }
 
-export function findUserByLogin(login: string) {
+export function findUserByLogin(login: string): IUserAuth | undefined {
 	const stmt = db().prepare('SELECT * FROM users WHERE login = ?')
 	return stmt.get(login) as IUserAuth | undefined
 }
 
-export function findPublicUserByLogin(login: string) {
+export function findPublicUserByLogin(login: string): PublicUserAuthDTO | undefined {
 	const stmt = db().prepare('SELECT user_id, login FROM users WHERE login = ?')
-	return stmt.get(login) as { id: number; login: string } | undefined
+	return stmt.get(login) as PublicUserAuthDTO | undefined
 }
 
-export function findPublicUserById(id: number) {
+export function findPublicUserById(id: number): PublicUserAuthDTO | undefined {
 	const stmt = db().prepare(
 		'SELECT user_id, login FROM users WHERE user_id = ?'
 	)
-	return stmt.get(id) as { id: number; login: string } | undefined
+	return stmt.get(id) as PublicUserAuthDTO | undefined
 }
 
-export function listPublicUsers() {
+export function listPublicUsers(): PublicUserListAuthDTO | undefined {
 	const stmt = db().prepare('SELECT user_id, login FROM users')
 	console.log('stmt', stmt.all())
-	return stmt.all() as { id: number; login: string }[]
+	const users = stmt.all() as { user_id: number; login: string }[]
+	return { users }
 }
 
-export function deleteUserById(id: number) {
+export function deleteUserById(id: number): boolean {
 	const stmt = db().prepare('DELETE FROM users WHERE user_id = ?')
 	const info = stmt.run(id)
 	return info.changes > 0
