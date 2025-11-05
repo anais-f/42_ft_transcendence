@@ -3,8 +3,8 @@ import {
 	handleUserCreated,
 	getPublicUser,
 	getPrivateUser,
-	updateUsername
-	// updateAvatar
+	updateUsername,
+	updateAvatar
 } from '../controllers/usersControllers.js'
 import {
 	SuccessResponseSchema,
@@ -97,21 +97,21 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	)
 
 	// PATCH /api/users/me/avatar - Update avatar (JWT protected)
-	// server.patch(
-	// 	'/api/users/me/avatar',
-	// 	{
-	// 		schema: {
-	// 			body: z.object({ avatarUrl: z.string() }),
-	// 			response: {
-	// 				200: SuccessResponseSchema,
-	// 				400: ErrorResponseSchema,
-	// 				401: ErrorResponseSchema,
-	// 				404: ErrorResponseSchema,
-	// 				500: ErrorResponseSchema
-	// 			}
-	// 		},
-	// 		preHandler: jwtAuthMiddleware
-	// 	},
-	// 	updateAvatar
-	// )
+	server.patch(
+		'/api/users/me/avatar',
+		{
+			schema: {
+				body: z.object({ avatarUrl: z.string() }),
+				response: {
+					200: SuccessResponseSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
+					404: ErrorResponseSchema,
+					500: ErrorResponseSchema
+				}
+			},
+			preHandler: jwtAuthMiddleware
+		},
+		updateAvatar
+	)
 }
