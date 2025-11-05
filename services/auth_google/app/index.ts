@@ -3,6 +3,11 @@ import fastifyOauth2, {
 	OAuth2Namespace,
 	FastifyOAuth2Options
 } from '@fastify/oauth2'
+import {
+	httpRequestCounter,
+	responseTimeHistogram
+} from '@ft_transcendence/common'
+import metricPlugin from 'fastify-metrics'
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -12,6 +17,32 @@ declare module 'fastify' {
 
 const fastify: FastifyInstance = Fastify({
 	logger: { level: 'trace' }
+})
+
+fastify.addHook('onRequest', (request, reply, done) => {
+	;(request as any).startTime = process.hrtime()
+	done()
+})
+
+fastify.addHook('onResponse', (request, reply) => {
+	httpRequestCounter.inc({
+		method: request.method,
+		route: request.url,
+		status_code: reply.statusCode
+	})
+	const startTime = (request as any).startTime
+	if (startTime) {
+		const diff = process.hrtime(startTime)
+		const responseTimeInSeconds = diff[0] + diff[1] / 1e9
+		responseTimeHistogram.observe(
+			{
+				method: request.method,
+				route: request.url,
+				status_code: reply.statusCode
+			},
+			responseTimeInSeconds
+		)
+	}
 })
 
 const oauth2Options: FastifyOAuth2Options = {
@@ -77,6 +108,7 @@ fastify.get(
 
 const start = async () => {
 	try {
+		await fastify.register(metricPlugin.default, { endpoint: '/metrics' })
 		await fastify.listen({
 			port: parseInt(process.env.PORT as string),
 			host: '0.0.0.0'

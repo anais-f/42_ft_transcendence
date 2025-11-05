@@ -12,6 +12,11 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ['users:3000']
+  
+  - job_name: 'auth_google'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['auth_google:3000']
 
   - job_name: 'prometheus'
     metrics_path: /prometheus/metrics
