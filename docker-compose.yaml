@@ -19,6 +19,8 @@ services:
         condition: service_healthy
       users:
         condition: service_healthy
+      alertmanager:
+        condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
@@ -121,6 +123,8 @@ services:
     depends_on:
       auth:
         condition: service_healthy
+    env_file:
+      - .env.test
     networks:
       - backend
     healthcheck:
@@ -145,6 +149,8 @@ services:
         condition: service_healthy
       users:
         condition: service_healthy
+    volumes:
+      - prometheus_data:/prometheus
     healthcheck:
       test:
         - CMD-SHELL
@@ -225,6 +231,7 @@ volumes:
   avatars:
   grafana_data:
   nginx_logs:
+  prometheus_data:
 
 secrets:
   discord_webhook:
