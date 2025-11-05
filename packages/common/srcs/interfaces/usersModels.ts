@@ -6,7 +6,8 @@
 export interface IUserAuth {
 	user_id: number
 	login: string
-	password: string
+	password?: string
+	google_id?: string
 }
 
 export type IPublicUserAuth = Omit<IUserAuth, 'password'>
