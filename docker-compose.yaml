@@ -55,9 +55,9 @@ services:
       frontend:
         condition: service_healthy
     healthcheck:
-      test: 
+      test:
         - CMD-SHELL
-        - "true"
+        - 'true'
       interval: 5s
       timeout: 3s
       retries: 12
@@ -217,7 +217,7 @@ services:
     volumes:
       - nginx_logs:/var/log/nginx:ro
       - ./services/monitoring/mtail/nginx.mtail:/progs/nginx.mtail:ro
-    command: ["-progs", "/progs", "-logs", "/var/log/nginx/access.log"]
+    command: ['-progs', '/progs', '-logs', '/var/log/nginx/access.log']
 
 networks:
   pong:

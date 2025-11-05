@@ -7,20 +7,20 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "High rate of HTTP requests on route {{ $labels.route }}"
-          description: "The rate of HTTP requests has exceeded 500 requests per minute on route {{ $labels.route }}."
+          summary: 'High rate of HTTP requests on route {{ $labels.route }}'
+          description: 'The rate of HTTP requests has exceeded 500 requests per minute on route {{ $labels.route }}.'
 
   - name: service_availability
     rules:
-      - alert: Service_Down 
+      - alert: Service_Down
         expr: up == 0
         for: 0m
         labels:
           severity: critical
         annotations:
-          summary: "Service {{ $labels.job }} is down"
-          description: "The service {{ $labels.job }} has not responded to Prometheus scrapes."
-  
+          summary: 'Service {{ $labels.job }} is down'
+          description: 'The service {{ $labels.job }} has not responded to Prometheus scrapes.'
+
   - name: new_nginx_5xx_errors
     rules:
       - alert: Nginx_5xx_Errors
@@ -29,9 +29,9 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}"
-          description: "{{$labels.code}} error occurred on Nginx in the last minute for route {{ $labels.method }} {{ $labels.route }}."
-    
+          summary: 'Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}'
+          description: '{{$labels.code}} error occurred on Nginx in the last minute for route {{ $labels.method }} {{ $labels.route }}.'
+
   - name: first_nginx_5xx_errors
     rules:
       - alert: Nginx_First_5xx_Error
@@ -40,5 +40,5 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}"
-          description: "{{$labels.code}} error occurred on Nginx for route {{ $labels.method }} {{ $labels.route }}."
+          summary: 'Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}'
+          description: '{{$labels.code}} error occurred on Nginx for route {{ $labels.method }} {{ $labels.route }}.'

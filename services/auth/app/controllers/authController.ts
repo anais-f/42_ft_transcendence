@@ -1,12 +1,19 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { registerUser, loginUser, registerGoogleUser } from '../usecases/register.js'
+import {
+	registerUser,
+	loginUser,
+	registerGoogleUser
+} from '../usecases/register.js'
 import {
 	RegisterSchema,
 	LoginActionSchema,
 	RegisterGoogleSchema,
 	PublicUserAuthDTO
 } from '@ft_transcendence/common'
-import { findPublicUserByLogin, findUserByGoogleId } from '../repositories/userRepository.js'
+import {
+	findPublicUserByLogin,
+	findUserByGoogleId
+} from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { signToken } from '../utils/jwt.js'
 
@@ -68,8 +75,7 @@ export async function registerGoogleController(
 ) {
 	console.log('Register Google controller called')
 	const parsed = RegisterGoogleSchema.safeParse(request.body)
-	if (!parsed.success)
-	{
+	if (!parsed.success) {
 		console.log('Invalid payload for Google registration:', parsed.error)
 		return reply.code(400).send({ error: 'Invalid payload - register' })
 	}
@@ -77,8 +83,7 @@ export async function registerGoogleController(
 	console.log('Google ID received:', google_id)
 	const user = await findUserByGoogleId(google_id)
 	console.log('Existing user with this Google ID:', user)
-	if (user)
-	{
+	if (user) {
 		console.log('Google user already exists, logging in')
 		return { token: signToken({ userId: user.user_id, login: user.login }) }
 	}
@@ -107,8 +112,7 @@ export async function registerGoogleController(
 		console.log('Registered google user successfully')
 		return reply.send({ success: true })
 	} catch (e: any) {
-		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
-		{
+		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
 			console.log('Google ID already exists....')
 			return reply.code(409).send({ error: 'Login already exists' })
 		}

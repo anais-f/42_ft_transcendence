@@ -14,11 +14,12 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
-import { httpRequestCounter, responseTimeHistogram } from '@ft_transcendence/common'
+import {
+	httpRequestCounter,
+	responseTimeHistogram
+} from '@ft_transcendence/common'
 
-const OPENAPI_FILE = path.join(
-	process.env.OPEN_API_FILE as string
-)
+const OPENAPI_FILE = path.join(process.env.OPEN_API_FILE as string)
 const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const HOST = '0.0.0.0'
@@ -60,29 +61,32 @@ async function initializeUsers(): Promise<void> {
 export async function start(): Promise<void> {
 	const app = createApp()
 	app.addHook('onRequest', (request, reply, done) => {
-		(request as any).startTime = process.hrtime();
-		done();
-	});
+		;(request as any).startTime = process.hrtime()
+		done()
+	})
 
 	app.addHook('onResponse', (request, reply) => {
 		httpRequestCounter.inc({
 			method: request.method,
 			route: request.url,
 			status_code: reply.statusCode
-		});
-		const startTime = (request as any).startTime;
+		})
+		const startTime = (request as any).startTime
 		if (startTime) {
-			const diff = process.hrtime(startTime);
-			const responseTimeInSeconds = diff[0] + diff[1] / 1e9;
-			responseTimeHistogram.observe({
-			method: request.method,
-			route: request.url,
-			status_code: reply.statusCode
-		}, responseTimeInSeconds);
-	} 
-	});
+			const diff = process.hrtime(startTime)
+			const responseTimeInSeconds = diff[0] + diff[1] / 1e9
+			responseTimeHistogram.observe(
+				{
+					method: request.method,
+					route: request.url,
+					status_code: reply.statusCode
+				},
+				responseTimeInSeconds
+			)
+		}
+	})
 	try {
-		await app.register(metricPlugin.default, { endpoint: '/metrics' });
+		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await initializeUsers()
 		await app.listen({

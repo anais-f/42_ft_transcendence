@@ -8,10 +8,9 @@ export const RegisterLoginSchema = z
 	.min(4)
 	.max(32)
 	.regex(LOGIN_REGEX, 'Invalid login format')
-	.refine(
-		(value) => !value.startsWith('google-'),
-		{ message: 'Login cannot start with "google-"' }
-	)
+	.refine((value) => !value.startsWith('google-'), {
+		message: 'Login cannot start with "google-"'
+	})
 
 export const LoginSchema = z
 	.string()

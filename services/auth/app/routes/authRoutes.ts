@@ -3,9 +3,12 @@ import {
 	registerController,
 	loginController,
 	registerGoogleController
-
 } from '../controllers/authController.js'
-import { RegisterSchema, LoginActionSchema, RegisterGoogleSchema } from '@ft_transcendence/common'
+import {
+	RegisterSchema,
+	LoginActionSchema,
+	RegisterGoogleSchema
+} from '@ft_transcendence/common'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(

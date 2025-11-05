@@ -11,7 +11,10 @@ import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import metricPlugin from 'fastify-metrics'
-import { httpRequestCounter, responseTimeHistogram } from '@ft_transcendence/common'
+import {
+	httpRequestCounter,
+	responseTimeHistogram
+} from '@ft_transcendence/common'
 
 const app = Fastify({
 	logger: true
@@ -21,39 +24,39 @@ app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
 app.addHook('onRequest', (request, reply, done) => {
-	(request as any).startTime = process.hrtime();
-	done();
-});
+	;(request as any).startTime = process.hrtime()
+	done()
+})
 
 app.addHook('onResponse', (request, reply) => {
 	httpRequestCounter.inc({
 		method: request.method,
 		route: request.url,
 		status_code: reply.statusCode
-	});
-	const startTime = (request as any).startTime;
- 	if (startTime) {
-		const diff = process.hrtime(startTime);
-		const responseTimeInSeconds = diff[0] + diff[1] / 1e9;
-		responseTimeHistogram.observe({
-		method: request.method,
-		route: request.url,
-		status_code: reply.statusCode
-	}, responseTimeInSeconds);
-  } 
-});
+	})
+	const startTime = (request as any).startTime
+	if (startTime) {
+		const diff = process.hrtime(startTime)
+		const responseTimeInSeconds = diff[0] + diff[1] / 1e9
+		responseTimeHistogram.observe(
+			{
+				method: request.method,
+				route: request.url,
+				status_code: reply.statusCode
+			},
+			responseTimeInSeconds
+		)
+	}
+})
 
 async function runServer() {
 	console.log('Starting Auth service...')
 	await runMigrations()
 
-	await app.register(metricPlugin.default, { endpoint: '/metrics' });
+	await app.register(metricPlugin.default, { endpoint: '/metrics' })
 	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
-		fs.readFileSync(
-			process.env.OPEN_API_FILE as string,
-			'utf-8'
-		)
+		fs.readFileSync(process.env.OPEN_API_FILE as string, 'utf-8')
 	)
 	// Configure Swagger to use the loaded schemas
 	await app.register(Swagger as any, {
