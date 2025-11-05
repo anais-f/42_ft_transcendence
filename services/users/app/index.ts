@@ -46,12 +46,6 @@ function createApp(): FastifyInstance {
 	return app
 }
 
-async function dumpOpenAPISchema(app: FastifyInstance): Promise<void> {
-	const openapiDoc = app.swagger()
-	writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
-	console.log('Documentation OpenAPI écrite dans openapi.json')
-}
-
 async function initializeUsers(): Promise<void> {
 	try {
 		console.log('Initializing users from auth service...')
@@ -90,7 +84,6 @@ export async function start(): Promise<void> {
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' });
 		await app.ready()
-		await dumpOpenAPISchema(app)
 		await initializeUsers()
 		await app.listen({
 			port: parseInt(process.env.PORT as string),
