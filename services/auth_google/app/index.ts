@@ -42,8 +42,28 @@ fastify.get('/login/google/callback', async (
   try {
     const { token } = await fastify.googleOAuth2
       .getAccessTokenFromAuthorizationCodeFlow(request);
-    console.log(request);
-    return reply.send({ access_token: token.access_token });
+    const userInfoResponse = await fetch(
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      {
+        headers: { 
+          Authorization: `Bearer ${token.access_token}` 
+        }
+      }
+    );
+    
+    const googleUser = await userInfoResponse.json();
+    console.log('Google User Info:', googleUser);
+    const authResponse = await fetch('http://auth:3000/api/register-google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        google_id: googleUser.id
+      })
+    });
+    const { token: myJWT, user } = await authResponse.json();
+    
+    return reply.send({ token: myJWT, user });
+    
   } catch (error) {
     fastify.log.error(error);
     return reply.status(500).send({ error: 'OAuth2 authentication failed' });
@@ -52,7 +72,7 @@ fastify.get('/login/google/callback', async (
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    await fastify.listen({ port: parseInt(process.env.PORT as string), host: '0.0.0.0' });
     fastify.log.info('Server listening on http://localhost:3000');
   } catch (err) {
     fastify.log.error(err);
