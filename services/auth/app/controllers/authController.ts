@@ -7,8 +7,7 @@ import {
 import {
 	RegisterSchema,
 	LoginActionSchema,
-	RegisterGoogleSchema,
-	PublicUserAuthDTO
+	RegisterGoogleSchema
 } from '@ft_transcendence/common'
 import {
 	findPublicUserByLogin,
@@ -84,7 +83,7 @@ export async function registerGoogleController(
 	}
 	const { google_id } = parsed.data
 	console.log('Google ID received:', google_id)
-	const user = await findUserByGoogleId(google_id)
+	const user = findUserByGoogleId(google_id)
 	console.log('Existing user with this Google ID:', user)
 	if (user) {
 		console.log('Google user already exists, logging in')

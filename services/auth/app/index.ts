@@ -1,4 +1,4 @@
-import Fastify, { FastifyRequest } from 'fastify'
+import Fastify, { FastifyRequest, FastifyReply } from 'fastify'
 import { runMigrations } from './database/connection.js'
 import {
 	ZodTypeProvider,
@@ -23,8 +23,10 @@ const app = Fastify({
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-app.addHook('onRequest', (request, reply, done) => {
-	;(request as any).startTime = process.hrtime()
+app.decorateRequest('startTime', null)
+
+app.addHook('onRequest', (request: FastifyRequest, reply: FastifyReply, done) => {
+	request.startTime = process.hrtime()
 	done()
 })
 
@@ -34,7 +36,7 @@ app.addHook('onResponse', (request, reply) => {
 		route: request.url,
 		status_code: reply.statusCode
 	})
-	const startTime = (request as any).startTime
+	const startTime = request.startTime
 	if (startTime) {
 		const diff = process.hrtime(startTime)
 		const responseTimeInSeconds = diff[0] + diff[1] / 1e9
@@ -51,15 +53,17 @@ app.addHook('onResponse', (request, reply) => {
 
 async function runServer() {
 	console.log('Starting Auth service...')
-	await runMigrations()
+	runMigrations()
 
+	const openapiFilePath = process.env.OPEN_API_FILE
+	if (!openapiFilePath) {
+		throw new Error('OPEN_API_FILE is not defined in environment variables')
+	}
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
-	// Load OpenAPI schemas from file
 	const openapiSwagger = JSON.parse(
-		fs.readFileSync(process.env.OPEN_API_FILE as string, 'utf-8')
+		fs.readFileSync(openapiFilePath, 'utf-8')
 	)
-	// Configure Swagger to use the loaded schemas
-	await app.register(Swagger as any, {
+	await app.register(Swagger, {
 		openapi: {
 			info: {
 				title: 'API for Auth Service',
@@ -72,17 +76,19 @@ async function runServer() {
 		},
 		transform: jsonSchemaTransform
 	})
-
-	await app.register(SwaggerUI as any, {
+	await app.register(SwaggerUI, {
 		routePrefix: '/docs'
 	})
-
 	await registerRoutes(app)
+	const port = Number(process.env.PORT)
+	if (!port) {
+		throw new Error('PORT is not defined in environment variables')
+	}
 	await app.listen({
-		port: parseInt(process.env.PORT as string),
+		port: port,
 		host: '0.0.0.0'
 	})
-	console.log('Auth service running on http://localhost:', process.env.PORT)
+	console.log('Auth service running on http://localhost:', port)
 }
 
 runServer().catch((err) => {
