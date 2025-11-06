@@ -11,7 +11,7 @@ export async function listPublicUsersController(
 	reply: FastifyReply
 ) {
 	const users = getPublicUsers()
-	return reply.send(PublicUserListAuthSchema.parse({ users }))
+	return reply.send(PublicUserListAuthSchema.parse(users))
 }
 
 export async function getPublicUserController(
