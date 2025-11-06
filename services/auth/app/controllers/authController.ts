@@ -32,7 +32,7 @@ export async function registerController(
 			return reply.code(500).send({ error: 'Server configuration error' })
 		}
 		await registerUser(login, password)
-		const PublicUser = (await findPublicUserByLogin(parsed.data.login))
+		const PublicUser = await findPublicUserByLogin(parsed.data.login)
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
@@ -103,7 +103,7 @@ export async function registerGoogleController(
 			return reply.code(500).send({ error: 'Server configuration error' })
 		}
 		await registerGoogleUser(google_id)
-		const PublicUser = (await findPublicUserByLogin(`google-${google_id}`))
+		const PublicUser = await findPublicUserByLogin(`google-${google_id}`)
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })

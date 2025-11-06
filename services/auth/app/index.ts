@@ -25,10 +25,13 @@ app.setSerializerCompiler(serializerCompiler)
 
 app.decorateRequest('startTime', null)
 
-app.addHook('onRequest', (request: FastifyRequest, reply: FastifyReply, done) => {
-	request.startTime = process.hrtime()
-	done()
-})
+app.addHook(
+	'onRequest',
+	(request: FastifyRequest, reply: FastifyReply, done) => {
+		request.startTime = process.hrtime()
+		done()
+	}
+)
 
 app.addHook('onResponse', (request, reply) => {
 	httpRequestCounter.inc({
@@ -60,9 +63,7 @@ async function runServer() {
 		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
 	}
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
-	const openapiSwagger = JSON.parse(
-		fs.readFileSync(openapiFilePath, 'utf-8')
-	)
+	const openapiSwagger = JSON.parse(fs.readFileSync(openapiFilePath, 'utf-8'))
 	await app.register(Swagger, {
 		openapi: {
 			info: {
