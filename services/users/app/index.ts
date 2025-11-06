@@ -21,7 +21,6 @@ import {
 
 const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
-const HOST = '0.0.0.0'
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 

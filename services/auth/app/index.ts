@@ -55,9 +55,9 @@ async function runServer() {
 	console.log('Starting Auth service...')
 	runMigrations()
 
-	const openapiFilePath = process.env.OPEN_API_FILE
+	const openapiFilePath = process.env.DTO_OPENAPI_FILE
 	if (!openapiFilePath) {
-		throw new Error('OPEN_API_FILE is not defined in environment variables')
+		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
 	}
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
 	const openapiSwagger = JSON.parse(
