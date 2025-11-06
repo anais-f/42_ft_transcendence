@@ -14,6 +14,7 @@ install:
 
 .PHONY: test
 test: down build
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
@@ -32,7 +33,7 @@ debug:
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
-	docker volume rm ft_transcendence_nginx_logs
+	docker volume rm ft_transcendence_nginx_logs || true
 
 .PHONY: sh-%
 sh-%:

@@ -17,6 +17,8 @@ services:
         condition: service_healthy
       auth:
         condition: service_healthy
+      auth_google:
+        condition: service_healthy
       users:
         condition: service_healthy
       alertmanager:
@@ -149,6 +151,8 @@ services:
         condition: service_healthy
       users:
         condition: service_healthy
+      auth_google:
+        condition: service_healthy
     volumes:
       - prometheus_data:/prometheus
     healthcheck:
@@ -218,6 +222,14 @@ services:
       - nginx_logs:/var/log/nginx:ro
       - ./services/monitoring/mtail/nginx.mtail:/progs/nginx.mtail:ro
     command: ['-progs', '/progs', '-logs', '/var/log/nginx/access.log']
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:3903 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
 networks:
   pong:
