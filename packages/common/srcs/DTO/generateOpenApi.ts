@@ -13,7 +13,7 @@ const schemas = {
 const openApiDoc = createDocument({
 	openapi: '3.1.0',
 	info: {
-		title: 'My API',
+		title: 'ft_transcendence API',
 		version: '1.0.0',
 		description: 'API documentation'
 	},

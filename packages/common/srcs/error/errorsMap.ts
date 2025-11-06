@@ -12,7 +12,10 @@ export const ERROR_MESSAGES = {
 	USER_ALREADY_EXISTS: 'User already exists',
 	INVALID_USER_DATA: 'Invalid user data',
 	INTERNAL_ERROR: 'Internal error',
-	INVALID_USER_ID: 'Invalid user ID'
+	INVALID_USER_ID: 'Invalid user ID',
+	UNAUTHORIZED: 'Unauthorized',
+	FORBIDDEN: 'Forbidden',
+	INVALID_TOKEN_USER: 'Invalid token user'
 } as const
 
 export const SUCCESS_MESSAGES = {

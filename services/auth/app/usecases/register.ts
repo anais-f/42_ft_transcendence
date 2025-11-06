@@ -18,7 +18,7 @@ export async function loginUser(login: string, password: string) {
 	if (!user || !user.password) return null
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
-	return { token: signToken({ userId: user.user_id, login: user.login }) }
+	return { token: signToken({ user_id: user.user_id, login: user.login }) }
 }
 
 export async function registerGoogleUser(google_id: string) {

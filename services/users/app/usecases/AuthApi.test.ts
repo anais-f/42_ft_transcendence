@@ -28,6 +28,8 @@ let PublicUserListAuthSchema: any
 let AppError: any
 let mockFetch: any
 
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://auth:3000'
+
 beforeAll(async () => {
 	mockFetch = jest.fn()
 
@@ -73,9 +75,12 @@ describe('AuthApi', () => {
 
 			expect(result).toEqual(mockResponse.users)
 			expect(result).toHaveLength(3)
-			expect(mockFetch).toHaveBeenCalledWith('http://auth:3000/api/users', {
+			expect(mockFetch).toHaveBeenCalledWith(`${AUTH_SERVICE_URL}/api/users`, {
 				method: 'GET',
-				headers: { 'content-type': 'application/json' }
+				headers: {
+					'content-type': 'application/json',
+					authorization: process.env.AUTH_API_SECRET
+				}
 			})
 		})
 
@@ -138,7 +143,7 @@ describe('AuthApi', () => {
 			})
 
 			await expect(AuthApi.getAllUsers()).rejects.toThrow(
-				'HTTP error! status: 404'
+				'Auth service HTTP 404'
 			)
 		})
 

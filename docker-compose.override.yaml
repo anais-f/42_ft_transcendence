@@ -13,12 +13,11 @@ services:
     volumes:
       - ./:/app
     environment:
-      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-
   users:
     build:
       context: .
@@ -26,12 +25,11 @@ services:
     volumes:
       - ./:/app
     environment:
-      - OPEN_API_FILE=../../../packages/common/openapiDTO.json
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.jsonn
     restart: none
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-
   auth_google:
     build:
       context: .

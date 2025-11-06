@@ -3,24 +3,18 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
+	UserPrivateProfileSchema,
 	AppError,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
 
-/**
- * Handle user creation via webhook
- * @description This function handles the creation of a new user when a webhook notification is received from the auth service.
- * It checks if the user already exists and creates a new user if not. Responds with appropriate status codes and messages based on the operation outcome.
- * @param req
- * @param reply
- */
 export async function handleUserCreated(
-	req: FastifyRequest<{ Body: PublicUserAuthDTO }>,
+	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const newUser: PublicUserAuthDTO = req.body
+		const newUser = req.body as PublicUserAuthDTO
 		await UsersServices.createUser(newUser)
 		void reply
 			.code(201)
@@ -43,24 +37,12 @@ export async function handleUserCreated(
 }
 
 export async function getPublicUser(
-	req: FastifyRequest<{ Params?: { id?: string | number } }>,
+	req: FastifyRequest & { params: { id: number } },
 	reply: FastifyReply
 ): Promise<void> {
-	const idRaw = req.params?.id
-	const idNumber = Number(idRaw)
+	const idNumber = req.params.id
 	console.log('Fetching user with id number:', idNumber)
-
-	if (
-		idRaw === undefined ||
-		idRaw === null ||
-		isNaN(idNumber) ||
-		idNumber <= 0
-	) {
-		void reply
-			.code(400)
-			.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-		return
-	}
+	console.log('requete recu :', req.params)
 
 	try {
 		const rawProfile = await UsersServices.getPublicUserProfile({
@@ -88,15 +70,37 @@ export async function getPublicUser(
 	}
 }
 
-//   async function getPrivateUser(
-//   req: FastifyRequest,
-//   reply: FastifyReply
-// ): Promise<FastifyReply> {
-//     try {
-//       const id = req.params.id
-//
-//
-//       }
-//
-//   return ;
-// }
+export async function getPrivateUser(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const userId = req.user?.user_id as number
+
+		const rawProfile = await UsersServices.getPrivateUserProfile({
+			user_id: userId
+		})
+
+		const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
+		if (!parsed.success) {
+			console.error('UserPrivateProfile validation failed:', parsed.error)
+			void reply
+				.code(500)
+				.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+			return
+		}
+
+		void reply.code(200).send(parsed.data)
+	} catch (error: any) {
+		if (error instanceof AppError) {
+			void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+			return
+		}
+		console.error('Unexpected error in getPrivateUser:', error)
+		void reply
+			.code(500)
+			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	}
+}
