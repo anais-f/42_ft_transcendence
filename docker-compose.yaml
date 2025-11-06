@@ -119,6 +119,9 @@ services:
   auth_google:
     restart: on-failure
     container_name: auth_google
+    secrets:
+      - google_client_id
+      - google_client_secret
     build:
       context: .
       dockerfile: ./services/auth_google/Dockerfile
@@ -250,3 +253,7 @@ secrets:
     file: ./.secret/discord_webhook.txt
   admin_token:
     file: ./.secret/admin_token.txt
+  google_client_id:
+    file: ./.secret/google_client_id.txt
+  google_client_secret:
+    file: ./.secret/google_client_secret.txt
