@@ -8,11 +8,32 @@ import {
 	responseTimeHistogram
 } from '@ft_transcendence/common'
 import metricPlugin from 'fastify-metrics'
+import fs from 'fs'
 
 declare module 'fastify' {
 	interface FastifyInstance {
 		googleOAuth2: OAuth2Namespace
 	}
+}
+
+function readSecret(name: string): string | undefined {
+	try {
+		return fs.readFileSync(`/run/secrets/${name}`, 'utf8').trim()
+	} catch {
+		return undefined
+	}
+}
+
+const clientId =
+	readSecret('google_client_id') || undefined
+const clientSecret =
+	readSecret('google_client_secret') || undefined
+
+if (!clientId || !clientSecret) {
+	console.error(
+		'Missing Google OAuth credentials. Provide via env (GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET) or Docker secrets (google_client_id/google_client_secret).'
+	)
+	process.exit(1)
 }
 
 const fastify: FastifyInstance = Fastify({
@@ -49,12 +70,8 @@ const oauth2Options: FastifyOAuth2Options = {
 	name: 'googleOAuth2',
 	credentials: {
 		client: {
-			id:
-				process.env.google_CLIENT_ID ||
-				'310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
-			secret:
-				process.env.google_CLIENT_SECRET ||
-				'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'
+			id: clientId,
+			secret: clientSecret
 		},
 		auth: {
 			authorizeHost: 'https://accounts.google.com',
