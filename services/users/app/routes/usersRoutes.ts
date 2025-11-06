@@ -103,6 +103,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/api/users/me/avatar',
 		{
 			schema: {
+				consumes: ['multipart/form-data', 'image/jpeg', 'image/png'],
 				response: {
 					200: SuccessResponseSchema,
 					400: ErrorResponseSchema,

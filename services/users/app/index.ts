@@ -14,6 +14,7 @@ import {
 } from 'fastify-type-provider-zod'
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
+import { imageParserPlugin } from './plugins/imageParser.js'
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
@@ -30,7 +31,12 @@ function createApp(): FastifyInstance {
 	app.register(fastifyJwt, {
 		secret: jwtSecret
 	})
-	app.register(fastifyMultipart)
+	app.register(fastifyMultipart, {
+		limits: {
+			fileSize: 5 * 1024 * 1024, // 5MB
+			files: 1
+		}
+	})
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
