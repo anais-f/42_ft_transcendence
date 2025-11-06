@@ -24,10 +24,8 @@ function readSecret(name: string): string | undefined {
 	}
 }
 
-const clientId =
-	readSecret('google_client_id') || undefined
-const clientSecret =
-	readSecret('google_client_secret') || undefined
+const clientId = readSecret('google_client_id') || undefined
+const clientSecret = readSecret('google_client_secret') || undefined
 
 if (!clientId || !clientSecret) {
 	console.error(
