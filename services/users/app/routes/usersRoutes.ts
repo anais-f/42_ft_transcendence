@@ -2,10 +2,12 @@ import { FastifyPluginAsync } from 'fastify'
 import {
 	handleUserCreated,
 	getPublicUser,
-	getPrivateUser,
-	updateUsername,
-	updateAvatar
+	getPrivateUser
 } from '../controllers/usersControllers.js'
+import {
+  updateUsername,
+  updateAvatar
+} from '../controllers/updateUsersControllers.js'
 import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
@@ -101,7 +103,6 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		'/api/users/me/avatar',
 		{
 			schema: {
-				body: z.object({ avatarUrl: z.string() }),
 				response: {
 					200: SuccessResponseSchema,
 					400: ErrorResponseSchema,

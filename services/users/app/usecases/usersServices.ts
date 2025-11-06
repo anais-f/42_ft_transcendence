@@ -11,7 +11,7 @@ import {
 
 export class UsersServices {
 	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
-		if (await UsersRepository.existsById({ user_id: newUser.user_id }))
+		if (UsersRepository.existsById({ user_id: newUser.user_id }))
 			throw new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
 
 		await UsersRepository.insertUser({
@@ -25,7 +25,7 @@ export class UsersServices {
 		const authUsers = await AuthApi.getAllUsers()
 
 		for (const authUser of authUsers) {
-			if (!(await UsersRepository.existsById({ user_id: authUser.user_id })))
+			if (!(UsersRepository.existsById({ user_id: authUser.user_id })))
 				await UsersRepository.insertUser({
 					user_id: authUser.user_id,
 					login: authUser.login
@@ -72,17 +72,6 @@ export class UsersServices {
 			last_connection: localUser.last_connection
 		}
 	}
-
-	static async updateUsernameProfile(
-		user: { user_id: number },
-		newUsername: string
-	): Promise<void> {
-		if (!user.user_id || user.user_id <= 0)
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
-
-		await UsersRepository.updateUsername({
-			user_id: user.user_id,
-			username: newUsername
-		})
-	}
 }
+
+

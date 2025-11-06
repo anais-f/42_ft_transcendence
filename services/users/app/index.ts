@@ -3,6 +3,7 @@ import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
+import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
 import { writeFileSync } from 'node:fs'
 import {
@@ -29,6 +30,7 @@ function createApp(): FastifyInstance {
 	app.register(fastifyJwt, {
 		secret: jwtSecret
 	})
+	app.register(fastifyMultipart)
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
