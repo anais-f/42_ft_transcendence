@@ -24,10 +24,10 @@
 		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/pong-server" },
 		{ "path": "./packages/common" },
-		{ "path": "./services/users" },
-		{ "path": "./services/auth" },
-		{ "path": "./services/pong-server" },
-		{ "path": "./services/auth-google" }
+		{ "path": "./services/users/app" },
+		{ "path": "./services/auth/app" },
+		{ "path": "./services/pong-server/app" },
+		{ "path": "./services/auth-google/app" }
 	],
 	"ts-node": {
 		"esm": true
