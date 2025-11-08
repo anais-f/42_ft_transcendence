@@ -12,6 +12,13 @@ export function createUser(login: string, passwordHash: string) {
 	stmt.run(login, passwordHash)
 }
 
+export function createAdminUser(login: string, passwordHash: string) {
+	const stmt = db().prepare(
+		'INSERT INTO users (login, password, is_admin) VALUES (?, ?, ?)'
+	)
+	stmt.run(login, passwordHash, 1)
+}
+
 export function findUserByLogin(login: string): IUserAuth | undefined {
 	const stmt = db().prepare('SELECT * FROM users WHERE login = ?')
 	return stmt.get(login) as IUserAuth | undefined
@@ -55,4 +62,10 @@ export function createGoogleUser(google_id: string) {
 export function findUserByGoogleId(google_id: string) {
 	const stmt = db().prepare('SELECT * FROM users WHERE google_id = ?')
 	return stmt.get(google_id) as IUserAuth | undefined
+}
+
+export function changeUserPassword(id: number, passwordHash: string): boolean {
+	const stmt = db().prepare('UPDATE users SET password = ? WHERE user_id = ?')
+	const info = stmt.run(passwordHash, id)
+	return info.changes > 0
 }
