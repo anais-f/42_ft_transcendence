@@ -15,6 +15,8 @@ import {
 	httpRequestCounter,
 	responseTimeHistogram
 } from '@ft_transcendence/common'
+import { findPublicUserByLogin } from './repositories/userRepository.js'
+import { registerAdminUser } from './usecases/register.js'
 
 const app = Fastify({
 	logger: true
@@ -54,11 +56,25 @@ app.addHook('onResponse', (request, reply) => {
 	}
 })
 
+function readSecret(name: string): string | undefined {
+	try {
+		return fs.readFileSync(`/run/secrets/${name}`, 'utf8').trim()
+	} catch {
+		return undefined
+	}
+}
+
 async function runServer() {
 	console.log('Starting Auth service...')
 	runMigrations()
+	console.log('Admin user ensured')
 
 	const openapiFilePath = process.env.DTO_OPENAPI_FILE
+	const login_admin = readSecret('login_admin') || undefined
+	const password_admin = readSecret('password_admin') || undefined
+	if (!login_admin || !password_admin) {
+		throw new Error('Admin credentials are not defined in secrets')
+	}
 	if (!openapiFilePath) {
 		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
 	}
@@ -80,6 +96,9 @@ async function runServer() {
 	await app.register(SwaggerUI, {
 		routePrefix: '/docs'
 	})
+	if (findPublicUserByLogin('admin') === undefined) {
+		registerAdminUser(login_admin, password_admin)
+	}
 	await registerRoutes(app)
 	const port = Number(process.env.PORT)
 	if (!port) {
@@ -90,6 +109,7 @@ async function runServer() {
 		host: '0.0.0.0'
 	})
 	console.log('Auth service running on http://localhost:', port)
+	
 }
 
 runServer().catch((err) => {

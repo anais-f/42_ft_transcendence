@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-export function signToken(payload: { user_id: number; login: string }) {
+export function signToken(payload: { user_id: number; login: string }): string {
 	const secret = process.env.JWT_SECRET
 	if (!secret) {
 		throw new Error(

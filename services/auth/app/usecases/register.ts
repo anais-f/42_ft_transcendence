@@ -1,10 +1,17 @@
 import {
 	createUser,
 	findUserByLogin,
+	createAdminUser,
 	createGoogleUser
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
+
+export async function registerAdminUser(login: string, password: string) {
+	const hashed = await hashPassword(password)
+	createAdminUser(login, hashed)
+	return { success: true }
+}
 
 export async function registerUser(login: string, password: string) {
 	const hashed = await hashPassword(password)

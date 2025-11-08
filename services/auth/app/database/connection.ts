@@ -17,7 +17,8 @@ export function runMigrations() {
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
       login TEXT UNIQUE NOT NULL,
       password TEXT,
-	  google_id TEXT UNIQUE
+	  google_id TEXT UNIQUE,
+	  is_admin BOOLEAN DEFAULT FALSE
     );
   `)
 }
