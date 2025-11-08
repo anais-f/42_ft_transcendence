@@ -107,6 +107,9 @@ services:
       - db_auth_data:/data
     env_file:
       - .env.test
+    secrets:
+      - login_admin
+      - password_admin
     healthcheck:
       test:
         - CMD-SHELL
@@ -257,3 +260,7 @@ secrets:
     file: ./.secret/google_client_id.txt
   google_client_secret:
     file: ./.secret/google_client_secret.txt
+  login_admin:
+    file: ./.secret/login_admin.txt
+  password_admin:
+    file: ./.secret/password_admin.txt
