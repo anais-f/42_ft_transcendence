@@ -59,3 +59,4 @@ dev-build:
 .PHONY: dev-up
 dev-up:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
+	

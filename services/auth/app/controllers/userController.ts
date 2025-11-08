@@ -60,4 +60,4 @@ export async function patchUserPassword(
 	const ok = changeUserPassword(idNum, hashed)
 	if (!ok) return reply.code(404).send({ error: 'User not found' })
 	return reply.send({ success: true })
-}	
+}

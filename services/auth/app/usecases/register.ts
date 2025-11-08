@@ -7,7 +7,6 @@ import {
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
 
-
 export async function registerAdminUser(login: string, password: string) {
 	const hashed = await hashPassword(password)
 	createAdminUser(login, hashed)
@@ -27,7 +26,13 @@ export async function loginUser(login: string, password: string) {
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
 	const isAdmin = Boolean(user.is_admin)
-	return { token: signToken({ user_id: user.user_id, login: user.login, is_admin: isAdmin }) }
+	return {
+		token: signToken({
+			user_id: user.user_id,
+			login: user.login,
+			is_admin: isAdmin
+		})
+	}
 }
 
 export async function registerGoogleUser(google_id: string) {

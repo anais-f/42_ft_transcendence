@@ -11,7 +11,10 @@ export interface IUserAuth {
 	is_admin: boolean
 }
 
-export type IPublicUserAuth = Omit<IUserAuth, 'is_admin' | 'password' | 'google_id'>
+export type IPublicUserAuth = Omit<
+	IUserAuth,
+	'is_admin' | 'password' | 'google_id'
+>
 
 /**
  * Comprehensive user model for application use

@@ -20,7 +20,10 @@
 		<a href="/auth-google/login/google">Google Login</a>
 
 		<hr />
-		<section id="login-section" style="max-width:480px;margin:16px auto;font-family:sans-serif">
+		<section
+			id="login-section"
+			style="max-width: 480px; margin: 16px auto; font-family: sans-serif"
+		>
 			<h2>Login</h2>
 			<form id="login-form">
 				<label>
@@ -30,13 +33,27 @@
 				<br />
 				<label>
 					Password
-					<input type="password" id="password" name="password" required minlength="4" />
+					<input
+						type="password"
+						id="password"
+						name="password"
+						required
+						minlength="4"
+					/>
 				</label>
 				<br />
 				<button type="submit">Sign in</button>
 			</form>
-			<pre id="login-result" style="background:#111;color:#0f0;padding:8px;white-space:pre-wrap"></pre>
-			<div style="margin-top:8px">
+			<pre
+				id="login-result"
+				style="
+					background: #111;
+					color: #0f0;
+					padding: 8px;
+					white-space: pre-wrap;
+				"
+			></pre>
+			<div style="margin-top: 8px">
 				<strong>Protected links (require admin cookie):</strong>
 				<ul>
 					<li><a href="/auth/docs/" target="_blank">Auth docs</a></li>
@@ -79,31 +96,37 @@
 			}
 
 			// Handle login form submit
-			document.getElementById('login-form').addEventListener('submit', async (e) => {
-				e.preventDefault()
-				const login = document.getElementById('login').value
-				const password = document.getElementById('password').value
-				const out = document.getElementById('login-result')
-				out.textContent = 'Logging in...'
-				try {
-					const res = await fetch('/auth/api/login', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ login, password })
-					})
-					const data = await res.json().catch(() => ({}))
-					if (!res.ok) {
-						out.textContent = 'Login failed: ' + (data.error || res.status)
-						return
+			document
+				.getElementById('login-form')
+				.addEventListener('submit', async (e) => {
+					e.preventDefault()
+					const login = document.getElementById('login').value
+					const password = document.getElementById('password').value
+					const out = document.getElementById('login-result')
+					out.textContent = 'Logging in...'
+					try {
+						const res = await fetch('/auth/api/login', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ login, password })
+						})
+						const data = await res.json().catch(() => ({}))
+						if (!res.ok) {
+							out.textContent = 'Login failed: ' + (data.error || res.status)
+							return
+						}
+						// Show token info (header.payload only)
+						let payload = {}
+						try {
+							payload = JSON.parse(atob((data.token || '').split('.')[1] || ''))
+						} catch {}
+						out.textContent =
+							'Login OK\n' + JSON.stringify({ payload }, null, 2)
+					} catch (err) {
+						out.textContent =
+							'Error: ' + (err && err.message ? err.message : err)
 					}
-					// Show token info (header.payload only)
-					let payload = {}
-					try { payload = JSON.parse(atob((data.token || '').split('.')[1] || '')) } catch {}
-					out.textContent = 'Login OK\n' + JSON.stringify({ payload }, null, 2)
-				} catch (err) {
-					out.textContent = 'Error: ' + (err && err.message ? err.message : err)
-				}
-			})
+				})
 		</script>
 	</body>
 </html>

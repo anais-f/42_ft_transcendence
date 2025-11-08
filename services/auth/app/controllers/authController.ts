@@ -87,7 +87,9 @@ export async function loginController(
 
 	// Decode minimal part to know if admin for cookie (no verification needed here)
 	try {
-		const payload: any = JSON.parse(Buffer.from(res.token.split('.')[1], 'base64').toString())
+		const payload: any = JSON.parse(
+			Buffer.from(res.token.split('.')[1], 'base64').toString()
+		)
 		if (payload.is_admin) {
 			reply.setCookie('admin_auth', res.token, {
 				httpOnly: true,
@@ -120,7 +122,13 @@ export async function registerGoogleController(
 	console.log('Existing user with this Google ID:', user)
 	if (user) {
 		console.log('Google user already exists, logging in')
-		return { token: signToken({ user_id: user.user_id, login: user.login, is_admin: user.is_admin }) }
+		return {
+			token: signToken({
+				user_id: user.user_id,
+				login: user.login,
+				is_admin: user.is_admin
+			})
+		}
 	}
 	try {
 		const authApiSecret = process.env.AUTH_API_SECRET

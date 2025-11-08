@@ -111,7 +111,6 @@ async function runServer() {
 		host: '0.0.0.0'
 	})
 	console.log('Auth service running on http://localhost:', port)
-	
 }
 
 runServer().catch((err) => {
