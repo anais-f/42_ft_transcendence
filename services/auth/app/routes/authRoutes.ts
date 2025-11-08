@@ -2,7 +2,8 @@ import type { FastifyInstance } from 'fastify'
 import {
 	registerController,
 	loginController,
-	registerGoogleController
+	registerGoogleController,
+	validateAdminController
 } from '../controllers/authController.js'
 import {
 	RegisterSchema,
@@ -38,4 +39,5 @@ export async function authRoutes(app: FastifyInstance) {
 		},
 		registerGoogleController
 	)
+	app.get('/api/admin/validate', validateAdminController)
 }

@@ -14,7 +14,7 @@ import {
 	findUserByGoogleId
 } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
-import { signToken } from '../utils/jwt.js'
+import { signToken, verifyToken } from '../utils/jwt.js'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -75,7 +75,33 @@ export async function loginController(
 	const { login, password } = parsed.data
 	const res = await loginUser(login, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })
-	return reply.send(res)
+
+	// Set user auth cookie
+	reply.setCookie('auth_token', res.token, {
+		httpOnly: true,
+		sameSite: 'strict',
+		secure: process.env.NODE_ENV === 'production',
+		path: '/',
+		maxAge: 60 * 15
+	})
+
+	// Decode minimal part to know if admin for cookie (no verification needed here)
+	try {
+		const payload: any = JSON.parse(Buffer.from(res.token.split('.')[1], 'base64').toString())
+		if (payload.is_admin) {
+			reply.setCookie('admin_auth', res.token, {
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				path: '/',
+				maxAge: 60 * 60
+			})
+		}
+	} catch {
+		// ignore payload decoding errors
+	}
+
+	return reply.send({ token: res.token })
 }
 
 export async function registerGoogleController(
@@ -94,7 +120,7 @@ export async function registerGoogleController(
 	console.log('Existing user with this Google ID:', user)
 	if (user) {
 		console.log('Google user already exists, logging in')
-		return { token: signToken({ user_id: user.user_id, login: user.login }) }
+		return { token: signToken({ user_id: user.user_id, login: user.login, is_admin: user.is_admin }) }
 	}
 	try {
 		const authApiSecret = process.env.AUTH_API_SECRET
@@ -130,5 +156,29 @@ export async function registerGoogleController(
 		}
 		console.log('Database error during Google registration:', e)
 		return reply.code(500).send({ error: 'Database error' })
+	}
+}
+
+export async function validateAdminController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	try {
+		const cookieToken = request.cookies?.admin_auth as string | undefined
+		const authHeader = request.headers.authorization
+		let token: string | undefined = cookieToken
+		if (!token && authHeader && authHeader.startsWith('Bearer ')) {
+			token = authHeader.substring(7)
+		}
+		if (!token) {
+			return reply.code(401).send({ success: false, error: 'Missing token' })
+		}
+		const payload = verifyToken(token)
+		if (!payload.is_admin) {
+			return reply.code(403).send({ success: false, error: 'Forbidden' })
+		}
+		return reply.code(200).send({ success: true })
+	} catch (e) {
+		return reply.code(401).send({ success: false, error: 'Invalid token' })
 	}
 }

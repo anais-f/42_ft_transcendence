@@ -17,6 +17,7 @@ import {
 } from '@ft_transcendence/common'
 import { findPublicUserByLogin } from './repositories/userRepository.js'
 import { registerAdminUser } from './usecases/register.js'
+import cookie from '@fastify/cookie'
 
 const app = Fastify({
 	logger: true
@@ -99,6 +100,7 @@ async function runServer() {
 	if (findPublicUserByLogin('admin') === undefined) {
 		registerAdminUser(login_admin, password_admin)
 	}
+	await app.register(cookie, { secret: 'test', parseOptions: {} })
 	await registerRoutes(app)
 	const port = Number(process.env.PORT)
 	if (!port) {
