@@ -1,3 +1,4 @@
+import { merge } from 'node_modules/zod/v4/core/util.cjs'
 import { EPSILON } from '../define.js'
 import { Ray } from './Ray.js'
 import { Vector2 } from './Vector2.js'
@@ -207,5 +208,13 @@ export class Segment {
 		const normal = new Vector2(-dy, dx)
 
 		return normal.normalize()
+	}
+
+	public serialize(): ArrayBuffer {
+		// 32o
+		const merged = new Uint8Array(32)
+		merged.set(new Uint8Array(this.getP1().serialize()), 0)
+		merged.set(new Uint8Array(this.getP2().serialize()), 8)
+		return merged.buffer
 	}
 }
