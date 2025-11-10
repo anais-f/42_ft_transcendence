@@ -7,6 +7,7 @@ export class PongObject {
 	private origin: Vector2
 	private velocity: Vector2 // maybe deprecated
 	private hitbox: AShape[] = []
+	public bufferSize
 
 	public constructor(
 		hitbox: AShape | AShape[],
@@ -20,6 +21,16 @@ export class PongObject {
 		}
 		this.origin = origin
 		this.velocity = velocity
+
+		let size = 16 + 1
+		for (const lhitbox of this.hitbox) {
+			if (lhitbox instanceof Circle) {
+				size += 25
+			} else if (lhitbox instanceof Polygon) {
+				size += 18 + 16 * lhitbox.getSegment().length
+			}
+		}
+		this.bufferSize = size
 	}
 
 	public applyVelo() {
