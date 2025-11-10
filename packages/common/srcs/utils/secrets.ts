@@ -5,9 +5,9 @@ import { readFileSync } from 'fs'
  * Returns undefined if the file does not exist or cannot be read.
  */
 export function readSecret(name: string): string | undefined {
-  try {
-    return readFileSync(`/run/secrets/${name}`, 'utf8').trim()
-  } catch {
-    return undefined
-  }
+	try {
+		return readFileSync(`/run/secrets/${name}`, 'utf8').trim()
+	} catch {
+		return undefined
+	}
 }

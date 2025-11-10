@@ -1,12 +1,20 @@
 import { jest } from '@jest/globals'
 
-const loginUserMock: jest.MockedFunction<(login: string, password: string) => Promise<{ token: string } | null>> = jest.fn()
-const registerUserMock: jest.MockedFunction<(login: string, password: string) => Promise<{ success: true }>> = jest.fn()
-const registerGoogleUserMock: jest.MockedFunction<(google_id: string) => Promise<{ success: true }>> = jest.fn()
+const loginUserMock: jest.MockedFunction<
+	(login: string, password: string) => Promise<{ token: string } | null>
+> = jest.fn()
+const registerUserMock: jest.MockedFunction<
+	(login: string, password: string) => Promise<{ success: true }>
+> = jest.fn()
+const registerGoogleUserMock: jest.MockedFunction<
+	(google_id: string) => Promise<{ success: true }>
+> = jest.fn()
 const verifyTokenMock: jest.MockedFunction<(token: string) => any> = jest.fn()
 const signTokenMock: jest.MockedFunction<(payload: any) => string> = jest.fn()
-const findPublicUserByLoginMock: jest.MockedFunction<(login: string) => any> = jest.fn()
-const findUserByGoogleIdMock: jest.MockedFunction<(google_id: string) => any> = jest.fn()
+const findPublicUserByLoginMock: jest.MockedFunction<(login: string) => any> =
+	jest.fn()
+const findUserByGoogleIdMock: jest.MockedFunction<(google_id: string) => any> =
+	jest.fn()
 const deleteUserByIdMock: jest.MockedFunction<(id: number) => void> = jest.fn()
 
 await jest.unstable_mockModule('../usecases/register.js', () => ({
@@ -34,7 +42,8 @@ const fetchMock: jest.MockedFunction<typeof fetch> = jest.fn() as any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ;(global as any).fetch = fetchMock
 
-const { loginController, validateAdminController, registerController } = await import('./authController.js')
+const { loginController, validateAdminController, registerController } =
+	await import('./authController.js')
 
 describe('authController login', () => {
 	beforeEach(() => jest.resetAllMocks())
@@ -93,7 +102,11 @@ describe('validateAdminController', () => {
 	})
 
 	test('admin token returns 200', async () => {
-		verifyTokenMock.mockReturnValue({ user_id: 1, login: 'a', is_admin: true } as any)
+		verifyTokenMock.mockReturnValue({
+			user_id: 1,
+			login: 'a',
+			is_admin: true
+		} as any)
 		const req: any = { headers: { authorization: 'Bearer t' }, cookies: {} }
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
 		await validateAdminController(req, reply)
@@ -125,7 +138,10 @@ describe('authController registerController', () => {
 
 	test('creates user and syncs with users service (happy path)', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({ user_id: 10, login: 'newuser' })
+		findPublicUserByLoginMock.mockResolvedValue({
+			user_id: 10,
+			login: 'newuser'
+		})
 		fetchMock.mockResolvedValue({ ok: true, status: 200 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
@@ -134,13 +150,19 @@ describe('authController registerController', () => {
 		await registerController(req, reply)
 
 		expect(registerUserMock).toHaveBeenCalled()
-		expect(fetchMock).toHaveBeenCalledWith('http://users/api/users/new-user', expect.any(Object))
+		expect(fetchMock).toHaveBeenCalledWith(
+			'http://users/api/users/new-user',
+			expect.any(Object)
+		)
 		expect(reply.send).toHaveBeenCalledWith({ success: true })
 	})
 
 	test('on users service 401, deletes created user and returns 500', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({ user_id: 11, login: 'newuser' })
+		findPublicUserByLoginMock.mockResolvedValue({
+			user_id: 11,
+			login: 'newuser'
+		})
 		fetchMock.mockResolvedValue({ ok: false, status: 401 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
@@ -154,7 +176,10 @@ describe('authController registerController', () => {
 
 	test('on users service failure, deletes created user and returns 400', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({ user_id: 12, login: 'newuser' })
+		findPublicUserByLoginMock.mockResolvedValue({
+			user_id: 12,
+			login: 'newuser'
+		})
 		fetchMock.mockResolvedValue({ ok: false, status: 500 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }

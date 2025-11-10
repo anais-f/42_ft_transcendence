@@ -1,11 +1,11 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import fastifyOauth2, {
-  OAuth2Namespace,
-  FastifyOAuth2Options
+	OAuth2Namespace,
+	FastifyOAuth2Options
 } from '@fastify/oauth2'
 import {
-  httpRequestCounter,
-  responseTimeHistogram
+	httpRequestCounter,
+	responseTimeHistogram
 } from '@ft_transcendence/common'
 import metricPlugin from 'fastify-metrics'
 import { getGoogleCredentials } from './secrets.js'

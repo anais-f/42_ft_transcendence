@@ -1,5 +1,10 @@
 import { jest } from '@jest/globals'
-import { httpRequestCounter, activeUsersGauge, dbQueryDurationGauge, responseTimeHistogram } from './monitoring.js'
+import {
+	httpRequestCounter,
+	activeUsersGauge,
+	dbQueryDurationGauge,
+	responseTimeHistogram
+} from './monitoring.js'
 import { register } from 'prom-client'
 
 describe('monitoring metrics', () => {
@@ -21,7 +26,10 @@ describe('monitoring metrics', () => {
 	})
 
 	test('responseTimeHistogram observe bucket', async () => {
-		responseTimeHistogram.observe({ method: 'GET', route: '/z', status_code: 200 }, 0.01)
+		responseTimeHistogram.observe(
+			{ method: 'GET', route: '/z', status_code: 200 },
+			0.01
+		)
 		const metricsAll = await register.metrics()
 		expect(metricsAll).toContain('http_response_time_seconds_bucket')
 	})
