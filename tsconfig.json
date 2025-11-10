@@ -27,7 +27,7 @@
 		{ "path": "./services/users/app" },
 		{ "path": "./services/auth/app" },
 		{ "path": "./services/pong-server/app" },
-		{ "path": "./services/auth-google/app" }
+		{ "path": "./services/auth_google/app" }
 	],
 	"ts-node": {
 		"esm": true

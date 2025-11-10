@@ -194,21 +194,24 @@ services:
       start_period: 10s
 
   grafana:
-    image: grafana/grafana-oss:12.2.0-17142428006
+    build:
+      context: ./services/monitoring/grafana
+      dockerfile: Dockerfile
     restart: on-failure
     container_name: grafana
     networks:
       - backend
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./services/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./services/monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
     depends_on:
       prometheus:
         condition: service_healthy
     environment:
       - GF_SERVER_ROOT_URL=http://localhost:8080/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    secrets:
+      - login_admin
+      - password_admin
     healthcheck:
       test:
         - CMD-SHELL
