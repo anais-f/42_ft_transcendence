@@ -1,14 +1,14 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import fastifyOauth2, {
-	OAuth2Namespace,
-	FastifyOAuth2Options
+  OAuth2Namespace,
+  FastifyOAuth2Options
 } from '@fastify/oauth2'
 import {
-	httpRequestCounter,
-	responseTimeHistogram
+  httpRequestCounter,
+  responseTimeHistogram
 } from '@ft_transcendence/common'
 import metricPlugin from 'fastify-metrics'
-import fs from 'fs'
+import { getGoogleCredentials } from './secrets.js'
 
 declare module 'fastify' {
 	interface FastifyInstance {
@@ -16,16 +16,7 @@ declare module 'fastify' {
 	}
 }
 
-function readSecret(name: string): string | undefined {
-	try {
-		return fs.readFileSync(`/run/secrets/${name}`, 'utf8').trim()
-	} catch {
-		return undefined
-	}
-}
-
-const clientId = readSecret('google_client_id') || undefined
-const clientSecret = readSecret('google_client_secret') || undefined
+const { clientId, clientSecret } = getGoogleCredentials()
 
 if (!clientId || !clientSecret) {
 	console.error(
@@ -64,7 +55,7 @@ fastify.addHook('onResponse', (request, reply) => {
 	}
 })
 
-const oauth2Options: FastifyOAuth2Options = {
+export const oauth2Options: FastifyOAuth2Options = {
 	name: 'googleOAuth2',
 	credentials: {
 		client: {
@@ -121,6 +112,8 @@ fastify.get(
 	}
 )
 
+export const app = fastify
+
 const start = async () => {
 	try {
 		await fastify.register(metricPlugin.default, { endpoint: '/metrics' })
@@ -135,4 +128,8 @@ const start = async () => {
 	}
 }
 
-start()
+if (process.env.NODE_ENV !== 'test') {
+	start()
+}
+
+export default fastify

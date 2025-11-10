@@ -18,6 +18,7 @@ import {
 import { findPublicUserByLogin } from './repositories/userRepository.js'
 import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
+import { readSecret } from '@ft_transcendence/common'
 
 const app = Fastify({
 	logger: true
@@ -57,13 +58,7 @@ app.addHook('onResponse', (request, reply) => {
 	}
 })
 
-function readSecret(name: string): string | undefined {
-	try {
-		return fs.readFileSync(`/run/secrets/${name}`, 'utf8').trim()
-	} catch {
-		return undefined
-	}
-}
+// readSecret now provided by @ft_transcendence/common
 
 async function runServer() {
 	console.log('Starting Auth service...')
