@@ -1,13 +1,15 @@
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
 
-export function signToken(payload: {
-	user_id: number
-	login?: string
-	is_admin?: boolean
-	type: string
+export function signToken(
+	payload: {
+		user_id: number
+		login?: string
+		is_admin?: boolean
+		type: string
 	},
-	expiresIn: ms.StringValue ): string {
+	expiresIn: ms.StringValue
+): string {
 	const secret = process.env.JWT_SECRET
 	if (!secret) {
 		throw new Error(

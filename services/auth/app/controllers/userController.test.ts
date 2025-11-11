@@ -2,10 +2,16 @@ import { jest } from '@jest/globals'
 
 // Mocks for repository & utils dependencies
 const listPublicUsersMock: jest.MockedFunction<() => any> = jest.fn()
-const findPublicUserByIdMock: jest.MockedFunction<(id: number) => any> = jest.fn()
-const deleteUserByIdMock: jest.MockedFunction<(id: number) => boolean> = jest.fn()
-const changeUserPasswordMock: jest.MockedFunction<(id: number, hash: string) => boolean> = jest.fn()
-const hashPasswordMock: jest.MockedFunction<(password: string) => Promise<string>> = jest.fn()
+const findPublicUserByIdMock: jest.MockedFunction<(id: number) => any> =
+	jest.fn()
+const deleteUserByIdMock: jest.MockedFunction<(id: number) => boolean> =
+	jest.fn()
+const changeUserPasswordMock: jest.MockedFunction<
+	(id: number, hash: string) => boolean
+> = jest.fn()
+const hashPasswordMock: jest.MockedFunction<
+	(password: string) => Promise<string>
+> = jest.fn()
 
 await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 	__esModule: true,
@@ -37,15 +43,21 @@ describe('userController listPublicUsersController', () => {
 	beforeEach(() => jest.resetAllMocks())
 
 	test('returns list of users parsed by schema', async () => {
-		listPublicUsersMock.mockReturnValue({ users: [{ user_id: 1, login: 'alice' }] })
+		listPublicUsersMock.mockReturnValue({
+			users: [{ user_id: 1, login: 'alice' }]
+		})
 		const reply = buildReply()
 		await listPublicUsersController({} as any, reply)
-		expect(reply.send).toHaveBeenCalledWith({ users: [{ user_id: 1, login: 'alice' }] })
+		expect(reply.send).toHaveBeenCalledWith({
+			users: [{ user_id: 1, login: 'alice' }]
+		})
 	})
 
 	test('schema validation failure propagates (invalid user_id)', async () => {
 		// user_id negative should fail zod parse and throw
-		listPublicUsersMock.mockReturnValue({ users: [{ user_id: -2, login: 'bad' }] })
+		listPublicUsersMock.mockReturnValue({
+			users: [{ user_id: -2, login: 'bad' }]
+		})
 		const reply = buildReply()
 		await expect(listPublicUsersController({} as any, reply)).rejects.toThrow()
 	})
@@ -117,19 +129,28 @@ describe('userController patchUserPassword', () => {
 
 	test('400 missing id', async () => {
 		const reply = buildReply()
-		await patchUserPassword({ params: {}, body: { password: 'abcdef' } } as any, reply)
+		await patchUserPassword(
+			{ params: {}, body: { password: 'abcdef' } } as any,
+			reply
+		)
 		expect(reply.code).toHaveBeenCalledWith(400)
 	})
 
 	test('400 invalid id', async () => {
 		const reply = buildReply()
-		await patchUserPassword({ params: { id: '-1' }, body: { password: 'abcdef' } } as any, reply)
+		await patchUserPassword(
+			{ params: { id: '-1' }, body: { password: 'abcdef' } } as any,
+			reply
+		)
 		expect(reply.code).toHaveBeenCalledWith(400)
 	})
 
 	test('400 invalid password (too short)', async () => {
 		const reply = buildReply()
-		await patchUserPassword({ params: { id: '1' }, body: { password: 'abc' } } as any, reply)
+		await patchUserPassword(
+			{ params: { id: '1' }, body: { password: 'abc' } } as any,
+			reply
+		)
 		expect(reply.code).toHaveBeenCalledWith(400)
 	})
 
@@ -137,7 +158,10 @@ describe('userController patchUserPassword', () => {
 		changeUserPasswordMock.mockReturnValue(false)
 		hashPasswordMock.mockResolvedValue('hashed-xxx')
 		const reply = buildReply()
-		await patchUserPassword({ params: { id: '5' }, body: { password: 'abcdef' } } as any, reply)
+		await patchUserPassword(
+			{ params: { id: '5' }, body: { password: 'abcdef' } } as any,
+			reply
+		)
 		expect(hashPasswordMock).toHaveBeenCalledWith('abcdef')
 		expect(reply.code).toHaveBeenCalledWith(404)
 	})
@@ -146,9 +170,11 @@ describe('userController patchUserPassword', () => {
 		changeUserPasswordMock.mockReturnValue(true)
 		hashPasswordMock.mockResolvedValue('hashed-yyy')
 		const reply = buildReply()
-		await patchUserPassword({ params: { id: '6' }, body: { password: 'abcdef' } } as any, reply)
+		await patchUserPassword(
+			{ params: { id: '6' }, body: { password: 'abcdef' } } as any,
+			reply
+		)
 		expect(hashPasswordMock).toHaveBeenCalledWith('abcdef')
 		expect(reply.send).toHaveBeenCalledWith({ success: true })
 	})
 })
-

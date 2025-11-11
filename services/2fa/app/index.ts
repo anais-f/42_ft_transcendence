@@ -2,9 +2,20 @@ import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { authenticator } from 'otplib'
 import { runMigrations } from './database/connection.js'
 import { encryptSecret, decryptSecret } from './utils/crypto.js'
-import { upsertPendingSecret, getPendingSecretEnc, activateSecret, deleteSecret, getSecretEnc } from './repositories/twofaRepository.js'
+import {
+	upsertPendingSecret,
+	getPendingSecretEnc,
+	activateSecret,
+	deleteSecret,
+	getSecretEnc
+} from './repositories/twofaRepository.js'
 import qrcode from 'qrcode'
-import { verify2FASchema, setup2FASchema, disable2FASchema, status2FASchema } from '@ft_transcendence/common'
+import {
+	verify2FASchema,
+	setup2FASchema,
+	disable2FASchema,
+	status2FASchema
+} from '@ft_transcendence/common'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
@@ -28,7 +39,7 @@ function authServiceGuard(req: FastifyRequest, reply: FastifyReply): boolean {
 app.post('/api/2fa/setup', async (req: FastifyRequest, reply: FastifyReply) => {
 	if (!authServiceGuard(req, reply)) return
 	try {
-		const parsed =  setup2FASchema.safeParse(req.body)
+		const parsed = setup2FASchema.safeParse(req.body)
 		if (!parsed.success)
 			return reply.code(400).send({ error: 'Invalid payload' })
 		const { user_id, issuer, label } = parsed.data
@@ -36,9 +47,19 @@ app.post('/api/2fa/setup', async (req: FastifyRequest, reply: FastifyReply) => {
 		const enc = encryptSecret(secret)
 		const pendingUntil = Date.now() + 5 * 60 * 1000
 		upsertPendingSecret(user_id, enc, pendingUntil)
-		const otpauth_url = authenticator.keyuri(label || String(user_id), issuer || 'FtTranscendence', secret)
+		const otpauth_url = authenticator.keyuri(
+			label || String(user_id),
+			issuer || 'FtTranscendence',
+			secret
+		)
 		const qr_base64 = await qrcode.toDataURL(otpauth_url)
-		return reply.code(200).send({ otpauth_url, qr_base64, expires_at: new Date(pendingUntil).toISOString() })
+		return reply
+			.code(200)
+			.send({
+				otpauth_url,
+				qr_base64,
+				expires_at: new Date(pendingUntil).toISOString()
+			})
 	} catch (e: any) {
 		req.log.error(e)
 		return reply.code(500).send({ error: 'Internal error' })
@@ -48,7 +69,7 @@ app.post('/api/2fa/setup', async (req: FastifyRequest, reply: FastifyReply) => {
 app.post('/api/2fa/verify', async (req, reply) => {
 	if (!authServiceGuard(req, reply)) return
 	try {
-		const parsed =  verify2FASchema.safeParse(req.body)
+		const parsed = verify2FASchema.safeParse(req.body)
 		if (!parsed.success)
 			return reply.code(400).send({ error: 'Invalid payload' })
 		const { user_id, twofa_code } = parsed.data
@@ -72,7 +93,7 @@ app.post('/api/2fa/verify', async (req, reply) => {
 app.post('/api/2fa/disable', async (req, reply) => {
 	if (!authServiceGuard(req, reply)) return
 	try {
-		const parsed =  disable2FASchema.safeParse(req.body)
+		const parsed = disable2FASchema.safeParse(req.body)
 		if (!parsed.success)
 			return reply.code(400).send({ error: 'Invalid payload' })
 		const { user_id } = parsed.data
@@ -87,7 +108,7 @@ app.post('/api/2fa/disable', async (req, reply) => {
 app.post('/api/2fa/status', async (req, reply) => {
 	if (!authServiceGuard(req, reply)) return
 	try {
-		const parsed =  status2FASchema.safeParse(req.body)
+		const parsed = status2FASchema.safeParse(req.body)
 		if (!parsed.success)
 			return reply.code(400).send({ error: 'Invalid payload' })
 		const { user_id } = parsed.data
@@ -105,7 +126,9 @@ const start = async () => {
 			port: parseInt(process.env.PORT as string),
 			host: '0.0.0.0'
 		})
-		app.log.info(`2FA Service listening on http://localhost:${process.env.PORT}`)
+		app.log.info(
+			`2FA Service listening on http://localhost:${process.env.PORT}`
+		)
 	} catch (err) {
 		app.log.error(err)
 		process.exit(1)

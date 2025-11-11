@@ -84,9 +84,7 @@ export async function loginController(
 			maxAge: 60 * 5
 		})
 		return reply.send({ pre_2fa_required: true })
-	}
-	else if (res.token)
-	{
+	} else if (res.token) {
 		reply.setCookie('auth_token', res.token, {
 			httpOnly: true,
 			sameSite: 'strict',
@@ -94,11 +92,12 @@ export async function loginController(
 			path: '/',
 			maxAge: 60 * 15
 		})
-		
+
 		// Decode minimal part to know if admin for cookie (no verification needed here)
 		return reply.send({
 			pre_2fa_required: false,
-			token: res.token })
+			token: res.token
+		})
 	}
 }
 
@@ -118,18 +117,19 @@ export async function registerGoogleController(
 	console.log('Existing user with this Google ID:', user)
 	if (user) {
 		console.log('Google user already exists, logging in')
-		if (!user.two_fa_enabled)
-		{
+		if (!user.two_fa_enabled) {
 			return {
-				token: signToken({
-					user_id: user.user_id,
-					login: user.login,
-					is_admin: user.is_admin,
-					type: 'auth'
-				}, '1h')
+				token: signToken(
+					{
+						user_id: user.user_id,
+						login: user.login,
+						is_admin: user.is_admin,
+						type: 'auth'
+					},
+					'1h'
+				)
 			}
-		}
-		else {
+		} else {
 			return {
 				pre_2fa_token: signToken(
 					{

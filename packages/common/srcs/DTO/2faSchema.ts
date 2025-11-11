@@ -3,7 +3,11 @@ import { z } from 'zod'
 export const verify2FASchema = z
 	.object({
 		user_id: z.number().int().positive(),
-		twofa_code: z.string().min(6).max(6).regex(/^\d{6}$/, '2FA code must be a 6-digit number')
+		twofa_code: z
+			.string()
+			.min(6)
+			.max(6)
+			.regex(/^\d{6}$/, '2FA code must be a 6-digit number')
 	})
 	.strict()
 
@@ -20,7 +24,7 @@ export const disable2FASchema = z
 		user_id: z.number().int().positive()
 	})
 	.strict()
-	
+
 export const status2FASchema = z
 	.object({
 		user_id: z.number().int().positive()
