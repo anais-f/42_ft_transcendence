@@ -183,7 +183,7 @@ export async function validateAdminController(
 	reply: FastifyReply
 ) {
 	try {
-		const cookieToken = request.cookies?.auth_token as string | undefined
+		const cookieToken = request.cookies?.auth_token
 		const authHeader = request.headers.authorization
 		let token: string | undefined = cookieToken
 		if (!token && authHeader && authHeader.startsWith('Bearer ')) {

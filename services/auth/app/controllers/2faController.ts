@@ -26,7 +26,7 @@ export async function enable2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const cookieToken = req.cookies?.auth_token as string | undefined
+	const cookieToken = req.cookies?.auth_token
 	const authHeader = req.headers.authorization
 	let token: string | undefined = cookieToken
 	if (!token && authHeader && authHeader.startsWith('Bearer ')) {
@@ -64,7 +64,7 @@ export async function verify2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const cookieToken = req.cookies?.auth_token as string | undefined
+	const cookieToken = req.cookies?.auth_token
 	const authHeader = req.headers.authorization
 	let token: string | undefined = cookieToken
 	if (!token && authHeader && authHeader.startsWith('Bearer ')) {
@@ -109,7 +109,7 @@ export async function disable2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const cookieToken = req.cookies?.auth_token as string | undefined
+	const cookieToken = req.cookies?.auth_token
 	const authHeader = req.headers.authorization
 	let token: string | undefined = cookieToken
 	if (!token && authHeader && authHeader.startsWith('Bearer ')) {
