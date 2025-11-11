@@ -127,9 +127,6 @@ services:
       - .env
     networks:
       - backend
-    secrets:
-      - google_client_id
-      - google_client_secret
     healthcheck:
       test:
         - CMD-SHELL
@@ -176,8 +173,8 @@ services:
     depends_on:
       prometheus:
         condition: service_healthy
-    secrets:
-      - discord_webhook
+    env_file:
+      - .env
     entrypoint: /entrypoint.sh
     healthcheck:
       test:
@@ -242,11 +239,3 @@ volumes:
   grafana_data:
   nginx_logs:
   prometheus_data:
-
-secrets:
-  discord_webhook:
-    file: ./.secret/discord_webhook.txt
-  google_client_id:
-    file: ./.secret/google_client_id.txt
-  google_client_secret:
-    file: ./.secret/google_client_secret.txt

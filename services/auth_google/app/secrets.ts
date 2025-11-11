@@ -5,8 +5,8 @@ export function getGoogleCredentials(): {
 	clientSecret?: string
 } {
 	const clientId =
-		process.env.GOOGLE_CLIENT_ID || readSecret('google_client_id')
+		process.env.GOOGLE_CLIENT_ID
 	const clientSecret =
-		process.env.GOOGLE_CLIENT_SECRET || readSecret('google_client_secret')
+		process.env.GOOGLE_CLIENT_SECRET
 	return { clientId, clientSecret }
 }
