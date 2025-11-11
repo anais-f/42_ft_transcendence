@@ -2,6 +2,7 @@ NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
 DOCKER_COMPOSE_FILE_DEV := ./docker-compose.override.yaml
 DOCKER_COMPOSE_FILE_TEST := ./docker-compose.test.yaml
+DOCKER_COMPOSE_FILE_MONITORING := ./docker-compose.monitoring.yaml
 .DEFAULT_GOAL = up
 SERVICES := $(shell docker compose -f $(DOCKER_COMPOSE_FILE) config --services)
 COMPOSE := docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE)
@@ -11,6 +12,14 @@ install:
 	./hooks/install-hooks.sh
 	./scripts/setup-node.sh
 	npm install
+
+.PHONY: build-monitoring
+build-monitoring:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) build
+
+.PHONY: up-monitoring
+up-monitoring:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) up -d
 
 .PHONY: test
 test: down build
@@ -51,12 +60,12 @@ format:
 format-check:
 	npm run format:check
 
-.PHONY: dev-build
-dev-build:
+.PHONY: build-dev
+build-dev:
 	rm -rf node_modules packages/*/node_modules services/*/app/node_modules
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
 
-.PHONY: dev-up
-dev-up:
+.PHONY: up-dev
+up-dev:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
 	

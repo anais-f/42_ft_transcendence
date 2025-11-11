@@ -1,0 +1,130 @@
+services:
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile.monitor
+    volumes:
+      - avatars:/usr/share/nginx/html/avatars:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      frontend:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      auth_google:
+        condition: service_healthy
+      users:
+        condition: service_healthy
+      2fa:
+        condition: service_healthy
+      alertmanager:
+        condition: service_healthy
+    networks:
+      - monitoring
+      - backend
+
+  prometheus:
+    build:
+      context: ./services/monitoring/prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    restart: on-failure
+    networks:
+      - backend
+      - monitoring
+    depends_on:
+      auth:
+        condition: service_healthy
+      users:
+        condition: service_healthy
+      auth_google:
+        condition: service_healthy
+    volumes:
+      - prometheus_data:/prometheus
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:9090 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  alertmanager:
+    build:
+      context: ./services/monitoring/alertmanager
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: alertmanager
+    networks:
+      - monitoring
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    secrets:
+      - discord_webhook
+    entrypoint: /entrypoint.sh
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:9093 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    build:
+      context: ./services/monitoring/grafana
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: grafana
+    networks:
+      - monitoring
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:8080/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    secrets:
+      - login_admin
+      - password_admin
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:3000 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  mtail:
+    image: ghcr.io/google/mtail:3.0.8
+    restart: on-failure
+    networks:
+      - monitoring
+    container_name: mtail
+    volumes:
+      - nginx_logs:/var/log/nginx:ro
+      - ./services/monitoring/mtail/nginx.mtail:/progs/nginx.mtail:ro
+    command: ['-progs', '/progs', '-logs', '/var/log/nginx/access.log']
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:3903 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  nginx_logs:     
