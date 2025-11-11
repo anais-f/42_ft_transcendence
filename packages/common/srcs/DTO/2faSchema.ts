@@ -31,7 +31,19 @@ export const status2FASchema = z
 	})
 	.strict()
 
+// Schema that validates only the code from the client (no user_id)
+export const twofaCodeSchema = z
+	.object({
+		twofa_code: z
+			.string()
+			.min(6)
+			.max(6)
+			.regex(/^\d{6}$/, '2FA code must be a 6-digit number')
+	})
+	.strict()
+
 export type Verify2FADTO = z.infer<typeof verify2FASchema>
 export type Setup2FADTO = z.infer<typeof setup2FASchema>
 export type Disable2FADTO = z.infer<typeof disable2FASchema>
 export type Status2FADTO = z.infer<typeof status2FASchema>
+export type TwoFACodeDTO = z.infer<typeof twofaCodeSchema>

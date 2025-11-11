@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { authenticator } from 'otplib'
 import { verifyToken, signToken } from '../utils/jwt.js'
 import { setUser2FAEnabled } from '../repositories/userRepository.js'
-import { verify2FASchema } from '@ft_transcendence/common'
+import { twofaCodeSchema } from '@ft_transcendence/common'
 
 const TWOFA_URL = process.env.TWOFA_SERVICE_URL
 const TWOFA_SECRET = process.env.TWOFA_API_SECRET
@@ -75,7 +75,7 @@ export async function verify2faController(
 	if (!payload || !payload.user_id) {
 		return reply.code(401).send({ error: 'Invalid token' })
 	}
-	const parsed = verify2FASchema.safeParse(req.body)
+	const parsed = twofaCodeSchema.safeParse(req.body)
 	if (!parsed.success) {
 		return reply.code(400).send({ error: 'Invalid request body' })
 	}
@@ -83,7 +83,7 @@ export async function verify2faController(
 	try {
 		const { ok, status, data } = await call2fa('/api/2fa/verify', {
 			user_id: payload.user_id,
-			code: twofa_code
+			twofa_code
 		})
 		if (!ok) return reply.code(status).send(data)
 		// Mark enabled and issue final auth token
