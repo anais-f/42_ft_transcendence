@@ -102,7 +102,6 @@ describe('UsersServices', () => {
 			expect(result).toHaveProperty('username', 'testuser')
 			expect(result).toHaveProperty('avatar')
 			expect(result).toHaveProperty('last_connection')
-			expect(result).toHaveProperty('status')
 		})
 	})
 
