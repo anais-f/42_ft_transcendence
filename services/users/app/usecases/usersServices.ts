@@ -25,7 +25,7 @@ export class UsersServices {
 		const authUsers = await AuthApi.getAllUsers()
 
 		for (const authUser of authUsers) {
-			if (!(UsersRepository.existsById({ user_id: authUser.user_id })))
+			if (!UsersRepository.existsById({ user_id: authUser.user_id }))
 				await UsersRepository.insertUser({
 					user_id: authUser.user_id,
 					login: authUser.login
@@ -48,7 +48,6 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
-			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
@@ -68,10 +67,7 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
-			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
 }
-
-

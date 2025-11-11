@@ -6,7 +6,7 @@ RUN apk add --no-cache nginx
 RUN mkdir -p /usr/share/nginx/html/avatars
 
 COPY conf/dev.conf /etc/nginx/http.d/default.conf
-COPY avatar/img_default.png /usr/share/nginx/html/avatars/img_default.png
+COPY avatars/img_default.png /usr/share/nginx/html/avatars/img_default.png
 
 RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \
     && chmod -R 755 /usr/share/nginx/html/avatars

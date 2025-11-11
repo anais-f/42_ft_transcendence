@@ -1,5 +1,5 @@
 import { UsersServices } from '../usecases/usersServices.js'
-import { UpdateUsersServices } from "../usecases/updateUsersServices.js";
+import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,

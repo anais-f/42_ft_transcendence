@@ -12,7 +12,6 @@ import {
 	AppError
 } from '@ft_transcendence/common'
 
-// const defaultAvatar: string = '../img.png' // default avatar path
 const defaultAvatar: string = '/avatars/img_default.png'
 
 /**
@@ -38,28 +37,48 @@ export class UsersRepository {
 	}
 
 	/**
+	 * @description Generate a unique username by incrementing if necessary
+	 * @param baseUsername - The base username (login) to check
+	 * @returns A unique username
+	 */
+	private static generateUniqueUsername(baseUsername: string): string {
+		if (!this.existsByUsername({ username: baseUsername })) {
+			return baseUsername
+		}
+
+		let counter = 1
+		let candidateUsername = `${baseUsername}${counter}`
+
+		while (this.existsByUsername({ username: candidateUsername })) {
+			counter++
+			candidateUsername = `${baseUsername}${counter}`
+
+			if (counter > 10000) {
+				throw new AppError('Unable to generate unique username', 500)
+			}
+		}
+
+		return candidateUsername
+	}
+
+	/**
 	 * @description Insert a new user with default values
 	 * @param user - The id of the user to insert
 	 * @returns A Result indicating success or an error occurred
 	 */
 	static insertUser(user: IPublicUserAuth): void {
+		const uniqueUsername = this.generateUniqueUsername(user.login)
+
 		const insertStmt = db.prepare(
-			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
+			'INSERT OR IGNORE INTO users (user_id, username, avatar, last_connection) VALUES (?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, user.login, defaultAvatar, 1, now)
+		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, now)
 	}
 
 	/**
-	 * @description Update methods for user status, last connection or avatar
+	 * @description Update methods for last connection or avatars
 	 */
-	//TODO: how status was setted? with a websocket
-	// static updateUserStatus(user: IUserStatus): void {
-	// 	const updateStmt = db.prepare(
-	// 		'UPDATE users SET status = ? WHERE user_id = ?'
-	// 	)
-	// 	updateStmt.run(user.status, user.user_id)
-	// }
 
 	static updateLastConnection(user: IUserConnection): void {
 		const updateStmt = db.prepare(
@@ -101,22 +120,16 @@ export class UsersRepository {
 	 */
 	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
+			'SELECT user_id, username, avatar, last_connection FROM users WHERE user_id = ?'
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
 	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
+			'SELECT user_id, username, avatar, last_connection FROM users WHERE username = ?'
 		)
 		return selectStmt.get(username) as IPrivateUser | undefined
-	}
-
-	static getStatusById(user: IUserId): number {
-		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
-		const row = selectStmt.get(user.user_id) as { status: number }
-		return row.status
 	}
 
 	static getLastConnectionById(user: IUserId): string {
@@ -138,14 +151,7 @@ export class UsersRepository {
 	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users'
-		)
-		return selectStmt.all() as IPrivateUser[]
-	}
-
-	static getOnlineUsers(): IPrivateUser[] {
-		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE status = 1'
+			'SELECT user_id, username, avatar, last_connection FROM users'
 		)
 		return selectStmt.all() as IPrivateUser[]
 	}

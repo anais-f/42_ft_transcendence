@@ -14,13 +14,15 @@ import {
 } from 'fastify-type-provider-zod'
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
-import { imageParserPlugin } from './plugins/imageParser.js'
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 function createApp(): FastifyInstance {
-	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
+	const app = Fastify({
+		logger: true,
+		bodyLimit: 6 * 1024 * 1024
+	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
@@ -33,10 +35,18 @@ function createApp(): FastifyInstance {
 	})
 	app.register(fastifyMultipart, {
 		limits: {
-			fileSize: 5 * 1024 * 1024, // 5MB
+			fileSize: 5 * 1024 * 1024,
 			files: 1
 		}
 	})
+
+	app.addContentTypeParser(
+		/^image\/.*/,
+		{ parseAs: 'buffer' },
+		(request, payload: Buffer, done) => {
+			done(null, payload)
+		}
+	)
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {

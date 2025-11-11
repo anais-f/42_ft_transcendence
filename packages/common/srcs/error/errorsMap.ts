@@ -17,7 +17,7 @@ export const ERROR_MESSAGES = {
 	FORBIDDEN: 'Forbidden',
 	INVALID_TOKEN_USER: 'Invalid token user',
 	USERNAME_ALREADY_TAKEN: 'Username already taken',
-  MISSING_FILE: 'Missing file'
+	MISSING_FILE: 'Missing file'
 } as const
 
 export const SUCCESS_MESSAGES = {

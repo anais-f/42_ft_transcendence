@@ -37,6 +37,7 @@ services:
     container_name: users-dev
     volumes:
       - ./:/app
+      - avatars_data:/app/avatars
     environment:
       - PORT=3042
       - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
@@ -58,6 +59,8 @@ services:
     build:
       context: services/nginx
       dockerfile: Dockerfile.dev
+    volumes:
+      - avatars_data:/usr/share/nginx/html/avatars
     ports:
       - '8042:8042'
     healthcheck:
@@ -76,3 +79,4 @@ volumes:
   users_root_node_modules:
   users_ws_node_modules:
   users_data:
+  avatars_data:

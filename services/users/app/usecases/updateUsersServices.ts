@@ -1,23 +1,23 @@
 import { fileTypeFromBuffer } from 'file-type'
-import {AppError, ERROR_MESSAGES} from "@ft_transcendence/common"
+import { AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
 import { UsersRepository } from '../repositories/usersRepository.js'
 import fs from 'fs/promises'
 import path from 'path'
 import { randomUUID } from 'crypto'
 
 export interface CheckUserAvatarParams {
-  user_id: number
-  avatarBuffer: Buffer
-  originalName: string
-  mimeType: string
+	user_id: number
+	avatarBuffer: Buffer
+	originalName: string
+	mimeType: string
 }
 
 interface AvatarPaths {
-  avatarsDir: string
-  outPath: string
-  tempPath: string
-  publicPath: string
-  filename: string
+	avatarsDir: string
+	outPath: string
+	tempPath: string
+	publicPath: string
+	filename: string
 }
 
 const ALLOWED_TYPES: readonly string[] = ['image/jpeg', 'image/png']
@@ -25,99 +25,140 @@ const ALLOWED_EXTENSIONS: readonly string[] = ['.jpg', '.jpeg', '.png']
 const MAX_SIZE = 5 * 1024 * 1024
 
 export class UpdateUsersServices {
-  static async updateUsernameProfile(
-      user: { user_id: number },
-      newUsername: string
-  ): Promise<void> {
-    if (!user.user_id || user.user_id <= 0)
-      throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+	static async updateUsernameProfile(
+		user: { user_id: number },
+		newUsername: string
+	): Promise<void> {
+		if (!user.user_id || user.user_id <= 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-    await UsersRepository.updateUsername({
-      user_id: user.user_id,
-      username: newUsername
-    })
-  }
+		await UsersRepository.updateUsername({
+			user_id: user.user_id,
+			username: newUsername
+		})
+	}
 
-  static async checkUserAvatar(params: CheckUserAvatarParams): Promise<boolean> {
-    // const { user_id, avatarBuffer, originalName, mimeType } = params
+	static async checkUserAvatar(
+		params: CheckUserAvatarParams
+	): Promise<boolean> {
+		const detectedType = await validateAvatar(params)
+		const paths = await generateAvatarPaths(params.user_id, detectedType)
+		await saveAvatarAndCleanup(paths, params.avatarBuffer, params.user_id)
 
-    const detectedType = await validateAvatar(params)
-    const paths = await generateAvatarPaths(params.user_id, detectedType)
-    await saveAvatarAndCleanup(paths, params.avatarBuffer, params.user_id)
-
-
-    return true
-  }
+		return true
+	}
 }
 
 async function validateAvatar(params: CheckUserAvatarParams) {
-  const { user_id, avatarBuffer, originalName, mimeType } = params
+	const { user_id, avatarBuffer, originalName, mimeType } = params
 
-  if (!user_id || user_id <= 0) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+	if (!user_id || user_id <= 0)
+		throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-  const fileExtension = originalName.slice(originalName.lastIndexOf(".")).toLowerCase()
-  if (!ALLOWED_TYPES.includes(mimeType)) throw new AppError("Invalid image type", 400)
-  if (!ALLOWED_EXTENSIONS.includes(fileExtension)) throw new AppError("Invalid file extension", 400)
+	const fileExtension =
+		originalName && originalName.includes('.')
+			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
+			: ''
 
-  if (avatarBuffer.length > MAX_SIZE) throw new AppError("File too large", 400)
+	if (avatarBuffer.length > MAX_SIZE) throw new AppError('File too large', 400)
 
-  const detectedType = await fileTypeFromBuffer(avatarBuffer)
-  if (!detectedType || !ALLOWED_TYPES.includes(detectedType.mime))
-    throw new AppError("File content not valid image", 400)
+	const detectedType = await fileTypeFromBuffer(avatarBuffer)
+	if (!detectedType) {
+		throw new AppError('File content not valid image', 400)
+	}
 
-  return detectedType
+	if (!ALLOWED_TYPES.includes(detectedType.mime)) {
+		throw new AppError('Invalid image type', 400)
+	}
+
+	if (mimeType && mimeType !== detectedType.mime) {
+		console.warn(
+			'[avatars] MIME mismatch: header=',
+			mimeType,
+			'detected=',
+			detectedType.mime
+		)
+	}
+
+	if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
+		console.warn(
+			'[avatars] original file extension not allowed:',
+			fileExtension,
+			' - continuing based on detectedType'
+		)
+	}
+
+	return detectedType
 }
 
-async function generateAvatarPaths(user_id: number, detectedType: { ext: string | undefined; mime: string }): Promise<AvatarPaths> {
-  const ext = detectedType.ext ? `.${detectedType.ext}` : (detectedType.mime === 'image/png' ? '.png' : '.jpg')
-  const uuid = randomUUID()
-  const filename = `img_${user_id}_${uuid}${ext}`
-  const avatarsDir = path.join(process.cwd(), 'avatars')
-  const outPath = path.join(avatarsDir, filename)
-  const tempPath = path.join(avatarsDir, `.tmp_${filename}`)
-  const publicPath = path.posix.join('/avatars', filename)
+async function generateAvatarPaths(
+	user_id: number,
+	detectedType: { ext: string | undefined; mime: string }
+): Promise<AvatarPaths> {
+	const ext = detectedType.ext
+		? `.${detectedType.ext}`
+		: detectedType.mime === 'image/png'
+			? '.png'
+			: '.jpg'
+	const uuid = randomUUID()
+	const filename = `img_${user_id}_${uuid}${ext}`
+	const avatarsDir = path.join(process.cwd(), 'avatars')
+	const outPath = path.join(avatarsDir, filename)
+	const tempPath = path.join(avatarsDir, `.tmp_${filename}`)
+	const publicPath = path.posix.join('/avatars', filename)
 
-  console.log('Name avatar: ', filename)
-  console.log('outPath avatar: ', outPath)
-  console.log('publicPath: ', publicPath)
+	console.log(
+		'[avatars] generateAvatarPaths - chosen ext:',
+		ext,
+		'filename:',
+		filename,
+		'detected mime:',
+		detectedType.mime
+	)
 
-  return { avatarsDir, outPath, tempPath, publicPath, filename }
+	return { avatarsDir, outPath, tempPath, publicPath, filename }
 }
 
-async function saveAvatarAndCleanup(paths: AvatarPaths, avatarBuffer: Buffer, user_id: number): Promise<void> {
-  const { avatarsDir, outPath, tempPath, publicPath, filename } = paths
+async function saveAvatarAndCleanup(
+	paths: AvatarPaths,
+	avatarBuffer: Buffer,
+	user_id: number
+): Promise<void> {
+	const { avatarsDir, outPath, tempPath, publicPath, filename } = paths
 
-  try {
-    await fs.mkdir(avatarsDir, { recursive: true })
-    await fs.writeFile(tempPath, avatarBuffer)
-    await fs.rename(tempPath, outPath)
-    console.log(`Avatar saved successfully: ${filename}`)
-  } catch (err) {
-    try { await fs.unlink(tempPath) } catch (_) {}
-    throw new AppError('Failed to save avatar', 500)
-  }
+	try {
+		await fs.mkdir(avatarsDir, { recursive: true })
+		await fs.writeFile(tempPath, avatarBuffer)
+		await fs.rename(tempPath, outPath)
+		console.log(`Avatar saved successfully: ${filename}`)
+	} catch (err) {
+		try {
+			await fs.unlink(tempPath)
+		} catch (_) {}
+		throw new AppError('Failed to save avatars', 500)
+	}
 
-  try {
-    UsersRepository.updateUserAvatar({ user_id, avatar: publicPath })
-  } catch (err) {
-    try { await fs.unlink(outPath) } catch (_) {}
-    throw err
-  }
+	try {
+		UsersRepository.updateUserAvatar({ user_id, avatar: publicPath })
+	} catch (err) {
+		try {
+			await fs.unlink(outPath)
+		} catch (_) {}
+		throw err
+	}
 
-  const files = await fs.readdir(avatarsDir)
-  const prefix = `img_${user_id}_`
-  const oldFiles = files.filter((f) =>
-      f.startsWith(prefix) &&
-      f !== filename &&
-      !f.startsWith('.tmp_')
-  )
+	const files = await fs.readdir(avatarsDir)
+	const prefix = `img_${user_id}_`
+	const oldFiles = files.filter(
+		(f) => f.startsWith(prefix) && f !== filename && !f.startsWith('.tmp_')
+	)
 
-  for (const file of oldFiles) {
-    try {
-      await fs.unlink(path.join(avatarsDir, file))
-      console.log(`Deleted old avatar: ${file}`)
-    } catch (err) {
-      console.warn(`Failed to delete old avatar file ${file}:`, err)
-    }
-  }
+	for (const file of oldFiles) {
+		try {
+			await fs.unlink(path.join(avatarsDir, file))
+			console.log(`Deleted old avatar: ${file}`)
+		} catch (err) {
+			console.warn(`Failed to delete old avatar file ${file}:`, err)
+		}
+	}
 }

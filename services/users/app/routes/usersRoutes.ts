@@ -5,8 +5,8 @@ import {
 	getPrivateUser
 } from '../controllers/usersControllers.js'
 import {
-  updateUsername,
-  updateAvatar
+	updateUsername,
+	updateAvatar
 } from '../controllers/updateUsersControllers.js'
 import {
 	SuccessResponseSchema,
@@ -98,7 +98,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		updateUsername
 	)
 
-	// PATCH /api/users/me/avatar - Update avatar (JWT protected)
+	// PATCH /api/users/me/avatars - Update avatars (JWT protected)
 	server.patch(
 		'/api/users/me/avatar',
 		{
