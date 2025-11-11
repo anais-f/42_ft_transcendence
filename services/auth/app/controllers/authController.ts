@@ -75,18 +75,31 @@ export async function loginController(
 	const { login, password } = parsed.data
 	const res = await loginUser(login, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })
-
-	// Set user auth cookie
-	reply.setCookie('auth_token', res.token, {
-		httpOnly: true,
-		sameSite: 'strict',
-		secure: process.env.NODE_ENV === 'production',
-		path: '/',
-		maxAge: 60 * 15
-	})
-
-	// Decode minimal part to know if admin for cookie (no verification needed here)
-	return reply.send({ token: res.token })
+	else if (res.pre_2fa_token) {
+		reply.setCookie('twofa_token', res.pre_2fa_token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 5
+		})
+		return reply.send({ pre_2fa_required: true })
+	}
+	else if (res.token)
+	{
+		reply.setCookie('auth_token', res.token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 15
+		})
+		
+		// Decode minimal part to know if admin for cookie (no verification needed here)
+		return reply.send({
+			pre_2fa_required: false,
+			token: res.token })
+	}
 }
 
 export async function registerGoogleController(
@@ -109,8 +122,9 @@ export async function registerGoogleController(
 			token: signToken({
 				user_id: user.user_id,
 				login: user.login,
-				is_admin: user.is_admin
-			})
+				is_admin: user.is_admin,
+				type: 'auth'
+			}, '1h')
 		}
 	}
 	try {

@@ -12,7 +12,8 @@
 	"dependencies": {
 		"@ft_transcendence/common": "*",
 		"argon2": "^0.40.0",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"otplib": "^12.0.1"
 	},
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.10",

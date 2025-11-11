@@ -51,7 +51,7 @@ export function deleteUserById(id: number): boolean {
 	return info.changes > 0
 }
 
-export function createGoogleUser(google_id: string) {
+export function createGoogleUser(google_id: string): void {
 	let login = `google-${google_id}`
 	const stmt = db().prepare(
 		'INSERT INTO users (login, google_id) VALUES (?, ?)'
@@ -59,7 +59,7 @@ export function createGoogleUser(google_id: string) {
 	stmt.run(login, google_id)
 }
 
-export function findUserByGoogleId(google_id: string) {
+export function findUserByGoogleId(google_id: string): IUserAuth | undefined {
 	const stmt = db().prepare('SELECT * FROM users WHERE google_id = ?')
 	return stmt.get(google_id) as IUserAuth | undefined
 }
@@ -68,4 +68,23 @@ export function changeUserPassword(id: number, passwordHash: string): boolean {
 	const stmt = db().prepare('UPDATE users SET password = ? WHERE user_id = ?')
 	const info = stmt.run(passwordHash, id)
 	return info.changes > 0
+}
+
+export function enableUser2FA(id: number, totp_secret: string): boolean {
+	const stmt = db().prepare(
+		'UPDATE users SET two_fa_secret = ? WHERE user_id = ?'
+	)
+	const info = stmt.run(totp_secret, id)
+	return info.changes > 0
+}
+
+export function disableUser2FA(id: number): boolean {
+	const stmt = db().prepare('UPDATE users SET two_fa_secret = NULL WHERE user_id = ?')
+	const info = stmt.run(id)
+	return info.changes > 0
+}
+
+export function getUser2FASecret(id: number): string | null {
+	const stmt = db().prepare('SELECT two_fa_secret FROM users WHERE user_id = ?')
+	return stmt.get(id) as string | null
 }

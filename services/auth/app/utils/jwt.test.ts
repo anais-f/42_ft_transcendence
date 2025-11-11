@@ -22,7 +22,7 @@ describe('jwt utils', () => {
 	})
 
 	test('signToken throws if JWT_SECRET missing', () => {
-		expect(() => signToken({ user_id: 1, login: 'alice' })).toThrow(
+		expect(() => signToken({ user_id: 1, login: 'alice', type: 'auth' }, '1h')).toThrow(
 			/JWT_SECRET/
 		)
 	})
@@ -30,7 +30,7 @@ describe('jwt utils', () => {
 	test('signToken signs with secret', () => {
 		process.env.JWT_SECRET = 's3cr3t'
 		signSpy.mockReturnValue('signed.jwt')
-		const token = signToken({ user_id: 2, login: 'bob', is_admin: true })
+		const token = signToken({ user_id: 2, login: 'bob', is_admin: true, type: 'auth' }, '1h')
 		expect(token).toBe('signed.jwt')
 		expect(signSpy).toHaveBeenCalledWith(
 			{ user_id: 2, login: 'bob', is_admin: true },
