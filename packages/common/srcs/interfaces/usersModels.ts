@@ -9,12 +9,12 @@ export interface IUserAuth {
 	password?: string
 	google_id?: string
 	is_admin: boolean
-	two_fa_secret?: string
+	two_fa_enabled: boolean
 }
 
 export type IPublicUserAuth = Omit<
 	IUserAuth,
-	'is_admin' | 'password' | 'google_id' | 'two_fa_secret'
+	'is_admin' | 'password' | 'google_id' | 'two_fa_enabled'
 >
 
 /**
