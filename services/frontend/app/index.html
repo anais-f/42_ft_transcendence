@@ -53,6 +53,18 @@
 					white-space: pre-wrap;
 				"
 			></pre>
+
+			<!-- 2FA controls integrated in the main frontend -->
+			<div style="margin-top:12px">
+				<button id="btn-2fa-setup">Activer 2FA (setup)</button>
+				<div id="setup-result" style="margin-top:8px"></div>
+				<div style="margin-top:8px">
+					<label>Code 2FA <input type="text" id="twofa-code" maxlength="6" /></label>
+					<button id="btn-2fa-verify">Vérifier 2FA</button>
+					<div id="verify-result" style="margin-top:8px"></div>
+				</div>
+			</div>
+
 			<div style="margin-top: 8px">
 				<strong>Protected links (require admin cookie):</strong>
 				<ul>
@@ -107,6 +119,7 @@
 					try {
 						const res = await fetch('/auth/api/login', {
 							method: 'POST',
+							credentials: 'include',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({ login, password })
 						})
@@ -120,13 +133,65 @@
 						try {
 							payload = JSON.parse(atob((data.token || '').split('.')[1] || ''))
 						} catch {}
-						out.textContent =
-							'Login OK\n' + JSON.stringify({ payload }, null, 2)
+						if (data.pre_2fa_required) {
+							out.textContent = '2FA required. Please verify using the code.'
+							// keep pre_2fa token in cookie (httpOnly) set by backend
+						} else {
+							out.textContent = 'Login OK\n' + JSON.stringify({ payload }, null, 2)
+						}
 					} catch (err) {
-						out.textContent =
-							'Error: ' + (err && err.message ? err.message : err)
+						out.textContent = 'Error: ' + (err && err.message ? err.message : err)
 					}
 				})
+
+			// 2FA setup handler
+			document.getElementById('btn-2fa-setup').addEventListener('click', async () => {
+				const out = document.getElementById('setup-result')
+				out.textContent = 'Génération en cours...'
+				try {
+					const res = await fetch('/auth/api/2fa/setup', {
+						method: 'POST',
+						credentials: 'include',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({})
+					})
+					const json = await res.json().catch(() => ({}))
+					if (!res.ok) { out.textContent = 'Erreur: ' + (json.error || res.status); return }
+					let html = ''
+					if (json.qr_base64) html += `<img id="qr" src="${json.qr_base64}" alt="QR" />`
+					if (json.otpauth_url) html += `<p>otpauth_url: <code>${json.otpauth_url}</code></p>`
+					if (json.expires_at) html += `<p>Expire: ${json.expires_at}</p>`
+					html += `<p>Après scan, entrez le code dans Vérifier 2FA.</p>`
+					out.innerHTML = html
+				} catch (e) { out.textContent = 'Erreur: ' + e.message }
+			})
+
+			// 2FA verify handler
+			document.getElementById('btn-2fa-verify').addEventListener('click', async () => {
+				const code = document.getElementById('twofa-code').value.trim()
+				const out = document.getElementById('verify-result')
+				if (!/^[0-9]{6}$/.test(code)) { out.textContent = 'Code invalide'; return }
+				out.textContent = 'Vérification...'
+				try {
+					const res = await fetch('/auth/api/2fa/verify', {
+						method: 'POST',
+						credentials: 'include',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ twofa_code: code })
+					})
+					const json = await res.json().catch(() => ({}))
+					if (!res.ok) { out.textContent = 'Erreur: ' + (json.error || res.status); return }
+					// if server returns final token, show payload
+					if (json.token) {
+						let payload = {}
+						try { payload = JSON.parse(atob((json.token || '').split('.')[1] || '')) } catch {}
+						out.textContent = '2FA validée. Authentifié.'
+						console.log('token payload', payload)
+					} else {
+						out.textContent = '2FA validée.'
+					}
+				} catch (e) { out.textContent = 'Erreur: ' + e.message }
+			})
 		</script>
 	</body>
 </html>
