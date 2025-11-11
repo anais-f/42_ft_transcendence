@@ -1,5 +1,3 @@
-import { readSecret } from '@ft_transcendence/common'
-
 export function getGoogleCredentials(): {
 	clientId?: string
 	clientSecret?: string
