@@ -42,7 +42,7 @@ jobs:
 
           # Monitoring / other
           ADMIN_TOKEN=test
-          DISCORD_WEBHOOK=${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
 
           # Google OAuth (optional)
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
