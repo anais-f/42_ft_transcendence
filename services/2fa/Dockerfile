@@ -14,7 +14,7 @@ COPY packages/ ./packages/
 
 RUN npm run build --workspace=packages/common
 #-------------------------------------------------------------#
-# Build app
+# Build 2fa app
 FROM node:22-alpine AS build-app
 
 WORKDIR /build
@@ -22,6 +22,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY services/2fa/app/package.json ./services/2fa/app/
 COPY packages/common/package.json ./packages/common/
+
 RUN apk add --no-cache python3 make g++
 RUN npm install
 
@@ -32,7 +33,7 @@ COPY services/ ./services/
 COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 
-RUN npm run build --workspace=auth-google-server-app
+RUN npm run build --workspace=2fa-server-app
 
 #-------------------------------------------------------------#
 # prod

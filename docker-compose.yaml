@@ -23,6 +23,8 @@ services:
         condition: service_healthy
       alertmanager:
         condition: service_healthy
+      2fa:
+        condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
@@ -144,6 +146,30 @@ services:
       retries: 12
       start_period: 20s
 
+  2fa:
+    restart: on-failure
+    container_name: 2fa
+    build:
+      context: .
+      dockerfile: ./services/2fa/Dockerfile
+    depends_on:
+      auth:
+        condition: service_started
+    networks:
+      - backend
+    volumes:
+      - db_2fa_data:/data
+    env_file:
+      - .env.test
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
   prometheus:
     build:
       context: ./services/monitoring/prometheus
@@ -249,6 +275,7 @@ networks:
 volumes:
   db_auth_data:
   db_users_data:
+  db_2fa_data:
   avatars:
   grafana_data:
   nginx_logs:
