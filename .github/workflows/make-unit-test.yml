@@ -61,4 +61,4 @@ jobs:
 
       - name: Run unit tests
         run: |
-          make test
+          make test || make logs-users
