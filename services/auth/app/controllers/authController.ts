@@ -86,23 +86,6 @@ export async function loginController(
 	})
 
 	// Decode minimal part to know if admin for cookie (no verification needed here)
-	try {
-		const payload: any = JSON.parse(
-			Buffer.from(res.token.split('.')[1], 'base64').toString()
-		)
-		if (payload.is_admin) {
-			reply.setCookie('admin_auth', res.token, {
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: process.env.NODE_ENV === 'production',
-				path: '/',
-				maxAge: 60 * 60
-			})
-		}
-	} catch {
-		// ignore payload decoding errors
-	}
-
 	return reply.send({ token: res.token })
 }
 
@@ -172,7 +155,7 @@ export async function validateAdminController(
 	reply: FastifyReply
 ) {
 	try {
-		const cookieToken = request.cookies?.admin_auth as string | undefined
+		const cookieToken = request.cookies?.auth_token as string | undefined
 		const authHeader = request.headers.authorization
 		let token: string | undefined = cookieToken
 		if (!token && authHeader && authHeader.startsWith('Bearer ')) {
