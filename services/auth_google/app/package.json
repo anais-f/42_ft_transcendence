@@ -12,10 +12,7 @@
 	"dependencies": {
 		"@fastify/cors": "^11.1.0",
 		"@fastify/oauth2": "^8.1.2",
-		"@ft_transcendence/common": "*",
-		"argon2": "^0.40.0",
-		"axios": "^1.13.1",
-		"jsonwebtoken": "^9.0.2"
+		"@ft_transcendence/common": "*"
 	},
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.10",
