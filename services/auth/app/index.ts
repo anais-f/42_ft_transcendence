@@ -66,10 +66,11 @@ async function runServer() {
 	console.log('Admin user ensured')
 
 	const openapiFilePath = process.env.DTO_OPENAPI_FILE
-	const login_admin = readSecret('login_admin') || undefined
-	const password_admin = readSecret('password_admin') || undefined
+	// prefer env variables for CI/local, fall back to docker secrets if present
+	const login_admin = process.env.LOGIN_ADMIN || readSecret('login_admin') || undefined
+	const password_admin = process.env.PASSWORD_ADMIN || readSecret('password_admin') || undefined
 	if (!login_admin || !password_admin) {
-		throw new Error('Admin credentials are not defined in secrets')
+		throw new Error('Admin credentials are not defined. Set LOGIN_ADMIN and PASSWORD_ADMIN in your .env or Docker secrets. See .env.example')
 	}
 	if (!openapiFilePath) {
 		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')

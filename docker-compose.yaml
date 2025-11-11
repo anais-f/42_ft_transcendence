@@ -10,8 +10,6 @@ services:
     volumes:
       - avatars:/usr/share/nginx/html/avatars:ro
       - nginx_logs:/var/log/nginx
-    secrets:
-      - admin_token
     depends_on:
       frontend:
         condition: service_healthy
@@ -82,7 +80,7 @@ services:
       - avatars:/app/avatars
       - db_users_data:/data
     env_file:
-      - .env.test
+      - .env
     healthcheck:
       test:
         - CMD-SHELL
@@ -106,10 +104,7 @@ services:
     volumes:
       - db_auth_data:/data
     env_file:
-      - .env.test
-    secrets:
-      - login_admin
-      - password_admin
+      - .env
     healthcheck:
       test:
         - CMD-SHELL
@@ -122,9 +117,6 @@ services:
   auth_google:
     restart: on-failure
     container_name: auth_google
-    secrets:
-      - google_client_id
-      - google_client_secret
     build:
       context: .
       dockerfile: ./services/auth_google/Dockerfile
@@ -132,9 +124,12 @@ services:
       auth:
         condition: service_healthy
     env_file:
-      - .env.test
+      - .env
     networks:
       - backend
+    secrets:
+      - google_client_id
+      - google_client_secret
     healthcheck:
       test:
         - CMD-SHELL
@@ -194,9 +189,7 @@ services:
       start_period: 10s
 
   grafana:
-    build:
-      context: ./services/monitoring/grafana
-      dockerfile: Dockerfile
+    image: grafana/grafana-oss:12.2.0-17142428006
     restart: on-failure
     container_name: grafana
     networks:
@@ -206,12 +199,8 @@ services:
     depends_on:
       prometheus:
         condition: service_healthy
-    environment:
-      - GF_SERVER_ROOT_URL=http://localhost:8080/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-    secrets:
-      - login_admin
-      - password_admin
+    env_file:
+      - .env
     healthcheck:
       test:
         - CMD-SHELL
@@ -257,13 +246,8 @@ volumes:
 secrets:
   discord_webhook:
     file: ./.secret/discord_webhook.txt
-  admin_token:
-    file: ./.secret/admin_token.txt
   google_client_id:
     file: ./.secret/google_client_id.txt
   google_client_secret:
     file: ./.secret/google_client_secret.txt
-  login_admin:
-    file: ./.secret/login_admin.txt
-  password_admin:
-    file: ./.secret/password_admin.txt
+    
