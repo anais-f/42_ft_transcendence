@@ -48,13 +48,11 @@ export async function enable2faController(
 			label
 		})
 		if (!ok) return reply.code(status).send(data)
-		return reply
-			.code(200)
-			.send({
-				otpauth_url: data.otpauth_url,
-				qr_base64: data.qr_base64,
-				expires_at: data.expires_at
-			})
+		return reply.code(200).send({
+			otpauth_url: data.otpauth_url,
+			qr_base64: data.qr_base64,
+			expires_at: data.expires_at
+		})
 	} catch (e: any) {
 		return reply.code(500).send({ error: '2FA service error' })
 	}

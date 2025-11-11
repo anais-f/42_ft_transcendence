@@ -27,7 +27,7 @@ export const PasswordBodySchema = z
 	})
 	.strict()
 
-export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>	
+export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>
 export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>

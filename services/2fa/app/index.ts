@@ -47,19 +47,13 @@ app.post('/api/2fa/setup', async (req: FastifyRequest, reply: FastifyReply) => {
 		const enc = encryptSecret(secret)
 		const pendingUntil = Date.now() + 5 * 60 * 1000
 		upsertPendingSecret(user_id, enc, pendingUntil)
-		const otpauth_url = authenticator.keyuri(
-			label,
-			issuer,
-			secret
-		)
+		const otpauth_url = authenticator.keyuri(label, issuer, secret)
 		const qr_base64 = await qrcode.toDataURL(otpauth_url)
-		return reply
-			.code(200)
-			.send({
-				otpauth_url,
-				qr_base64,
-				expires_at: new Date(pendingUntil).toISOString()
-			})
+		return reply.code(200).send({
+			otpauth_url,
+			qr_base64,
+			expires_at: new Date(pendingUntil).toISOString()
+		})
 	} catch (e: any) {
 		req.log.error(e)
 		return reply.code(500).send({ error: 'Internal error' })

@@ -33,10 +33,7 @@ export async function getPublicUserController(
 	return reply.send(PublicUserAuthSchema.parse(user))
 }
 
-export async function deleteUser(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
+export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {
 	const parsed = IdParamSchema.safeParse(request.params)
 	if (!parsed.success) return reply.code(400).send({ error: 'Invalid id' })
 	const idNum = Number(parsed.data.id)
