@@ -48,8 +48,8 @@ app.post('/api/2fa/setup', async (req: FastifyRequest, reply: FastifyReply) => {
 		const pendingUntil = Date.now() + 5 * 60 * 1000
 		upsertPendingSecret(user_id, enc, pendingUntil)
 		const otpauth_url = authenticator.keyuri(
-			label || String(user_id),
-			issuer || 'FtTranscendence',
+			label,
+			issuer,
 			secret
 		)
 		const qr_base64 = await qrcode.toDataURL(otpauth_url)
