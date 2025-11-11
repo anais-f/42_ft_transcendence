@@ -23,17 +23,17 @@ jobs:
 
           # Users service
           USERS_API_SECRET=test
-          USERS_SERVICE_URL=http://users:${PORT}
+          USERS_SERVICE_URL=http://users:3000
           USERS_DB_PATH=/data/db-users.sqlite
 
           # Auth service
           AUTH_API_SECRET=test
-          AUTH_SERVICE_URL=http://auth:${PORT}
+          AUTH_SERVICE_URL=http://auth:3000
           AUTH_DB_PATH=/data/db-auth.sqlite
 
           # 2FA service
           TWOFA_API_SECRET=test
-          TWOFA_SERVICE_URL=http://2fa:${PORT}
+          TWOFA_SERVICE_URL=http://2fa:3000
           TWOFA_DB_PATH=/data/db-2fa.sqlite
 
           # Admin credentials (seed)
