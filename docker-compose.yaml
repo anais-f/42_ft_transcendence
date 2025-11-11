@@ -250,4 +250,3 @@ secrets:
     file: ./.secret/google_client_id.txt
   google_client_secret:
     file: ./.secret/google_client_secret.txt
-    
