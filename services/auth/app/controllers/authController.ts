@@ -118,13 +118,27 @@ export async function registerGoogleController(
 	console.log('Existing user with this Google ID:', user)
 	if (user) {
 		console.log('Google user already exists, logging in')
-		return {
-			token: signToken({
-				user_id: user.user_id,
-				login: user.login,
-				is_admin: user.is_admin,
-				type: 'auth'
-			}, '1h')
+		if (!user.two_fa_enabled)
+		{
+			return {
+				token: signToken({
+					user_id: user.user_id,
+					login: user.login,
+					is_admin: user.is_admin,
+					type: 'auth'
+				}, '1h')
+			}
+		}
+		else {
+			return {
+				pre_2fa_token: signToken(
+					{
+						user_id: user.user_id,
+						type: '2fa'
+					},
+					'5m'
+				)
+			}
 		}
 	}
 	try {

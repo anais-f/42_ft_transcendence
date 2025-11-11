@@ -2,7 +2,8 @@ import {
 	createUser,
 	findUserByLogin,
 	createAdminUser,
-	createGoogleUser
+	createGoogleUser,
+	isUser2FAEnabled
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
@@ -26,23 +27,27 @@ export async function loginUser(login: string, password: string) {
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
 	const isAdmin = Boolean(user.is_admin)
-	if (!user.two_fa_secret)
-	{
+	if (!isUser2FAEnabled(user.user_id)) {
 		return {
-			token: signToken({
-				user_id: user.user_id,
-				login: user.login,
-				is_admin: isAdmin,
-				type: 'auth'
-			}, '1h')
+			token: signToken(
+				{
+					user_id: user.user_id,
+					login: user.login,
+					is_admin: isAdmin,
+					type: 'auth'
+				},
+				'1h'
+			)
 		}
-	}
-	else {
+	} else {
 		return {
-			pre_2fa_token: signToken({
-				user_id: user.user_id,
-				type: '2fa'
-			}, '5m')
+			pre_2fa_token: signToken(
+				{
+					user_id: user.user_id,
+					type: '2fa'
+				},
+				'5m'
+			)
 		}
 	}
 }

@@ -7,18 +7,9 @@ import {
  import { verify2FASchema } from '@ft_transcendence/common'
 
 export async function twoFARoutes(app: FastifyInstance) {
-	app.post('/api/2fa/setup',
-		enable2faController
-	)
-	app.post('/api/2fa/verify',
-		{
-			schema: {
-				body: verify2FASchema
-			}
-		},
-		verify2faController
-	)
-	app.delete('/api/2fa/disable',
-		disable2faController
-	)
+	app.post('/api/2fa/setup', enable2faController)
+	app.post('/api/2fa/verify', {
+		schema: { body: verify2FASchema }
+	}, verify2faController)
+	app.delete('/api/2fa/disable', disable2faController)
 }

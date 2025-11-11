@@ -70,21 +70,15 @@ export function changeUserPassword(id: number, passwordHash: string): boolean {
 	return info.changes > 0
 }
 
-export function enableUser2FA(id: number, totp_secret: string): boolean {
-	const stmt = db().prepare(
-		'UPDATE users SET two_fa_secret = ? WHERE user_id = ?'
-	)
-	const info = stmt.run(totp_secret, id)
+// 2FA flag management
+export function setUser2FAEnabled(id: number, enabled: boolean): boolean {
+	const stmt = db().prepare('UPDATE users SET two_fa_enabled = ? WHERE user_id = ?')
+	const info = stmt.run(enabled ? 1 : 0, id)
 	return info.changes > 0
 }
 
-export function disableUser2FA(id: number): boolean {
-	const stmt = db().prepare('UPDATE users SET two_fa_secret = NULL WHERE user_id = ?')
-	const info = stmt.run(id)
-	return info.changes > 0
-}
-
-export function getUser2FASecret(id: number): string | null {
-	const stmt = db().prepare('SELECT two_fa_secret FROM users WHERE user_id = ?')
-	return stmt.get(id) as string | null
+export function isUser2FAEnabled(id: number): boolean {
+	const stmt = db().prepare('SELECT two_fa_enabled FROM users WHERE user_id = ?')
+	const row = stmt.get(id) as { two_fa_enabled: number } | undefined
+	return !!row && row.two_fa_enabled === 1
 }

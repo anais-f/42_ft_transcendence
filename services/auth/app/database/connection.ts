@@ -19,7 +19,7 @@ export function runMigrations() {
       password TEXT,
 	  google_id TEXT UNIQUE,
 	  is_admin BOOLEAN DEFAULT FALSE,
-	  two_fa_secret TEXT
+	  two_fa_enabled BOOLEAN DEFAULT 0
     );
   `)
 }
