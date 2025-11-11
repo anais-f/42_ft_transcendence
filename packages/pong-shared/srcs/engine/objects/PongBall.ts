@@ -4,8 +4,10 @@ import { PongObject } from './PongObject.js'
 
 export class PongBall {
 	private ball: PongObject
-	public constructor(size: number) {
+	public velo: Vector2
+	public constructor(size: number, velo = new Vector2()) {
 		this.ball = new PongObject(new Circle(new Vector2(), size), new Vector2())
+		this.velo = velo
 	}
 
 	public getPos(): Vector2 {

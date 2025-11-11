@@ -24,6 +24,18 @@ export class S0ASync implements IS00PongBase {
 	getTime(): number {
 		return this.time
 	}
+	
+	getBorders(): Segment[] {
+		return this.border
+	}
+
+	getPads(): PongPad[] {
+		return this.pads
+	}
+
+	getBall() {
+		return this.ball
+	}
 
 	serialize(): ArrayBuffer {
 		// -----------------------| -- |
@@ -37,6 +49,10 @@ export class S0ASync implements IS00PongBase {
 		// 		PongObject      --|
 		// 		1oplayer  	    --|
 		// theire is 2 PongPad  --|
+		// ---
+		// ball
+		// PongObject
+		// velo
 		const borderBytes = 10 + this.border.length * 32
 
 		const pad1Obj = this.pads[0]
@@ -52,7 +68,7 @@ export class S0ASync implements IS00PongBase {
 		const ballBuff = ballObj.serialize()
 		const ballLen = ballBuff.byteLength
 
-		const finalLen = borderBytes + 1 + pad1Len + 1 + pad2Len + ballLen
+		const finalLen = borderBytes + 1 + pad1Len + 1 + pad2Len + ballLen + 16
 		const buff = new ArrayBuffer(finalLen)
 		const view = new DataView(buff)
 		let offset = 0
@@ -88,6 +104,10 @@ export class S0ASync implements IS00PongBase {
 		// BALL
 		new Uint8Array(buff, offset, ballLen).set(new Uint8Array(ballBuff))
 		offset += ballLen
+		const ballV = new DataView(buff)
+		ballV.setFloat64(offset, this.ball.velo.getX(), true)
+		offset += 8
+		ballV.setFloat64(offset, this.ball.velo.getY(), true)
 
 		return buff
 	}

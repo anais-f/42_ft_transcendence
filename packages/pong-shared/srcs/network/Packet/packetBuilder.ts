@@ -20,6 +20,7 @@ import { Segment } from '../../math/Segment.js'
 import { PongObject } from '../../engine/objects/PongObject.js'
 import { PongPad } from '../../engine/objects/PongPad.js'
 import { PongBall } from '../../engine/objects/PongBall.js'
+import { Circle } from '../../math/shapes/Circle.js'
 
 export enum CPacketsType {
 	C00 = 0b00000001,
@@ -146,7 +147,16 @@ export class packetBuilder {
 					const pad2 = new PongPad(padPlayer2, padObj2)
 					const ballObj = PongObject.deserialize(buff.slice(offset))
 					offset += ballObj.bufferSize
-					return new S0ASync(seg, [pad1, pad2], truc, time)
+					const ballVelo = new Vector2(
+						view.getFloat64(offset, true),
+						view.getFloat64(offset + 8, true)
+					)
+					return new S0ASync(
+						seg,
+						[pad1, pad2],
+						new PongBall((ballObj.getHitbox()[0] as Circle).getRad(), ballVelo),
+						time
+					)
 				default:
 					break
 			}
