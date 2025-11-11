@@ -1,6 +1,7 @@
 export * from './DTO/authSchema.js'
 export * from './DTO/ResponseSchema.js'
 export * from './DTO/usersSchema.js'
+export * from './DTO/2faSchema.js'
 export * from './error/errorsMap.js'
 export * from './interfaces/usersModels.js'
 export * from './monitoring/monitoring.js'
