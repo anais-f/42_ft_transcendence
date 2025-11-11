@@ -1,5 +1,4 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { z } from 'zod'
 import {
 	listPublicUsers,
 	findPublicUserById,
@@ -9,7 +8,8 @@ import {
 import {
 	PublicUserAuthSchema,
 	PublicUserListAuthSchema,
-	IdParamSchema
+	IdParamSchema,
+	PasswordBodySchema
 } from '@ft_transcendence/common'
 import { hashPassword } from '../utils/password.js'
 
@@ -22,7 +22,7 @@ export async function listPublicUsersController(
 }
 
 export async function getPublicUserController(
-	request: FastifyRequest<{ Params: { id: string } }>,
+	request: FastifyRequest,
 	reply: FastifyReply
 ) {
 	const parsed = IdParamSchema.safeParse(request.params)
@@ -34,7 +34,7 @@ export async function getPublicUserController(
 }
 
 export async function deleteUser(
-	request: FastifyRequest<{ Params: { id: string } }>,
+	request: FastifyRequest,
 	reply: FastifyReply
 ) {
 	const parsed = IdParamSchema.safeParse(request.params)
@@ -46,16 +46,15 @@ export async function deleteUser(
 }
 
 export async function patchUserPassword(
-	request: FastifyRequest<{ Params: { id: string }; Body: { password?: string } }>,
+	request: FastifyRequest,
 	reply: FastifyReply
 ) {
 	const parsed = IdParamSchema.safeParse(request.params)
 	if (!parsed.success) return reply.code(400).send({ error: 'Invalid id' })
 	const idNum = Number(parsed.data.id)
-	const { password } = request.body
-	if (!password || typeof password !== 'string' || password.length < 6)
-		return reply.code(400).send({ error: 'Invalid password' })
-	const hashed = await hashPassword(password)
+	const body = PasswordBodySchema.safeParse(request.body)
+	if (!body.success) return reply.code(400).send({ error: 'Invalid password' })
+	const hashed = await hashPassword(body.data.password)
 	const ok = changeUserPassword(idNum, hashed)
 	if (!ok) return reply.code(404).send({ error: 'User not found' })
 	return reply.send({ success: true })
