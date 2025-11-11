@@ -4,14 +4,14 @@ import {
 	verify2faController,
 	disable2faController
 } from '../controllers/2faController.js'
-import { verify2FASchema } from '@ft_transcendence/common'
+import { twofaCodeSchema } from '@ft_transcendence/common'
 
 export async function twoFARoutes(app: FastifyInstance) {
 	app.post('/api/2fa/setup', enable2faController)
 	app.post(
 		'/api/2fa/verify',
 		{
-			schema: { body: verify2FASchema }
+			schema: { body: twofaCodeSchema }
 		},
 		verify2faController
 	)
