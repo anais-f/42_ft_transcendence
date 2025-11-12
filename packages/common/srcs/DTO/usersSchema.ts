@@ -1,18 +1,27 @@
 import { z } from 'zod'
 
-const LOGIN_REGEX = /^[\w-]{4,16}$/
-const USERNAME_REGEX = /^[\w-]{4,16}$/
+const LOGIN_REGEX = /^[\w-]{4,32}$/
+const USERNAME_REGEX = /^[\w-]{4,32}$/
+
+export const RegisterLoginSchema = z
+	.string()
+	.min(4)
+	.max(32)
+	.regex(LOGIN_REGEX, 'Invalid login format')
+	.refine((value) => !value.startsWith('google-'), {
+		message: 'Login cannot start with "google-"'
+	})
 
 export const LoginSchema = z
 	.string()
 	.min(4)
-	.max(16)
+	.max(32)
 	.regex(LOGIN_REGEX, 'Invalid login format')
 
 export const UsernameSchema = z
 	.string()
 	.min(4)
-	.max(16)
+	.max(32)
 	.regex(USERNAME_REGEX, 'Invalid username format')
 
 export const UserIdSchema = z

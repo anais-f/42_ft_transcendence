@@ -270,7 +270,7 @@ describe('usersRoutes', () => {
 					headers: {
 						authorization: TEST_USERS_TOKEN
 					},
-					payload: { user_id: 1, login: '12345678901234567' }
+					payload: { user_id: 1, login: '123456789012345678901234567890123' }
 				})
 				expect(tooLong.statusCode).toBe(400)
 
