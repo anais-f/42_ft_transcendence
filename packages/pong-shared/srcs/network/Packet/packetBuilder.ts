@@ -81,7 +81,7 @@ export class packetBuilder {
 			}
 			throw 'unknow type'
 		} catch (e) {
-			console.log('ignored packet')
+			console.log('ignored packet: ' + e)
 		}
 		return null
 	}
@@ -95,8 +95,6 @@ export class packetBuilder {
 			switch (type) {
 				case SPacketsType.S00:
 					break
-				case SPacketsType.S0A:
-					throw 'not implemented yet'
 				case SPacketsType.S0B:
 					throw 'not implemented yet'
 				case SPacketsType.S01:
@@ -119,10 +117,11 @@ export class packetBuilder {
 						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true)),
 						view.getFloat64(0, true)
 					)
-				case SPacketsType.S0A:
+				case SPacketsType.S0A: {
 					const time = view.getFloat64(0, true)
 					const nbseg = view.getUint8(9)
 					let offset = 10
+
 					const seg: Segment[] = []
 					for (let i = 0; i < nbseg; ++i) {
 						const x1 = view.getFloat64(offset, true)
@@ -135,33 +134,38 @@ export class packetBuilder {
 						offset += 8
 						seg.push(new Segment(new Vector2(x1, y1), new Vector2(x2, y2)))
 					}
-					const padObj1: PongObject = PongObject.deserialize(buff.slice(offset))
-					offset += padObj1.bufferSize
+
 					const padPlayer1 = view.getUint8(offset)
+					offset += 1
+					const padObj1 = PongObject.deserialize(buff.slice(offset))
+					offset += padObj1.bufferSize
+
+					const padPlayer2 = view.getUint8(offset)
 					offset += 1
 					const padObj2 = PongObject.deserialize(buff.slice(offset))
 					offset += padObj2.bufferSize
-					const padPlayer2 = view.getUint8(offset)
-					offset += 1
+
 					const pad1 = new PongPad(padPlayer1, padObj1)
 					const pad2 = new PongPad(padPlayer2, padObj2)
+
 					const ballObj = PongObject.deserialize(buff.slice(offset))
 					offset += ballObj.bufferSize
-					const ballVelo = new Vector2(
-						view.getFloat64(offset, true),
-						view.getFloat64(offset + 8, true)
-					)
-					return new S0ASync(
-						seg,
-						[pad1, pad2],
-						new PongBall((ballObj.getHitbox()[0] as Circle).getRad(), ballVelo),
-						time
-					)
+
+					const vx = view.getFloat64(offset, true)
+					offset += 8
+					const vy = view.getFloat64(offset, true)
+					offset += 8
+					const ballVelo = new Vector2(vx, vy)
+
+					const ball = new PongBall((ballObj.getHitbox()[0] as Circle).getRad(), ballVelo)
+
+					return new S0ASync(seg, [pad1, pad2], ball, time)
+				}
 				default:
 					break
 			}
 		} catch (e) {
-			console.log('ignored packet')
+			console.log('ignored packet: ' + e)
 		}
 		return null
 	}

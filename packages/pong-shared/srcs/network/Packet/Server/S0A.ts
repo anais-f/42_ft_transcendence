@@ -24,7 +24,7 @@ export class S0ASync implements IS00PongBase {
 	getTime(): number {
 		return this.time
 	}
-	
+
 	getBorders(): Segment[] {
 		return this.border
 	}
@@ -33,7 +33,7 @@ export class S0ASync implements IS00PongBase {
 		return this.pads
 	}
 
-	getBall() {
+	getBall(): PongBall {
 		return this.ball
 	}
 
@@ -104,11 +104,11 @@ export class S0ASync implements IS00PongBase {
 		// BALL
 		new Uint8Array(buff, offset, ballLen).set(new Uint8Array(ballBuff))
 		offset += ballLen
-		const ballV = new DataView(buff)
-		ballV.setFloat64(offset, this.ball.velo.getX(), true)
-		offset += 8
-		ballV.setFloat64(offset, this.ball.velo.getY(), true)
 
+		view.setFloat64(offset, this.ball.velo.getX(), true)
+		offset += 8
+		view.setFloat64(offset, this.ball.velo.getY(), true)
+		offset += 8
 		return buff
 	}
 }
