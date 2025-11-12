@@ -8,7 +8,7 @@ COPY package.json package-lock.json ./
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
 
-RUN npm install
+RUN apk add --no-cache python3 make g++ && npm install
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -22,7 +22,7 @@ FROM node:22-alpine AS build-app
 
 WORKDIR /build
 
-RUN apk add --no-cache python3
+RUN apk add --no-cache python3 make g++
 
 COPY package.json package-lock.json ./
 COPY services/users/app/package.json ./services/users/app/
