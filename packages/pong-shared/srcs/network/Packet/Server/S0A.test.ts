@@ -2,6 +2,7 @@ import { PongBall } from '../../../engine/objects/PongBall'
 import { PongObject } from '../../../engine/objects/PongObject'
 import { PongPad } from '../../../engine/objects/PongPad'
 import { Segment } from '../../../math/Segment'
+import { AShape } from '../../../math/shapes/AShape'
 import { Circle } from '../../../math/shapes/Circle'
 import { Polygon } from '../../../math/shapes/Polygon'
 import { Vector2 } from '../../../math/Vector2'
@@ -50,23 +51,39 @@ describe('S0A', () => {
 		expect(type).toBe(SPacketsType.S0A)
 
 		expect(view.getUint8(9)).toBe(4)
-		const s1 = new Segment(new Vector2(view.getFloat64(10, true), view.getFloat64(18, true)), new Vector2(view.getFloat64(26, true), view.getFloat64(34, true)))
-		const s2 = new Segment(new Vector2(view.getFloat64(42, true), view.getFloat64(50, true)), new Vector2(view.getFloat64(58, true), view.getFloat64(66, true)))
-		const s3 = new Segment(new Vector2(view.getFloat64(74, true), view.getFloat64(82, true)), new Vector2(view.getFloat64(90, true), view.getFloat64(98, true)))
-		const s4 = new Segment(new Vector2(view.getFloat64(106, true), view.getFloat64(114, true)), new Vector2(view.getFloat64(122, true), view.getFloat64(130, true)))
+		const s1 = new Segment(
+			new Vector2(view.getFloat64(10, true), view.getFloat64(18, true)),
+			new Vector2(view.getFloat64(26, true), view.getFloat64(34, true))
+		)
+		const s2 = new Segment(
+			new Vector2(view.getFloat64(42, true), view.getFloat64(50, true)),
+			new Vector2(view.getFloat64(58, true), view.getFloat64(66, true))
+		)
+		const s3 = new Segment(
+			new Vector2(view.getFloat64(74, true), view.getFloat64(82, true)),
+			new Vector2(view.getFloat64(90, true), view.getFloat64(98, true))
+		)
+		const s4 = new Segment(
+			new Vector2(view.getFloat64(106, true), view.getFloat64(114, true)),
+			new Vector2(view.getFloat64(122, true), view.getFloat64(130, true))
+		)
 
 		const eqSeg = (a: Segment, b: Segment) => {
-			const a1 = a.getP1(), a2 = a.getP2()
-			const b1 = b.getP1(), b2 = b.getP2()
-			return (a1.equals(b1) && a2.equals(b2)) || (a1.equals(b2) && a2.equals(b1))
+			const a1 = a.getP1(),
+				a2 = a.getP2()
+			const b1 = b.getP1(),
+				b2 = b.getP2()
+			return (
+				(a1.equals(b1) && a2.equals(b2)) || (a1.equals(b2) && a2.equals(b1))
+			)
 		}
 
 		const borders = S0A.getBorders()
 
-		expect(borders.some(b => eqSeg(b, s1))).toBe(true)
-		expect(borders.some(b => eqSeg(b, s2))).toBe(true)
-		expect(borders.some(b => eqSeg(b, s3))).toBe(true)
-		expect(borders.some(b => eqSeg(b, s4))).toBe(true)
+		expect(borders.some((b) => eqSeg(b, s1))).toBe(true)
+		expect(borders.some((b) => eqSeg(b, s2))).toBe(true)
+		expect(borders.some((b) => eqSeg(b, s3))).toBe(true)
+		expect(borders.some((b) => eqSeg(b, s4))).toBe(true)
 		// todo test pads and ball
 	})
 	test('serialize + deserialize', () => {
@@ -91,11 +108,59 @@ describe('S0A', () => {
 		})
 		const ball = p.getBall() as PongBall
 		expect(ball.getPos().equals(S0A.getBall().getPos())).toBe(true)
-		expect(ball.getObj().getOrigin().equals(S0A.getBall().getObj().getOrigin())).toBe(true)
+		expect(
+			ball.getObj().getOrigin().equals(S0A.getBall().getObj().getOrigin())
+		).toBe(true)
 		expect(ball.velo.equals(S0A.getBall().velo)).toBe(true)
-		expect(typeof ball.getObj().getHitbox()[0] === typeof S0A.getBall().getObj().getHitbox()[0]).toBe(true)
+		expect(
+			typeof ball.getObj().getHitbox()[0] ===
+				typeof S0A.getBall().getObj().getHitbox()[0]
+		).toBe(true)
 		expect(ball.getObj().getHitbox()[0]).toBeInstanceOf(Circle)
 		expect(S0A.getBall().getObj().getHitbox()[0]).toBeInstanceOf(Circle)
-		expect((ball.getObj().getHitbox()[0] as Circle).getRad()).toBeCloseTo((S0A.getBall().getObj().getHitbox()[0] as Circle).getRad())
+		expect((ball.getObj().getHitbox()[0] as Circle).getRad()).toBeCloseTo(
+			(S0A.getBall().getObj().getHitbox()[0] as Circle).getRad()
+		)
+
+		expect(p.getPads()).toHaveLength(2)
+		expect(S0A.getPads()).toHaveLength(2)
+		const pad1: PongPad = p.getPads()[0]
+		const pad2: PongPad = p.getPads()[1]
+		expect(pad1.getPlayer()).toBeCloseTo(S0A.getPads()[0].getPlayer())
+		expect(pad2.getPlayer()).toBeCloseTo(S0A.getPads()[1].getPlayer())
+
+		p.getPads().forEach((pad, padI) => {
+			const origPad = S0A.getPads()[padI]
+
+			expect(
+				pad.getObjs().getOrigin().equals(origPad.getObjs().getOrigin())
+			).toBe(true)
+
+			const hitboxes = pad.getObjs().getHitbox()
+			const origHitboxes = origPad.getObjs().getHitbox()
+			expect(hitboxes).toHaveLength(origHitboxes.length)
+
+			hitboxes.forEach((hb: AShape, i: number) => {
+				const origHb = origHitboxes[i]
+				expect(hb.getOrigin().equals(origHb.getOrigin())).toBe(true)
+
+				if (origHb instanceof Circle) {
+					expect(hb).toBeInstanceOf(Circle)
+					expect((hb as Circle).getRad()).toBeCloseTo(
+						(origHb as Circle).getRad()
+					)
+				} else if (origHb instanceof Polygon) {
+					// type et segments du polygone
+					expect(hb).toBeInstanceOf(Polygon)
+					const segs = (hb as Polygon).getSegment()
+					const origSegs = origHb.getSegment()
+					expect(segs).toHaveLength(origSegs.length)
+					segs.forEach((seg: Segment, j: number) => {
+						expect(seg.getP1().equals(origSegs[j].getP1())).toBe(true)
+						expect(seg.getP2().equals(origSegs[j].getP2())).toBe(true)
+					})
+				}
+			})
+		})
 	})
 })
