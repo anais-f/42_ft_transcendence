@@ -9,8 +9,6 @@ services:
       - backend
     volumes:
       - avatars:/usr/share/nginx/html/avatars:ro
-    secrets:
-      - admin_token
     depends_on:
       frontend:
         condition: service_healthy
@@ -106,9 +104,6 @@ services:
       - db_auth_data:/data
     env_file:
       - .env.test
-    secrets:
-      - login_admin
-      - password_admin
     healthcheck:
       test:
         - CMD-SHELL
@@ -182,13 +177,7 @@ volumes:
 secrets:
   discord_webhook:
     file: ./.secret/discord_webhook.txt
-  admin_token:
-    file: ./.secret/admin_token.txt
   google_client_id:
     file: ./.secret/google_client_id.txt
   google_client_secret:
     file: ./.secret/google_client_secret.txt
-  login_admin:
-    file: ./.secret/login_admin.txt
-  password_admin:
-    file: ./.secret/password_admin.txt
