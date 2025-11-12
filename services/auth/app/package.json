@@ -10,9 +10,9 @@
 		"dev": "tsx watch index.ts"
 	},
 	"dependencies": {
+		"@ft_transcendence/common": "*",
 		"argon2": "^0.40.0",
-		"jsonwebtoken": "^9.0.2",
-		"@ft_transcendence/common": "*"
+		"jsonwebtoken": "^9.0.2"
 	},
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.10",

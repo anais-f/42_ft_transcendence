@@ -1,0 +1,5 @@
+counter nginx_http_requests_total by method, route, code
+
+/^[^ ]+ - - \[[^\]]+\] "([A-Z]+) ([^? ]+)[^ ]* HTTP\/[^"]+" ([0-9]{3}) / {
+  nginx_http_requests_total[$1][$2][$3]++
+}
