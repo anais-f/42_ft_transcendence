@@ -214,7 +214,7 @@ export class Segment {
 		// 32o
 		const merged = new Uint8Array(32)
 		merged.set(new Uint8Array(this.getP1().serialize()), 0)
-		merged.set(new Uint8Array(this.getP2().serialize()), 8)
+		merged.set(new Uint8Array(this.getP2().serialize()), 16)
 		return merged.buffer
 	}
 }
