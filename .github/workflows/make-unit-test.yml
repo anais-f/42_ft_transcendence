@@ -6,23 +6,59 @@ on:
 jobs:
   unit_tests:
     name: Unit Tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run unit tests via Makefile
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Create .env from GitHub Secrets
         run: |
-          # Install npm for test
-          if make install; then
-            echo "Npm installed succesfully."
-          else
-            echo "Npm installed failed."
-            exit 1
-          fi
-          # Run unit tests via Makefile
-          if make test; then
-            echo "All unit tests passed successfully."
-          else
-            echo "Unit tests failed. Please fix the failing tests before merging."
-            exit 1
-          fi
+          cat > .env <<EOF
+          PORT=3000
+
+          # Users service
+          USERS_API_SECRET=test
+          USERS_SERVICE_URL=http://users:3000
+          USERS_DB_PATH=/data/db-users.sqlite
+
+          # Auth service
+          AUTH_API_SECRET=test
+          AUTH_SERVICE_URL=http://auth:3000
+          AUTH_DB_PATH=/data/db-auth.sqlite
+
+          # 2FA service
+          TWOFA_API_SECRET=test
+          TWOFA_SERVICE_URL=http://2fa:3000
+          TWOFA_DB_PATH=/data/db-2fa.sqlite
+
+          # Admin credentials (seed)
+          LOGIN_ADMIN=admin
+          PASSWORD_ADMIN=admin1234
+
+          # Monitoring / other
+          ADMIN_TOKEN=test
+          DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
+
+          # Google OAuth (optional)
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+          # DTO / OpenAPI
+          DTO_OPENAPI_FILE=/app/packages/common/openapiDTO.json
+
+          # JWT
+          JWT_SECRET=test
+          EOF
+
+      - name: Install dependencies
+        run: |
+          make install
+
+      - name: Run unit tests
+        run: |
+          make test

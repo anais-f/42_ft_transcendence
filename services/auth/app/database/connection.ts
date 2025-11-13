@@ -5,7 +5,7 @@ let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		db = new BetterSqlite3('db-auth.sqlite')
+		db = new BetterSqlite3(process.env.AUTH_DB_PATH)
 	}
 	return db
 }
@@ -14,9 +14,11 @@ export function runMigrations() {
 	const db = getDb()
 	db.exec(`
     CREATE TABLE IF NOT EXISTS users (
-      id_user INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      login TEXT UNIQUE NOT NULL,
+      password TEXT,
+	  google_id TEXT UNIQUE,
+	  is_admin BOOLEAN DEFAULT FALSE
     );
   `)
 }

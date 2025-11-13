@@ -1,0 +1,45 @@
+services:
+  install-dependencies:
+    container_name: install-dependencies
+    build:
+      context: .
+      dockerfile: .dev/Dockerfile.install
+    volumes:
+      - ./:/app
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile.dev
+    volumes:
+      - ./:/app
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+  users:
+    build:
+      context: .
+      dockerfile: services/users/Dockerfile.dev
+    volumes:
+      - ./:/app
+      - avatars_data:/app/avatars
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+  auth_google:
+    build:
+      context: .
+      dockerfile: services/auth_google/Dockerfile.dev
+    volumes:
+      - ./:/app
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully

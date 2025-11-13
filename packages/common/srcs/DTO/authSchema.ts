@@ -1,16 +1,26 @@
 import { z } from 'zod'
-import { UsernameSchema } from './usersSchema.js'
+import { RegisterLoginSchema } from './usersSchema.js'
 
 export const RegisterSchema = z
 	.object({
-		username: UsernameSchema,
+		login: RegisterLoginSchema,
 		password: z.string().min(8).max(128)
 	})
 	.strict()
 
-export const LoginSchema = z
+export const LoginActionSchema = z
 	.object({
-		username: UsernameSchema,
+		login: RegisterLoginSchema,
 		password: z.string().min(8).max(128)
 	})
 	.strict()
+
+export const RegisterGoogleSchema = z
+	.object({
+		google_id: z.string().min(1)
+	})
+	.strict()
+
+export type RegisterDTO = z.infer<typeof RegisterSchema>
+export type LoginActionDTO = z.infer<typeof LoginActionSchema>
+export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>

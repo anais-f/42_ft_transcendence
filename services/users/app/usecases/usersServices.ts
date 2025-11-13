@@ -2,121 +2,72 @@ import { UsersRepository } from '../repositories/usersRepository.js'
 import { AuthApi } from './AuthApi.js'
 import {
 	IUserId,
-	IUserUA,
-	IFullUser,
-	IUserStatus,
-	IUserConnection,
-	IUserAvatar,
 	AppError,
+	PublicUserAuthDTO,
+	UserPublicProfileDTO,
+	UserPrivateProfileDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 
 export class UsersServices {
-	/**
-	 * @description Create a new user if not exists when receiving an event from Auth service
-	 * @param newUser
-	 * @throws Error if user already exists
-	 * @returns void
-	 */
-	static async createUser(newUser: IUserId): Promise<void> {
-		if (UsersRepository.existsById({ id_user: newUser.id_user }))
+	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
+		if (UsersRepository.existsById({ user_id: newUser.user_id }))
 			throw new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
 
-		await UsersRepository.insertUser({ id_user: newUser.id_user })
-		console.log(`User ${newUser.id_user} created`)
+		await UsersRepository.insertUser({
+			user_id: newUser.user_id,
+			login: newUser.login
+		})
+		console.log(`User ${newUser.user_id} ${newUser.login} created`)
 	}
 
-	/**
-	 * @description Sync all users from Auth service to local database
-	 * @returns void
-	 */
 	static async syncAllUsersFromAuth(): Promise<void> {
 		const authUsers = await AuthApi.getAllUsers()
 
 		for (const authUser of authUsers) {
-			if (!UsersRepository.existsById({ id_user: authUser.id_user }))
-				UsersRepository.insertUser({ id_user: authUser.id_user })
+			if (!UsersRepository.existsById({ user_id: authUser.user_id }))
+				await UsersRepository.insertUser({
+					user_id: authUser.user_id,
+					login: authUser.login
+				})
 		}
 	}
 
-	/**
-	 * @description Get user profile by id with enrichissement from Auth service
-	 * @returns UserProfileDTO
-	 * @throws Error if user not found
-	 * @param user userId
-	 */
-	static async getUserProfile(user: IUserId): Promise<IFullUser> {
-		if (!user?.id_user || user.id_user <= 0)
+	static async getPublicUserProfile(
+		user: IUserId
+	): Promise<UserPublicProfileDTO> {
+		if (!user?.user_id || user.user_id <= 0)
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-		const localUser = UsersRepository.getUserById({ id_user: user.id_user })
+		const localUser = await UsersRepository.getUserById({
+			user_id: user.user_id
+		})
 		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 
-		const username = await AuthApi.getUsernameById({ id_user: user.id_user })
 		return {
-			id_user: localUser.id_user,
-			username,
+			user_id: localUser.user_id,
+			username: localUser.username,
 			avatar: localUser.avatar,
-			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
-}
 
-/*
-  Wrapper of UsersRepository
-  Can add business usecases if needed
-*/
-export class UsersServicesRequests {
-	static existsById(user: IUserId): boolean {
-		return UsersRepository.existsById(user)
-	}
+	static async getPrivateUserProfile(user: {
+		user_id: number
+	}): Promise<UserPrivateProfileDTO> {
+		if (!user.user_id || user.user_id <= 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-	// INSERT methods
-	static insertUser(user: IUserId): void {
-		UsersRepository.insertUser(user)
-	}
+		const localUser = await UsersRepository.getUserById({
+			user_id: user.user_id
+		})
+		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 
-	// SET / UPDATE methods
-	static updateUserStatus(user: IUserStatus): void {
-		UsersRepository.updateUserStatus(user)
-	}
-
-	static updateLastConnection(user: IUserConnection): void {
-		UsersRepository.updateLastConnection(user)
-	}
-
-	static setUserAvatar(user: IUserAvatar): void {
-		UsersRepository.updateUserAvatar(user)
-	}
-
-	// GET methods
-	static getUserById(user: IUserId): IUserUA | undefined {
-		return UsersRepository.getUserById(user)
-	}
-
-	static getAllUsers(): IUserUA[] {
-		return UsersRepository.getAllUsers()
-	}
-
-	static getOnlineUsers(): IUserUA[] {
-		return UsersRepository.getOnlineUsers()
-	}
-
-	static getStatusById(user: IUserId): number {
-		return UsersRepository.getStatusById(user)
-	}
-
-	static getAvatarById(user: IUserId): string {
-		return UsersRepository.getAvatarById(user)
-	}
-
-	static getLastConnectionById(user: IUserId): string {
-		return UsersRepository.getLastConnectionById(user)
-	}
-
-	// DELETE methods
-	static deleteUserById(user: IUserId): void {
-		UsersRepository.deleteUserById(user)
+		return {
+			user_id: localUser.user_id,
+			username: localUser.username,
+			avatar: localUser.avatar,
+			last_connection: localUser.last_connection
+		}
 	}
 }

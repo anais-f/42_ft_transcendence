@@ -1,20 +1,41 @@
 import {
 	createUser,
-	findUserByUsername
+	findUserByLogin,
+	createAdminUser,
+	createGoogleUser
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
 
-export async function registerUser(username: string, password: string) {
+export async function registerAdminUser(login: string, password: string) {
 	const hashed = await hashPassword(password)
-	await createUser(username, hashed)
+	createAdminUser(login, hashed)
 	return { success: true }
 }
 
-export async function loginUser(username: string, password: string) {
-	const user = await findUserByUsername(username)
-	if (!user) return null
+export async function registerUser(login: string, password: string) {
+	const hashed = await hashPassword(password)
+	createUser(login, hashed)
+	return { success: true }
+}
+
+export async function loginUser(login: string, password: string) {
+	if (!password) return null
+	const user = findUserByLogin(login)
+	if (!user || !user.password) return null
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
-	return { token: signToken({ userId: user.id_user, username: user.username }) }
+	const isAdmin = Boolean(user.is_admin)
+	return {
+		token: signToken({
+			user_id: user.user_id,
+			login: user.login,
+			is_admin: isAdmin
+		})
+	}
+}
+
+export async function registerGoogleUser(google_id: string) {
+	createGoogleUser(google_id)
+	return { success: true }
 }

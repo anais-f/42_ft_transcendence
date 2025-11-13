@@ -1,13 +1,17 @@
 import { db } from '../database/usersDatabase.js'
 import {
 	IUserId,
-	IUserStatus,
+	IUsernameId,
+	IUsername,
 	IUserConnection,
 	IUserAvatar,
-	IUserUA
+	IPrivateUser,
+	IPublicUserAuth,
+	UserPublicProfileDTO,
+	ERROR_MESSAGES,
+	AppError
 } from '@ft_transcendence/common'
 
-// const defaultAvatar: string = '../img.png' // default avatar path
 const defaultAvatar: string = '/avatars/img_default.png'
 
 /**
@@ -21,9 +25,40 @@ export class UsersRepository {
 	 * @returns A Result indicating whether the user exists or an error occurred
 	 */
 	static existsById(user: IUserId): boolean {
-		const selectStmt = db.prepare('SELECT 1 FROM users WHERE id_user = ?')
-		const row = selectStmt.get(user.id_user)
+		const selectStmt = db.prepare('SELECT 1 FROM users WHERE user_id = ?')
+		const row = selectStmt.get(user.user_id)
 		return !!row
+	}
+
+	static existsByUsername(username: IUsername): boolean {
+		const selectStmt = db.prepare('SELECT 1 FROM users WHERE username = ?')
+		const row = selectStmt.get(username.username)
+		return !!row
+	}
+
+	/**
+	 * @description Generate a unique username by incrementing if necessary
+	 * @param baseUsername - The base username (login) to check
+	 * @returns A unique username
+	 */
+	private static generateUniqueUsername(baseUsername: string): string {
+		if (!this.existsByUsername({ username: baseUsername })) {
+			return baseUsername
+		}
+
+		let counter = 1
+		let candidateUsername = `${baseUsername}${counter}`
+
+		while (this.existsByUsername({ username: candidateUsername })) {
+			counter++
+			candidateUsername = `${baseUsername}${counter}`
+
+			if (counter > 10000) {
+				throw new AppError('Unable to generate unique username', 500)
+			}
+		}
+
+		return candidateUsername
 	}
 
 	/**
@@ -31,104 +66,101 @@ export class UsersRepository {
 	 * @param user - The id of the user to insert
 	 * @returns A Result indicating success or an error occurred
 	 */
-	static insertUser(user: IUserId): void {
+	static insertUser(user: IPublicUserAuth): void {
+		const uniqueUsername = this.generateUniqueUsername(user.login)
+
 		const insertStmt = db.prepare(
-			'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
+			'INSERT OR IGNORE INTO users (user_id, username, avatar, last_connection) VALUES (?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.id_user, defaultAvatar, 1, now)
+		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, now)
 	}
 
 	/**
-	 * @description Update methods for user status, last connection or avatar
+	 * @description Update methods for last connection or avatars
 	 */
-	static updateUserStatus(user: IUserStatus): void {
-		const updateStmt = db.prepare(
-			'UPDATE users SET status = ? WHERE id_user = ?'
-		)
-		updateStmt.run(user.status, user.id_user)
-	}
 
 	static updateLastConnection(user: IUserConnection): void {
 		const updateStmt = db.prepare(
-			'UPDATE users SET last_connection = ? WHERE id_user = ?'
+			'UPDATE users SET last_connection = ? WHERE user_id = ?'
 		)
 		const now = new Date().toISOString()
-		updateStmt.run(now, user.id_user)
+		updateStmt.run(now, user.user_id)
 	}
 
 	static updateUserAvatar(user: IUserAvatar): void {
 		const updateStmt = db.prepare(
-			'UPDATE users SET avatar = ? WHERE id_user = ?'
+			'UPDATE users SET avatar = ? WHERE user_id = ?'
 		)
-		updateStmt.run(user.avatar, user.id_user)
+		updateStmt.run(user.avatar, user.user_id)
+	}
+
+	static updateUsername(user: IUsernameId): void {
+		try {
+			const updateStmt = db.prepare(
+				'UPDATE users SET username = ? WHERE user_id = ?'
+			)
+			const info = updateStmt.run(user.username, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		} catch (error: any) {
+			if (
+				error?.code === 'SQLITE_CONSTRAINT' ||
+				error?.message?.includes('UNIQUE constraint failed')
+			) {
+				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
+			}
+			throw error
+		}
 	}
 
 	/**
 	 * @description Some get methods according to the table fields
 	 */
-	static getUserById(user: IUserId): IUserUA | undefined {
+	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
-			'SELECT id_user, avatar, status, last_connection FROM users WHERE id_user = ?'
+			'SELECT user_id, username, avatar, last_connection FROM users WHERE user_id = ?'
 		)
-		return selectStmt.get(user.id_user) as IUserUA | undefined
+		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
-	static getStatusById(user: IUserId): number {
-		const selectStmt = db.prepare('SELECT status FROM users WHERE id_user = ?')
-		const row = selectStmt.get(user.id_user) as { status: number }
-		return row.status
+	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
+		const selectStmt = db.prepare(
+			'SELECT user_id, username, avatar, last_connection FROM users WHERE username = ?'
+		)
+		return selectStmt.get(username) as IPrivateUser | undefined
 	}
 
 	static getLastConnectionById(user: IUserId): string {
 		const selectStmt = db.prepare(
-			'SELECT last_connection FROM users WHERE id_user = ?'
+			'SELECT last_connection FROM users WHERE user_id = ?'
 		)
-		const row = selectStmt.get(user.id_user) as { last_connection: string }
+		const row = selectStmt.get(user.user_id) as { last_connection: string }
 		return row.last_connection
 	}
 
 	static getAvatarById(user: IUserId): string {
-		const selectStmt = db.prepare('SELECT avatar FROM users WHERE id_user = ?')
-		const row = selectStmt.get(user.id_user) as { avatar: string }
+		const selectStmt = db.prepare('SELECT avatar FROM users WHERE user_id = ?')
+		const row = selectStmt.get(user.user_id) as { avatar: string }
 		return row.avatar
 	}
 
 	/**
 	 * @description Get all users or users according to their status
 	 */
-	static getAllUsers(): IUserUA[] {
+	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
-			'SELECT id_user, avatar, status, last_connection FROM users'
+			'SELECT user_id, username, avatar, last_connection FROM users'
 		)
-		return selectStmt.all() as IUserUA[]
-	}
-
-	static getOnlineUsers(): IUserUA[] {
-		const selectStmt = db.prepare(
-			'SELECT id_user, avatar, status, last_connection FROM users WHERE status = 1'
-		)
-		return selectStmt.all() as IUserUA[]
+		return selectStmt.all() as IPrivateUser[]
 	}
 
 	/**
 	 * @description Delete user by id
 	 */
 	static deleteUserById(user: IUserId): void {
-		const deleteStmt = db.prepare('DELETE FROM users WHERE id_user = ?')
-		deleteStmt.run(user.id_user)
+		const deleteStmt = db.prepare('DELETE FROM users WHERE user_id = ?')
+		deleteStmt.run(user.user_id)
 	}
 }
-
-// static insertManyUsers(users: UserId[]) {
-//   const insertStmt = db.prepare(
-//       'INSERT OR IGNORE INTO users (id_user, avatar, status, last_connection) VALUES (?, ?, ?, ?)'
-//   )
-//   const now = new Date().toISOString()
-//   const insertMany = db.transaction((usersList: UserId[]) => {
-//     for (const user of usersList) {
-//       insertStmt.run(user.id_user, defaultAvatar, 1, now)
-//     }
-//   })
-//   insertMany(users)
-// }

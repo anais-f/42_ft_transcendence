@@ -7,7 +7,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY packages/pong-shared/package.json ./packages/pong-shared/
 
-RUN npm install
+RUN apk add --no-cache python3 make g++ && npm install
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -22,7 +22,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY services/pong-server/app/package.json ./services/pong-server/app/
 COPY packages/pong-shared/package.json ./packages/pong-shared/
-RUN npm install
+RUN apk add --no-cache python3 make g++ && npm install
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -38,8 +38,12 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY --from=build-app /build/services/pong-server/app/dist ./dist
+COPY --from=build-app /build/services/pong-server/app/dist/ ./dist
 COPY --from=build-app /build/services/pong-server/app/package.json ./
-COPY --from=build-app /build/node_modules ./node_modules
+COPY --from=build-app /build/node_modules/ ./node_modules
 
+# todo dist things
+COPY --from=build-app /build/packages/pong-shared/ ./packages/pong-shared/
+
+#CMD ["tail", "-f", "/dev/urandom"]
 CMD ["node", "dist/index.js"]

@@ -1,11 +1,10 @@
-import { PhysicsEngine } from './physics-engine'
+import { PhysicsEngine } from './physics-engine.js'
 
-class TPS_MANAGER {
-	public TPS: number
+export class TPS_MANAGER {
 	public TPS_INTERVAL_MS: number
 	public previousTime_MS: number = 0
 
-	constructor(TPS: number) {
+	constructor(public TPS: number) {
 		this.TPS = TPS
 		this.TPS_INTERVAL_MS = 1000 / TPS
 	}
@@ -15,16 +14,18 @@ export enum GameState {
 	Paused,
 	Started
 }
+
 export class GameEngine {
 	private isClientSide: boolean
 	private offset: number = 0
-	private physicsEngine: PhysicsEngine
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
 
-	constructor(physicsEngine: PhysicsEngine, TPS: number) {
-		this.physicsEngine = physicsEngine
+	constructor(
+		private physicsEngine: PhysicsEngine,
+		TPS: number
+	) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
 		this.isClientSide =
 			typeof performance !== 'undefined' &&
@@ -91,5 +92,9 @@ export class GameEngine {
 		intervalMs: number
 	): ReturnType<typeof setInterval> {
 		return setInterval(() => fn(this.getTimeMs()), intervalMs)
+	}
+
+	public getState(): GameState {
+		return this.currentState
 	}
 }

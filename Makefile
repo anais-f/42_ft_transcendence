@@ -1,14 +1,22 @@
 NAME := ft_transcendence
 DOCKER_COMPOSE_FILE := ./docker-compose.yaml
+DOCKER_COMPOSE_FILE_DEV := ./docker-compose.override.yaml
+DOCKER_COMPOSE_FILE_TEST := ./docker-compose.test.yaml
 .DEFAULT_GOAL = up
+SERVICES := $(shell docker compose -f $(DOCKER_COMPOSE_FILE) config --services)
+COMPOSE := docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE)
 
 .PHONY: install
 install:
+	./hooks/install-hooks.sh
+	./scripts/setup-node.sh
 	npm install
 
 .PHONY: test
-test:
-	npm test
+test: down build
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: build
 build:
@@ -18,9 +26,14 @@ build:
 up:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
+.PHONY: debug
+debug:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
+
 .PHONY: down
 down:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
+	docker volume rm ft_transcendence_nginx_logs || true
 
 .PHONY: sh-%
 sh-%:
@@ -38,17 +51,12 @@ format:
 format-check:
 	npm run format:check
 
-.PHONY: setup
-setup:
-	./hooks/install-hooks.sh
-	@bash -lc ' \
-	  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; \
-	  NVM_DIR="$${HOME}/.nvm"; \
-	  if [ -s "$$NVM_DIR/nvm.sh" ]; then \
-	    . "$$NVM_DIR/nvm.sh"; \
-	  fi; \
-	  nvm install 22.20.0; \
-	  nvm use 22.20.0; \
-	  nvm alias default 22.20.0; \
-	  npm install -g ts-node; \
-	'
+.PHONY: dev-build
+dev-build:
+	rm -rf node_modules packages/*/node_modules services/*/app/node_modules
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
+
+.PHONY: dev-up
+dev-up:
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
+	

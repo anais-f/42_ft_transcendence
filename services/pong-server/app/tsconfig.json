@@ -2,8 +2,9 @@
 	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "dist",
-		"rootDir": "."
+		"rootDir": ".",
+		"moduleResolution": "nodenext"
 	},
 	"references": [{ "path": "../../../packages/pong-shared" }],
-	"include": ["index.ts"]
+	"include": ["./**/*"]
 }
