@@ -157,7 +157,10 @@ export class packetBuilder {
 					offset += 8
 					const ballVelo = new Vector2(vx, vy)
 
-					const ball = new PongBall((ballObj.getHitbox()[0] as Circle).getRad(), ballVelo)
+					const ball = new PongBall(
+						(ballObj.getHitbox()[0] as Circle).getRad(),
+						ballVelo
+					)
 
 					return new S0ASync(seg, [pad1, pad2], ball, time)
 				}
