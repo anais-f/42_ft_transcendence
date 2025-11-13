@@ -7,12 +7,10 @@ export enum PadDirection {
 }
 
 export class PongPad {
-	private player: number
-	private obj: PongObject
-	public constructor(player: number, obj: PongObject) {
-		this.player = player
-		this.obj = obj
-	}
+	public constructor(
+		private player: number,
+		private obj: PongObject
+	) {}
 
 	public getPlayer(): number {
 		return this.player
@@ -23,7 +21,7 @@ export class PongPad {
 	}
 
 	public move(dir: PadDirection, incr: number, border: PongObject[]) {
-		const pos = this.obj.getOrigin()
+		const pos = this.obj.getOrigin().clone()
 		switch (dir) {
 			case PadDirection.Up:
 				this.obj.setOrigin(Vector2.add(pos, new Vector2(0, incr)))
