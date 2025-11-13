@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "node --experimental-vm-modules node_modules/.bin/jest",
-		"test:local": "dotenv -e .env.localtest -- node --experimental-vm-modules node_modules/.bin/jest",
+		"test:local": "dotenv -e .env.localtest -- node --experimental-vm-modules node_modules/.bin/jest --silent",
 		"test:pong": "npm run test:pong:shared && npm run test:pong:client && npm run test:pong:server",
 		"test:pong:shared": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-shared",
 		"test:pong:client": "node --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-client",
