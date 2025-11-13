@@ -124,12 +124,9 @@ describe('S0A', () => {
 
 		expect(p.getPads()).toHaveLength(2)
 		expect(S0A.getPads()).toHaveLength(2)
-		const pad1: PongPad = p.getPads()[0]
-		const pad2: PongPad = p.getPads()[1]
-		expect(pad1.getPlayer()).toBeCloseTo(S0A.getPads()[0].getPlayer())
-		expect(pad2.getPlayer()).toBeCloseTo(S0A.getPads()[1].getPlayer())
 
-		p.getPads().forEach((pad, padI) => {
+		p.getPads().forEach((pad: PongPad, padI: number) => {
+			expect(pad.getPlayer()).toBe(S0A.getPads()[padI].getPlayer())
 			const origPad = S0A.getPads()[padI]
 
 			expect(
@@ -150,7 +147,6 @@ describe('S0A', () => {
 						(origHb as Circle).getRad()
 					)
 				} else if (origHb instanceof Polygon) {
-					// type et segments du polygone
 					expect(hb).toBeInstanceOf(Polygon)
 					const segs = (hb as Polygon).getSegment()
 					const origSegs = origHb.getSegment()
