@@ -69,3 +69,6 @@ build-dev:
 up-dev:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
 	
+.PHONY: reset-db
+reset-db: down
+	cd ~/goinfre/docker/volumes && docker volume rm * ; cd -

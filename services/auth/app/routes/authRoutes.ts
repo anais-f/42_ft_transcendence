@@ -3,7 +3,8 @@ import {
 	registerController,
 	loginController,
 	registerGoogleController,
-	validateAdminController
+	validateAdminController,
+	logoutController
 } from '../controllers/authController.js'
 import {
 	RegisterSchema,
@@ -40,4 +41,5 @@ export async function authRoutes(app: FastifyInstance) {
 		registerGoogleController
 	)
 	app.get('/api/admin/validate', validateAdminController)
+	app.post('/api/logout', logoutController)
 }

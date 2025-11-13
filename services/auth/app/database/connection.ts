@@ -5,7 +5,13 @@ let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		db = new BetterSqlite3(process.env.AUTH_DB_PATH)
+		const path = process.env.AUTH_DB_PATH
+		if (!path) {
+			throw new Error(
+				'AUTH_DB_PATH environment variable is required to connect to the database'
+			)
+		}
+		db = new BetterSqlite3(path)
 	}
 	return db
 }

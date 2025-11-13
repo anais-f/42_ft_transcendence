@@ -25,7 +25,7 @@ services:
     volumes:
       - ./:/app
     environment:
-      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.jsonn
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:

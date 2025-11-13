@@ -1,0 +1,15 @@
+{
+  "name": "transcendence-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "http-server dist -p 3000 -c-1"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

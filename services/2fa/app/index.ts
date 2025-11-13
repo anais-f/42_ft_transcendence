@@ -67,17 +67,42 @@ app.post('/api/2fa/verify', async (req, reply) => {
 		if (!parsed.success)
 			return reply.code(400).send({ error: 'Invalid payload' })
 		const { user_id, twofa_code } = parsed.data
+
+		// 1) Try to finalize a pending setup (activation flow)
 		const pending = getPendingSecretEnc(user_id)
-		if (!pending) return reply.code(404).send({ error: 'No pending 2FA setup' })
-		if (pending.pending_until && Date.now() > pending.pending_until) {
-			deleteSecret(user_id)
-			return reply.code(410).send({ error: 'Setup expired' })
+		if (pending) {
+			if (pending.pending_until && Date.now() > pending.pending_until) {
+				deleteSecret(user_id)
+				return reply.code(410).send({ error: 'Setup expired' })
+			}
+			try {
+				const secret = decryptSecret(pending.secret_enc)
+				const ok = authenticator.check(twofa_code, secret)
+				if (!ok) return reply.code(401).send({ error: 'Invalid code' })
+				activateSecret(user_id)
+				return reply.code(200).send({ success: true, activated: true })
+			} catch (e: any) {
+				req.log.error(e)
+				return reply
+					.code(500)
+					.send({ error: '2FA secret decrypt failed - check TOTP_ENC_KEY' })
+			}
 		}
-		const secret = decryptSecret(pending.secret_enc)
-		const ok = authenticator.check(twofa_code, secret)
-		if (!ok) return reply.code(401).send({ error: 'Invalid code' })
-		activateSecret(user_id)
-		return reply.code(200).send({ success: true })
+
+		// 2) Otherwise, verify against the active secret (login flow)
+		const activeEnc = getSecretEnc(user_id)
+		if (!activeEnc) return reply.code(404).send({ error: 'No 2FA secret' })
+		try {
+			const activeSecret = decryptSecret(activeEnc)
+			const ok = authenticator.check(twofa_code, activeSecret)
+			if (!ok) return reply.code(401).send({ error: 'Invalid code' })
+			return reply.code(200).send({ success: true, activated: false })
+		} catch (e: any) {
+			req.log.error(e)
+			return reply
+				.code(500)
+				.send({ error: '2FA secret decrypt failed - check TOTP_ENC_KEY' })
+		}
 	} catch (e: any) {
 		req.log.error(e)
 		return reply.code(500).send({ error: 'Internal error' })

@@ -30,7 +30,8 @@
 		"services/auth/app",
 		"services/users/app",
 		"services/auth_google/app",
-		"services/2fa/app"
+		"services/2fa/app",
+		"services/frontend/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",

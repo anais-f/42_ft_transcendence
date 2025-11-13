@@ -45,7 +45,7 @@ export async function registerController(
 			},
 			body: JSON.stringify(PublicUser)
 		})
-		console.log('response', response)
+	console.log('response', response)
 
 		if (response.status === 401) {
 			deleteUserById(PublicUser.user_id)
@@ -57,7 +57,24 @@ export async function registerController(
 			return reply.code(400).send({ error: 'Synchronisation user db' })
 		}
 
-		return reply.send({ success: true })
+		// Auto-login on successful registration
+		const token = signToken(
+			{
+				user_id: PublicUser.user_id,
+				login: PublicUser.login,
+				is_admin: false,
+				type: 'auth'
+			},
+			'1h'
+		)
+		reply.setCookie('auth_token', token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 15
+		})
+		return reply.send({ success: true, token })
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			return reply.code(409).send({ error: 'Login already exists' })
@@ -199,5 +216,18 @@ export async function validateAdminController(
 		return reply.code(200).send({ success: true })
 	} catch (e) {
 		return reply.code(401).send({ success: false, error: 'Invalid token' })
+	}
+}
+
+export async function logoutController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	try {
+		reply.clearCookie('auth_token', { path: '/' })
+		reply.clearCookie('twofa_token', { path: '/' })
+		return reply.code(200).send({ success: true })
+	} catch (e) {
+		return reply.code(500).send({ success: false })
 	}
 }

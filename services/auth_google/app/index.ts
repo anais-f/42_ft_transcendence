@@ -102,9 +102,36 @@ fastify.get(
 					google_id: googleUser.id
 				})
 			})
-			const { token: myJWT, user } = await authResponse.json()
+			const body = await authResponse.json()
 
-			return reply.send({ token: myJWT, user })
+			// Build a frontend base URL from proxy headers if available
+			const proto = (request.headers['x-forwarded-proto'] as string) || 'http'
+			const host = (request.headers['x-forwarded-host'] as string) || (request.headers['host'] as string) || 'localhost:8080'
+			const derivedBase = `${proto}://${host}`
+			const frontendBase = process.env.FRONTEND_BASE_URL || derivedBase
+			if (body && body.token) {
+				// Directly authenticated
+				return reply.redirect(
+					`${frontendBase}/?token=${encodeURIComponent(body.token)}`
+				)
+			}
+			if (body && body.pre_2fa_token) {
+				// Pre-2FA flow required
+				return reply.redirect(
+					`${frontendBase}/?twofa=1&token=${encodeURIComponent(body.pre_2fa_token)}`
+				)
+			}
+			if (body && body.success) {
+				// Account created, ask user to login
+				return reply.redirect(`${frontendBase}/?registered=1`)
+			}
+
+			// Fallback: if we reached here without tokens but request succeeded, send to login
+			if (authResponse.ok) {
+				return reply.redirect(`${frontendBase}/#/login?registered=1`)
+			}
+			// Otherwise, return raw body for debugging
+			return reply.code(authResponse.status || 500).send(body)
 		} catch (error) {
 			fastify.log.error(error)
 			return reply.status(500).send({ error: 'OAuth2 authentication failed' })
@@ -121,7 +148,7 @@ const start = async () => {
 			port: parseInt(process.env.PORT as string),
 			host: '0.0.0.0'
 		})
-		fastify.log.info('Server listening on http://localhost:3000')
+		fastify.log.info(`Server listening on http://localhost:${process.env.PORT}`)
 	} catch (err) {
 		fastify.log.error(err)
 		process.exit(1)
