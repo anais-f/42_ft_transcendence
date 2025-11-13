@@ -6,8 +6,9 @@ RUN apk add --no-cache nginx
 RUN mkdir -p /usr/share/nginx/html/avatars
 
 COPY conf/default.conf /etc/nginx/http.d/default.conf
-COPY avatar/img_default.png /usr/share/nginx/html/avatars/img_default.png
+COPY avatars/img_default.png /usr/share/nginx/html/avatars/img_default.png
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \

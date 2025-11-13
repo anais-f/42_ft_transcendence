@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./",
-		"moduleResolution": "nodenext"
+		"moduleResolution": "nodenext",
+		"types": ["node", "@fastify/multipart"]
 	},
 	"references": [{ "path": "../../../packages/common" }],
 	"include": ["./**/*"],

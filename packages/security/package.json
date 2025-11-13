@@ -1,0 +1,30 @@
+{
+	"name": "@ft_transcendence/security",
+	"version": "0.0.1",
+	"description": "Shared validation code for backend",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"default": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./*": "./dist/*"
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.json",
+		"clean": "rimraf dist"
+	},
+	"devDependencies": {
+		"rimraf": "^5.0.0",
+		"typescript": "^5.1.6"
+	},
+	"dependencies": {
+		"@fastify/jwt": "^10.0.0"
+	}
+}

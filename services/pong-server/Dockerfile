@@ -7,7 +7,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY packages/pong-shared/package.json ./packages/pong-shared/
 
-RUN npm install
+RUN apk add --no-cache python3 make g++ && npm install
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -22,7 +22,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY services/pong-server/app/package.json ./services/pong-server/app/
 COPY packages/pong-shared/package.json ./packages/pong-shared/
-RUN npm install
+RUN apk add --no-cache python3 make g++ && npm install
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
