@@ -70,14 +70,14 @@ export class UsersRepository {
 		const uniqueUsername = this.generateUniqueUsername(user.login)
 
 		const insertStmt = db.prepare(
-			'INSERT OR IGNORE INTO users (user_id, username, avatar, last_connection) VALUES (?, ?, ?, ?)'
+			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, now)
+		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, 1, now)
 	}
 
 	/**
-	 * @description Update methods for last connection or avatars
+	 * @description Update methods for last connection, status, username or avatars
 	 */
 
 	static updateLastConnection(user: IUserConnection): void {
@@ -115,19 +115,26 @@ export class UsersRepository {
 		}
 	}
 
+  static updateUserStatus(user: IUserConnection, status: number): void {
+    const updateStmt = db.prepare(
+      'UPDATE users SET status = ? WHERE user_id = ?'
+    )
+    updateStmt.run(status, user.user_id)
+  }
+
 	/**
 	 * @description Some get methods according to the table fields
 	 */
 	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users WHERE user_id = ?'
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
 	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users WHERE username = ?'
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
 		)
 		return selectStmt.get(username) as IPrivateUser | undefined
 	}
@@ -151,7 +158,7 @@ export class UsersRepository {
 	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users'
+			'SELECT user_id, username, avatar, status, last_connection FROM users'
 		)
 		return selectStmt.all() as IPrivateUser[]
 	}

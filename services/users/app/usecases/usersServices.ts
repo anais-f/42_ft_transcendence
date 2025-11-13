@@ -48,6 +48,7 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
+			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
@@ -67,6 +68,7 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
+			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}

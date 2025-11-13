@@ -50,6 +50,7 @@ export const UserPublicProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
+		status: z.number().int().nonnegative(),
 		last_connection: z.string()
 	})
 	.meta({ description: 'Public user profile schema' })
@@ -59,6 +60,7 @@ export const UserPrivateProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
+		status: z.number().int().nonnegative(),
 		last_connection: z.string()
 	})
 	.strict()

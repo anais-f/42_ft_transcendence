@@ -303,6 +303,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			UsersServices.getPublicUserProfile.mockResolvedValueOnce(mockProfile)
@@ -366,6 +367,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			UsersServices.getPrivateUserProfile.mockResolvedValueOnce(mockProfile)
@@ -531,6 +533,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 99,
 				username: 'test',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			})
 			const jwtRoute = await app.inject({

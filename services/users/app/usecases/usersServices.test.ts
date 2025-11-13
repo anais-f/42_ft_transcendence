@@ -145,6 +145,7 @@ describe('UsersServices', () => {
 				user_id: 42,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2024-01-01T00:00:00.000Z'
 			}
 			UsersRepository.getUserById.mockReturnValueOnce(mockProfile)
@@ -154,6 +155,7 @@ describe('UsersServices', () => {
 			expect(result).toHaveProperty('user_id', 42)
 			expect(result).toHaveProperty('username', 'testuser')
 			expect(result).toHaveProperty('avatar')
+			expect(result).toHaveProperty('status', 1)
 			expect(result).toHaveProperty('last_connection')
 		})
 	})
