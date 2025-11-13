@@ -3,6 +3,7 @@ import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
+import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
 import { writeFileSync } from 'node:fs'
 import {
@@ -13,12 +14,22 @@ import {
 } from 'fastify-type-provider-zod'
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
+import metricPlugin from 'fastify-metrics'
+import {
+	httpRequestCounter,
+	responseTimeHistogram
+} from '@ft_transcendence/common'
 
+const SWAGGER_TITTLE = 'API for Users Service'
+const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 function createApp(): FastifyInstance {
-	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
+	const app = Fastify({
+		logger: true,
+		bodyLimit: 6 * 1024 * 1024
+	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
@@ -29,6 +40,20 @@ function createApp(): FastifyInstance {
 	app.register(fastifyJwt, {
 		secret: jwtSecret
 	})
+	app.register(fastifyMultipart, {
+		limits: {
+			fileSize: 5 * 1024 * 1024,
+			files: 1
+		}
+	})
+
+	app.addContentTypeParser(
+		/^image\/.*/,
+		{ parseAs: 'buffer' },
+		(request, payload: Buffer, done) => {
+			done(null, payload)
+		}
+	)
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
@@ -49,12 +74,6 @@ function createApp(): FastifyInstance {
 	return app
 }
 
-async function dumpOpenAPISchema(app: FastifyInstance): Promise<void> {
-	const openapiDoc = app.swagger()
-	writeFileSync('./openapi.json', JSON.stringify(openapiDoc, null, 2))
-	console.log('Documentation OpenAPI writen in openapi.json')
-}
-
 async function initializeUsers(): Promise<void> {
 	try {
 		console.log('Initializing users from auth service...')
@@ -68,9 +87,34 @@ async function initializeUsers(): Promise<void> {
 
 export async function start(): Promise<void> {
 	const app = createApp()
+	app.addHook('onRequest', (request, reply, done) => {
+		;(request as any).startTime = process.hrtime()
+		done()
+	})
+
+	app.addHook('onResponse', (request, reply) => {
+		httpRequestCounter.inc({
+			method: request.method,
+			route: request.url,
+			status_code: reply.statusCode
+		})
+		const startTime = (request as any).startTime
+		if (startTime) {
+			const diff = process.hrtime(startTime)
+			const responseTimeInSeconds = diff[0] + diff[1] / 1e9
+			responseTimeHistogram.observe(
+				{
+					method: request.method,
+					route: request.url,
+					status_code: reply.statusCode
+				},
+				responseTimeInSeconds
+			)
+		}
+	})
 	try {
+		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
-		await dumpOpenAPISchema(app)
 		await initializeUsers()
 		await app.listen({
 			port: parseInt(process.env.PORT as string),

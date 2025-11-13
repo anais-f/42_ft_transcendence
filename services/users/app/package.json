@@ -10,9 +10,13 @@
 		"dev": "tsx watch index.ts"
 	},
 	"dependencies": {
-		"@ft_transcendence/common": "*"
+		"@fastify/multipart": "^9.3.0",
+		"@ft_transcendence/common": "*",
+		"@ft_transcendence/security": "*",
+		"jsonwebtoken": "^9.0.2"
 	},
 	"devDependencies": {
-		"@types/node": "^24.9.1"
+		"@types/node": "^24.9.1",
+		"file-type": "^21.0.0"
 	}
 }

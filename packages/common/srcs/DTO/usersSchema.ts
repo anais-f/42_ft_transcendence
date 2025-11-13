@@ -1,18 +1,27 @@
 import { z } from 'zod'
 
-const LOGIN_REGEX = /^[\w-]{4,16}$/
-const USERNAME_REGEX = /^[\w-]{4,16}$/
+const LOGIN_REGEX = /^[\w-]{4,32}$/
+const USERNAME_REGEX = /^[\w-]{4,32}$/
+
+export const RegisterLoginSchema = z
+	.string()
+	.min(4)
+	.max(32)
+	.regex(LOGIN_REGEX, 'Invalid login format')
+	.refine((value) => !value.startsWith('google-'), {
+		message: 'Login cannot start with "google-"'
+	})
 
 export const LoginSchema = z
 	.string()
 	.min(4)
-	.max(16)
+	.max(32)
 	.regex(LOGIN_REGEX, 'Invalid login format')
 
 export const UsernameSchema = z
 	.string()
 	.min(4)
-	.max(16)
+	.max(32)
 	.regex(USERNAME_REGEX, 'Invalid username format')
 
 export const UserIdSchema = z
@@ -41,7 +50,6 @@ export const UserPublicProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
-		status: z.number(),
 		last_connection: z.string()
 	})
 	.meta({ description: 'Public user profile schema' })
@@ -51,7 +59,6 @@ export const UserPrivateProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
-		status: z.number(),
 		last_connection: z.string()
 	})
 	.strict()
@@ -63,6 +70,28 @@ export const UserPrivateProfileListSchema = z
 	})
 	.strict()
 	.meta({ description: 'List of private user profiles' })
+
+export const UserProfileUpdateUsernameSchema = z
+	.object({
+		username: UsernameSchema
+	})
+	.strict()
+	.meta({ description: 'Update username schema' })
+
+export const UserProfileUpdateAvatarSchema = z
+	.object({
+		avatar: z.string()
+	})
+	.strict()
+	.meta({ description: 'Update avatars schema' })
+
+export const UserProfileUpdateSchema = z
+	.object({
+		username: UsernameSchema.optional(),
+		avatar: z.string().optional()
+	})
+	.strict()
+	.meta({ description: 'Update private user profile schema' })
 
 // Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema

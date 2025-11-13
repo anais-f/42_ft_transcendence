@@ -15,12 +15,15 @@ export const ERROR_MESSAGES = {
 	INVALID_USER_ID: 'Invalid user ID',
 	UNAUTHORIZED: 'Unauthorized',
 	FORBIDDEN: 'Forbidden',
-	INVALID_TOKEN_USER: 'Invalid token user'
+	INVALID_TOKEN_USER: 'Invalid token user',
+	USERNAME_ALREADY_TAKEN: 'Username already taken',
+	MISSING_FILE: 'Missing file'
 } as const
 
 export const SUCCESS_MESSAGES = {
 	USER_CREATED: 'User created',
-	USER_UPDATED: 'User updated'
+	USER_UPDATED: 'User updated',
+	USER_DELETED: 'User deleted'
 } as const
 
 // export const ERRORS = {

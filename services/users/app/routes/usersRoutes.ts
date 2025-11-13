@@ -5,16 +5,20 @@ import {
 	getPrivateUser
 } from '../controllers/usersControllers.js'
 import {
+	updateUsername,
+	updateAvatar
+} from '../controllers/updateUsersControllers.js'
+import {
 	SuccessResponseSchema,
 	ErrorResponseSchema,
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
-	ERROR_MESSAGES
+	UserProfileUpdateUsernameSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { apiKeyMiddleware, jwtAuthMiddleware } from '../jwt.js'
+import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -72,5 +76,44 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			preHandler: jwtAuthMiddleware
 		},
 		getPrivateUser
+	)
+
+	// PATCH /api/users/me - Update private user profile (JWT protected - own profile only)
+	server.patch(
+		'/api/users/me',
+		{
+			schema: {
+				body: UserProfileUpdateUsernameSchema,
+				response: {
+					200: SuccessResponseSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
+					404: ErrorResponseSchema,
+					409: ErrorResponseSchema,
+					500: ErrorResponseSchema
+				}
+			},
+			preHandler: jwtAuthMiddleware
+		},
+		updateUsername
+	)
+
+	// PATCH /api/users/me/avatars - Update avatars (JWT protected)
+	server.patch(
+		'/api/users/me/avatar',
+		{
+			schema: {
+				consumes: ['multipart/form-data', 'image/jpeg', 'image/png'],
+				response: {
+					200: SuccessResponseSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
+					404: ErrorResponseSchema,
+					500: ErrorResponseSchema
+				}
+			},
+			preHandler: jwtAuthMiddleware
+		},
+		updateAvatar
 	)
 }

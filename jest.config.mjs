@@ -60,6 +60,25 @@ const config = {
 			rootDir: '<rootDir>/services/users/app',
 			testMatch: ['**/*.test.ts']
 		}
+		,
+		{
+			...commonConfig,
+			displayName: 'auth',
+			rootDir: '<rootDir>/services/auth/app',
+			testMatch: ['**/*.test.ts']
+		},
+		{
+			...commonConfig,
+			displayName: 'auth-google',
+			rootDir: '<rootDir>/services/auth_google/app',
+			testMatch: ['**/*.test.ts']
+		},
+		{
+			...commonConfig,
+			displayName: 'common-monitoring',
+			rootDir: '<rootDir>/packages/common/srcs/monitoring',
+			testMatch: ['**/*.test.ts']
+		}
 	]
 }
 
