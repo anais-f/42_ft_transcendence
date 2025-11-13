@@ -91,7 +91,7 @@ describe('S0A', () => {
 		const packet = packetBuilder.deserializeS(buff)
 
 		expect(packet?.time).toBeCloseTo(S0A.time)
-		console.log(packet)
+		//console.log(packet)
 		expect(packet).toBeInstanceOf(S0ASync)
 		const p = packet as S0ASync
 		const borders = p.getBorders()
