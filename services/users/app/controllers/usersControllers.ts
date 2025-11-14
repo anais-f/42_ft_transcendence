@@ -1,10 +1,12 @@
 import { UsersServices } from '../usecases/usersServices.js'
+import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
 	UserPrivateProfileSchema,
 	AppError,
+	UserProfileUpdateUsernameSchema,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
@@ -75,7 +77,14 @@ export async function getPrivateUser(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const userId = req.user?.user_id as number
+		const user = req.user as { user_id?: number } | undefined
+		const userId = Number(user?.user_id)
+		if (!userId || userId <= 0) {
+			void reply
+				.code(400)
+				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+			return
+		}
 
 		const rawProfile = await UsersServices.getPrivateUserProfile({
 			user_id: userId

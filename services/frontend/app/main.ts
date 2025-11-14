@@ -1,5 +1,8 @@
 type Json = Record<string, any>
 
+// Use explicit .js extension so the browser requests /ui.js (correct MIME) when modules are loaded from the server
+import { createGoogleButton, BUTTON_CLASSES, HEADLINE_CLASSES, SUBHEAD_CLASSES } from './ui.js'
+
 function getFt(): any {
   return (window as any).ftAuth
 }
@@ -13,15 +16,39 @@ function navigate(to: Route) {
 
 function landingView() {
   const el = document.createElement('div')
-  el.className = 'card rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm'
+  el.className = 'rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm'
   el.innerHTML = `
-    <h1 class="text-2xl font-semibold">Bienvenue 👋</h1>
-    <p class="muted text-sm text-gray-500 dark:text-neutral-400">Connectez-vous ou créez un compte pour continuer.</p>
-    <div class="actions mt-3">
-      <button id="btn-login" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Login</button>
-      <button id="btn-signup" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Sign up</button>
+    <div class="mb-4">
+      <div class="${SUBHEAD_CLASSES}">Le quotidien du Pong</div>
+      <h1 class="${HEADLINE_CLASSES}">Jouez maintenant, devenez une légende</h1>
+      <p class="text-sm text-gray-600 dark:text-neutral-400 mt-2">Matchs en direct, classements, avatars — tout ce qu'il faut pour la gloire.</p>
+    </div>
+    <div class="actions mt-2">
+      <button id="btn-login" class="${BUTTON_CLASSES}">Login</button>
+      <button id="btn-signup" class="${BUTTON_CLASSES}">Sign up</button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div class="md:col-span-2 rounded-lg border border-gray-200 dark:border-neutral-800 p-4">
+        <div class="${SUBHEAD_CLASSES} mb-2">Résultats récents</div>
+        <ul class="space-y-2 text-sm text-gray-700 dark:text-neutral-300">
+          <li class="flex justify-between"><span>Player A vs Player B</span><span>11–9</span></li>
+          <li class="flex justify-between"><span>Player C vs Player D</span><span>7–11</span></li>
+          <li class="flex justify-between"><span>Player E vs Player F</span><span>10–12</span></li>
+        </ul>
+      </div>
+      <div class="rounded-lg border border-gray-200 dark:border-neutral-800 p-4">
+        <div class="${SUBHEAD_CLASSES} mb-2">Classement</div>
+        <ol class="text-sm text-gray-700 dark:text-neutral-300 space-y-1 list-decimal list-inside">
+          <li>anaïs</li>
+          <li>mjuffard</li>
+          <li>guest</li>
+        </ol>
+      </div>
     </div>
   `
+  // append google button beside login/signup to reuse it for both actions
+  const actions = el.querySelector('.actions')
+  if (actions) actions.appendChild(createGoogleButton('btn-google-landing'))
   el.querySelector<HTMLButtonElement>('#btn-login')?.addEventListener('click', () => navigate('#/login'))
   el.querySelector<HTMLButtonElement>('#btn-signup')?.addEventListener('click', () => navigate('#/signup'))
   return el
@@ -38,7 +65,7 @@ function twofaView() {
       <input type="text" id="twofa" required minlength="6" maxlength="6" pattern="\\d{6}" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       <div class="actions mt-3">
         <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Vérifier</button>
-        <a href="#/" class="button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
+        <a href="#/" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
       </div>
     </form>
     <pre id="twofa-result" class="muted text-sm text-gray-500 dark:text-neutral-400"></pre>
@@ -51,7 +78,9 @@ function twofaView() {
     if (!ft) return
     const code = (el.querySelector('#twofa') as HTMLInputElement)?.value || ''
     out && (out.textContent = 'Vérification...')
-  const r = await ft.verify2faLogin(code)
+  // some frontends expose verify2faLogin, others expose verify2fa — support both
+  const verifyLogin = typeof ft.verify2faLogin === 'function' ? ft.verify2faLogin.bind(ft) : ft.verify2fa?.bind(ft)
+  const r = verifyLogin ? await verifyLogin(code) : { ok: false, status: 500, body: { error: 'Auth verify API missing' } }
     if (!r.ok) {
       out && (out.textContent = 'Erreur: ' + ((r.body && r.body.error) || r.status))
     } else {
@@ -66,8 +95,18 @@ function navbar(authenticated: boolean, login: string | null) {
   const bar = document.createElement('header')
   bar.className = 'flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-neutral-800'
   const left = document.createElement('div')
-  left.textContent = 'Transcendence'
-  left.className = 'text-lg font-semibold'
+  left.className = 'flex items-baseline gap-3'
+  const brand = document.createElement('div')
+  brand.textContent = 'Transcendence'
+  brand.className = 'font-serif text-2xl tracking-tight'
+  const date = document.createElement('div')
+  try {
+    const d = new Date()
+    const fmt = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    date.textContent = fmt
+  } catch { date.textContent = '' }
+  date.className = 'text-xs uppercase tracking-wide text-gray-500 dark:text-neutral-400'
+  left.append(brand, date)
   const right = document.createElement('div')
   right.className = 'flex items-center gap-3'
   if (authenticated) {
@@ -92,10 +131,10 @@ function navbar(authenticated: boolean, login: string | null) {
     })
     right.append(avatar, user, btn)
   } else {
-    const a = document.createElement('a')
-    a.href = '#/login'
-    a.className = 'button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700'
-    a.textContent = 'Login'
+  const a = document.createElement('a')
+  a.href = '#/login'
+  a.className = BUTTON_CLASSES
+  a.textContent = 'Login'
     right.appendChild(a)
   }
   bar.append(left, right)
@@ -114,20 +153,158 @@ async function loadUserProfileAndAvatar() {
     const userEl = document.getElementById('nav-username')
     const avatarEl = document.getElementById('nav-avatar') as HTMLImageElement | null
     if (userEl && username) userEl.textContent = username
-    if (avatarEl && avatar) avatarEl.src = avatar
+      if (avatarEl && avatar) {
+        avatarEl.src = avatar
+        avatarEl.style.cursor = 'pointer'
+        avatarEl.addEventListener('click', () => openAvatarModal(avatar))
+      }
   } catch {
     // ignore
   }
 }
+
+  function openAvatarModal(src: string) {
+    // prevent multiple modals
+    if (document.getElementById('avatar-modal')) return
+    const modal = document.createElement('div')
+    modal.id = 'avatar-modal'
+    modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50'
+    modal.style.padding = '20px'
+
+    const container = document.createElement('div')
+    container.className = 'bg-white dark:bg-neutral-900 rounded-lg p-4 max-w-xl w-full'
+
+    const img = document.createElement('img')
+    img.src = src
+    img.alt = 'Avatar large'
+    img.className = 'w-full h-auto rounded-md mb-3'
+    img.style.maxHeight = '80vh'
+    img.style.objectFit = 'contain'
+
+    const controls = document.createElement('div')
+    controls.className = 'flex items-center gap-3'
+
+    const uploadLabel = document.createElement('label')
+    uploadLabel.className = 'inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 cursor-pointer'
+    uploadLabel.textContent = 'Changer l\'avatar'
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.accept = 'image/*'
+    fileInput.style.display = 'none'
+    uploadLabel.appendChild(fileInput)
+
+    const closeBtn = document.createElement('button')
+    closeBtn.className = 'inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2'
+    closeBtn.textContent = 'Fermer'
+    closeBtn.addEventListener('click', () => closeAvatarModal())
+
+    controls.append(uploadLabel, closeBtn)
+    container.append(img, controls)
+    modal.appendChild(container)
+    document.body.appendChild(modal)
+
+    fileInput.addEventListener('change', async (ev) => {
+      const f = (ev.target as HTMLInputElement).files?.[0]
+      if (!f) return
+      await uploadAvatarFile(f)
+      // reload user profile/avatar
+      await loadUserProfileAndAvatar()
+      closeAvatarModal()
+    })
+  }
+
+  function closeAvatarModal() {
+    const modal = document.getElementById('avatar-modal')
+    if (modal) modal.remove()
+  }
+
+  function openDisable2faModal(msgEl?: HTMLElement | null) {
+    // prevent multiple modals
+    if (document.getElementById('disable-2fa-modal')) return
+    const modal = document.createElement('div')
+    modal.id = 'disable-2fa-modal'
+    modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50'
+    modal.style.padding = '20px'
+
+    const container = document.createElement('div')
+    container.className = 'bg-white dark:bg-neutral-900 rounded-lg p-4 max-w-md w-full'
+
+    const title = document.createElement('h3')
+    title.className = 'text-lg font-semibold mb-2'
+    title.textContent = 'Désactiver 2FA'
+
+    const desc = document.createElement('p')
+    desc.className = 'muted text-sm text-gray-500 dark:text-neutral-400 mb-3'
+    desc.textContent = "Entrez votre code 2FA pour confirmer la désactivation."
+
+    const form = document.createElement('form')
+    form.innerHTML = `
+      <label>Code 2FA</label>
+      <input type="text" id="disable-2fa-code" required minlength="6" maxlength="6" pattern="\\d{6}" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3" />
+      <div class="flex items-center gap-3">
+        <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Confirmer</button>
+        <button type="button" id="disable-2fa-cancel" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2">Annuler</button>
+      </div>`
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault()
+      const code = (form.querySelector('#disable-2fa-code') as HTMLInputElement)?.value || ''
+      if (msgEl) msgEl.textContent = 'Désactivation…'
+      const ft = getFt()
+      if (!ft) {
+        if (msgEl) msgEl.textContent = 'Module auth introuvable.'
+        return
+      }
+      const r = await ft.twofa.disable(code)
+      if (!r.ok) {
+        if (msgEl) msgEl.textContent = 'Erreur: ' + ((r.body && r.body.error) || r.status)
+      } else {
+        if (msgEl) msgEl.textContent = '2FA désactivée.'
+        closeDisable2faModal()
+        render()
+      }
+    })
+
+    container.append(title, desc, form)
+    modal.appendChild(container)
+    document.body.appendChild(modal)
+
+    const cancel = document.getElementById('disable-2fa-cancel')
+    cancel?.addEventListener('click', () => closeDisable2faModal())
+  }
+
+  function closeDisable2faModal() {
+    const modal = document.getElementById('disable-2fa-modal')
+    if (modal) modal.remove()
+  }
+
+  async function uploadAvatarFile(file: File) {
+    const ft = getFt()
+    if (!ft) return
+    const fd = new FormData()
+    fd.append('file', file, file.name)
+    try {
+      const res = await ft.fetch('/users/api/users/me/avatar', {
+        method: 'PATCH',
+        body: fd
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        alert('Erreur upload avatar: ' + ((json && json.error) || res.status))
+        return
+      }
+      // success
+    } catch (e: any) {
+      alert('Erreur upload avatar: ' + (e?.message || e))
+    }
+  }
 
 function loginView() {
   const el = document.createElement('div')
   el.className = 'card rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm'
   el.innerHTML = `
     <h1 class="text-2xl font-semibold">Login</h1>
-    <div class="actions mb-4">
-      <a id="btn-google-login" class="button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700" href="/auth-google/login/google">Continuer avec Google</a>
-    </div>
+    <div class="actions mb-4"></div>
     <div id="login-msg" class="muted text-sm text-gray-500 dark:text-neutral-400"></div>
     <form id="login-form">
       <label>Login</label>
@@ -136,7 +313,7 @@ function loginView() {
       <input type="password" id="password" required minlength="4" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       <div class="actions mt-3">
         <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Se connecter</button>
-        <a href="#/" class="button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
+        <a href="#/" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
       </div>
     </form>
     <pre id="login-result" class="muted text-sm text-gray-500 dark:text-neutral-400"></pre>
@@ -177,9 +354,7 @@ function signupView() {
   el.innerHTML = `
     <h1 class="text-2xl font-semibold">Créer un compte</h1>
     <p class="muted text-sm text-gray-500 dark:text-neutral-400">Choisissez une méthode d'inscription.</p>
-    <div class="actions mb-4">
-      <a id="btn-google" class="button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700" href="/auth-google/login/google">Continuer avec Google</a>
-    </div>
+    <div class="actions mb-4"></div>
     <form id="signup-form">
       <label>Login</label>
       <input type="text" id="s-login" required minlength="3" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -187,7 +362,7 @@ function signupView() {
       <input type="password" id="s-password" required minlength="4" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       <div class="actions mt-3">
         <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Créer mon compte</button>
-        <a href="#/" class="button inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
+        <a href="#/" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Annuler</a>
       </div>
     </form>
     <pre id="signup-result" class="muted text-sm text-gray-500 dark:text-neutral-400"></pre>
@@ -333,7 +508,9 @@ function render() {
             ev.preventDefault()
             const code = (form.querySelector('#code2') as HTMLInputElement)?.value || ''
             msgEl.textContent = 'Vérification…'
-            const vr = await ft.verify2faSetup(code)
+                        // support both naming conventions from different builds
+                        const verifySetup = typeof ft.verify2faSetup === 'function' ? ft.verify2faSetup.bind(ft) : ft.verify2fa?.bind(ft)
+                        const vr = verifySetup ? await verifySetup(code) : { ok: false, status: 500, body: { error: 'Auth verify API missing' } }
             if (!vr.ok) {
               msgEl.textContent = 'Erreur: ' + ((vr.body && vr.body.error) || vr.status)
             } else {
@@ -348,14 +525,34 @@ function render() {
         const btn = document.createElement('button')
         btn.textContent = 'Désactiver 2FA'
         btn.className = 'inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700'
-        btn.addEventListener('click', async () => {
-          msgEl.textContent = 'Désactivation…'
-          const r = await ft.twofa.disable()
-          if (!r.ok) msgEl.textContent = 'Erreur: ' + ((r.body && r.body.error) || r.status)
-          else {
-            msgEl.textContent = '2FA désactivée.'
+        btn.addEventListener('click', () => {
+          // Render an inline disable form inside the same setup block (same frame as activation)
+          setupEl.innerHTML = ''
+          const form = document.createElement('form')
+          form.innerHTML = `
+            <label>Code 2FA</label>
+            <input type="text" id="disable-code" required minlength="6" maxlength="6" pattern="\\d{6}" class="w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3" />
+            <div class="actions mt-3">
+              <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700">Confirmer</button>
+              <button type="button" id="cancel-disable-2fa" class="inline-flex items-center rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm font-medium px-3 py-2">Annuler</button>
+            </div>`
+          form.addEventListener('submit', async (ev) => {
+            ev.preventDefault()
+            const code = (form.querySelector('#disable-code') as HTMLInputElement)?.value || ''
+            msgEl.textContent = 'Désactivation…'
+            const r = await ft.twofa.disable(code)
+            if (!r.ok) msgEl.textContent = 'Erreur: ' + ((r.body && r.body.error) || r.status)
+            else {
+              msgEl.textContent = '2FA désactivée.'
+              render()
+            }
+          })
+          const cancel = form.querySelector('#cancel-disable-2fa') as HTMLButtonElement
+          cancel.addEventListener('click', () => {
+            // restore by re-rendering the page
             render()
-          }
+          })
+          setupEl.appendChild(form)
         })
         actionsEl.appendChild(btn)
       }

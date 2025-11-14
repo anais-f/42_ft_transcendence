@@ -110,7 +110,14 @@ async function twofaSetup() {
 }
 
 async function twofaDisable() {
-  const res = await fetchWithAuth('/auth/api/2fa/disable', { method: 'DELETE', credentials: 'include' })
+  // Optionally accept a 2FA code string as last argument via arguments
+  const code = (arguments as any)[0] as string | undefined
+  const init: RequestInit = { method: 'DELETE', credentials: 'include' }
+  if (code) {
+    init.headers = { 'content-type': 'application/json' }
+    init.body = JSON.stringify({ twofa_code: code })
+  }
+  const res = await fetchWithAuth('/auth/api/2fa/disable', init)
   const json: Json = await res.json().catch(() => ({}))
   return { ok: res.ok, status: res.status, body: json }
 }

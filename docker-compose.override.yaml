@@ -24,6 +24,7 @@ services:
       dockerfile: services/users/Dockerfile.dev
     volumes:
       - ./:/app
+      - avatars_data:/app/avatars
     environment:
       - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none

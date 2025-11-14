@@ -8,7 +8,7 @@ services:
     networks:
       - backend
     volumes:
-      - avatars:/usr/share/nginx/html/avatars:ro
+      - avatars_data:/usr/share/nginx/html/avatars:ro
     depends_on:
       frontend:
         condition: service_healthy
@@ -78,7 +78,7 @@ services:
     networks:
       - backend
     volumes:
-      - avatars:/app/avatars
+      - avatars_data:/app/avatars
       - db_users_data:/data
     env_file:
       - .env
@@ -175,6 +175,4 @@ volumes:
   db_auth_data:
   db_users_data:
   db_2fa_data:
-  avatars:
-  grafana_data:
-  prometheus_data:
+  avatars_data:

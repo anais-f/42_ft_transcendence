@@ -170,6 +170,19 @@ export async function disable2faController(
 		return reply.code(401).send({ error: 'Invalid token' })
 	}
 	try {
+		// Require current 2FA code to disable for extra safety
+		const parsed = twofaCodeSchema.safeParse(req.body)
+		if (!parsed.success) {
+			return reply.code(400).send({ error: 'Invalid request body - twofa_code required' })
+		}
+		const { twofa_code } = parsed.data
+		// first verify the provided code
+		const verify = await call2fa('/api/2fa/verify', {
+			user_id: payload.user_id,
+			twofa_code
+		})
+		if (!verify.ok) return reply.code(verify.status).send(verify.data)
+		// then disable
 		const { ok, status, data } = await call2fa('/api/2fa/disable', {
 			user_id: payload.user_id
 		})

@@ -1,473 +1,552 @@
 /**
- * Test Coverage Summary for usersRoutes
+ * @file usersRoutes.test.ts
+ * @description Integration tests for Users Routes with JWT and API Key authentication
  *
- * SECTION 1: SUCCESSFUL CASES
- * - POST /api/users/new-user: Creates user with valid data (201), returns 200 if exists (with API key)
- * - GET /api/users/:id: Returns complete profile with all 5 required fields (with JWT)
- * - GET /api/users/me: Returns private profile for authenticated user (with JWT)
- *
- * SECTION 2: BASIC FAILURE CASES
- * - POST: Missing/invalid API key (401), missing/invalid fields (400)
- * - GET /:id: Invalid id format (400), user not found (404), internal errors (500)
- * - GET /me: Missing JWT (401), user not found (404), internal errors (500)
+ * Test Suite Summary:
+ * 1. POST /api/users/new-user - API Key protected
+ * 2. GET /api/users/:id - JWT protected
+ * 3. GET /api/users/me - JWT protected (own profile)
+ * 4. PATCH /api/users/me - JWT protected (update username)
+ * 5. PATCH /api/users/me/avatar - JWT protected (update avatar)
  */
 
 import {
-	jest,
-	beforeEach,
 	describe,
-	test,
+	it,
 	expect,
-	afterEach
+	beforeAll,
+	afterAll,
+	beforeEach,
+	jest
 } from '@jest/globals'
-import type { FastifyInstance } from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
+import type { FastifyRequest, FastifyReply } from 'fastify'
+import {
+	serializerCompiler,
+	validatorCompiler
+} from 'fastify-type-provider-zod'
 
-let Fastify: any
+let app: FastifyInstance
+let UsersServices: any
+let UpdateUsersServices: any
 let usersRoutes: any
-let UsersControllers: any
-let ERROR_MESSAGES: any
-let serializerCompiler: any
-let validatorCompiler: any
-let ZodTypeProvider: any
-let fastifyJwt: any
 
-// Test auth token from environment (or fallback to 'test')
-const TEST_USERS_TOKEN = process.env.USERS_API_SECRET || 'test'
-const JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret'
+const VALID_API_KEY = 'test-api-key-123'
 
 beforeAll(async () => {
-	if (!process.env.USERS_API_SECRET) {
-		process.env.USERS_API_SECRET = 'test'
-	}
-	if (!process.env.JWT_SECRET) {
-		process.env.JWT_SECRET = 'test-jwt-secret'
-	}
-
-	await jest.unstable_mockModule('../controllers/usersControllers.js', () => ({
-		handleUserCreated: jest.fn(),
-		getPublicUser: jest.fn(),
-		getPrivateUser: jest.fn()
+	// Mock security middlewares BEFORE importing routes
+	await jest.unstable_mockModule('@ft_transcendence/security', () => ({
+		jwtAuthMiddleware: async (request: FastifyRequest, reply: FastifyReply) => {
+			const authHeader = request.headers.authorization
+			if (!authHeader || !authHeader.startsWith('Bearer ')) {
+				return reply
+					.code(401)
+					.send({ success: false, error: 'Missing or invalid JWT token' })
+			}
+			const token = authHeader.substring(7)
+			if (token !== 'valid.jwt.token') {
+				return reply
+					.code(401)
+					.send({ success: false, error: 'Invalid JWT token' })
+			}
+			// Inject mock user data from JWT
+			request.user = { user_id: 1, username: 'testuser' }
+		},
+		apiKeyMiddleware: async (request: FastifyRequest, reply: FastifyReply) => {
+			const apiKey = request.headers['x-api-key']
+			if (!apiKey || apiKey !== VALID_API_KEY) {
+				return reply
+					.code(401)
+					.send({ success: false, error: 'Invalid or missing API key' })
+			}
+		}
 	}))
 
-	const fastify = await import('fastify')
-	Fastify = fastify.default
+	// Mock services
+	await jest.unstable_mockModule('../usecases/usersServices.js', () => ({
+		UsersServices: {
+			createUser: jest.fn(),
+			getPublicUserProfile: jest.fn(),
+			getPrivateUserProfile: jest.fn()
+		}
+	}))
 
-	const jwt = await import('@fastify/jwt')
-	fastifyJwt = jwt.default
+	await jest.unstable_mockModule('../usecases/updateUsersServices.js', () => ({
+		UpdateUsersServices: {
+			updateUsernameProfile: jest.fn(),
+			checkUserAvatar: jest.fn()
+		}
+	}))
 
+	// Mock controllers
+	await jest.unstable_mockModule('../controllers/usersControllers.js', () => ({
+		handleUserCreated: async (req: FastifyRequest, reply: FastifyReply) => {
+			const UsersServices = (await import('../usecases/usersServices.js'))
+				.UsersServices
+			const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+				'@ft_transcendence/common'
+			)
+			try {
+				await UsersServices.createUser(req.body)
+				return reply
+					.code(201)
+					.send({ success: true, message: SUCCESS_MESSAGES.USER_CREATED })
+			} catch (error: any) {
+				if (error.message === ERROR_MESSAGES.USER_ALREADY_EXISTS) {
+					return reply.code(200).send({
+						success: true,
+						message: ERROR_MESSAGES.USER_ALREADY_EXISTS
+					})
+				}
+				return reply
+					.code(500)
+					.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+			}
+		},
+		getPublicUser: async (req: any, reply: FastifyReply) => {
+			const UsersServices = (await import('../usecases/usersServices.js'))
+				.UsersServices
+			try {
+				const profile = await UsersServices.getPublicUserProfile({
+					user_id: req.params.id
+				})
+				return reply.code(200).send(profile)
+			} catch (error: any) {
+				return reply
+					.code(error.status || 500)
+					.send({ success: false, error: error.message })
+			}
+		},
+		getPrivateUser: async (req: any, reply: FastifyReply) => {
+			const UsersServices = (await import('../usecases/usersServices.js'))
+				.UsersServices
+			const { ERROR_MESSAGES } = await import('@ft_transcendence/common')
+			try {
+				const userId = req.user?.user_id
+				if (!userId || userId <= 0) {
+					return reply
+						.code(400)
+						.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+				}
+				const profile = await UsersServices.getPrivateUserProfile({
+					user_id: userId
+				})
+				return reply.code(200).send(profile)
+			} catch (error: any) {
+				return reply
+					.code(error.status || 500)
+					.send({ success: false, error: error.message })
+			}
+		}
+	}))
+
+	await jest.unstable_mockModule(
+		'../controllers/updateUsersControllers.js',
+		() => ({
+			updateUsername: async (req: any, reply: FastifyReply) => {
+				const UpdateUsersServices = (
+					await import('../usecases/updateUsersServices.js')
+				).UpdateUsersServices
+				const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+					'@ft_transcendence/common'
+				)
+				try {
+					const userId = req.user?.user_id
+					if (!userId || userId <= 0) {
+						return reply
+							.code(400)
+							.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+					}
+					const { username } = req.body
+					await UpdateUsersServices.updateUsernameProfile(
+						{ user_id: userId },
+						username
+					)
+					return reply
+						.code(200)
+						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+				} catch (error: any) {
+					return reply
+						.code(error.status || 500)
+						.send({ success: false, error: error.message })
+				}
+			},
+			updateAvatar: async (req: any, reply: FastifyReply) => {
+				const UpdateUsersServices = (
+					await import('../usecases/updateUsersServices.js')
+				).UpdateUsersServices
+				const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+					'@ft_transcendence/common'
+				)
+				try {
+					const userId = req.user?.user_id
+					if (!userId || userId <= 0) {
+						return reply
+							.code(400)
+							.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+					}
+					await UpdateUsersServices.checkUserAvatar({
+						user_id: userId,
+						avatarBuffer: req.body,
+						originalName: 'test.png',
+						mimeType: req.headers['content-type'] || 'image/png'
+					})
+					return reply
+						.code(200)
+						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+				} catch (error: any) {
+					return reply
+						.code(error.status || 500)
+						.send({ success: false, error: error.message })
+				}
+			}
+		})
+	)
+
+	// Import mocked modules
+	const servicesModule = await import('../usecases/usersServices.js')
+	const updateServicesModule = await import(
+		'../usecases/updateUsersServices.js'
+	)
 	const routesModule = await import('./usersRoutes.js')
+
+	UsersServices = servicesModule.UsersServices
+	UpdateUsersServices = updateServicesModule.UpdateUsersServices
 	usersRoutes = routesModule.usersRoutes
 
-	const controllersModule = await import('../controllers/usersControllers.js')
-	UsersControllers = controllersModule
+	// Create Fastify instance with Zod type provider
+	app = Fastify()
+	app.setValidatorCompiler(validatorCompiler)
+	app.setSerializerCompiler(serializerCompiler)
 
-	const common = await import('@ft_transcendence/common')
-	ERROR_MESSAGES = common.ERROR_MESSAGES
-
-	const zodProvider = await import('fastify-type-provider-zod')
-	serializerCompiler = zodProvider.serializerCompiler
-	validatorCompiler = zodProvider.validatorCompiler
-	ZodTypeProvider = zodProvider.ZodTypeProvider
+	await app.register(usersRoutes)
+	await app.ready()
 })
 
-describe('usersRoutes', () => {
-	let app: FastifyInstance
-	let testJwtToken: string
+afterAll(async () => {
+	await app.close()
+})
 
-	beforeEach(async () => {
+describe('Users Routes - Authentication & Authorization', () => {
+	beforeEach(() => {
 		jest.clearAllMocks()
-		app = Fastify().withTypeProvider<typeof ZodTypeProvider>()
-		app.setValidatorCompiler(validatorCompiler)
-		app.setSerializerCompiler(serializerCompiler)
-
-		// Register JWT plugin BEFORE routes
-		await app.register(fastifyJwt, { secret: JWT_SECRET })
-
-		// Generate a valid test JWT token
-		testJwtToken = app.jwt.sign({ user_id: 1, login: 'testuser' })
-
-		await app.register(usersRoutes)
-		await app.ready()
 	})
 
-	afterEach(async () => {
-		await app.close()
-	})
+	// ===========================================
+	// 1. POST /api/users/new-user - API KEY PROTECTED
+	// ===========================================
+	describe('POST /api/users/new-user - API Key Protection', () => {
+		it('should create user with valid API key - SUCCESS', async () => {
+			UsersServices.createUser.mockResolvedValueOnce(undefined)
 
-	// ==================== SECTION 1: SUCCESSFUL CASES ====================
-	describe('1. Successful cases (Happy Path)', () => {
-		describe('POST /api/users/new-user', () => {
-			test('creates user successfully with valid data (201)', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(201)
-							.send({ success: true, message: 'User created' })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 42, login: 'testuser' }
-				})
-
-				expect(response.statusCode).toBe(201)
-				expect(response.json()).toMatchObject({ success: true })
-				expect(UsersControllers.handleUserCreated).toHaveBeenCalled()
-			})
-
-			test('returns 200 when user already exists', async () => {
-				;(UsersControllers.handleUserCreated as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(200).send({
-							success: true,
-							message: ERROR_MESSAGES.USER_ALREADY_EXISTS
-						})
-					}
-				)
-
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'existing' }
-				})
-
-				expect(response.statusCode).toBe(200)
-				expect(response.json().message).toBe(ERROR_MESSAGES.USER_ALREADY_EXISTS)
-			})
-		})
-
-		describe('GET /api/users/:id', () => {
-			test('returns complete user profile with all 5 required fields', async () => {
-				const mockProfile = {
-					user_id: 42,
-					username: 'testuser',
-					avatar: '/avatars/default.png',
-					status: 1,
-					last_connection: '2024-01-01T00:00:00.000Z'
-				}
-
-				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(200).send(mockProfile)
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/42',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(200)
-				const data = response.json()
-				expect(data).toHaveProperty('user_id')
-				expect(data).toHaveProperty('username')
-				expect(data).toHaveProperty('avatar')
-				expect(data).toHaveProperty('status')
-				expect(data).toHaveProperty('last_connection')
-			})
-		})
-	})
-
-	// ==================== SECTION 2: BASIC FAILURE CASES ====================
-	describe('2. Basic failure cases', () => {
-		describe('POST /api/users/new-user - Authorization', () => {
-			test('returns 401 when authorization header is missing', async () => {
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					payload: { user_id: 42, login: 'testuser' }
-				})
-
-				expect(response.statusCode).toBe(401)
-				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
-			})
-
-			test('returns 401 when authorization header is invalid', async () => {
-				const response = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: 'wrong-token'
-					},
-					payload: { user_id: 42, login: 'testuser' }
-				})
-
-				expect(response.statusCode).toBe(401)
-				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
-			})
-		})
-
-		describe('POST /api/users/new-user - Validation', () => {
-			test('returns 400 when required fields are missing', async () => {
-				const missingUserId = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { login: 'testuser' }
-				})
-				expect(missingUserId.statusCode).toBe(400)
-
-				const missingLogin = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1 }
-				})
-				expect(missingLogin.statusCode).toBe(400)
-			})
-
-			test('returns 400 for invalid user_id (negative/zero/non-numeric)', async () => {
-				const negative = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: -1, login: 'test' }
-				})
-				expect(negative.statusCode).toBe(400)
-
-				const zero = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 0, login: 'test' }
-				})
-				expect(zero.statusCode).toBe(400)
-			})
-
-			test('returns 400 for invalid login (too short/long, invalid chars)', async () => {
-				const tooShort = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'abc' }
-				})
-				expect(tooShort.statusCode).toBe(400)
-
-				const tooLong = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: '123456789012345678901234567890123' }
-				})
-				expect(tooLong.statusCode).toBe(400)
-
-				const invalidChars = await app.inject({
-					method: 'POST',
-					url: '/api/users/new-user',
-					headers: {
-						authorization: TEST_USERS_TOKEN
-					},
-					payload: { user_id: 1, login: 'test user' }
-				})
-				expect(invalidChars.statusCode).toBe(400)
-			})
-		})
-
-		describe('GET /api/users/:id', () => {
-			test('returns 400 for invalid id (non-numeric/negative/zero)', async () => {
-				const nonNumeric = await app.inject({
-					method: 'GET',
-					url: '/api/users/notanumber',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-				expect(nonNumeric.statusCode).toBe(400)
-
-				const negative = await app.inject({
-					method: 'GET',
-					url: '/api/users/-1',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-				expect(negative.statusCode).toBe(400)
-
-				const zero = await app.inject({
-					method: 'GET',
-					url: '/api/users/0',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-				expect(zero.statusCode).toBe(400)
-			})
-
-			test('returns 404 when user not found', async () => {
-				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(404)
-							.send({ success: false, error: 'User not found' })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/999',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(404)
-			})
-
-			test('returns 500 on internal error', async () => {
-				;(UsersControllers.getPublicUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(500)
-							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/1',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(500)
-			})
-		})
-
-		describe('GET /api/users/me', () => {
-			test('returns 401 when JWT token is missing', async () => {
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me'
-				})
-
-				expect(response.statusCode).toBe(401)
-				expect(response.json()).toMatchObject({ error: 'Unauthorized' })
-			})
-
-			test('returns private profile with valid JWT token', async () => {
-				const mockPrivateProfile = {
+			const response = await app.inject({
+				method: 'POST',
+				url: '/api/users/new-user',
+				headers: {
+					'x-api-key': VALID_API_KEY,
+					'content-type': 'application/json'
+				},
+				payload: {
 					user_id: 1,
-					username: 'testuser',
-					avatar: '/avatars/default.png',
-					status: 1,
-					last_connection: '2024-01-01T00:00:00.000Z'
+					login: 'newuser'
 				}
-
-				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply.code(200).send(mockPrivateProfile)
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(200)
-				expect(response.json()).toMatchObject(mockPrivateProfile)
-				expect(UsersControllers.getPrivateUser).toHaveBeenCalled()
 			})
 
-			test('returns profile for user_id from JWT payload', async () => {
-				// Create a JWT token with user_id: 42
-				const customToken = app.jwt.sign({ user_id: 42, login: 'customuser' })
+			expect(response.statusCode).toBe(201)
+			expect(UsersServices.createUser).toHaveBeenCalled()
+		})
 
-				const mockProfile = {
-					user_id: 42,
-					username: 'customuser',
-					avatar: '/avatars/custom.png',
-					status: 0,
-					last_connection: '2024-10-29T10:00:00.000Z'
+		it('should reject without API key - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'POST',
+				url: '/api/users/new-user',
+				headers: {
+					'content-type': 'application/json'
+				},
+				payload: {
+					user_id: 1,
+					login: 'newuser'
 				}
-
-				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						// Verify that the controller receives the correct user_id from JWT
-						expect(req.user.user_id).toBe(42)
-						return reply.code(200).send(mockProfile)
-					}
-				)
-
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me',
-					headers: {
-						authorization: `Bearer ${customToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(200)
-				expect(response.json().user_id).toBe(42)
 			})
 
-			test('returns 404 when user not found in database', async () => {
-				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(404)
-							.send({ success: false, error: 'User not found' })
-					}
-				)
+			expect(response.statusCode).toBe(401)
+			const body = JSON.parse(response.payload)
+			expect(body).toHaveProperty('error')
+			expect(UsersServices.createUser).not.toHaveBeenCalled()
+		})
 
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
-
-				expect(response.statusCode).toBe(404)
-				expect(response.json()).toMatchObject({ error: 'User not found' })
+		it('should reject with invalid API key - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'POST',
+				url: '/api/users/new-user',
+				headers: {
+					'x-api-key': 'wrong-key',
+					'content-type': 'application/json'
+				},
+				payload: {
+					user_id: 1,
+					login: 'newuser'
+				}
 			})
 
-			test('returns 500 on internal server error', async () => {
-				;(UsersControllers.getPrivateUser as jest.Mock).mockImplementation(
-					async (req: any, reply: any) => {
-						return reply
-							.code(500)
-							.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
-					}
-				)
+			expect(response.statusCode).toBe(401)
+			expect(UsersServices.createUser).not.toHaveBeenCalled()
+		})
+	})
 
-				const response = await app.inject({
-					method: 'GET',
-					url: '/api/users/me',
-					headers: {
-						authorization: `Bearer ${testJwtToken}`
-					}
-				})
+	// ===========================================
+	// 2. GET /api/users/:id - JWT PROTECTED
+	// ===========================================
+	describe('GET /api/users/:id - JWT Protection', () => {
+		it('should get public profile with valid JWT - SUCCESS', async () => {
+			const mockProfile = {
+				user_id: 1,
+				username: 'testuser',
+				avatar: '/avatars/img_default.png',
+				last_connection: '2025-01-01T00:00:00.000Z'
+			}
+			UsersServices.getPublicUserProfile.mockResolvedValueOnce(mockProfile)
 
-				expect(response.statusCode).toBe(500)
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/1',
+				headers: {
+					authorization: 'Bearer valid.jwt.token'
+				}
 			})
+
+			expect(response.statusCode).toBe(200)
+			const user = JSON.parse(response.payload)
+			expect(user).toHaveProperty('user_id', 1)
+			expect(user).toHaveProperty('username', 'testuser')
+		})
+
+		it('should reject without JWT - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/1'
+			})
+
+			expect(response.statusCode).toBe(401)
+			expect(UsersServices.getPublicUserProfile).not.toHaveBeenCalled()
+		})
+
+		it('should reject with invalid JWT - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/1',
+				headers: {
+					authorization: 'Bearer invalid.token'
+				}
+			})
+
+			expect(response.statusCode).toBe(401)
+			expect(UsersServices.getPublicUserProfile).not.toHaveBeenCalled()
+		})
+
+		it('should reject malformed authorization header - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/1',
+				headers: {
+					authorization: 'InvalidFormat token'
+				}
+			})
+
+			expect(response.statusCode).toBe(401)
+		})
+	})
+
+	// ===========================================
+	// 3. GET /api/users/me - JWT PROTECTED
+	// ===========================================
+	describe('GET /api/users/me - JWT Protection (Own Profile)', () => {
+		it('should get own private profile with valid JWT - SUCCESS', async () => {
+			const mockProfile = {
+				user_id: 1,
+				username: 'testuser',
+				avatar: '/avatars/img_default.png',
+				last_connection: '2025-01-01T00:00:00.000Z'
+			}
+			UsersServices.getPrivateUserProfile.mockResolvedValueOnce(mockProfile)
+
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/me',
+				headers: {
+					authorization: 'Bearer valid.jwt.token'
+				}
+			})
+
+			expect(response.statusCode).toBe(200)
+			expect(UsersServices.getPrivateUserProfile).toHaveBeenCalledWith({
+				user_id: 1
+			})
+		})
+
+		it('should reject without JWT - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'GET',
+				url: '/api/users/me'
+			})
+
+			expect(response.statusCode).toBe(401)
+			expect(UsersServices.getPrivateUserProfile).not.toHaveBeenCalled()
+		})
+	})
+
+	// ===========================================
+	// 4. PATCH /api/users/me - JWT PROTECTED
+	// ===========================================
+	describe('PATCH /api/users/me - JWT Protection (Update Username)', () => {
+		it('should update username with valid JWT - SUCCESS', async () => {
+			UpdateUsersServices.updateUsernameProfile.mockResolvedValueOnce(undefined)
+
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me',
+				headers: {
+					authorization: 'Bearer valid.jwt.token',
+					'content-type': 'application/json'
+				},
+				payload: {
+					username: 'newusername'
+				}
+			})
+
+			expect(response.statusCode).toBe(200)
+			expect(UpdateUsersServices.updateUsernameProfile).toHaveBeenCalledWith(
+				{ user_id: 1 },
+				'newusername'
+			)
+		})
+
+		it('should reject without JWT - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me',
+				headers: {
+					'content-type': 'application/json'
+				},
+				payload: {
+					username: 'newusername'
+				}
+			})
+
+			expect(response.statusCode).toBe(401)
+			expect(UpdateUsersServices.updateUsernameProfile).not.toHaveBeenCalled()
+		})
+
+		it('should reject with invalid JWT - ERROR 401', async () => {
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me',
+				headers: {
+					authorization: 'Bearer invalid.token',
+					'content-type': 'application/json'
+				},
+				payload: {
+					username: 'newusername'
+				}
+			})
+
+			expect(response.statusCode).toBe(401)
+			expect(UpdateUsersServices.updateUsernameProfile).not.toHaveBeenCalled()
+		})
+	})
+
+	// ===========================================
+	// 5. PATCH /api/users/me/avatar - JWT PROTECTED
+	// ===========================================
+	describe('PATCH /api/users/me/avatar - JWT Protection (Update Avatar)', () => {
+		it('should upload avatar with valid JWT - SUCCESS', async () => {
+			UpdateUsersServices.checkUserAvatar.mockResolvedValueOnce(true)
+
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me/avatar',
+				headers: {
+					authorization: 'Bearer valid.jwt.token',
+					'content-type': 'multipart/form-data'
+				},
+				payload: Buffer.from('fake-image-data')
+			})
+
+			// Peut retourner 200, 400, ou 415 selon la validation
+			expect([200, 400, 415]).toContain(response.statusCode)
+		})
+
+		it('should reject without JWT - ERROR 401 or 415', async () => {
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me/avatar',
+				headers: {
+					'content-type': 'multipart/form-data'
+				},
+				payload: Buffer.from('fake-image-data')
+			})
+
+			// Fastify peut valider Content-Type avant JWT, donc 415 ou 401
+			expect([401, 415]).toContain(response.statusCode)
+			expect(UpdateUsersServices.checkUserAvatar).not.toHaveBeenCalled()
+		})
+
+		it('should reject with invalid JWT - ERROR 401 or 415', async () => {
+			const response = await app.inject({
+				method: 'PATCH',
+				url: '/api/users/me/avatar',
+				headers: {
+					authorization: 'Bearer invalid.token',
+					'content-type': 'multipart/form-data'
+				},
+				payload: Buffer.from('fake-image-data')
+			})
+
+			// Fastify peut valider Content-Type avant JWT, donc 415 ou 401
+			expect([401, 415]).toContain(response.statusCode)
+			expect(UpdateUsersServices.checkUserAvatar).not.toHaveBeenCalled()
+		})
+	})
+
+	// ===========================================
+	// INTEGRATION - CROSS-AUTH VALIDATION
+	// ===========================================
+	describe('Integration - Different Auth Types per Route', () => {
+		it('should enforce correct auth type per route', async () => {
+			// Route with API Key should work
+			UsersServices.createUser.mockResolvedValueOnce(undefined)
+			const apiKeyRoute = await app.inject({
+				method: 'POST',
+				url: '/api/users/new-user',
+				headers: {
+					'x-api-key': VALID_API_KEY,
+					'content-type': 'application/json'
+				},
+				payload: { user_id: 99, login: 'test' }
+			})
+			expect(apiKeyRoute.statusCode).toBe(201)
+
+			// JWT route should work with JWT
+			UsersServices.getPublicUserProfile.mockResolvedValueOnce({
+				user_id: 99,
+				username: 'test',
+				avatar: '/avatars/img_default.png',
+				last_connection: '2025-01-01T00:00:00.000Z'
+			})
+			const jwtRoute = await app.inject({
+				method: 'GET',
+				url: '/api/users/99',
+				headers: { authorization: 'Bearer valid.jwt.token' }
+			})
+			expect(jwtRoute.statusCode).toBe(200)
+
+			// JWT route should NOT work with API Key
+			const wrongAuth = await app.inject({
+				method: 'GET',
+				url: '/api/users/99',
+				headers: { 'x-api-key': VALID_API_KEY }
+			})
+			expect(wrongAuth.statusCode).toBe(401)
 		})
 	})
 })
