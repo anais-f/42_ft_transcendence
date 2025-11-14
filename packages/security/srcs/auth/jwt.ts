@@ -1,8 +1,5 @@
 import jwt from 'jsonwebtoken'
 
-/**
- * Payload JWT utilisé dans l'application
- */
 export interface IJWTPayload {
 	user_id: number
 	login: string
@@ -12,9 +9,9 @@ export interface IJWTPayload {
 }
 
 /**
- * Vérifie et décode un token JWT
- * @param token - Le token à vérifier
- * @returns Le payload décodé ou null si le token est invalide/expiré
+ * Check and decode a JWT token
+ * @param token - The JWT token to verify
+ * @returns The decoded payload if valid, otherwise null
  */
 export function verifyToken(token: string): IJWTPayload | null {
 	const secret = process.env.JWT_SECRET
