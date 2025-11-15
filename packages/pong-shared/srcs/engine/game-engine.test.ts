@@ -11,25 +11,19 @@ describe('TPS_MANAGER', () => {
 })
 
 describe('game-engine', () => {
-	let physic: null | PhysicsEngine = null
 	let game: null | GameEngine = null
 	beforeAll(() => {
-		physic = new PhysicsEngine()
-		game = new GameEngine(physic, 20)
+		game = new GameEngine(20)
 	})
 
 	test('init', () => {
-		expect(game?.getPhysicsEngine().tickCount).toBe(0)
+		expect(game?.getTickCount()).toBe(0)
 		expect(game?.packets.length).toBe(0)
 		expect(game?.getState()).toEqual(GameState.Paused)
 	})
 
 	test('play tick', () => {
 		const spyGameTicks = jest.spyOn(GameEngine.prototype as any, 'playTick')
-		const spyPhysicsTicks = jest.spyOn(
-			PhysicsEngine.prototype as any,
-			'playTick'
-		)
 
 		jest.useFakeTimers()
 		game?.setState(GameState.Started)
@@ -40,6 +34,5 @@ describe('game-engine', () => {
 		jest.useRealTimers()
 
 		expect(spyGameTicks).toHaveBeenCalled()
-		expect(spyPhysicsTicks).toHaveBeenCalled()
 	})
 })

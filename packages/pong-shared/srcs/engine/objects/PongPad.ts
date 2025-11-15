@@ -21,7 +21,7 @@ export class PongPad {
 	}
 
 	public move(dir: PadDirection, incr: number, border: PongObject[]) {
-		const pos = this.obj.getOrigin().clone()
+		const pos = this.obj.getOrigin()
 		switch (dir) {
 			case PadDirection.Up:
 				this.obj.setOrigin(Vector2.add(pos, new Vector2(0, incr)))
@@ -32,7 +32,7 @@ export class PongPad {
 		}
 		for (const o of border) {
 			if (o.intersect(this.obj)) {
-				this.obj.setOrigin(pos)
+				this.obj.setOrigin(pos.clone())
 				break
 			}
 		}

@@ -1,8 +1,7 @@
-import { PhysicsEngine } from './physics-engine.js'
-
 export class TPS_MANAGER {
 	public TPS_INTERVAL_MS: number
 	public previousTime_MS: number = 0
+	public tickCount: number = 0
 
 	constructor(public TPS: number) {
 		this.TPS = TPS
@@ -23,7 +22,6 @@ export class GameEngine {
 	public startTime
 
 	constructor(
-		private physicsEngine: PhysicsEngine,
 		TPS: number
 	) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
@@ -33,7 +31,7 @@ export class GameEngine {
 	private startGame() {
 		if (this.currentState === GameState.Started) return
 		this.currentState = GameState.Started
-		this.TPS_DATA.previousTime_MS = this.getTimeMs()
+		this.TPS_DATA.previousTime_MS = Date.now()
 		this.startTickLoop()
 	}
 
@@ -57,7 +55,7 @@ export class GameEngine {
 	}
 
 	private playTick() {
-		this.physicsEngine.playTick()
+		++this.TPS_DATA.tickCount
 	}
 
 	private startTickLoop() {
@@ -75,22 +73,19 @@ export class GameEngine {
 		return Date.now()
 	}
 
-	protected getTimeMs(): number {
-		return Date.now()
-	}
-
 	private scheduleTick(
 		fn: (now: number) => void,
 		intervalMs: number
 	): ReturnType<typeof setInterval> {
-		return setInterval(() => fn(this.getTimeMs()), intervalMs)
+		return setInterval(() => fn(Date.now()), intervalMs)
 	}
 
 	public getState(): GameState {
 		return this.currentState
 	}
 
-	public getPhysicsEngine(): PhysicsEngine {
-		return this.physicsEngine
+	public getTickCount(): number {
+		return this.TPS_DATA.tickCount
 	}
 }
+
