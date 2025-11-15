@@ -5,70 +5,72 @@ import { IUserId} from '@ft_transcendence/common'
 // 0 -> pending
 // 1 -> friends
 
+type RelationRow = { relation_status: number }
+type RelationUserRow = { user_id: number; friend_id: number }
 
 export class SocialRepository {
   //TODO : verifier que les 2 id existent avant d'ajouter la relation
 
   private static getOrderedPair(a: IUserId, b: IUserId): [number, number] {
-    return a.id_user < b.id_user ? [a.id_user, b.id_user] : [b.id_user, a.id_user]
+    return a.user_id < b.user_id ? [a.user_id, b.user_id] : [b.user_id, a.user_id]
   }
 
-   static relationExisted(id_user: IUserId, friend_id: IUserId): boolean {
+   static relationExisted(user_id: IUserId, friend_id: IUserId): boolean {
     const selectStmt = db.prepare(
-      'SELECT 1 FROM relations WHERE (id_user = ? AND friend_id = ?)')
-    const [firstId, secondId] = this.getOrderedPair(id_user, friend_id)
+      'SELECT 1 FROM relations WHERE (user_id = ? AND friend_id = ?)')
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
     const row = selectStmt.get(firstId, secondId)
     return !!row
   }
 
-  static relationStatus(id_user: IUserId, friend_id: IUserId): number {
+  static relationStatus(user_id: IUserId, friend_id: IUserId): number {
     const selectStmt = db.prepare(
-      'SELECT relation_status FROM relations WHERE (id_user = ? AND friend_id = ?)')
-    const [firstId, secondId] = this.getOrderedPair(id_user, friend_id)
-    const row = selectStmt.get(firstId, secondId)
+      'SELECT relation_status FROM relations WHERE (user_id = ? AND friend_id = ?)')
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+    const row = selectStmt.get(firstId, secondId) as RelationRow | undefined
     return row ? row.relation_status : -1
   }
 
-  static addRelation(id_user: IUserId, friend_id: IUserId, origin_id: IUserId): void {
-    const insertStmt = db.prepare('INSERT INTO relations (id_user, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)')
-    const [firstId, secondId] = this.getOrderedPair(id_user, friend_id)
-    insertStmt.run(firstId, secondId, origin_id.id_user, 0)
+  static addRelation(user_id: IUserId, friend_id: IUserId, origin_id: IUserId): void {
+    const insertStmt = db.prepare('INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)')
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+    insertStmt.run(firstId, secondId, origin_id.user_id, 0)
   }
 
-  static updateRelationStatus(id_user: IUserId, friend_id: IUserId, status: number): void {
-    const updateStmt = db.prepare('UPDATE relations SET relation_status = ? WHERE (id_user = ? AND friend_id = ?)')
-    const [firstId, secondId] = this.getOrderedPair(id_user, friend_id)
+  static updateRelationStatus(user_id: IUserId, friend_id: IUserId, status: number): void {
+    const updateStmt = db.prepare('UPDATE relations SET relation_status = ? WHERE (user_id = ? AND friend_id = ?)')
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
     updateStmt.run(status, firstId, secondId)
   }
 
-  static deleteRelation(id_user: IUserId, friend_id: IUserId): void {
-    const selectStmt = db.prepare('DELETE FROM relations WHERE id_user = ? AND friend_id = ?')
-    const [firstId, secondId] = this.getOrderedPair(id_user, friend_id)
+  static deleteRelation(user_id: IUserId, friend_id: IUserId): void {
+    const selectStmt = db.prepare('DELETE FROM relations WHERE user_id = ? AND friend_id = ?')
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
     selectStmt.run(firstId, secondId)
   }
 
-  static findFriendsList(id_user: IUserId): IUserId[] {
-    const selectStmt = db.prepare('SELECT id_user, friend_id FROM relations WHERE relation_status = ? AND (id_user = ? OR friend_id = ?)')
-    const rows = selectStmt.all(1, id_user.id_user, id_user.id_user)
+  static findFriendsList(user_id: IUserId): IUserId[] {
+    const selectStmt = db.prepare('SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND (user_id = ? OR friend_id = ?)')
+    const rows = selectStmt.all(1, user_id.user_id, user_id.user_id) as RelationUserRow[]
     const friends: IUserId[] = []
     for (const row of rows) {
-      if (row.id_user === id_user.id_user)
-        friends.push({ id_user: row.friend_id })
+      if (row.user_id === user_id.user_id)
+        friends.push({ user_id: row.friend_id })
       else
-        friends.push({ id_user: row.id_user })
+        friends.push({ user_id: row.user_id })
     }
     return friends
   }
 
-  static findPendingListToApprove(id_user: IUserId): IUserId[] {
-    const selectStmt = db.prepare('SELECT id_user, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (id_user = ? OR friend_id = ?)')
-    const rows = selectStmt.all(0, id_user.id_user, id_user.id_user, id_user.id_user)
+  static findPendingListToApprove(user_id: IUserId): IUserId[] {
+    const selectStmt = db.prepare('SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (user_id = ? OR friend_id = ?)')
+    const rows = selectStmt.all(0, user_id.user_id, user_id.user_id, user_id.user_id) as RelationUserRow[]
     const pending: IUserId[] = []
     for (const row of rows) {
-      if (row.id_user === id_user.id_user)
-        pending.push({ id_user: row.friend_id })
+      if (row.user_id === user_id.user_id)
+        pending.push({ user_id: row.friend_id })
       else
-        pending.push({ id_user: row.id_user })
+        pending.push({ user_id: row.user_id })
     }
     return pending
   }
