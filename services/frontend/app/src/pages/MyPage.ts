@@ -1,4 +1,4 @@
-export const MyPage = (): string => /*html*/`
+export const MyPage = (): string => /*html*/ `
 <body class="flex ">
     <aside class=" bg-blue-800 col-start-1 col-end-2">
         <img src="/images/acancel.jpg" alt="User's avatar" class="rounded-full justify-center size-1/4">

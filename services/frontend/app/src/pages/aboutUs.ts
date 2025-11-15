@@ -1,4 +1,4 @@
-export const AboutUsPage = (): string => /*html*/`
+export const AboutUsPage = (): string => /*html*/ `
     <div class="p-4 text-blue-400 text-xl">
         <h1>
             About Us

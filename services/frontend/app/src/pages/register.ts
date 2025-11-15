@@ -1,4 +1,4 @@
-export const RegisterPage = (): string => /*html*/`
+export const RegisterPage = (): string => /*html*/ `
   <div class=" text-pink-200 text-xl text-center">
       Create account
   </div>

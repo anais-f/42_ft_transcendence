@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		about: AboutUsPage(),
 		register: RegisterPage(),
 		wales: WalerPage(),
-		me : MyPage()
+		me: MyPage()
 	} satisfies Record<string, string>
 
 	// Build menu
@@ -77,4 +77,3 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	})
 })
-

@@ -1,4 +1,4 @@
-export const HomePage = (): string => /*html*/`
+export const HomePage = (): string => /*html*/ `
 <header>
   <!-- ? -->
 </header>
