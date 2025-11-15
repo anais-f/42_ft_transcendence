@@ -1,6 +1,8 @@
 .secret
 .env
 .env.localtest
+.env.test
+
 
 #IDE
 .idea/
