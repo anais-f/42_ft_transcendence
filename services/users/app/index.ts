@@ -5,7 +5,6 @@ import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
 import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
-import { writeFileSync } from 'node:fs'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -20,8 +19,6 @@ import {
 	responseTimeHistogram
 } from '@ft_transcendence/common'
 
-const SWAGGER_TITTLE = 'API for Users Service'
-const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
@@ -40,13 +37,13 @@ function createApp(): FastifyInstance {
 	app.register(fastifyJwt, {
 		secret: jwtSecret
 	})
+
 	app.register(fastifyMultipart, {
 		limits: {
 			fileSize: 5 * 1024 * 1024,
 			files: 1
 		}
 	})
-
 	app.addContentTypeParser(
 		/^image\/.*/,
 		{ parseAs: 'buffer' },
@@ -67,9 +64,11 @@ function createApp(): FastifyInstance {
 		},
 		transform: jsonSchemaTransform
 	})
+
 	app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
+
 	app.register(usersRoutes)
 	return app
 }
