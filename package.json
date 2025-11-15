@@ -21,6 +21,10 @@
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
 		"build:common": "npm run build --workspace=packages/common",
 		"build:security": "npm run build --workspace=packages/security",
+    "build:auth": "npm run build --workspace=services/auth/app",
+    "build:users": "npm run build --workspace=services/users/app",
+    "build:auth_google": "npm run build --workspace=services/auth_google/app",
+    "build:social": "npm run build --workspace=services/social/app",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
