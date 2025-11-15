@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals'
 import { GameEngine, GameState, TPS_MANAGER } from './game-engine.js'
-import { PhysicsEngine } from './physics-engine.js'
 
 describe('TPS_MANAGER', () => {
 	test('init', () => {
@@ -18,7 +17,6 @@ describe('game-engine', () => {
 
 	test('init', () => {
 		expect(game?.getTickCount()).toBe(0)
-		expect(game?.packets.length).toBe(0)
 		expect(game?.getState()).toEqual(GameState.Paused)
 	})
 

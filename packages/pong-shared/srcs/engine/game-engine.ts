@@ -1,3 +1,7 @@
+import { Segment } from '../math/Segment.js'
+import { Vector2 } from '../math/Vector2.js'
+import { PongBall } from './objects/PongBall.js'
+
 export class TPS_MANAGER {
 	public TPS_INTERVAL_MS: number
 	public previousTime_MS: number = 0
@@ -18,24 +22,34 @@ export class GameEngine {
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
-	public packets: Uint8Array[] = []
 	public startTime
 
-	constructor(
-		TPS: number
-	) {
+	private border: Segment[] = [
+		new Segment(new Vector2(-20, -10), new Vector2(20, -10)),
+		new Segment(new Vector2(-20, 10), new Vector2(20, 10))
+	]
+	private winBorder: Segment[] = [
+		new Segment(new Vector2(-20, -10), new Vector2(-20, 10)),
+		new Segment(new Vector2(20, -10), new Vector2(20, 10))
+	]
+	private ball: PongBall = new PongBall(
+		1,
+		new Vector2(Math.random(), Math.random()).normalize()
+	)
+
+	constructor(TPS: number) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
 	}
 
-	private startGame() {
+	private startGame(): void {
 		if (this.currentState === GameState.Started) return
 		this.currentState = GameState.Started
 		this.TPS_DATA.previousTime_MS = Date.now()
 		this.startTickLoop()
 	}
 
-	private pauseGame() {
+	private pauseGame(): void {
 		this.currentState = GameState.Paused
 		if (this.tickTimer !== null) {
 			clearInterval(this?.tickTimer)
@@ -43,7 +57,7 @@ export class GameEngine {
 		}
 	}
 
-	public setState(gameState: GameState) {
+	public setState(gameState: GameState): void {
 		switch (gameState) {
 			case GameState.Started:
 				this.startGame()
@@ -54,11 +68,13 @@ export class GameEngine {
 		}
 	}
 
-	private playTick() {
+	private playTick(): void {
+		console.log(this.TPS_DATA.tickCount)
+
 		++this.TPS_DATA.tickCount
 	}
 
-	private startTickLoop() {
+	private startTickLoop(): void {
 		const tickInterval = this.TPS_DATA.TPS_INTERVAL_MS
 		this.tickTimer = this.scheduleTick((now: number) => {
 			if (this.currentState !== GameState.Started) {
@@ -88,4 +104,3 @@ export class GameEngine {
 		return this.TPS_DATA.tickCount
 	}
 }
-
