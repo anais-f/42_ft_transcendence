@@ -1,16 +1,14 @@
 import { db } from '../database/socialDatabase.js'
-import { IUserId} from '@ft_transcendence/common'
+import { IUserId } from '@ft_transcendence/common'
 
 // Table relations
 // 0 -> pending
 // 1 -> friends
 
-type RelationRow = { relation_status: number }
-type RelationUserRow = { user_id: number; friend_id: number }
+export type RelationRow = { relation_status: number }
+export type RelationUserRow = { user_id: number; friend_id: number }
 
 export class SocialRepository {
-  //TODO : verifier que les 2 id existent avant d'ajouter la relation
-
   private static getOrderedPair(a: IUserId, b: IUserId): [number, number] {
     return a.user_id < b.user_id ? [a.user_id, b.user_id] : [b.user_id, a.user_id]
   }
