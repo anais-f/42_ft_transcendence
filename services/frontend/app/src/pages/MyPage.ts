@@ -1,11 +1,11 @@
 export const MyPage = (): string => /*html*/ `
-<body class="flex ">
-    <aside class=" bg-blue-800 col-start-1 col-end-2">
-        <img src="/images/acancel.jpg" alt="User's avatar" class="rounded-full justify-center size-1/4">
-        <table class="border-white border mt-10 mb-10">
-            <tr class=" border border-white">
-                <td class ="w-fit">Username :</td>
-                <td class="pl-1 flex-wrap">Adrien</td>
+<body class="flex flex-row">
+    <aside class=" bg-gray-200 flex flex-col w-[30%] justify-between">
+        <img src="/images/acancel.jpg" alt="User's avatar" class="rounded-full justify-center size-fit">
+        <table class="border-black border mt-10 mb-10">
+            <tr class=" border border-black">
+                <td class ="">Username :</td>
+                <td class="pl-1">Adrien</td>
             </tr>
             <tr>
                 <td>Win : </td>
@@ -20,31 +20,31 @@ export const MyPage = (): string => /*html*/ `
                 <td class="pl-1">10/11/25</td>
             </tr>
         </table>
-        <a href="Settings" class=" bg-gray-300 p-3">
+        <a href="Settings" class=" bg-gray-300 p-3 size-fit self-center rounded-xl hover:bg-gray-400">
             <button class="text-black">Settings</button>
         </a>
     </aside>
-    <section class="bg-white ml-10 p-10 col-start-2 col-end-3">
-        <h1 class="text-blue-800 text-xl">Game</h1>
-        <a href="#localGame">
-            <h2 class="text-blue-700">• Local</h2>
-        </a>
-        <a href="#remoteGame">
-            <h2 class="text-blue-700">• Remote</h2>
-        </a>
-        <a href="#tournamentGame">
-            <h2 class="text-blue-700">• Tournament</h2>
-        </a>
-    </section>
-    <section class="text-right">
-      <a href="#Freinds" class="bg-gray-400">
+    <span class="flex flex-col place-items-center">
+        <section class="flex flex-col items-center bg-gray-100 p-2 size-fit">
+            <h1 class="text-blue-800 text-2xl">Game</h1>
+            <a href="#localGame">
+                <h2 class="text-blue-700 text-xl text-left">• Local</h2>
+            </a>
+            <a href="#remoteGame" class="align-self-start">
+                <h2 class="text-blue-700 text-xl text-left">• Remote</h2>
+            </a>
+            <a href="#tournamentGame" class="align-self-start">
+                <h2 class="text-blue-700 text-xl text-left">• Tournament</h2>
+            </a>
+        </section>
+    </span>
+    <section class="flex flex-col items-end gap-1">
+      <a href="#Friends" class="bg-gray-400 mx-2 px-2 rounded-md">
         <button>
             <h2 class="text-blue-700">Friends</h2>
         </button>
       </a>
-    </section>
-    <section class="text-right">
-      <a href="#Request" class="bg-gray-400">
+      <a href="#Request" class="bg-gray-400 mx-2 px-2 rounded-md">
         <button>
             <h2 class="text-blue-700">Request</h2>
         </button>
