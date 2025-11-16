@@ -1,8 +1,5 @@
 import fetch from 'node-fetch'
-import {
-	AppError,
-	IUserId
-} from '@ft_transcendence/common'
+import { AppError, IUserId } from '@ft_transcendence/common'
 
 export class UsersApi {
 	/**
@@ -15,7 +12,10 @@ export class UsersApi {
 		const base = process.env.USERS_SERVICE_URL
 		const secret = process.env.USERS_API_SECRET
 		if (!base || !secret)
-			throw new AppError('Missing USERS_SERVICE_URL or USERS_API_SECRET env', 500)
+			throw new AppError(
+				'Missing USERS_SERVICE_URL or USERS_API_SECRET env',
+				500
+			)
 
 		const url = `${base}/api/users/${user.user_id}`
 		const headers = {

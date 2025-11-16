@@ -115,12 +115,12 @@ export class UsersRepository {
 		}
 	}
 
-  static updateUserStatus(user: IUserConnection, status: number): void {
-    const updateStmt = db.prepare(
-      'UPDATE users SET status = ? WHERE user_id = ?'
-    )
-    updateStmt.run(status, user.user_id)
-  }
+	static updateUserStatus(user: IUserConnection, status: number): void {
+		const updateStmt = db.prepare(
+			'UPDATE users SET status = ? WHERE user_id = ?'
+		)
+		updateStmt.run(status, user.user_id)
+	}
 
 	/**
 	 * @description Some get methods according to the table fields

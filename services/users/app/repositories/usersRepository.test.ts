@@ -36,7 +36,13 @@ beforeAll(async () => {
 				// Simulate INSERT, UPDATE, DELETE operations
 				if (query.includes('INSERT')) {
 					const [user_id, username, avatar, status, last_connection] = params
-					dbData.users.push({ user_id, username, avatar, status, last_connection })
+					dbData.users.push({
+						user_id,
+						username,
+						avatar,
+						status,
+						last_connection
+					})
 				} else if (query.includes('UPDATE')) {
 					// Update logic
 				} else if (query.includes('DELETE')) {

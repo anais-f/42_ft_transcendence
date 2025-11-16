@@ -11,9 +11,9 @@
 		"test:pong:client": "node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-client",
 		"test:pong:server": "node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=pong-server",
 		"test:users": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=users",
-    "test:auth": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=auth",
-    "test:auth_google": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=auth_google",
-    "test:social": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=social",
+		"test:auth": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=auth",
+		"test:auth_google": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=auth_google",
+		"test:social": "dotenv -e .env.localtest -- node --no-warnings=ExperimentalWarning --experimental-vm-modules node_modules/.bin/jest --selectProjects=social",
 		"build": "npm run build --workspaces --if-present",
 		"build:pong": "npm run build:pong:shared && npm run build:pong:client && npm run build:pong:server",
 		"build:pong:shared": "npm run build --workspace=packages/pong-shared",
@@ -21,10 +21,10 @@
 		"build:pong:server": "npm run build --workspace=packages/pong-server",
 		"build:common": "npm run build --workspace=packages/common",
 		"build:security": "npm run build --workspace=packages/security",
-    "build:auth": "npm run build --workspace=services/auth/app",
-    "build:users": "npm run build --workspace=services/users/app",
-    "build:auth_google": "npm run build --workspace=services/auth_google/app",
-    "build:social": "npm run build --workspace=services/social/app",
+		"build:auth": "npm run build --workspace=services/auth/app",
+		"build:users": "npm run build --workspace=services/users/app",
+		"build:auth_google": "npm run build --workspace=services/auth_google/app",
+		"build:social": "npm run build --workspace=services/social/app",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
@@ -39,7 +39,7 @@
 		"services/auth/app",
 		"services/users/app",
 		"services/auth_google/app",
-    "services/social/app"
+		"services/social/app"
 	],
 	"devDependencies": {
 		"@eslint/js": "^9.32.0",

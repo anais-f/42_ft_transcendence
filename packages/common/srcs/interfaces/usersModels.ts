@@ -25,7 +25,7 @@ export interface IPrivateUser {
 	user_id: number
 	username: string
 	avatar: string
-  status: number // e.g., 0 = offline, 1 = online, etc.
+	status: number // e.g., 0 = offline, 1 = online, etc.
 	last_connection: string // ISO timestamp
 }
 
