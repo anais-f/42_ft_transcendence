@@ -12,11 +12,9 @@ describe('PongObject', () => {
 					[new Vector2(), new Vector2(10, 0), new Vector2(5, 5)],
 					new Vector2(0, 0)
 				),
-				new Vector2(5, 5),
-				new Vector2()
+				new Vector2(5, 5)
 			)
 			expect(obj.getHitbox().length === 1).toBe(true)
-			expect(obj.getVelocity()).toEqual(new Vector2())
 			expect(obj.getOrigin()).toEqual(new Vector2(5, 5))
 		})
 
@@ -25,7 +23,7 @@ describe('PongObject', () => {
 				new Circle(new Vector2(), 5),
 				new Rectangle(new Vector2(-5, -1), new Vector2(10, 2))
 			]
-			const obj = new PongObject(shapeArray, new Vector2(), new Vector2())
+			const obj = new PongObject(shapeArray, new Vector2())
 			expect(obj.getHitbox().length).toEqual(2)
 			expect(obj.getOrigin()).toEqual(new Vector2())
 			expect(obj.getHitbox()[0].getOrigin()).toEqual(new Vector2())
@@ -37,7 +35,6 @@ describe('PongObject', () => {
 		test('self intersect', () => {
 			const obj = new PongObject(
 				[new Circle(new Vector2(-1, 0), 2), new Circle(new Vector2(1, 0), 2)],
-				new Vector2(),
 				new Vector2()
 			)
 
@@ -50,8 +47,8 @@ describe('PongObject', () => {
 		})
 		test('2 circle', () => {
 			const c = new Circle(new Vector2(), 2)
-			const o1 = new PongObject(c, new Vector2(-1, 0), new Vector2())
-			const o2 = new PongObject(c, new Vector2(1, 0), new Vector2())
+			const o1 = new PongObject(c, new Vector2(-1, 0))
+			const o2 = new PongObject(c, new Vector2(1, 0))
 
 			const res = o1.intersect(o2)
 			expect(res).toBeInstanceOf(Array)
@@ -61,8 +58,8 @@ describe('PongObject', () => {
 
 		test('test relative coord', () => {
 			const c = new Circle(new Vector2(), 2)
-			const o1 = new PongObject([c], new Vector2(-13, 0), new Vector2())
-			const o2 = new PongObject(c, new Vector2(109, 0), new Vector2())
+			const o1 = new PongObject([c], new Vector2(-13, 0))
+			const o2 = new PongObject(c, new Vector2(109, 0))
 			let res = o1.intersect(o2)
 
 			expect(res).toBe(null)
@@ -97,7 +94,6 @@ describe('PongObject', () => {
 
 			const obj3 = new PongObject(
 				new Circle(new Vector2(0, 0), 0.2),
-				new Vector2(),
 				new Vector2()
 			)
 
@@ -106,7 +102,6 @@ describe('PongObject', () => {
 
 			const obj4 = new PongObject(
 				new Circle(new Vector2(0, 0), 2.3),
-				new Vector2(),
 				new Vector2()
 			)
 			res = obj1.intersect(obj4)
@@ -140,6 +135,57 @@ describe('PongObject', () => {
 			expect(res?.some((e) => e.equals(new Vector2(-1.157477, -1.98752)))).toBe(
 				true
 			)
+		})
+
+		test('seg', () => {
+			const obj = new PongObject(
+				new Circle(new Vector2(-3, -1), 3),
+				new Vector2()
+			)
+			const seg = new PongObject(
+				new Polygon([new Vector2(0, -8), new Vector2(4, 0)]),
+				new Vector2()
+			)
+
+			const res = obj.intersect(seg)
+
+			expect(res).toEqual(null)
+		})
+
+		test('seg 1', () => {
+			const obj = new PongObject(
+				new Circle(new Vector2(), 3),
+				new Vector2(-3, -1)
+			)
+			const seg = new PongObject(
+				new Polygon([new Vector2(), new Vector2(4, 0)]),
+				new Vector2(0, -8)
+			)
+
+			const res = obj.intersect(seg)
+
+			expect(res).toEqual(null)
+		})
+		test('seg 2', () => {
+			const obj = new PongObject(
+				new Circle(new Vector2(), 3),
+				new Vector2(-3, -1)
+			)
+			const seg = new PongObject(
+				new Polygon([new Vector2(-6, -5), new Vector2(4, 0)]),
+				new Vector2()
+			)
+
+			const res = obj.intersect(seg)
+
+			expect(res).toBeInstanceOf(Array)
+			expect(res).toHaveLength(2)
+			expect(
+				res?.some((e) => e.equals(new Vector2(-3.788854, -3.894427)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.equals(new Vector2(-0.211145, -2.105572)))
+			).toBe(true)
 		})
 
 		test('obj inside other', () => {

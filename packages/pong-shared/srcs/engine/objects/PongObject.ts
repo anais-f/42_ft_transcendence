@@ -5,14 +5,12 @@ import { Vector2 } from '../../math/Vector2.js'
 
 export class PongObject {
 	private origin: Vector2
-	private velocity: Vector2 // maybe deprecated
 	private hitbox: AShape[] = []
 	public bufferSize
 
 	public constructor(
 		hitbox: AShape | AShape[],
-		origin: Vector2 = new Vector2(),
-		velocity: Vector2 = new Vector2()
+		origin: Vector2 = new Vector2()
 	) {
 		if (Array.isArray(hitbox)) {
 			this.hitbox = hitbox
@@ -20,7 +18,6 @@ export class PongObject {
 			this.hitbox = [hitbox]
 		}
 		this.origin = origin
-		this.velocity = velocity
 
 		let size = 16 + 1
 		for (const lhitbox of this.hitbox) {
@@ -31,17 +28,6 @@ export class PongObject {
 			}
 		}
 		this.bufferSize = size
-	}
-
-	public applyVelo() {
-		this.origin.setXY(
-			this.origin.getX() + this.velocity.getX(),
-			this.origin.getY() + this.velocity.getY()
-		)
-	}
-
-	public getVelocity(): Vector2 {
-		return this.velocity
 	}
 
 	public getHitbox(): AShape[] {
@@ -58,11 +44,7 @@ export class PongObject {
 
 	public static clone(obj: PongObject): PongObject {
 		const dupHitbox = obj.getHitbox().map((h) => h.clone())
-		return new PongObject(
-			dupHitbox,
-			obj.getOrigin().clone(),
-			obj.getVelocity().clone()
-		)
+		return new PongObject(dupHitbox, obj.getOrigin().clone())
 	}
 
 	public clone() {
