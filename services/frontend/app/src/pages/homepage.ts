@@ -7,13 +7,13 @@ export const HomePage = (): string => /*html*/ `
       ft_transcendence</h1>
     <div class="flex place-content-center">
       <a href="#register">
-        <button class="bg-green-800 p-3 m-5 rounded-lg hover:bg-green-300 hover:text-black">Sign in</button>
+        <button class="bg-gray-300 m-5 p-3 rounded-md border border-gray-400  hover:bg-gray-400 shadow-xl">Sign in</button>
       </a>
       <a href="#wales">
-        <button class="bg-blue-800  m-5 p-3 rounded-lg hover:bg-sky-300 hover:text-black">Sign up</button>
+        <button class="bg-gray-300 m-5 p-3 rounded-md border border-gray-400  hover:bg-gray-400 shadow-xl">Sign up</button>
       </a>
         <a href="#me" class="flex justify-between">
-          <button class=" bg-gray-100 place-center m-5 rounded-lg p-3 px-4 text-black hover:bg-gray-400">
+          <button class="bg-gray-100 place-center m-5 rounded-lg p-3 px-4 hover:bg-gray-400 shadow-xl">
             <img src="/images/Google_logo_svg.webp" alt="Google_logo" class="size-7 inline -ml-3">
             Continue with Google</button>
         </a>
