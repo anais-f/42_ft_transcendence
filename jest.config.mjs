@@ -38,18 +38,6 @@ const config = {
 		},
 		{
 			...commonConfig,
-			displayName: 'pong-client',
-			rootDir: '<rootDir>/packages/pong-client',
-			testMatch: ['**/*.test.ts']
-		},
-		{
-			...commonConfig,
-			displayName: 'pong-server',
-			rootDir: '<rootDir>/packages/pong-server',
-			testMatch: ['**/*.test.ts']
-		},
-		{
-			...commonConfig,
 			displayName: 'pong-server-app',
 			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
 			rootDir: './'
