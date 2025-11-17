@@ -69,8 +69,6 @@ export class GameEngine {
 	}
 
 	private playTick(): void {
-		console.log(this.TPS_DATA.tickCount)
-
 		++this.TPS_DATA.tickCount
 	}
 
