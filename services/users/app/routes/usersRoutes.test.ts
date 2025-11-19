@@ -3,7 +3,7 @@
  * @description Integration tests for Users Routes with JWT and API Key authentication
  *
  * Test Suite Summary:
- * 1. POST /api/users/new-user - API Key protected
+ * 1. POST /api/internal/users/new-user - API Key protected
  * 2. GET /api/users/:id - JWT protected
  * 3. GET /api/users/me - JWT protected (own profile)
  * 4. PATCH /api/users/me - JWT protected (update username)
@@ -233,15 +233,15 @@ describe('Users Routes - Authentication & Authorization', () => {
 	})
 
 	// ===========================================
-	// 1. POST /api/users/new-user - API KEY PROTECTED
+	// 1. POST /api/internal/users/new-user - API KEY PROTECTED
 	// ===========================================
-	describe('POST /api/users/new-user - API Key Protection', () => {
+	describe('POST /api/internal/users/new-user - API Key Protection', () => {
 		it('should create user with valid API key - SUCCESS', async () => {
 			UsersServices.createUser.mockResolvedValueOnce(undefined)
 
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': VALID_API_KEY,
 					'content-type': 'application/json'
@@ -259,7 +259,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject without API key - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'content-type': 'application/json'
 				},
@@ -278,7 +278,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject with invalid API key - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': 'wrong-key',
 					'content-type': 'application/json'
@@ -519,7 +519,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 			UsersServices.createUser.mockResolvedValueOnce(undefined)
 			const apiKeyRoute = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': VALID_API_KEY,
 					'content-type': 'application/json'

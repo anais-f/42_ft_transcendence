@@ -151,7 +151,7 @@ describe('authController registerController', () => {
 
 		expect(registerUserMock).toHaveBeenCalled()
 		expect(fetchMock).toHaveBeenCalledWith(
-			'http://users/api/users/new-user',
+			'http://users/api/internal/users/new-user',
 			expect.any(Object)
 		)
 		expect(reply.send).toHaveBeenCalledWith({ success: true })
