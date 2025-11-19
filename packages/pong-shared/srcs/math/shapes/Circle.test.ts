@@ -80,9 +80,9 @@ describe('Circle', () => {
 			)
 			const res = circle.intersect(segmentPartial)
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-3.53553, -3.53553)))).toBe(
-				true
-			)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-3.53553, -3.53553)))
+			).toBe(true)
 		})
 
 		test('intersect circle with other fully inside', () => {
@@ -92,7 +92,9 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))).toBe(false)
+			expect(
+				res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))
+			).toBe(false)
 		})
 		test('intersect circle with other fully inside 2', () => {
 			const v1 = new Vector2(5, 7)
@@ -101,7 +103,9 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))).toBe(false)
+			expect(
+				res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))
+			).toBe(false)
 		})
 
 		test('intersect circle with other fully inside 3', () => {
@@ -110,7 +114,9 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))).toBe(false)
+			expect(
+				res?.some((e) => isNaN(e.hitPoint.getX()) || isNaN(e.hitPoint.getY()))
+			).toBe(false)
 		})
 
 		test('intersect circle with other inside', () => {
@@ -124,7 +130,9 @@ describe('Circle', () => {
 
 			expect(res).toHaveLength(2)
 
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0.8, -0.6)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0.8, -0.6)))).toBe(
+				true
+			)
 			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1)))).toBe(true)
 		})
 
@@ -137,8 +145,12 @@ describe('Circle', () => {
 
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(2)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0.866025, 0.5)))).toBe(true)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-0.866025, 0.5)))).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(0.866025, 0.5)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-0.866025, 0.5)))
+			).toBe(true)
 		})
 
 		test('intersect circle with other outside', () => {
@@ -166,7 +178,9 @@ describe('Circle', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				expect(
-					res?.some((e) => e.hitPoint.equals(new Vector2(3.5355339059, 3.5355339059)))
+					res?.some((e) =>
+						e.hitPoint.equals(new Vector2(3.5355339059, 3.5355339059))
+					)
 				).toBe(true)
 			})
 
@@ -194,10 +208,14 @@ describe('Circle', () => {
 				const res = circle.intersect(ray)
 
 				expect(
-					res?.some((e) => e.hitPoint.equals(new Vector2(-3.5355339059, -3.5355339059)))
+					res?.some((e) =>
+						e.hitPoint.equals(new Vector2(-3.5355339059, -3.5355339059))
+					)
 				)
 				expect(
-					res?.some((e) => e.hitPoint.equals(new Vector2(3.5355339059, 3.5355339059)))
+					res?.some((e) =>
+						e.hitPoint.equals(new Vector2(3.5355339059, 3.5355339059))
+					)
 				)
 				expect(res).toBeInstanceOf(Array)
 			})
@@ -209,10 +227,14 @@ describe('Circle', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(
-					res?.some((e) => e.hitPoint.equals(new Vector2(3.5355339059, -3.5355339059)))
+					res?.some((e) =>
+						e.hitPoint.equals(new Vector2(3.5355339059, -3.5355339059))
+					)
 				)
 				expect(
-					res?.some((e) => e.hitPoint.equals(new Vector2(-3.5355339059, 3.5355339059)))
+					res?.some((e) =>
+						e.hitPoint.equals(new Vector2(-3.5355339059, 3.5355339059))
+					)
 				)
 			})
 

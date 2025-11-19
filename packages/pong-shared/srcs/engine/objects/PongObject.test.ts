@@ -52,8 +52,12 @@ describe('PongObject', () => {
 
 			const res = o1.intersect(o2)
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.73205)))).toBe(true)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, -1.73205)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.73205)))).toBe(
+				true
+			)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(0, -1.73205)))
+			).toBe(true)
 		})
 
 		test('test relative coord', () => {
@@ -69,8 +73,12 @@ describe('PongObject', () => {
 			res = o1.intersect(o2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.82287)))).toBe(true)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, -0.82287)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.82287)))).toBe(
+				true
+			)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(0, -0.82287)))
+			).toBe(true)
 		})
 
 		test('multiobj test', () => {
@@ -107,34 +115,34 @@ describe('PongObject', () => {
 			res = obj1.intersect(obj4)
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(4)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, 1.98752)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, 1.15747)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, 1.15747)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, 1.98752)))).toBe(
-				true
-			)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, 1.98752)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, 1.15747)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, 1.15747)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, 1.98752)))
+			).toBe(true)
 
 			res = obj2.intersect(obj4)
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(4)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, -1.98752)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, -1.15747)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, -1.15747)))).toBe(
-				true
-			)
-			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, -1.98752)))).toBe(
-				true
-			)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, -1.98752)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, -1.15747)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, -1.15747)))
+			).toBe(true)
+			expect(
+				res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, -1.98752)))
+			).toBe(true)
 		})
 
 		test('seg', () => {

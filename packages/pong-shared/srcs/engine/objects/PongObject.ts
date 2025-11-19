@@ -79,7 +79,8 @@ export class PongObject {
 			return null
 		}
 		return hits.filter(
-			(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
+			(pt, idx, arr) =>
+				arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 		)
 	}
 

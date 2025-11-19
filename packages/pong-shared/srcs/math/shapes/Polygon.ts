@@ -33,51 +33,65 @@ export class Polygon extends AShape {
 		)
 	}
 
-	public intersect(other: Circle): IIntersect[] | null
-	public intersect(other: Polygon): IIntersect[] | null
-	public intersect(other: Ray): IIntersect[] | null
-	public intersect(other: Segment): IIntersect[] | null
+	public intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
+	public intersect(other: Polygon, otherNormal: boolean): IIntersect[] | null
+	public intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
+	public intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
 
-	public intersect(other: Circle | Ray | Polygon | Segment): IIntersect[] | null {
+	public intersect(
+		other: Circle | Ray | Polygon | Segment,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		if (other instanceof Circle) {
-			return this.intersectCircle(other)
+			return this.intersectCircle(other, otherNormal)
 		} else if (other instanceof Ray) {
-			return this.intersectRay(other)
+			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Polygon) {
-			return this.intersectPolygon(other)
+			return this.intersectPolygon(other, otherNormal)
 		} else if (other instanceof Segment) {
-			return this.intersectSeg(other)
+			return this.intersectSeg(other, otherNormal)
 		}
 		throw 'Invalid intersect'
 	}
 
-	private intersectCircle(other: Circle): IIntersect[] | null {
+	private intersectCircle(
+		other: Circle,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		const AS = this.getAbsoluteSegments()
 		let hps: IIntersect[] = []
 		for (const seg of AS) {
-			const hp = seg.intersect(other)
+			const hp = seg.intersect(other, otherNormal)
 			if (Array.isArray(hp)) {
 				hps = [...hps, ...hp]
 			}
 		}
 		if (hps.length !== 0) {
 			return hps.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
+				(pt, idx, arr) =>
+					arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 		}
 
 		if (this.containsPoint(other.getPos())) {
-			return [{hitPoint: other.getPos()}]
+			return [
+				{
+					hitPoint: other.getPos(),
+					normal: otherNormal
+						? other.getNormalAt(other.getPos())
+						: this.getNormalAt(other.getPos())
+				}
+			]
 		}
 		return null
 	}
 
-	private intersectRay(other: Ray): IIntersect[] | null {
+	private intersectRay(other: Ray, otherNormal: boolean): IIntersect[] | null {
 		const AS = this.getAbsoluteSegments()
 		let hps: IIntersect[] = []
 
 		for (const seg of AS) {
-			let hp: IIntersect[] | null = other.intersect(seg)
+			let hp: IIntersect[] | null = other.intersect(seg, otherNormal)
 			if (Array.isArray(hp)) {
 				hps.push(hp[0])
 			}
@@ -88,7 +102,8 @@ export class Polygon extends AShape {
 		}
 		return hps
 			.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
+				(pt, idx, arr) =>
+					arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 			.sort(
 				(a, b) =>
@@ -97,14 +112,17 @@ export class Polygon extends AShape {
 			)
 	}
 
-	private intersectPolygon(other: Polygon): IIntersect[] | null {
+	private intersectPolygon(
+		other: Polygon,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		const localAbSeg = this.getAbsoluteSegments()
 		const otherAbSeg = other.getAbsoluteSegments()
 
 		let res: IIntersect[] = []
 		for (const seg1 of localAbSeg) {
 			for (const seg2 of otherAbSeg) {
-				const t: IIntersect[] | null = seg1.intersect(seg2)
+				const t: IIntersect[] | null = seg1.intersect(seg2, otherNormal)
 				if (Array.isArray(t)) {
 					res = [...res, ...t]
 				}
@@ -112,7 +130,8 @@ export class Polygon extends AShape {
 		}
 		if (res.length !== 0) {
 			return res.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
+				(pt, idx, arr) =>
+					arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 		}
 		// bad polygon clipping implementation
@@ -129,7 +148,8 @@ export class Polygon extends AShape {
 		}
 
 		return res.filter(
-			(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
+			(pt, idx, arr) =>
+				arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 		)
 	}
 
@@ -161,17 +181,30 @@ export class Polygon extends AShape {
 		return inside
 	}
 
-	private intersectSeg(other: Segment): IIntersect[] | null {
+	private intersectSeg(
+		other: Segment,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		let hps: IIntersect[] = []
 		if (this.containsPoint(other.getP1())) {
-			hps.push({hitPoint: other.getP1()})
+			hps.push({
+				hitPoint: other.getP1(),
+				normal: otherNormal
+					? other.getNormal()
+					: this.getNormalAt(other.getP1())
+			})
 		}
 		if (this.containsPoint(other.getP2())) {
-			hps.push({hitPoint: other.getP2()})
+			hps.push({
+				hitPoint: other.getP2(),
+				normal: otherNormal
+					? other.getNormal()
+					: this.getNormalAt(other.getP2())
+			})
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {
-			const hp = seg.intersect(other)
+			const hp = seg.intersect(other, otherNormal)
 			if (Array.isArray(hp)) {
 				for (const point of hp) {
 					if (!hps.some((e) => e.hitPoint.equals(point.hitPoint))) {

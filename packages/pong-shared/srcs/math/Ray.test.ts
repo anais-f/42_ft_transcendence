@@ -76,7 +76,9 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].hitPoint.equals(new Vector2(expected, expected))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(expected, expected))).toBe(
+					true
+				)
 			})
 
 			test('should handle near-parallel rays correctly', () => {

@@ -8,7 +8,7 @@ export abstract class AShape {
 		this.origin = origin
 	}
 
-	abstract intersect(_other: AShape): IIntersect[] | null
+	abstract intersect(_other: AShape, _otherNormal: boolean): IIntersect[] | null
 	abstract containsPoint(point: Vector2): boolean
 	abstract clone(): AShape
 	abstract getNormalAt(point: Vector2): Vector2

@@ -28,26 +28,28 @@ export class Circle extends AShape {
 		this.rad = rad
 	}
 
-	
-	intersect(other: Segment): IIntersect[] | null
-	intersect(other: Circle): IIntersect[] | null
-	intersect(other: Ray): IIntersect[] | null
-	intersect(other: Polygon): IIntersect[] | null
+	intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Polygon, otherNormal: boolean): IIntersect[] | null
 
-	intersect(other: Segment | Ray | Polygon | Circle): IIntersect[] | null {
+	intersect(
+		other: Segment | Ray | Polygon | Circle,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		if (other instanceof Segment) {
-			return other.intersect(this)
+			return other.intersect(this, otherNormal)
 		} else if (other instanceof Circle) {
-			return this.intersectCircle(other)
+			return this.intersectCircle(other, otherNormal)
 		} else if (other instanceof Ray) {
-			return this.intersectRay(other)
+			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Polygon) {
-			return other.intersect(this)
+			return other.intersect(this, otherNormal)
 		}
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): IIntersect[] | null {
+	private intersectRay(other: Ray, otherNormal: boolean): IIntersect[] | null {
 		function getHitPoint(ray: Ray, t: number): Vector2 {
 			return Vector2.add(
 				ray.getOrigin(),
@@ -55,7 +57,7 @@ export class Circle extends AShape {
 			)
 		}
 
-		const op = Vector2.subtract(this.getOrigin(), other.getOrigin())
+		const op = Vector2.subtract(this.getPos(), other.getOrigin())
 		const squaredRad = this.getRad() ** 2
 		const dotOp = Vector2.dot(op, op)
 
@@ -70,7 +72,15 @@ export class Circle extends AShape {
 
 		if (dotOp <= squaredRad) {
 			const t = D + K
-			return [{hitPoint:getHitPoint(other, t)}]
+			const point = getHitPoint(other, t)
+			return [
+				{
+					hitPoint: point,
+					normal: otherNormal
+						? new Segment(other.getOrigin(), point).getNormal()
+						: this.getNormalAt(point)
+				}
+			]
 		}
 
 		const t1 = D - K
@@ -84,12 +94,35 @@ export class Circle extends AShape {
 		const p2 = getHitPoint(other, t2)
 
 		if (p1.equals(p2)) {
-			return [{hitPoint: p1}]
+			return [
+				{
+					hitPoint: p1,
+					normal: otherNormal
+						? new Segment(other.getOrigin(), p1).getNormal()
+						: this.getNormalAt(p1)
+				}
+			]
 		}
-		return [{hitPoint: p1}, {hitPoint: p2}]
+		return [
+			{
+				hitPoint: p1,
+				normal: otherNormal
+					? new Segment(other.getOrigin(), p1).getNormal()
+					: this.getNormalAt(p1)
+			},
+			{
+				hitPoint: p2,
+				normal: otherNormal
+					? new Segment(other.getOrigin(), p2).getNormal()
+					: this.getNormalAt(p2)
+			}
+		]
 	}
 
-	private intersectCircle(other: Circle): IIntersect[] | null {
+	private intersectCircle(
+		other: Circle,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		let d = Vector2.subtract(other.getPos(), this.origin)
 		const sqDistance = d.squaredLength()
 		const radiusSum = this.rad + other.getRad()
@@ -101,13 +134,33 @@ export class Circle extends AShape {
 
 		// weird fix
 		if (sqDistance <= 0) {
-			return [this.getRad() > other.getRad() ? {hitPoint: other.getPos()} : {hitPoint: this.getPos()}]
+			return [
+				this.getRad() > other.getRad()
+					? {
+							hitPoint: other.getPos(),
+							normal: otherNormal
+								? other.getNormalAt(other.getPos())
+								: this.getNormalAt(other.getPos())
+						}
+					: {
+							hitPoint: this.getPos(),
+							normal: otherNormal
+								? other.getNormalAt(this.getPos())
+								: this.getNormalAt(this.getPos())
+						}
+			]
 		}
 
 		const distance = Math.sqrt(sqDistance)
 
 		if (distance === radiusSum) {
-			return [{hitPoint: Vector2.add(this.origin, d.multiply(this.rad))}]
+			const hp = Vector2.add(this.origin, d.multiply(this.rad))
+			return [
+				{
+					hitPoint: hp,
+					normal: otherNormal ? other.getNormalAt(hp) : this.getNormalAt(hp)
+				}
+			]
 		}
 
 		const a =
@@ -133,9 +186,32 @@ export class Circle extends AShape {
 			isNaN(t1.getY()) ||
 			isNaN(t2.getY())
 		) {
-			return [this.getRad() > other.getRad() ? {hitPoint: other.getPos()} : {hitPoint: this.getPos()}]
+			return [
+				this.getRad() > other.getRad()
+					? {
+							hitPoint: other.getPos(),
+							normal: otherNormal
+								? other.getNormalAt(other.getPos())
+								: this.getNormalAt(other.getPos())
+						}
+					: {
+							hitPoint: this.getPos(),
+							normal: otherNormal
+								? other.getNormalAt(this.getPos())
+								: this.getNormalAt(this.getPos())
+						}
+			]
 		}
-		return [{hitPoint: t1}, {hitPoint: t2}]
+		return [
+			{
+				hitPoint: t1,
+				normal: otherNormal ? other.getNormalAt(t1) : this.getNormalAt(t1)
+			},
+			{
+				hitPoint: t2,
+				normal: otherNormal ? other.getNormalAt(t2) : this.getNormalAt(t2)
+			}
+		]
 	}
 
 	public containsPoint(point: Vector2): boolean {

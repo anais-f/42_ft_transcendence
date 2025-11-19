@@ -22,8 +22,8 @@ describe('Segment', () => {
 				const hps: IIntersect[] | null = s.intersect(c)
 				expect(Array.isArray(hps)).toBe(true)
 				expect(hps?.length).toEqual(2)
-				expect(hps).toContainEqual({hitPoint: new Vector2(7, 0)})
-				expect(hps).toContainEqual({hitPoint: new Vector2(3, 0)})
+				expect(hps).toContainEqual({ hitPoint: new Vector2(7, 0) })
+				expect(hps).toContainEqual({ hitPoint: new Vector2(3, 0) })
 			})
 
 			test('no intersect test', () => {
@@ -43,7 +43,7 @@ describe('Segment', () => {
 				const hps: IIntersect[] | null = s.intersect(c)
 				expect(Array.isArray(hps)).toBe(true) // tangent
 				expect(hps?.length).toEqual(1)
-				expect(hps).toContainEqual({hitPoint: new Vector2(5, 0)})
+				expect(hps).toContainEqual({ hitPoint: new Vector2(5, 0) })
 			})
 		})
 
@@ -62,7 +62,7 @@ describe('Segment', () => {
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual({hitPoint: new Vector2(0, 0)})
+				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0) })
 			})
 			test('point intersect', () => {
 				const s1 = new Segment(new Vector2(), new Vector2(0, 1))
@@ -71,7 +71,7 @@ describe('Segment', () => {
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual({hitPoint: new Vector2(0, 0)})
+				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0) })
 			})
 
 			test('paralel no intersect', () => {
@@ -87,7 +87,7 @@ describe('Segment', () => {
 				const res = s1.intersect(s2)
 
 				expect(Array.isArray(res)).toBe(true)
-				expect(res).toContainEqual({hitPoint: new Vector2(0, 0.5)})
+				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0.5) })
 			})
 
 			test('self intersect', () => {
@@ -159,7 +159,9 @@ describe('Segment', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].hitPoint.equals(new Vector2(-0.54383, -0.54383))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(-0.54383, -0.54383))).toBe(
+					true
+				)
 			})
 		})
 

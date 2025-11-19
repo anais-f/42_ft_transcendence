@@ -349,7 +349,10 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res).toEqual([{hitPoint: new Vector2(0, 5)}, {hitPoint: new Vector2(10, 5)}])
+					expect(res).toEqual([
+						{ hitPoint: new Vector2(0, 5) },
+						{ hitPoint: new Vector2(10, 5) }
+					])
 				})
 
 				test('Ray from inside pointing outward', () => {
@@ -357,7 +360,9 @@ describe('Polygon', () => {
 					const res = square.intersect(ray2)
 
 					expect(res).toBeInstanceOf(Array)
-					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 5)))).toBe(true)
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 5)))).toBe(
+						true
+					)
 				})
 
 				test('edge', () => {
@@ -366,7 +371,10 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res).toEqual([{hitPoint: new Vector2(10, 0)}, {hitPoint: new Vector2(10, 10)}])
+					expect(res).toEqual([
+						{ hitPoint: new Vector2(10, 0) },
+						{ hitPoint: new Vector2(10, 10) }
+					])
 				})
 			})
 
@@ -395,8 +403,12 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 7.23606)))).toBe(true)
-					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 2.76393)))).toBe(true)
+					expect(
+						res?.some((e) => e.hitPoint.equals(new Vector2(0, 7.23606)))
+					).toBe(true)
+					expect(
+						res?.some((e) => e.hitPoint.equals(new Vector2(0, 2.76393)))
+					).toBe(true)
 				})
 				test('circle entirely inside polygon', () => {
 					const circle = new Circle(new Vector2(5, 5), 2)
@@ -412,12 +424,12 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 7.23606)))).toBe(
-						true
-					)
-					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 2.76393)))).toBe(
-						true
-					)
+					expect(
+						res?.some((e) => e.hitPoint.equals(new Vector2(10, 7.23606)))
+					).toBe(true)
+					expect(
+						res?.some((e) => e.hitPoint.equals(new Vector2(10, 2.76393)))
+					).toBe(true)
 				})
 				test('touching at a vertex', () => {
 					const circle = new Circle(new Vector2(-2, 0), 2)

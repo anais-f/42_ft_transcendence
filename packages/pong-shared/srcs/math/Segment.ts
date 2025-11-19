@@ -4,6 +4,7 @@ import { Vector2 } from './Vector2.js'
 import { Circle } from './shapes/Circle.js'
 import { Polygon } from './shapes/Polygon.js'
 import { IIntersect } from './IIntersect.js'
+import { ota } from 'zod/locales'
 
 export class Segment {
 	constructor(
@@ -23,24 +24,30 @@ export class Segment {
 		return this.p2
 	}
 
-	intersect(other: Circle): IIntersect[] | null
-	intersect(other: Segment): IIntersect[] | null
-	intersect(other: Polygon): IIntersect[] | null
-	intersect(other: Ray): IIntersect[] | null
-	intersect(other: Circle | Segment | Polygon | Ray): IIntersect[] | null {
+	intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Polygon, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
+	intersect(
+		other: Circle | Segment | Polygon | Ray,
+		otherNormal: boolean = false
+	): IIntersect[] | null {
 		if (other instanceof Circle) {
-			return this.intersectCircle(other)
+			return this.intersectCircle(other, otherNormal)
 		} else if (other instanceof Segment) {
-			return this.intersectSeg(other)
+			return this.intersectSeg(other, otherNormal)
 		} else if (other instanceof Polygon) {
-			return other.intersect(this)
+			return other.intersect(this, true)
 		} else if (other instanceof Ray) {
-			return other.intersect(this)
+			return other.intersect(this, true)
 		}
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(other: Segment): IIntersect[] | null {
+	private intersectSeg(
+		other: Segment,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		const [a1, a2] = [this.p1, this.p2]
 		const [b1, b2] = other.getPoints()
 
@@ -57,21 +64,27 @@ export class Segment {
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
 			const t = d1 / (d1 - d2)
+			const hp = Vector2.add(a1, Vector2.subtract(a2, a1).multiply(t))
 			const intersectionPoint = {
-				hitPoint : Vector2.add(
-				a1,
-				Vector2.subtract(a2, a1).multiply(t)
-				)
+				hitPoint: hp,
+				normal: otherNormal ? other.getNormal() : this.getNormal()
 			}
 			return [intersectionPoint]
 		}
 
 		let points: IIntersect[] = []
 		if (a1.equals(b1) || a1.equals(b2)) {
-			points.push({hitPoint: a1})
+			points.push({
+				hitPoint: a1,
+				normal: otherNormal ? other.getNormal() : this.getNormal()
+			})
 		}
+
 		if (a2.equals(b1) || a2.equals(b2)) {
-			points.push({hitPoint: a2})
+			points.push({
+				hitPoint: a2,
+				normal: otherNormal ? other.getNormal() : this.getNormal()
+			})
 		}
 
 		const colinear =
@@ -86,7 +99,10 @@ export class Segment {
 					Segment.pointIsOnSeg(b1, b2, pt)
 				) {
 					if (!overlap.some((p) => p.hitPoint.equals(pt))) {
-						overlap.push({hitPoint: pt})
+						overlap.push({
+							hitPoint: pt,
+							normal: otherNormal ? other.getNormal() : this.getNormal()
+						})
 					}
 				}
 			}
@@ -107,7 +123,7 @@ export class Segment {
 		return null
 	}
 
-	intersectCircle(other: Circle): IIntersect[] | null {
+	intersectCircle(other: Circle, otherNormal: boolean): IIntersect[] | null {
 		const a = this.p1
 		const b = this.p2
 		const center = other.getPos()
@@ -119,9 +135,12 @@ export class Segment {
 		if (aIn && bIn) {
 			return [
 				{
-					hitPoint: a.clone()
-				}, {
-					hitPoint: b.clone()
+					hitPoint: a.clone(),
+					normal: otherNormal ? other.getNormalAt(a) : this.getNormal()
+				},
+				{
+					hitPoint: b.clone(),
+					normal: otherNormal ? other.getNormalAt(a) : this.getNormal()
 				}
 			]
 		}
@@ -144,10 +163,18 @@ export class Segment {
 
 		const points: IIntersect[] = []
 		if (t1 >= 0 && t1 <= 1) {
-			points.push({hitPoint: Vector2.add(a, Vector2.multiply(d, t1))})
+			const hp = Vector2.add(a, Vector2.multiply(d, t1))
+			points.push({
+				hitPoint: hp,
+				normal: otherNormal ? other.getNormalAt(hp) : this.getNormal()
+			})
 		}
 		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
-			points.push({hitPoint: Vector2.add(a, Vector2.multiply(d, t2))})
+			const hp = Vector2.add(a, Vector2.multiply(d, t2))
+			points.push({
+				hitPoint: hp,
+				normal: otherNormal ? other.getNormalAt(hp) : this.getNormal()
+			})
 		}
 
 		if ((aIn || bIn) && points.length === 1) {

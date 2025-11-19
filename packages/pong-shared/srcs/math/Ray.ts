@@ -33,22 +33,25 @@ export class Ray {
 		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
-	intersect(other: Segment): IIntersect[] | null
-	intersect(other: Ray): IIntersect[] | null
-	intersect(other: Circle): IIntersect[] | null
+	intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
 
-	intersect(other: Segment | Circle | Ray): IIntersect[] | null {
+	intersect(
+		other: Segment | Circle | Ray,
+		otherNormal: boolean = false
+	): IIntersect[] | null {
 		if (other instanceof Segment) {
-			return this.intersectSegment(other)
+			return this.intersectSegment(other, otherNormal)
 		} else if (other instanceof Ray) {
-			return this.intersectRay(other)
+			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Circle) {
-			return other.intersect(this)
+			return other.intersect(this, otherNormal)
 		}
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): IIntersect[] | null {
+	private intersectRay(other: Ray, otherNormal: boolean): IIntersect[] | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
 		if (Math.abs(crossProduct) < EPSILON) {
@@ -69,12 +72,23 @@ export class Ray {
 				this.getOrigin(),
 				this.getDirection().multiply(t1)
 			)
-			return [{hitPoint: intersectionPoint}]
+			return [
+				{
+					hitPoint: intersectionPoint,
+					normal: new Segment(
+						otherNormal ? other.getOrigin() : this.origin,
+						intersectionPoint
+					).getNormal()
+				}
+			]
 		}
 		return null
 	}
 
-	private intersectSegment(other: Segment): IIntersect[] | null {
+	private intersectSegment(
+		other: Segment,
+		otherNormal: boolean
+	): IIntersect[] | null {
 		const O = this.getOrigin()
 		const D = this.getDirection()
 		const A = other.getP1()
@@ -105,14 +119,28 @@ export class Ray {
 			}
 
 			const hitPoint = Vector2.add(O, D.clone().multiply(tOverlapStart))
-			return [{hitPoint: hitPoint}]
+			return [
+				{
+					hitPoint: hitPoint,
+					normal: otherNormal
+						? other.getNormal()
+						: new Segment(this.getOrigin(), hitPoint).getNormal()
+				}
+			]
 		}
 		const t1 = Vector2.cross(v2, v1) / denom
 		const t2 = Vector2.cross(D, v1) / denom
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
 			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1))
-			return [{hitPoint: intersectionPoint}]
+			return [
+				{
+					hitPoint: intersectionPoint,
+					normal: otherNormal
+						? other.getNormal()
+						: new Segment(this.getOrigin(), intersectionPoint).getNormal()
+				}
+			]
 		}
 
 		return null
