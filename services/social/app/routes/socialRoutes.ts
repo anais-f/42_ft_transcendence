@@ -2,7 +2,7 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
-import { createTokenController } from '../controllers/websocketControllers.js'
+import { createTokenController } from '../controllers/tokenControllers.js'
 import { addConnection, getTotalConnections } from '../usescases/connectionManager.js'
 import WebSocket from 'ws'
 
@@ -13,7 +13,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	server.post(
 		'/api/create-token',
 		{
-			preHandler: jwtAuthMiddleware
+			preHandler: [jwtAuthMiddleware]
 		},
 		createTokenController
 	)
@@ -61,11 +61,14 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			// connectionManager va automatiquement :
 			// - attacher les handlers (pong, close, error)
 			// - notifier le service users que l'user est online
-			const isFirstConnection = addConnection(userId, socket)
+			addConnection(userId, socket).catch((error) => {
+				const message = error instanceof Error ? error.message : String(error)
+				console.error(`Failed to add connection for user ${userId}:`, message)
+			})
 
 			console.log(`✅ [WS] ${userLogin} (${userId}) connected`)
 			console.log(
-				`   First: ${isFirstConnection} | Total: ${getTotalConnections()}`
+				`   Total: ${getTotalConnections()}`
 			)
 
 			// Send welcome message
@@ -75,7 +78,6 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 					data: {
 						userId,
 						login: userLogin,
-						isFirstConnection,
 						totalConnected: getTotalConnections(),
 						timestamp: new Date().toISOString()
 					}
@@ -84,14 +86,17 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 
 			// Handle incoming messages from client
 			socket.on('message', (rawData: WebSocket.Data) => {
+				const rawMessage = rawData.toString()
+				
+				// Try to parse as JSON, fallback to plain text
+				let message: any
 				try {
-					const message = JSON.parse(rawData.toString())
-					console.log(
-						`📨 [MSG] ${userLogin}: ${message.type || 'unknown'}`
-					)
-
-					// TODO: Route message to appropriate handler
-					// For now, just echo back
+					message = JSON.parse(rawMessage)
+				} catch (e) {
+					// Not JSON, treat as plain text message
+					// Sanitize and truncate the raw message for safe logging
+					const safe = rawMessage.replace(/\s+/g, ' ').trim().slice(0, 200)
+					console.log(`📨 [MSG] ${userLogin}: ${safe}`)
 					socket.send(
 						JSON.stringify({
 							type: 'message:echo',
@@ -100,23 +105,32 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 									userId,
 									login: userLogin
 								},
-								content: message
+								content: rawMessage
 							}
 						})
 					)
-				} catch (e) {
-					const message = e instanceof Error ? e.message : String(e)
-					console.warn(
-						`[MSG] Error parsing message from ${userLogin}: ${message}`
-					)
-					socket.send(
-						JSON.stringify({
-							type: 'error',
-							code: 'INVALID_MESSAGE',
-							message: 'Invalid message format'
-						})
-					)
+					return
 				}
+
+				// Valid JSON message
+				console.log(
+					`📨 [MSG] ${userLogin}: ${message.type || 'unknown'}`
+				)
+
+				// TODO: Route message to appropriate handler
+				// For now, just echo back
+				socket.send(
+					JSON.stringify({
+						type: 'message:echo',
+						data: {
+							from: {
+								userId,
+								login: userLogin
+							},
+							content: message
+						}
+					})
+				)
 			})
 			// Note: 'pong', 'close', and 'error' handlers are attached by connectionManager
 		}

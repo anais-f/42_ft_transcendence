@@ -34,7 +34,7 @@ function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
 }
 
 /**
- * Start heartbeat interval (enverra un ping toutes les 30s)
+ * Start heartbeat interval (ping 30s)
  */
 function startHeartbeat(): void {
 	if (heartbeatInterval) return
@@ -64,8 +64,6 @@ function startHeartbeat(): void {
 			}
 		}
 	}, HEARTBEAT_INTERVAL_MS) as NodeJS.Timeout
-
-	console.log('Heartbeat started')
 }
 
 /**
@@ -75,7 +73,6 @@ function stopHeartbeat(): void {
 	if (heartbeatInterval) {
 		clearInterval(heartbeatInterval)
 		heartbeatInterval = null
-		console.log('Heartbeat stopped')
 	}
 }
 
@@ -87,7 +84,6 @@ function cancelPendingDisconnect(userId: string): void {
 	if (timer) {
 		clearTimeout(timer)
 		pendingDisconnectTimers.delete(userId)
-		console.log(`Cancelled pending disconnect for user ${userId}`)
 	}
 }
 
@@ -110,7 +106,6 @@ async function notifyStatusChange(
 		status: statusValue
 	}
 
-	// Add lastConnection timestamp when going offline
 	if (status === 'offline') {
 		body.lastConnection = new Date().toISOString()
 	}
@@ -153,7 +148,7 @@ async function notifyStatusChange(
  * @param ws - WebSocket instance
  * @returns true if this is the user's first connection (went online), false if replacing existing
  */
-export function addConnection(userId: string, ws: WebSocket): boolean {
+export async function addConnection(userId: string, ws: WebSocket): Promise<boolean> {
 	const existingConn = wsConnections.get(userId)
 	const isFirstConnection = !existingConn
 
@@ -176,11 +171,12 @@ export function addConnection(userId: string, ws: WebSocket): boolean {
 
 	setupWebSocketHandlers(userId, ws)
 
-	if (isFirstConnection) {
-		console.log(`User ${userId} is now ONLINE`)
-		notifyStatusChange(userId, 'online')
-	} else {
-		console.log(`User ${userId} reconnected (replaced old connection)`)
+	console.log(`User ${userId} is now ONLINE`)
+	try {
+		await notifyStatusChange(userId, 'online')
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error)
+		console.error(`Failed to notify user ${userId} online status:`, message)
 	}
 
 	return isFirstConnection
@@ -202,11 +198,11 @@ export function removeConnection(userId: string, ws: WebSocket): boolean {
 	wsConnections.delete(userId)
 
 	cancelPendingDisconnect(userId)
-	const timer = setTimeout(() => {
+	const timer = setTimeout(async () => {
 		try {
 			pendingDisconnectTimers.delete(userId)
 			console.log(`User ${userId} disconnect timer expired - marking offline`)
-			notifyStatusChange(userId, 'offline')
+			await notifyStatusChange(userId, 'offline')
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error)
 			console.error(`Failed to notify user ${userId} offline status:`, message)
