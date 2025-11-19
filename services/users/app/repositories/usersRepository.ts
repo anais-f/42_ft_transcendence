@@ -115,11 +115,24 @@ export class UsersRepository {
 		}
 	}
 
-	static updateUserStatus(user: IUserConnection, status: number): void {
-		const updateStmt = db.prepare(
-			'UPDATE users SET status = ? WHERE user_id = ?'
-		)
-		updateStmt.run(status, user.user_id)
+	static updateUserStatus(user: IUserId, status: number, lastConnection?: string): void {
+		if (status === 0 && lastConnection) {
+			const updateStmt = db.prepare(
+				'UPDATE users SET status = ?, last_connection = ? WHERE user_id = ?'
+			)
+			const info = updateStmt.run(status, lastConnection, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		} else {
+			const updateStmt = db.prepare(
+				'UPDATE users SET status = ? WHERE user_id = ?'
+			)
+			const info = updateStmt.run(status, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		}
 	}
 
 	/**
@@ -151,6 +164,12 @@ export class UsersRepository {
 		const selectStmt = db.prepare('SELECT avatar FROM users WHERE user_id = ?')
 		const row = selectStmt.get(user.user_id) as { avatar: string }
 		return row.avatar
+	}
+
+	static getUserStatusById(user: IUserId): number | undefined {
+		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
+		const row = selectStmt.get(user.user_id) as { status: number } | undefined
+		return row?.status
 	}
 
 	/**
