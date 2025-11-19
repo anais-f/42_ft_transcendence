@@ -42,8 +42,8 @@ describe('PongObject', () => {
 			expect(res).toBeInstanceOf(Array)
 			// @ts-ignore
 			expect(res?.length >= 2).toBe(true)
-			expect(res?.some((e) => e.equals(new Vector2(0, 1.73205))))
-			expect(res?.some((e) => e.equals(new Vector2(0, -1.73205))))
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.73205))))
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, -1.73205))))
 		})
 		test('2 circle', () => {
 			const c = new Circle(new Vector2(), 2)
@@ -52,8 +52,8 @@ describe('PongObject', () => {
 
 			const res = o1.intersect(o2)
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => e.equals(new Vector2(0, 1.73205)))).toBe(true)
-			expect(res?.some((e) => e.equals(new Vector2(0, -1.73205)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.73205)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, -1.73205)))).toBe(true)
 		})
 
 		test('test relative coord', () => {
@@ -69,8 +69,8 @@ describe('PongObject', () => {
 			res = o1.intersect(o2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => e.equals(new Vector2(0, 1.82287)))).toBe(true)
-			expect(res?.some((e) => e.equals(new Vector2(0, -0.82287)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1.82287)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, -0.82287)))).toBe(true)
 		})
 
 		test('multiobj test', () => {
@@ -89,8 +89,8 @@ describe('PongObject', () => {
 			let res = obj2.intersect(obj1)
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(2)
-			expect(res?.some((e) => e.equals(new Vector2(-1, 0)))).toBe(true)
-			expect(res?.some((e) => e.equals(new Vector2(1, 0)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1, 0)))).toBe(true)
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1, 0)))).toBe(true)
 
 			const obj3 = new PongObject(
 				new Circle(new Vector2(0, 0), 0.2),
@@ -107,32 +107,32 @@ describe('PongObject', () => {
 			res = obj1.intersect(obj4)
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(4)
-			expect(res?.some((e) => e.equals(new Vector2(-1.157477, 1.98752)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, 1.98752)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(-1.98752, 1.15747)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, 1.15747)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(1.98752, 1.15747)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, 1.15747)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(1.157477, 1.98752)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, 1.98752)))).toBe(
 				true
 			)
 
 			res = obj2.intersect(obj4)
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(4)
-			expect(res?.some((e) => e.equals(new Vector2(1.157477, -1.98752)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.157477, -1.98752)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(1.98752, -1.15747)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(1.98752, -1.15747)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(-1.98752, -1.15747)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.98752, -1.15747)))).toBe(
 				true
 			)
-			expect(res?.some((e) => e.equals(new Vector2(-1.157477, -1.98752)))).toBe(
+			expect(res?.some((e) => e.hitPoint.equals(new Vector2(-1.157477, -1.98752)))).toBe(
 				true
 			)
 		})
@@ -181,10 +181,10 @@ describe('PongObject', () => {
 			expect(res).toBeInstanceOf(Array)
 			expect(res).toHaveLength(2)
 			expect(
-				res?.some((e) => e.equals(new Vector2(-3.788854, -3.894427)))
+				res?.some((e) => e.hitPoint.equals(new Vector2(-3.788854, -3.894427)))
 			).toBe(true)
 			expect(
-				res?.some((e) => e.equals(new Vector2(-0.211145, -2.105572)))
+				res?.some((e) => e.hitPoint.equals(new Vector2(-0.211145, -2.105572)))
 			).toBe(true)
 		})
 

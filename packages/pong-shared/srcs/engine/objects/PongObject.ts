@@ -1,3 +1,4 @@
+import { IIntersect } from '../../math/IIntersect.js'
 import { AShape } from '../../math/shapes/AShape.js'
 import { Circle } from '../../math/shapes/Circle.js'
 import { Polygon } from '../../math/shapes/Polygon.js'
@@ -51,7 +52,7 @@ export class PongObject {
 		return PongObject.clone(this)
 	}
 
-	public intersect(other: PongObject): Vector2[] | null {
+	public intersect(other: PongObject): IIntersect[] | null {
 		const createAbsHitbox = (hitbox: AShape, origin: Vector2) => {
 			const clonedHitbox = hitbox.clone()
 			clonedHitbox.addToOrigin(origin.clone())
@@ -65,20 +66,20 @@ export class PongObject {
 			.getHitbox()
 			.map((h) => createAbsHitbox(h, other.getOrigin()))
 
-		let hitpoints: Vector2[] = []
+		let hits: IIntersect[] = []
 		for (let localObj of absLocalHitbox) {
 			for (let otherObj of absOtherHitbox) {
 				const hp = otherObj.intersect(localObj)
 				if (hp instanceof Array) {
-					hitpoints = [...hitpoints, ...hp]
+					hits = [...hits, ...hp]
 				}
 			}
 		}
-		if (hitpoints.length === 0) {
+		if (hits.length === 0) {
 			return null
 		}
-		return hitpoints.filter(
-			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+		return hits.filter(
+			(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 		)
 	}
 
