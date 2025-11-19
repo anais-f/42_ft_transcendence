@@ -37,7 +37,7 @@ beforeAll(async () => {
 	AppError = common.AppError
 	ERROR_MESSAGES = common.ERROR_MESSAGES
 	;({ UsersRepository } = await import('../repositories/usersRepository.js'))
-	;({ AuthApi } = await import('./AuthApi.js'))
+	;({ AuthApi } = await import('../repositories/AuthApi.js'))
 	;({ UsersServices } = await import('./usersServices.js'))
 })
 

@@ -1,5 +1,5 @@
 import { UsersRepository } from '../repositories/usersRepository.js'
-import { AuthApi } from './AuthApi.js'
+import { AuthApi } from '../repositories/AuthApi.js'
 import {
 	IUserId,
 	AppError,

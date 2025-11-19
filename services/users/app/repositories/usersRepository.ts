@@ -73,7 +73,7 @@ export class UsersRepository {
 			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, 1, now)
+		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, 0, now)
 	}
 
 	/**
