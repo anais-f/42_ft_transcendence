@@ -3,11 +3,12 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 export async function createTokenController(
 	request: FastifyRequest,
 	reply: FastifyReply
-): Promise<{ wsToken: string; expiresIn: number }> {
+): Promise<void> {
 	const fastify = request.server as any
 	const user = request.user as { user_id: number; login: string }
 	if (!user) {
-		return reply.status(401).send({ error: 'Unauthorized' })
+		reply.status(401).send({ error: 'Unauthorized' })
+		return
 	}
 
 	const payload = {
@@ -19,8 +20,8 @@ export async function createTokenController(
 		expiresIn: '30s'
 	})
 
-	return {
+	reply.send({
 		wsToken,
 		expiresIn: 30
-	}
+	})
 }

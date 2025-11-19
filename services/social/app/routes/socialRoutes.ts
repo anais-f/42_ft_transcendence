@@ -3,7 +3,8 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
 import { createTokenController } from '../controllers/websocketControllers.js'
-import * as wsMap from '../usescases/connectionManager.js'
+import { addConnection, getTotalConnections } from '../usescases/connectionManager.js'
+import WebSocket from 'ws'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -19,7 +20,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 
 	// WebSocket route - client must connect with: ws://<host>/api/ws?token=<wsToken>
 	const wsQuerySchema = z.object({
-		token: z.string()
+		token: z.string().min(1, 'Token is required')
 	})
 
 	server.get(
@@ -31,106 +32,93 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			}
 		},
 		(
-			socket: any,
+			socket: WebSocket,
 			request: FastifyRequest<{ Querystring: { token: string } }>
 		) => {
-			// Étape 1 : Extraire le token depuis l'URL query parameter
 			const token = request.query.token
+			const jwtInstance = (fastify as any).jwt
 
-			// Étape 2 : Vérifier qu'un token est présent
-			if (!token) {
-				socket.send(
-					JSON.stringify({
-						type: 'error',
-						message: 'Authentication required: no token provided'
-					})
-				)
-				socket.close()
-				return
-			}
-
-			// Étape 3 : Vérifier et décoder le token JWT
+			// Verify and decode JWT token
 			let payload: any
 			try {
-				payload = fastify.jwt.verify(token)
+				payload = jwtInstance.verify(token)
 			} catch (err) {
 				socket.send(
 					JSON.stringify({
 						type: 'error',
+						code: 'INVALID_TOKEN',
 						message: 'Invalid or expired token'
 					})
 				)
-				socket.close()
+				socket.close(1008, 'Authentication failed')
 				return
 			}
 
-			// Étape 4 : Extraire user_id et login du payload
-			const userId = payload.user_id.toString() // 👈 Convertir en string pour la map
-			const userLogin = payload.login
+			const userId = String(payload.user_id)
+			const userLogin = String(payload.login)
 
-			// 👇 NOUVEAU : Ajouter la connexion à la map
-			const isFirstConnection = wsMap.addConnection(userId, socket)
-			console.log(`✅ User ${userLogin} (ID: ${userId}) connected to WebSocket`)
+			// Add connection to manager
+			// connectionManager va automatiquement :
+			// - attacher les handlers (pong, close, error)
+			// - notifier le service users que l'user est online
+			const isFirstConnection = addConnection(userId, socket)
+
+			console.log(`✅ [WS] ${userLogin} (${userId}) connected`)
 			console.log(
-				`   First connection: ${isFirstConnection} | Total connections: ${wsMap.getTotalConnections()}`
+				`   First: ${isFirstConnection} | Total: ${getTotalConnections()}`
 			)
 
-			// Si première connexion → user passe OFFLINE → ONLINE
-			if (isFirstConnection) {
-				console.log(`🟢 User ${userLogin} is now ONLINE (first connection)`)
-				// 🔔 TODO : Appeler user service pour marquer online
-			}
-
-			// Message de bienvenue avec les infos utilisateur
+			// Send welcome message
 			socket.send(
 				JSON.stringify({
-					type: 'connected',
-					message: 'Successfully connected to social WebSocket',
-					user: {
-						id: userId,
-						login: userLogin
-					},
-					connectionCount: wsMap.getConnectionCount(userId)
+					type: 'connection:established',
+					data: {
+						userId,
+						login: userLogin,
+						isFirstConnection,
+						totalConnected: getTotalConnections(),
+						timestamp: new Date().toISOString()
+					}
 				})
 			)
 
-			socket.on('message', (message: any) => {
-				// Echo du message avec l'identité de l'utilisateur
-				console.log(
-					`📨 Message from user ${userLogin} (${userId}):`,
-					message.toString()
-				)
-				socket.send(
-					JSON.stringify({
-						type: 'echo',
-						from_user_id: userId,
-						from_login: userLogin,
-						message: message.toString()
-					})
-				)
-			})
-
-			socket.on('close', () => {
-				// 👇 NOUVEAU : Retirer la connexion de la map
-				const isLastConnection = wsMap.removeConnection(userId, socket)
-				console.log(
-					`❌ User ${userLogin} (ID: ${userId}) disconnected from WebSocket`
-				)
-				console.log(
-					`   Last connection: ${isLastConnection} | Total connections: ${wsMap.getTotalConnections()}`
-				)
-
-				// Si dernière connexion → user passe ONLINE → OFFLINE
-				if (isLastConnection) {
+			// Handle incoming messages from client
+			socket.on('message', (rawData: WebSocket.Data) => {
+				try {
+					const message = JSON.parse(rawData.toString())
 					console.log(
-						`🔴 User ${userLogin} is now OFFLINE (last connection closed)`
+						`📨 [MSG] ${userLogin}: ${message.type || 'unknown'}`
 					)
-					// 🔔 TODO : Appeler user service pour marquer offline
+
+					// TODO: Route message to appropriate handler
+					// For now, just echo back
+					socket.send(
+						JSON.stringify({
+							type: 'message:echo',
+							data: {
+								from: {
+									userId,
+									login: userLogin
+								},
+								content: message
+							}
+						})
+					)
+				} catch (e) {
+					const message = e instanceof Error ? e.message : String(e)
+					console.warn(
+						`[MSG] Error parsing message from ${userLogin}: ${message}`
+					)
+					socket.send(
+						JSON.stringify({
+							type: 'error',
+							code: 'INVALID_MESSAGE',
+							message: 'Invalid message format'
+						})
+					)
 				}
 			})
-
-			// 👇 NOUVEAU : Gérer les erreurs de socket
-			socket.on('error', (err: any) => {})
+			// Note: 'pong', 'close', and 'error' handlers are attached by connectionManager
 		}
 	)
 }
