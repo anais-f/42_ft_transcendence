@@ -101,12 +101,9 @@ export const UpdateUserStatusSchema = z
 		lastConnection: z.string().datetime().optional()
 	})
 	.strict()
-	.refine(
-		(data) => data.status !== 0 || !!data.lastConnection,
-		{
-			message: 'lastConnection is required when status is 0 (offline)'
-		}
-	)
+	.refine((data) => data.status !== 0 || !!data.lastConnection, {
+		message: 'lastConnection is required when status is 0 (offline)'
+	})
 	.meta({ description: 'Update user status schema' })
 
 // Webhook alias
@@ -123,7 +120,11 @@ export type UserPrivateProfileListDTO = z.infer<
 	typeof UserPrivateProfileListSchema
 >
 export type UserPublicProfileDTO = z.infer<typeof UserPublicProfileSchema>
-export type UserProfileUpdateUsernameDTO = z.infer<typeof UserProfileUpdateUsernameSchema>
-export type UserProfileUpdateAvatarDTO = z.infer<typeof UserProfileUpdateAvatarSchema>
+export type UserProfileUpdateUsernameDTO = z.infer<
+	typeof UserProfileUpdateUsernameSchema
+>
+export type UserProfileUpdateAvatarDTO = z.infer<
+	typeof UserProfileUpdateAvatarSchema
+>
 export type UserProfileUpdateDTO = z.infer<typeof UserProfileUpdateSchema>
 export type UpdateUserStatusDTO = z.infer<typeof UpdateUserStatusSchema>

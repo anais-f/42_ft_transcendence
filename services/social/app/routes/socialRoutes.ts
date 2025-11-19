@@ -3,6 +3,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
 import { createTokenController } from '../controllers/websocketControllers.js'
+import * as wsMap from '../usescases/connectionManager.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -49,52 +50,87 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			}
 
 			// Étape 3 : Vérifier et décoder le token JWT
-      let payload: any
-      try {
-        payload = fastify.jwt.verify(token)
-      }
-      catch (err) {
-        socket.send(
-          JSON.stringify({
-            type: 'error',
-            message: 'Invalid or expired token'
-          })
-        )
-        socket.close()
-        return
-      }
+			let payload: any
+			try {
+				payload = fastify.jwt.verify(token)
+			} catch (err) {
+				socket.send(
+					JSON.stringify({
+						type: 'error',
+						message: 'Invalid or expired token'
+					})
+				)
+				socket.close()
+				return
+			}
 
-			// // Étape 4 : Extraire user_id et login du payload
-      const userId = payload.user_id
-      const userLogin = payload.login
+			// Étape 4 : Extraire user_id et login du payload
+			const userId = payload.user_id.toString() // 👈 Convertir en string pour la map
+			const userLogin = payload.login
 
+			// 👇 NOUVEAU : Ajouter la connexion à la map
+			const isFirstConnection = wsMap.addConnection(userId, socket)
+			console.log(`✅ User ${userLogin} (ID: ${userId}) connected to WebSocket`)
+			console.log(
+				`   First connection: ${isFirstConnection} | Total connections: ${wsMap.getTotalConnections()}`
+			)
 
-      // Étape 5 : Gérer la connexion WebSocket avec l'utilisateur authentifié
-      console.log(`✅ User ${userLogin} (ID: ${userId}) connected to WebSocket`)
+			// Si première connexion → user passe OFFLINE → ONLINE
+			if (isFirstConnection) {
+				console.log(`🟢 User ${userLogin} is now ONLINE (first connection)`)
+				// 🔔 TODO : Appeler user service pour marquer online
+			}
 
-      // Message de bienvenue avec les infos utilisateur
-      socket.send(JSON.stringify({
-        type: 'connected',
-        message: 'Successfully connected to social WebSocket',
-        user: {
-          id: userId,
-          login: userLogin
-        }
-      }))
+			// Message de bienvenue avec les infos utilisateur
+			socket.send(
+				JSON.stringify({
+					type: 'connected',
+					message: 'Successfully connected to social WebSocket',
+					user: {
+						id: userId,
+						login: userLogin
+					},
+					connectionCount: wsMap.getConnectionCount(userId)
+				})
+			)
 
-      socket.on('message', (message: any) => {
-        // Echo du message avec l'identité de l'utilisateur
-        console.log(`📨 Message from user ${userLogin} (${userId}):`, message.toString())
-        socket.send(JSON.stringify({
-          type: 'echo',
-          from_user_id: userId,
-          from_login: userLogin,
-          message: message.toString()
-        }))
-      })
+			socket.on('message', (message: any) => {
+				// Echo du message avec l'identité de l'utilisateur
+				console.log(
+					`📨 Message from user ${userLogin} (${userId}):`,
+					message.toString()
+				)
+				socket.send(
+					JSON.stringify({
+						type: 'echo',
+						from_user_id: userId,
+						from_login: userLogin,
+						message: message.toString()
+					})
+				)
+			})
 
-      socket.on('close', () => {
-        console.log(`❌ User ${userLogin} (ID: ${userId}) disconnected from WebSocket`)
-      })
-		})
+			socket.on('close', () => {
+				// 👇 NOUVEAU : Retirer la connexion de la map
+				const isLastConnection = wsMap.removeConnection(userId, socket)
+				console.log(
+					`❌ User ${userLogin} (ID: ${userId}) disconnected from WebSocket`
+				)
+				console.log(
+					`   Last connection: ${isLastConnection} | Total connections: ${wsMap.getTotalConnections()}`
+				)
+
+				// Si dernière connexion → user passe ONLINE → OFFLINE
+				if (isLastConnection) {
+					console.log(
+						`🔴 User ${userLogin} is now OFFLINE (last connection closed)`
+					)
+					// 🔔 TODO : Appeler user service pour marquer offline
+				}
+			})
+
+			// 👇 NOUVEAU : Gérer les erreurs de socket
+			socket.on('error', (err: any) => {})
+		}
+	)
 }

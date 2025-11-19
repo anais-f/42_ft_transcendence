@@ -115,7 +115,11 @@ export class UsersRepository {
 		}
 	}
 
-	static updateUserStatus(user: IUserId, status: number, lastConnection?: string): void {
+	static updateUserStatus(
+		user: IUserId,
+		status: number,
+		lastConnection?: string
+	): void {
 		if (status === 0 && lastConnection) {
 			const updateStmt = db.prepare(
 				'UPDATE users SET status = ?, last_connection = ? WHERE user_id = ?'

@@ -65,12 +65,18 @@ export class UpdateUsersServices {
 			lastConnection = new Date().toISOString()
 		}
 
-		UsersRepository.updateUserStatus({ user_id: userId }, status, lastConnection)
+		UsersRepository.updateUserStatus(
+			{ user_id: userId },
+			status,
+			lastConnection
+		)
 		console.log(`User ${userId} status updated to ${status}`)
 	}
 
 	/** Check and update user avatar */
-	static async checkUserAvatar(params: CheckUserAvatarParams): Promise<boolean> {
+	static async checkUserAvatar(
+		params: CheckUserAvatarParams
+	): Promise<boolean> {
 		const detectedType = await _validateAvatar(params)
 		const paths = await _generateAvatarPaths(params.user_id, detectedType)
 		await _saveAvatarAndCleanup(paths, params.avatarBuffer, params.user_id)
@@ -90,9 +96,10 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 		throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 	}
 
-	const fileExtension = originalName && originalName.includes('.')
-		? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
-		: ''
+	const fileExtension =
+		originalName && originalName.includes('.')
+			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
+			: ''
 
 	if (!Buffer.isBuffer(avatarBuffer) || avatarBuffer.length === 0) {
 		throw new AppError('Missing file', 400)
@@ -112,11 +119,20 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 	}
 
 	if (mimeType && mimeType !== detectedType.mime) {
-		console.warn('[avatars] MIME mismatch: header=', mimeType, 'detected=', detectedType.mime)
+		console.warn(
+			'[avatars] MIME mismatch: header=',
+			mimeType,
+			'detected=',
+			detectedType.mime
+		)
 	}
 
 	if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
-		console.warn('[avatars] original file extension not allowed:', fileExtension, ' - continuing based on detectedType')
+		console.warn(
+			'[avatars] original file extension not allowed:',
+			fileExtension,
+			' - continuing based on detectedType'
+		)
 	}
 
 	return detectedType
@@ -129,7 +145,11 @@ async function _generateAvatarPaths(
 	user_id: number,
 	detectedType: { ext: string | undefined; mime: string }
 ): Promise<AvatarPaths> {
-	const ext = detectedType.ext ? `.${detectedType.ext}` : detectedType.mime === 'image/png' ? '.png' : '.jpg'
+	const ext = detectedType.ext
+		? `.${detectedType.ext}`
+		: detectedType.mime === 'image/png'
+			? '.png'
+			: '.jpg'
 	const uuid = randomUUID()
 	const filename = `img_${user_id}_${uuid}${ext}`
 	const avatarsDir = path.join(process.cwd(), 'avatars')
@@ -137,7 +157,14 @@ async function _generateAvatarPaths(
 	const tempPath = path.join(avatarsDir, `.tmp_${filename}`)
 	const publicPath = path.posix.join('/avatars', filename)
 
-	console.log('[avatars] generateAvatarPaths - chosen ext:', ext, 'filename:', filename, 'detected mime:', detectedType.mime)
+	console.log(
+		'[avatars] generateAvatarPaths - chosen ext:',
+		ext,
+		'filename:',
+		filename,
+		'detected mime:',
+		detectedType.mime
+	)
 
 	return { avatarsDir, outPath, tempPath, publicPath, filename }
 }
@@ -146,43 +173,45 @@ async function _generateAvatarPaths(
  * Internal helper: save avatar and cleanup old files
  */
 async function _saveAvatarAndCleanup(
-    paths: AvatarPaths,
-    avatarBuffer: Buffer,
-    user_id: number
+	paths: AvatarPaths,
+	avatarBuffer: Buffer,
+	user_id: number
 ): Promise<void> {
-  const { avatarsDir, outPath, tempPath, publicPath, filename } = paths
+	const { avatarsDir, outPath, tempPath, publicPath, filename } = paths
 
-  try {
-    await fs.mkdir(avatarsDir, { recursive: true })
-    await fs.writeFile(tempPath, avatarBuffer)
-    await fs.rename(tempPath, outPath)
-    console.log(`Avatar saved successfully: ${filename}`)
-  } catch (err) {
-    try {
-      await fs.unlink(tempPath)
-    } catch (_) {}
-    throw new AppError('Failed to save avatars', 500)
-  }
+	try {
+		await fs.mkdir(avatarsDir, { recursive: true })
+		await fs.writeFile(tempPath, avatarBuffer)
+		await fs.rename(tempPath, outPath)
+		console.log(`Avatar saved successfully: ${filename}`)
+	} catch (err) {
+		try {
+			await fs.unlink(tempPath)
+		} catch (_) {}
+		throw new AppError('Failed to save avatars', 500)
+	}
 
-  try {
-    UsersRepository.updateUserAvatar({ user_id, avatar: publicPath })
-  } catch (err) {
-    try {
-      await fs.unlink(outPath)
-    } catch (_) {}
-    throw err
-  }
+	try {
+		UsersRepository.updateUserAvatar({ user_id, avatar: publicPath })
+	} catch (err) {
+		try {
+			await fs.unlink(outPath)
+		} catch (_) {}
+		throw err
+	}
 
-  const files = await fs.readdir(avatarsDir)
-  const prefix = `img_${user_id}_`
-  const oldFiles = files.filter((f) => f.startsWith(prefix) && f !== filename && !f.startsWith('.tmp_'))
+	const files = await fs.readdir(avatarsDir)
+	const prefix = `img_${user_id}_`
+	const oldFiles = files.filter(
+		(f) => f.startsWith(prefix) && f !== filename && !f.startsWith('.tmp_')
+	)
 
-  for (const file of oldFiles) {
-    try {
-      await fs.unlink(path.join(avatarsDir, file))
-      console.log(`Deleted old avatar: ${file}`)
-    } catch (err) {
-      console.warn(`Failed to delete old avatar file ${file}:`, err)
-    }
-  }
+	for (const file of oldFiles) {
+		try {
+			await fs.unlink(path.join(avatarsDir, file))
+			console.log(`Deleted old avatar: ${file}`)
+		} catch (err) {
+			console.warn(`Failed to delete old avatar file ${file}:`, err)
+		}
+	}
 }
