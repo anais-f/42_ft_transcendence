@@ -81,6 +81,7 @@ export class PongObject {
 			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
 		)
 	}
+
 	//
 	// nb obj 1o
 	// [ obj

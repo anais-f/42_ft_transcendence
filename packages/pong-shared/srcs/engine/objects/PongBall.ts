@@ -2,6 +2,12 @@ import { Circle } from '../../math/shapes/Circle.js'
 import { Vector2 } from '../../math/Vector2.js'
 import { PongObject } from './PongObject.js'
 
+// TODO: add ball speed multiple
+// 	- serialize
+// 	- deserialize
+// 	- game loop
+// 	- unit tests
+
 export class PongBall {
 	private ball: PongObject
 	public constructor(
