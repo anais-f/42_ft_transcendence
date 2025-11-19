@@ -1,4 +1,5 @@
 import { Ray } from '../Ray.js'
+import { IIntersect } from '../IIntersect.js'
 import { Segment } from '../Segment.js'
 import { Vector2 } from '../Vector2.js'
 import { Polygon } from './Polygon.js'
@@ -27,12 +28,13 @@ export class Circle extends AShape {
 		this.rad = rad
 	}
 
-	intersect(other: Segment): Vector2[] | null
-	intersect(other: Circle): Vector2[] | null
-	intersect(other: Ray): Vector2[] | null
-	intersect(other: Polygon): Vector2[] | null
+	
+	intersect(other: Segment): IIntersect[] | null
+	intersect(other: Circle): IIntersect[] | null
+	intersect(other: Ray): IIntersect[] | null
+	intersect(other: Polygon): IIntersect[] | null
 
-	intersect(other: Segment | Ray | Polygon | Circle): Vector2[] | null {
+	intersect(other: Segment | Ray | Polygon | Circle): IIntersect[] | null {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
@@ -45,7 +47,7 @@ export class Circle extends AShape {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): Vector2[] | null {
+	private intersectRay(other: Ray): IIntersect[] | null {
 		function getHitPoint(ray: Ray, t: number): Vector2 {
 			return Vector2.add(
 				ray.getOrigin(),
@@ -68,7 +70,7 @@ export class Circle extends AShape {
 
 		if (dotOp <= squaredRad) {
 			const t = D + K
-			return [getHitPoint(other, t)]
+			return [{hitPoint:getHitPoint(other, t)}]
 		}
 
 		const t1 = D - K
@@ -82,12 +84,12 @@ export class Circle extends AShape {
 		const p2 = getHitPoint(other, t2)
 
 		if (p1.equals(p2)) {
-			return [p1]
+			return [{hitPoint: p1}]
 		}
-		return [p1, p2]
+		return [{hitPoint: p1}, {hitPoint: p2}]
 	}
 
-	private intersectCircle(other: Circle): Vector2[] | null {
+	private intersectCircle(other: Circle): IIntersect[] | null {
 		let d = Vector2.subtract(other.getPos(), this.origin)
 		const sqDistance = d.squaredLength()
 		const radiusSum = this.rad + other.getRad()
@@ -99,13 +101,13 @@ export class Circle extends AShape {
 
 		// weird fix
 		if (sqDistance <= 0) {
-			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+			return [this.getRad() > other.getRad() ? {hitPoint: other.getPos()} : {hitPoint: this.getPos()}]
 		}
 
 		const distance = Math.sqrt(sqDistance)
 
 		if (distance === radiusSum) {
-			return [Vector2.add(this.origin, d.multiply(this.rad))]
+			return [{hitPoint: Vector2.add(this.origin, d.multiply(this.rad))}]
 		}
 
 		const a =
@@ -131,9 +133,9 @@ export class Circle extends AShape {
 			isNaN(t1.getY()) ||
 			isNaN(t2.getY())
 		) {
-			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
+			return [this.getRad() > other.getRad() ? {hitPoint: other.getPos()} : {hitPoint: this.getPos()}]
 		}
-		return [t1, t2]
+		return [{hitPoint: t1}, {hitPoint: t2}]
 	}
 
 	public containsPoint(point: Vector2): boolean {

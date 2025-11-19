@@ -1,4 +1,5 @@
 import { EPSILON } from '../define.js'
+import { IIntersect } from './IIntersect.js'
 import { Segment } from './Segment.js'
 import { Circle } from './shapes/Circle.js'
 import { Vector2 } from './Vector2.js'
@@ -32,11 +33,11 @@ export class Ray {
 		return new Ray(p1, Vector2.subtract(p2, p1).normalize())
 	}
 
-	intersect(other: Segment): Vector2[] | null
-	intersect(other: Ray): Vector2[] | null
-	intersect(other: Circle): Vector2[] | null
+	intersect(other: Segment): IIntersect[] | null
+	intersect(other: Ray): IIntersect[] | null
+	intersect(other: Circle): IIntersect[] | null
 
-	intersect(other: Segment | Circle | Ray): Vector2[] | null {
+	intersect(other: Segment | Circle | Ray): IIntersect[] | null {
 		if (other instanceof Segment) {
 			return this.intersectSegment(other)
 		} else if (other instanceof Ray) {
@@ -47,7 +48,7 @@ export class Ray {
 		throw 'Invalid type'
 	}
 
-	private intersectRay(other: Ray): Vector2[] | null {
+	private intersectRay(other: Ray): IIntersect[] | null {
 		const crossProduct = this.getDirection().cross(other.getDirection())
 
 		if (Math.abs(crossProduct) < EPSILON) {
@@ -68,12 +69,12 @@ export class Ray {
 				this.getOrigin(),
 				this.getDirection().multiply(t1)
 			)
-			return [intersectionPoint]
+			return [{hitPoint: intersectionPoint}]
 		}
 		return null
 	}
 
-	private intersectSegment(other: Segment): Vector2[] | null {
+	private intersectSegment(other: Segment): IIntersect[] | null {
 		const O = this.getOrigin()
 		const D = this.getDirection()
 		const A = other.getP1()
@@ -104,14 +105,14 @@ export class Ray {
 			}
 
 			const hitPoint = Vector2.add(O, D.clone().multiply(tOverlapStart))
-			return [hitPoint]
+			return [{hitPoint: hitPoint}]
 		}
 		const t1 = Vector2.cross(v2, v1) / denom
 		const t2 = Vector2.cross(D, v1) / denom
 
 		if (t1 >= 0 && t2 >= 0 && t2 <= 1) {
 			const intersectionPoint = Vector2.add(O, D.clone().multiply(t1))
-			return [intersectionPoint]
+			return [{hitPoint: intersectionPoint}]
 		}
 
 		return null

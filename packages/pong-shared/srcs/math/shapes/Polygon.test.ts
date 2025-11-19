@@ -3,6 +3,7 @@ import { Polygon } from './Polygon.js'
 import { Circle } from './Circle.js'
 import { Segment } from '../Segment.js'
 import { Ray } from '../Ray.js'
+import { IIntersect } from '../IIntersect.js'
 
 describe('Polygon', () => {
 	describe('getAbsolutePoints', () => {
@@ -270,7 +271,7 @@ describe('Polygon', () => {
 					const segment1 = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
 					const res = square.intersect(segment1)
 					expect(res).toBeInstanceOf(Array)
-					expect(res?.some((e) => e.equals(new Vector2(0, 1))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 1))))
 					// alse have 5 5 ...
 				})
 				test('Segment crossing two edge', () => {
@@ -278,8 +279,8 @@ describe('Polygon', () => {
 					const res = square.intersect(segment2)
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2(0, 5))))
-					expect(res?.some((e) => e.equals(new Vector2(10, 5))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 5))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 5))))
 				})
 				test('Segment entirely inside', () => {
 					const segment3 = new Segment(new Vector2(2, 2), new Vector2(8, 8))
@@ -305,7 +306,7 @@ describe('Polygon', () => {
 					const res = square.intersect(segment1)
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(1)
-					expect(res?.some((e) => e.equals(new Vector2())))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2())))
 				})
 
 				test('along an edge', () => {
@@ -313,8 +314,8 @@ describe('Polygon', () => {
 					const res = square.intersect(segment2)
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2())))
-					expect(res?.some((e) => e.equals(new Vector2(10, 0))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2())))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 0))))
 				})
 			})
 
@@ -325,8 +326,8 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2(2.5, 0))))
-					expect(res?.some((e) => e.equals(new Vector2(1, 1))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(2.5, 0))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(1, 1))))
 				})
 				test('test 2', () => {
 					const seg = new Segment(new Vector2(2, 14), new Vector2(7, -3))
@@ -334,8 +335,8 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2(6.12, 0))))
-					expect(res?.some((e) => e.equals(new Vector2(3.18, 10))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(6.12, 0))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(3.18, 10))))
 				})
 			})
 		})
@@ -348,7 +349,7 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res).toEqual([new Vector2(0, 5), new Vector2(10, 5)])
+					expect(res).toEqual([{hitPoint: new Vector2(0, 5)}, {hitPoint: new Vector2(10, 5)}])
 				})
 
 				test('Ray from inside pointing outward', () => {
@@ -356,7 +357,7 @@ describe('Polygon', () => {
 					const res = square.intersect(ray2)
 
 					expect(res).toBeInstanceOf(Array)
-					expect(res?.some((e) => e.equals(new Vector2(10, 5)))).toBe(true)
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 5)))).toBe(true)
 				})
 
 				test('edge', () => {
@@ -365,7 +366,7 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res).toEqual([new Vector2(10, 0), new Vector2(10, 10)])
+					expect(res).toEqual([{hitPoint: new Vector2(10, 0)}, {hitPoint: new Vector2(10, 10)}])
 				})
 			})
 
@@ -394,8 +395,8 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2(0, 7.23606)))).toBe(true)
-					expect(res?.some((e) => e.equals(new Vector2(0, 2.76393)))).toBe(true)
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 7.23606)))).toBe(true)
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(0, 2.76393)))).toBe(true)
 				})
 				test('circle entirely inside polygon', () => {
 					const circle = new Circle(new Vector2(5, 5), 2)
@@ -403,7 +404,7 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(1)
-					expect(res?.some((e) => e.equals(new Vector2(5, 5))))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(5, 5))))
 				})
 				test('circle center outside, partially overlapping', () => {
 					const circle = new Circle(new Vector2(12, 5), 3)
@@ -411,10 +412,10 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(2)
-					expect(res?.some((e) => e.equals(new Vector2(10, 7.23606)))).toBe(
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 7.23606)))).toBe(
 						true
 					)
-					expect(res?.some((e) => e.equals(new Vector2(10, 2.76393)))).toBe(
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 2.76393)))).toBe(
 						true
 					)
 				})
@@ -424,7 +425,7 @@ describe('Polygon', () => {
 
 					expect(res).toBeInstanceOf(Array)
 					expect(res).toHaveLength(1)
-					expect(res?.some((e) => e.equals(new Vector2())))
+					expect(res?.some((e) => e.hitPoint.equals(new Vector2())))
 				})
 				test('touching at en edge', () => {
 					const circle = new Circle(new Vector2(5, -3), 3)
@@ -499,8 +500,8 @@ describe('Polygon', () => {
 				])
 				const res2 = square.intersect(polygon2)
 				expect(res2).toBeInstanceOf(Array)
-				expect(res2?.some((e) => e.equals(new Vector2(10, 0))))
-				expect(res2?.some((e) => e.equals(new Vector2(10, 10))))
+				expect(res2?.some((e) => e.hitPoint.equals(new Vector2(10, 0))))
+				expect(res2?.some((e) => e.hitPoint.equals(new Vector2(10, 10))))
 			})
 
 			test('none corner intersec', () => {
@@ -513,8 +514,8 @@ describe('Polygon', () => {
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(2)
-				expect(res?.some((e) => e.equals(new Vector2(10, 2.4))))
-				expect(res?.some((e) => e.equals(new Vector2(10, 4.8))))
+				expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 2.4))))
+				expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 4.8))))
 			})
 
 			test('should handle concave polygons', () => {
@@ -529,9 +530,9 @@ describe('Polygon', () => {
 				])
 				const res = concavePolygon.intersect(square)
 				expect(res).toBeInstanceOf(Array)
-				expect(res?.some((e) => e.equals(new Vector2(10, 5))))
-				expect(res?.some((e) => e.equals(new Vector2(10, 10))))
-				expect(res?.some((e) => e.equals(new Vector2(5, 10))))
+				expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 5))))
+				expect(res?.some((e) => e.hitPoint.equals(new Vector2(10, 10))))
+				expect(res?.some((e) => e.hitPoint.equals(new Vector2(5, 10))))
 			})
 		})
 		describe('with relative position (origin)', () => {

@@ -1,6 +1,7 @@
 import { Ray } from './Ray.js'
 import { Vector2 } from './Vector2.js'
 import { Segment } from './Segment.js'
+import { IIntersect } from './IIntersect.js'
 
 describe('Ray', () => {
 	test('constructor and getters', () => {
@@ -47,7 +48,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(0.5, 0.5))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(0.5, 0.5))).toBe(true)
 			})
 
 			test('should return null for parallel rays', () => {
@@ -75,7 +76,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(expected, expected))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(expected, expected))).toBe(true)
 			})
 
 			test('should handle near-parallel rays correctly', () => {
@@ -90,7 +91,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2())).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2())).toBe(true)
 			})
 
 			test('random test', () => {
@@ -101,7 +102,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(22, 11))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(22, 11))).toBe(true)
 			})
 		})
 
@@ -114,7 +115,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(2, 0))).toBe(true)
 			})
 
 			test('ray directly intersecting segment', () => {
@@ -124,7 +125,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(2, 0))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(2, 0))).toBe(true)
 			})
 
 			test('ray parallel to segment', () => {
@@ -142,7 +143,7 @@ describe('Ray', () => {
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)
 				// @ts-ignore
-				expect(res[0].equals(new Vector2(1, 0))).toBe(true)
+				expect(res[0].hitPoint.equals(new Vector2(1, 0))).toBe(true)
 			})
 		})
 

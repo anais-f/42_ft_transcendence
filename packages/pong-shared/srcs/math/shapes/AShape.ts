@@ -1,3 +1,4 @@
+import { IIntersect } from '../IIntersect.js'
 import { Vector2 } from '../Vector2.js'
 
 export abstract class AShape {
@@ -7,7 +8,7 @@ export abstract class AShape {
 		this.origin = origin
 	}
 
-	abstract intersect(_other: AShape): Vector2[] | null
+	abstract intersect(_other: AShape): IIntersect[] | null
 	abstract containsPoint(point: Vector2): boolean
 	abstract clone(): AShape
 	abstract getNormalAt(point: Vector2): Vector2

@@ -3,6 +3,7 @@ import { Circle } from './Circle.js'
 import { Ray } from '../Ray.js'
 import { Segment } from '../Segment.js'
 import { AShape } from './AShape.js'
+import { IIntersect } from '../IIntersect.js'
 
 export class Polygon extends AShape {
 	private segments: Segment[] = []
@@ -32,12 +33,12 @@ export class Polygon extends AShape {
 		)
 	}
 
-	public intersect(other: Circle): Vector2[] | null
-	public intersect(other: Polygon): Vector2[] | null
-	public intersect(other: Ray): Vector2[] | null
-	public intersect(other: Segment): Vector2[] | null
+	public intersect(other: Circle): IIntersect[] | null
+	public intersect(other: Polygon): IIntersect[] | null
+	public intersect(other: Ray): IIntersect[] | null
+	public intersect(other: Segment): IIntersect[] | null
 
-	public intersect(other: Circle | Ray | Polygon | Segment): Vector2[] | null {
+	public intersect(other: Circle | Ray | Polygon | Segment): IIntersect[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Ray) {
@@ -50,9 +51,9 @@ export class Polygon extends AShape {
 		throw 'Invalid intersect'
 	}
 
-	private intersectCircle(other: Circle): Vector2[] | null {
+	private intersectCircle(other: Circle): IIntersect[] | null {
 		const AS = this.getAbsoluteSegments()
-		let hps: Vector2[] = []
+		let hps: IIntersect[] = []
 		for (const seg of AS) {
 			const hp = seg.intersect(other)
 			if (Array.isArray(hp)) {
@@ -61,22 +62,22 @@ export class Polygon extends AShape {
 		}
 		if (hps.length !== 0) {
 			return hps.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 		}
 
 		if (this.containsPoint(other.getPos())) {
-			return [other.getPos()]
+			return [{hitPoint: other.getPos()}]
 		}
 		return null
 	}
 
-	private intersectRay(other: Ray): Vector2[] | null {
+	private intersectRay(other: Ray): IIntersect[] | null {
 		const AS = this.getAbsoluteSegments()
-		let hps: Vector2[] = []
+		let hps: IIntersect[] = []
 
 		for (const seg of AS) {
-			let hp: Vector2[] | null = other.intersect(seg)
+			let hp: IIntersect[] | null = other.intersect(seg)
 			if (Array.isArray(hp)) {
 				hps.push(hp[0])
 			}
@@ -87,23 +88,23 @@ export class Polygon extends AShape {
 		}
 		return hps
 			.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 			.sort(
 				(a, b) =>
-					Vector2.squaredDist(this.origin, a) -
-					Vector2.squaredDist(this.origin, b)
+					Vector2.squaredDist(this.origin, a.hitPoint) -
+					Vector2.squaredDist(this.origin, b.hitPoint)
 			)
 	}
 
-	private intersectPolygon(other: Polygon): Vector2[] | null {
+	private intersectPolygon(other: Polygon): IIntersect[] | null {
 		const localAbSeg = this.getAbsoluteSegments()
 		const otherAbSeg = other.getAbsoluteSegments()
 
-		let res: Vector2[] = []
+		let res: IIntersect[] = []
 		for (const seg1 of localAbSeg) {
 			for (const seg2 of otherAbSeg) {
-				const t: Vector2[] | null = seg1.intersect(seg2)
+				const t: IIntersect[] | null = seg1.intersect(seg2)
 				if (Array.isArray(t)) {
 					res = [...res, ...t]
 				}
@@ -111,7 +112,7 @@ export class Polygon extends AShape {
 		}
 		if (res.length !== 0) {
 			return res.filter(
-				(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+				(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 			)
 		}
 		// bad polygon clipping implementation
@@ -128,7 +129,7 @@ export class Polygon extends AShape {
 		}
 
 		return res.filter(
-			(pt, idx, arr) => arr.findIndex((other) => pt.equals(other)) === idx
+			(pt, idx, arr) => arr.findIndex((other) => pt.hitPoint.equals(other.hitPoint)) === idx
 		)
 	}
 
@@ -160,20 +161,20 @@ export class Polygon extends AShape {
 		return inside
 	}
 
-	private intersectSeg(other: Segment): Vector2[] | null {
-		let hps: Vector2[] = []
+	private intersectSeg(other: Segment): IIntersect[] | null {
+		let hps: IIntersect[] = []
 		if (this.containsPoint(other.getP1())) {
-			hps.push(other.getP1())
+			hps.push({hitPoint: other.getP1()})
 		}
 		if (this.containsPoint(other.getP2())) {
-			hps.push(other.getP2())
+			hps.push({hitPoint: other.getP2()})
 		}
 
 		for (const seg of this.getAbsoluteSegments()) {
 			const hp = seg.intersect(other)
 			if (Array.isArray(hp)) {
 				for (const point of hp) {
-					if (!hps.some((e) => e.equals(point))) {
+					if (!hps.some((e) => e.hitPoint.equals(point.hitPoint))) {
 						hps.push(point)
 					}
 				}

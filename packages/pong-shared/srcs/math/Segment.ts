@@ -1,9 +1,9 @@
-import { merge } from 'node_modules/zod/v4/core/util.cjs'
 import { EPSILON } from '../define.js'
 import { Ray } from './Ray.js'
 import { Vector2 } from './Vector2.js'
 import { Circle } from './shapes/Circle.js'
 import { Polygon } from './shapes/Polygon.js'
+import { IIntersect } from './IIntersect.js'
 
 export class Segment {
 	constructor(
@@ -23,11 +23,11 @@ export class Segment {
 		return this.p2
 	}
 
-	intersect(other: Circle): Vector2[] | null
-	intersect(other: Segment): Vector2[] | null
-	intersect(other: Polygon): Vector2[] | null
-	intersect(other: Ray): Vector2[] | null
-	intersect(other: Circle | Segment | Polygon | Ray): Vector2[] | null {
+	intersect(other: Circle): IIntersect[] | null
+	intersect(other: Segment): IIntersect[] | null
+	intersect(other: Polygon): IIntersect[] | null
+	intersect(other: Ray): IIntersect[] | null
+	intersect(other: Circle | Segment | Polygon | Ray): IIntersect[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
@@ -40,7 +40,7 @@ export class Segment {
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(other: Segment): Vector2[] | null {
+	private intersectSeg(other: Segment): IIntersect[] | null {
 		const [a1, a2] = [this.p1, this.p2]
 		const [b1, b2] = other.getPoints()
 
@@ -57,19 +57,21 @@ export class Segment {
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
 			const t = d1 / (d1 - d2)
-			const intersectionPoint = Vector2.add(
+			const intersectionPoint = {
+				hitPoint : Vector2.add(
 				a1,
 				Vector2.subtract(a2, a1).multiply(t)
-			)
+				)
+			}
 			return [intersectionPoint]
 		}
 
-		let points: Vector2[] = []
+		let points: IIntersect[] = []
 		if (a1.equals(b1) || a1.equals(b2)) {
-			points.push(a1)
+			points.push({hitPoint: a1})
 		}
 		if (a2.equals(b1) || a2.equals(b2)) {
-			points.push(a2)
+			points.push({hitPoint: a2})
 		}
 
 		const colinear =
@@ -77,22 +79,22 @@ export class Segment {
 			Math.abs(direction(a1, a2, b2)) < EPSILON
 		if (colinear) {
 			const allPoints = [a1, a2, b1, b2]
-			const overlap: Vector2[] = []
+			const overlap: IIntersect[] = []
 			for (let pt of allPoints) {
 				if (
 					Segment.pointIsOnSeg(a1, a2, pt) &&
 					Segment.pointIsOnSeg(b1, b2, pt)
 				) {
-					if (!overlap.some((p) => p.equals(pt))) {
-						overlap.push(pt)
+					if (!overlap.some((p) => p.hitPoint.equals(pt))) {
+						overlap.push({hitPoint: pt})
 					}
 				}
 			}
 			if (overlap.length >= 2) {
 				overlap.sort((p1, p2) =>
-					p1.getX() !== p2.getX()
-						? p1.getX() - p2.getX()
-						: p1.getY() - p2.getY()
+					p1.hitPoint.getX() !== p2.hitPoint.getX()
+						? p1.hitPoint.getX() - p2.hitPoint.getX()
+						: p1.hitPoint.getY() - p2.hitPoint.getY()
 				)
 				return overlap
 			}
@@ -105,7 +107,7 @@ export class Segment {
 		return null
 	}
 
-	intersectCircle(other: Circle): Vector2[] | null {
+	intersectCircle(other: Circle): IIntersect[] | null {
 		const a = this.p1
 		const b = this.p2
 		const center = other.getPos()
@@ -115,7 +117,13 @@ export class Segment {
 		const bIn = Vector2.subtract(b, center).squaredLength() <= radius * radius
 
 		if (aIn && bIn) {
-			return [a.clone(), b.clone()]
+			return [
+				{
+					hitPoint: a.clone()
+				}, {
+					hitPoint: b.clone()
+				}
+			]
 		}
 
 		const d = Vector2.subtract(b, a)
@@ -134,16 +142,16 @@ export class Segment {
 		const t1 = (-bCoeff - sqrtDiscriminant) / (2 * aCoeff)
 		const t2 = (-bCoeff + sqrtDiscriminant) / (2 * aCoeff)
 
-		const points: Vector2[] = []
+		const points: IIntersect[] = []
 		if (t1 >= 0 && t1 <= 1) {
-			points.push(Vector2.add(a, Vector2.multiply(d, t1)))
+			points.push({hitPoint: Vector2.add(a, Vector2.multiply(d, t1))})
 		}
 		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
-			points.push(Vector2.add(a, Vector2.multiply(d, t2)))
+			points.push({hitPoint: Vector2.add(a, Vector2.multiply(d, t2))})
 		}
 
 		if ((aIn || bIn) && points.length === 1) {
-			return [/*aIn ? a : b,*/ points[0]]
+			return [points[0]]
 		}
 
 		if (points.length > 0) {

@@ -1,4 +1,3 @@
-import { th } from 'zod/locales'
 import { EPSILON } from '../define.js'
 
 export class Vector2 {
