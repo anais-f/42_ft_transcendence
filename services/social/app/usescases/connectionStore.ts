@@ -6,16 +6,19 @@ interface UserConnection {
 }
 
 export const wsConnections = new Map<string, UserConnection>()
-const pendingDisconnectTimers = new Map<string, NodeJS.Timeout>()
-const DISCONNECT_DELAY_MS = 5000
 const HEARTBEAT_INTERVAL_MS = 30000
 const PONG_TIMEOUT_MS = 60000
 let heartbeatInterval: NodeJS.Timeout | null = null
 
-/**
+/** A VOIR
  * Setup event handlers for a WebSocket connection
+ * Callback for close/error are handled by the caller (presenceService)
  */
-function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
+function setupWebSocketHandlers(
+	userId: string,
+	ws: WebSocket,
+	onClose: (userId: string, ws: WebSocket) => void
+): void {
 	ws.on('pong', () => {
 		const conn = wsConnections.get(userId)
 		if (conn) {
@@ -24,17 +27,17 @@ function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
 	})
 
 	ws.on('close', () => {
-		removeConnection(userId, ws)
+		onClose(userId, ws)
 	})
 
 	ws.on('error', (err: Error) => {
 		console.error(`WebSocket error for user ${userId}:`, err.message)
-		removeConnection(userId, ws)
+		onClose(userId, ws)
 	})
 }
 
-/**
- * Start heartbeat interval (ping 30s)
+/** A VOIR
+ * Start heartbeat interval (ping every 30s)
  */
 function startHeartbeat(): void {
 	if (heartbeatInterval) return
@@ -76,84 +79,23 @@ function stopHeartbeat(): void {
 	}
 }
 
-/**
- * Cancel pending disconnect timer for a user
- */
-function cancelPendingDisconnect(userId: string): void {
-	const timer = pendingDisconnectTimers.get(userId)
-	if (timer) {
-		clearTimeout(timer)
-		pendingDisconnectTimers.delete(userId)
-	}
-}
-
-/**
- * Notify users service about status change
- */
-async function notifyStatusChange(
-	userId: string,
-	status: 'online' | 'offline'
-): Promise<void> {
-	const base = process.env.USERS_SERVICE_URL
-	const secret = process.env.USERS_API_SECRET
-	if (!base || !secret) {
-		console.error('Missing USERS_SERVICE_URL or USERS_API_SECRET env')
-		return
-	}
-
-	const statusValue = status === 'online' ? 1 : 0
-	const body: { status: number; lastConnection?: string } = {
-		status: statusValue
-	}
-
-	if (status === 'offline') {
-		body.lastConnection = new Date().toISOString()
-	}
-
-	const url = `${base}/api/internal/users/${userId}/status`
-	const headers = {
-		'Content-Type': 'application/json',
-		'X-API-Key': secret
-	}
-	const options = {
-		method: 'PATCH',
-		headers,
-		body: JSON.stringify(body)
-	}
-
-	try {
-		const response = await fetch(url, options)
-
-		if (!response.ok) {
-			const errorText = await response.text()
-			console.error(
-				`[STATUS] Failed to update user ${userId} status to ${status}: ${response.status} - ${errorText}`
-			)
-		} else {
-			console.log(`[STATUS] User ${userId} is now ${status.toUpperCase()}`)
-		}
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(
-			`[STATUS] Error updating user ${userId} status to ${status}:`,
-			message
-		)
-	}
-}
-
-/**
- * Add a WebSocket connection for a user
- * If user already has a connection, the old one is closed and replaced
+/** A VOIR
+ * Add a WebSocket connection for a user (PURE - no side effects)
+ * If user already has a connection, close the old one
  * @param userId - User ID
  * @param ws - WebSocket instance
- * @returns true if this is the user's first connection (went online), false if replacing existing
+ * @param onClose - Callback when connection closes/errors
+ * @returns true if this is the user's first connection, false if replacing existing
  */
-export async function addConnection(userId: string, ws: WebSocket): Promise<boolean> {
+export function addConnection(
+	userId: string,
+	ws: WebSocket,
+	onClose: (userId: string, ws: WebSocket) => void
+): boolean {
 	const existingConn = wsConnections.get(userId)
 	const isFirstConnection = !existingConn
 
 	if (!isFirstConnection) {
-		cancelPendingDisconnect(userId)
 		try {
 			if (existingConn && existingConn.ws.readyState === WebSocket.OPEN) {
 				existingConn.ws.close(1000, 'New connection from another tab')
@@ -168,25 +110,20 @@ export async function addConnection(userId: string, ws: WebSocket): Promise<bool
 	}
 
 	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
+	setupWebSocketHandlers(userId, ws, onClose)
 
-	setupWebSocketHandlers(userId, ws)
-
-	console.log(`User ${userId} is now ONLINE`)
-	try {
-		await notifyStatusChange(userId, 'online')
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to notify user ${userId} online status:`, message)
+	if (isFirstConnection) {
+		startHeartbeat()
 	}
 
 	return isFirstConnection
 }
 
-/**
- * Remove a WebSocket connection for a user
+/** A VOIR
+ * Remove a WebSocket connection for a user (PURE - just removes from store)
  * @param userId - User ID
  * @param ws - WebSocket instance (to verify it's the current one)
- * @returns true if this was the user's only connection (went offline), false if connection was already gone
+ * @returns true if connection was found and removed, false otherwise
  */
 export function removeConnection(userId: string, ws: WebSocket): boolean {
 	const currentConn = wsConnections.get(userId)
@@ -196,29 +133,10 @@ export function removeConnection(userId: string, ws: WebSocket): boolean {
 	}
 
 	wsConnections.delete(userId)
-
-	cancelPendingDisconnect(userId)
-	const timer = setTimeout(async () => {
-		try {
-			pendingDisconnectTimers.delete(userId)
-			console.log(`User ${userId} disconnect timer expired - marking offline`)
-			await notifyStatusChange(userId, 'offline')
-		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error)
-			console.error(`Failed to notify user ${userId} offline status:`, message)
-			pendingDisconnectTimers.delete(userId)
-		}
-	}, DISCONNECT_DELAY_MS) as NodeJS.Timeout
-
-	pendingDisconnectTimers.set(userId, timer)
-	console.log(
-		`User ${userId} disconnected, offline in ${DISCONNECT_DELAY_MS}ms`
-	)
-
 	return true
 }
 
-/**
+/** A VOIR
  * Send message to a specific user
  * @param userId - User ID
  * @param message - Message to send (string or object)
@@ -237,14 +155,14 @@ export function sendToUser(userId: string, message: unknown): boolean {
 			return true
 		}
 	} catch (e) {
-		const message = e instanceof Error ? e.message : String(e)
-		console.error(`Failed to send message to user ${userId}:`, message)
+		const msg = e instanceof Error ? e.message : String(e)
+		console.error(`Failed to send message to user ${userId}:`, msg)
 	}
 
 	return false
 }
 
-/**
+/** AVOIR
  * Broadcast message to all connected users
  * @param message - Message to send (string or object)
  */
@@ -270,19 +188,40 @@ export function broadcast(message: unknown): void {
 	)
 }
 
-
-/**
- * Cleanup all pending disconnect timers (call on server shutdown)
+/** A VOIR
+ * Check if a user is currently connected
+ * @param userId - User ID
+ * @returns true if user has an active connection
  */
-export function cleanupAllTimers(): void {
-	for (const [userId, timer] of pendingDisconnectTimers.entries()) {
-		clearTimeout(timer)
-		console.log(`Cleared pending timer for user ${userId}`)
-	}
-	pendingDisconnectTimers.clear()
-	console.log('All disconnect timers cleared')
+export function isUserOnline(userId: string): boolean {
+	return wsConnections.has(userId)
 }
 
+/**
+ * Get total number of active connections across all users
+ * @returns Total number of active WebSocket connections
+ */
+export function getTotalConnections(): number {
+	return wsConnections.size
+}
 
+/**
+ * Close all active WebSocket connections (call on server shutdown)
+ */
+export function closeAllConnections(): void {
+	stopHeartbeat()
 
-startHeartbeat()
+	for (const [, conn] of wsConnections.entries()) {
+		try {
+			if (conn.ws.readyState === WebSocket.OPEN) {
+				conn.ws.close(1001, 'Server shutting down')
+			}
+		} catch (e) {
+			const message = e instanceof Error ? e.message : String(e)
+			console.error(`Error closing WebSocket:`, message)
+		}
+	}
+	wsConnections.clear()
+	console.log('All WebSocket connections closed')
+}
+
