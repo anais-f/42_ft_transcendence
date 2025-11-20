@@ -1,3 +1,5 @@
+import { notifyFriendsWatching } from './connectionManager.js'
+
 /**
  * Notify users service about status change
  * @param userId - User ID
@@ -62,6 +64,18 @@ export async function handleUserOnline(userId: string): Promise<void> {
 	console.log(`User ${userId} is now ONLINE`)
 	try {
 		await notifyStatusChange(userId, 'online')
+
+		// Notifier les amis qui regardent cette personne -
+    // TODO : revoir ce morceau de watch
+		const friendId = parseInt(userId)
+		notifyFriendsWatching(friendId, {
+			type: 'friend:status_changed',
+			data: {
+				friendId: userId,
+				status: 'online',
+				timestamp: new Date().toISOString()
+			}
+		})
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} online status:`, message)
@@ -76,6 +90,18 @@ export async function handleUserOffline(userId: string): Promise<void> {
 	console.log(`User ${userId} disconnect timer expired - marking offline`)
 	try {
 		await notifyStatusChange(userId, 'offline')
+
+		// Notifier les amis qui regardent cette personne
+    // TODO : revoir ce morceau de watch
+		const friendId = parseInt(userId)
+		notifyFriendsWatching(friendId, {
+			type: 'friend:status_changed',
+			data: {
+				friendId: userId,
+				status: 'offline',
+				timestamp: new Date().toISOString()
+			}
+		})
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} offline status:`, message)

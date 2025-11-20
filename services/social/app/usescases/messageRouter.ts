@@ -1,4 +1,5 @@
 import WebSocket from 'ws'
+import { watchFriendsList, unwatchFriendsList } from './connectionManager.js'
 
 export interface Message {
 	type: string
@@ -20,6 +21,19 @@ export async function routeMessage(
 	const messageType = message.type?.toLowerCase() || 'unknown'
 
 	console.log(`📨 [MSG] User ${userId}: ${messageType}`)
+
+	// Handle watch/unwatch friends list
+  // TODO : revoir ce morceau de watch
+	if (messageType === 'watch:friends_list') {
+		const friendIds = (message.data as any)?.friendIds || []
+		watchFriendsList(userId, friendIds)
+		return
+	}
+
+	if (messageType === 'unwatch:friends_list') {
+		unwatchFriendsList(userId)
+		return
+	}
 
 	// Route by message type prefix
 	if (messageType.startsWith('presence:')) {

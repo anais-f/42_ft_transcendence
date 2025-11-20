@@ -25,7 +25,7 @@ const HOST = process.env.HOST || 'http://localhost:8080'
 function createApp(): FastifyInstance {
 	const app = Fastify({
 		logger: true,
-		bodyLimit: 6 * 1024 * 1024
+		bodyLimit: 5 * 1024 * 1024
 	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
