@@ -4,7 +4,6 @@ import { Vector2 } from './Vector2.js'
 import { Circle } from './shapes/Circle.js'
 import { Polygon } from './shapes/Polygon.js'
 import { IIntersect } from './IIntersect.js'
-import { ota } from 'zod/locales'
 
 export class Segment {
 	constructor(
@@ -37,9 +36,9 @@ export class Segment {
 		} else if (other instanceof Segment) {
 			return this.intersectSeg(other, otherNormal)
 		} else if (other instanceof Polygon) {
-			return other.intersect(this, true)
+			return other.intersect(this, !otherNormal)
 		} else if (other instanceof Ray) {
-			return other.intersect(this, true)
+			return other.intersect(this, !otherNormal)
 		}
 		throw 'invalid Type in segment intersect'
 	}

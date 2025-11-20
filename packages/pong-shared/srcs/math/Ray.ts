@@ -46,7 +46,7 @@ export class Ray {
 		} else if (other instanceof Ray) {
 			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Circle) {
-			return other.intersect(this, otherNormal)
+			return other.intersect(this, !otherNormal)
 		}
 		throw 'Invalid type'
 	}

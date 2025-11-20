@@ -38,13 +38,13 @@ export class Circle extends AShape {
 		otherNormal: boolean
 	): IIntersect[] | null {
 		if (other instanceof Segment) {
-			return other.intersect(this, otherNormal)
+			return other.intersect(this, !otherNormal)
 		} else if (other instanceof Circle) {
 			return this.intersectCircle(other, otherNormal)
 		} else if (other instanceof Ray) {
 			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Polygon) {
-			return other.intersect(this, otherNormal)
+			return other.intersect(this, !otherNormal)
 		}
 		throw 'Invalid type'
 	}
