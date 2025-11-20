@@ -2,6 +2,7 @@ import { EPSILON } from '../define.js'
 import { IIntersect } from './IIntersect.js'
 import { Segment } from './Segment.js'
 import { Circle } from './shapes/Circle.js'
+import { Polygon } from './shapes/Polygon.js'
 import { Vector2 } from './Vector2.js'
 
 export class Ray {
@@ -36,9 +37,10 @@ export class Ray {
 	intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
 	intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
 	intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
+	intersect(other: Polygon, otherNormal: boolean): IIntersect[] | null
 
 	intersect(
-		other: Segment | Circle | Ray,
+		other: Segment | Circle | Ray| Polygon,
 		otherNormal: boolean = false
 	): IIntersect[] | null {
 		if (other instanceof Segment) {
@@ -46,6 +48,8 @@ export class Ray {
 		} else if (other instanceof Ray) {
 			return this.intersectRay(other, otherNormal)
 		} else if (other instanceof Circle) {
+			return other.intersect(this, !otherNormal)
+		} else if (other instanceof Polygon) {
 			return other.intersect(this, !otherNormal)
 		}
 		throw 'Invalid type'

@@ -19,11 +19,11 @@ describe('Segment', () => {
 				const b = new Vector2(10, 0)
 				const s = new Segment(a, b)
 				const c = new Circle(new Vector2(5, 0), 2)
-				const hps: IIntersect[] | null = s.intersect(c)
+				const hps: IIntersect[] | null = s.intersect(c, true)
 				expect(Array.isArray(hps)).toBe(true)
 				expect(hps?.length).toEqual(2)
-				expect(hps).toContainEqual({ hitPoint: new Vector2(7, 0) })
-				expect(hps).toContainEqual({ hitPoint: new Vector2(3, 0) })
+				expect(hps).toContainEqual({ hitPoint: new Vector2(7, 0), normal: new Vector2(1, 0)})
+				expect(hps).toContainEqual({ hitPoint: new Vector2(3, 0), normal: new Vector2(-1, 0)})
 			})
 
 			test('no intersect test', () => {
@@ -31,7 +31,7 @@ describe('Segment', () => {
 				const b = new Vector2(10, 0)
 				const s = new Segment(a, b)
 				const c = new Circle(new Vector2(5, 5), 2)
-				const hps: IIntersect[] | null = s.intersect(c)
+				const hps: IIntersect[] | null = s.intersect(c, true)
 				expect(Array.isArray(hps)).toBe(false)
 			})
 
@@ -40,10 +40,10 @@ describe('Segment', () => {
 				const b = new Vector2(10, 0)
 				const s = new Segment(a, b)
 				const c = new Circle(new Vector2(5, 2), 2)
-				const hps: IIntersect[] | null = s.intersect(c)
+				const hps: IIntersect[] | null = s.intersect(c, true)
 				expect(Array.isArray(hps)).toBe(true) // tangent
 				expect(hps?.length).toEqual(1)
-				expect(hps).toContainEqual({ hitPoint: new Vector2(5, 0) })
+				expect(hps).toContainEqual({ hitPoint: new Vector2(5, 0), normal: new Vector2(0, -1) })
 			})
 		})
 
@@ -58,41 +58,43 @@ describe('Segment', () => {
 			test('90deg intersect', () => {
 				const s2 = new Segment(new Vector2(0, -1), new Vector2(0, 1))
 				const s1 = new Segment(new Vector2(-1, 0), new Vector2(1, 0))
-				const res = s1.intersect(s2)
+				const res = s1.intersect(s2, true)
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0) })
+				expect(res?.some(e => e.hitPoint.equals(new Vector2()))).toBe(true)
 			})
 			test('point intersect', () => {
 				const s1 = new Segment(new Vector2(), new Vector2(0, 1))
 				const s2 = new Segment(new Vector2(), new Vector2(0, -1))
-				const res = s1.intersect(s2)
+				const res = s1.intersect(s2, true)
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0) })
+				// 1 0
+				expect(res?.some(e => e.hitPoint.equals(new Vector2()))).toBe(true)
+				expect(res?.some(e => e.normal.equals(new Vector2(1, 0))) || res?.some(e => e.normal.equals(new Vector2(-1, 0)))).toBe(true)
 			})
 
 			test('paralel no intersect', () => {
 				const s1 = new Segment(new Vector2(0, 0), new Vector2(0, 1))
 				const s2 = new Segment(new Vector2(1, 0), new Vector2(1, 1))
 
-				expect(Array.isArray(s1.intersect(s2))).toBe(false)
+				expect(Array.isArray(s1.intersect(s2, true))).toBe(false)
 			})
 
 			test('paralel intersect', () => {
 				const s1 = new Segment(new Vector2(0, 0), new Vector2(0, 1))
 				const s2 = new Segment(new Vector2(0, 0.5), new Vector2(0, 1.5))
-				const res = s1.intersect(s2)
+				const res = s1.intersect(s2, true)
 
 				expect(Array.isArray(res)).toBe(true)
-				expect(res).toContainEqual({ hitPoint: new Vector2(0, 0.5) })
+				expect(res?.some(e => e.hitPoint.equals(new Vector2(0, 0.5)))).toBe(true)
 			})
 
 			test('self intersect', () => {
 				const s1 = new Segment(new Vector2(0, 0), new Vector2(0, 1))
-				const res = s1.intersect(s1)
+				const res = s1.intersect(s1, true)
 				expect(Array.isArray(res)).toBe(true)
 			})
 
@@ -104,7 +106,7 @@ describe('Segment', () => {
 				const s1 = new Segment(a, b)
 				const s2 = new Segment(c, d)
 
-				const res = s1.intersect(s2)
+				const res = s1.intersect(s2, true)
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res).toBeInstanceOf(Array)
@@ -124,16 +126,16 @@ describe('Segment', () => {
 				const s1 = new Segment(new Vector2(-1, 1), new Vector2(1, -1))
 				const s2 = new Segment(new Vector2(-2, -1), new Vector2(-1, -2))
 
-				expect(ray.intersect(s1)).toBeInstanceOf(Array)
+				expect(ray.intersect(s1, true)).toBeInstanceOf(Array)
 				// @ts-ignore
 				expect(ray.intersect(s1)[0].hitPoint.equals(new Vector2())).toBe(true)
-				expect(ray.intersect(s2)).toBe(null)
+				expect(ray.intersect(s2, true)).toBe(null)
 			})
 
 			// TODO
 			test('start intersection', () => {
 				const s1 = new Segment(new Vector2(0, -2), new Vector2(-2, 0))
-				const result = ray.intersect(s1)
+				const result = ray.intersect(s1, true)
 				const expected = new Vector2(-1, -1)
 
 				expect(result).toBeInstanceOf(Array)
@@ -145,8 +147,8 @@ describe('Segment', () => {
 			test('parallel collinear', () => {
 				const s1 = new Segment(new Vector2(0, -2), new Vector2(2, 0))
 				const s2 = new Segment(new Vector2(0, 0), new Vector2(1, 1))
-				expect(ray.intersect(s1)).toBe(null)
-				expect(ray.intersect(s2)).toBeInstanceOf(Array)
+				expect(ray.intersect(s1, true)).toBe(null)
+				expect(ray.intersect(s2, true)).toBeInstanceOf(Array)
 			})
 
 			test('random test intersect', () => {
@@ -154,7 +156,7 @@ describe('Segment', () => {
 					new Vector2(-1.2692, -1.67395),
 					new Vector2(0.78382, 1.52463)
 				)
-				const res: IIntersect[] | null = ray.intersect(s)
+				const res: IIntersect[] | null = ray.intersect(s, true)
 
 				expect(res).toBeInstanceOf(Array)
 				expect(res).toHaveLength(1)

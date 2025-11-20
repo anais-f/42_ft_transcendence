@@ -69,7 +69,7 @@ export class PongObject {
 		let hits: IIntersect[] = []
 		for (let localObj of absLocalHitbox) {
 			for (let otherObj of absOtherHitbox) {
-				const hp = otherObj.intersect(localObj)
+				const hp = otherObj.intersect(localObj, true)
 				if (hp instanceof Array) {
 					hits = [...hits, ...hp]
 				}
