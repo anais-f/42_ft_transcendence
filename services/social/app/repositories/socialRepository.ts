@@ -15,15 +15,6 @@ export class SocialRepository {
 			: [b.user_id, a.user_id]
 	}
 
-	static relationExisted(user_id: IUserId, friend_id: IUserId): boolean {
-		const selectStmt = db.prepare(
-			'SELECT 1 FROM relations WHERE (user_id = ? AND friend_id = ?)'
-		)
-		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
-		const row = selectStmt.get(firstId, secondId)
-		return !!row
-	}
-
 	static relationStatus(user_id: IUserId, friend_id: IUserId): number {
 		const selectStmt = db.prepare(
 			'SELECT relation_status FROM relations WHERE (user_id = ? AND friend_id = ?)'
@@ -58,11 +49,15 @@ export class SocialRepository {
 	}
 
 	static deleteRelation(user_id: IUserId, friend_id: IUserId): void {
-		const selectStmt = db.prepare(
+		const deleteStmt = db.prepare(
 			'DELETE FROM relations WHERE user_id = ? AND friend_id = ?'
 		)
 		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
-		selectStmt.run(firstId, secondId)
+		const result = deleteStmt.run(firstId, secondId)
+
+		if (result.changes === 0) {
+			throw new Error('Relation does not exist')
+		}
 	}
 
 	static findFriendsList(user_id: IUserId): IUserId[] {
@@ -86,6 +81,25 @@ export class SocialRepository {
 	static findPendingListToApprove(user_id: IUserId): IUserId[] {
 		const selectStmt = db.prepare(
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (user_id = ? OR friend_id = ?)'
+		)
+		const rows = selectStmt.all(
+			0,
+			user_id.user_id,
+			user_id.user_id,
+			user_id.user_id
+		) as RelationUserRow[]
+		const pending: IUserId[] = []
+		for (const row of rows) {
+			if (row.user_id === user_id.user_id)
+				pending.push({ user_id: row.friend_id })
+			else pending.push({ user_id: row.user_id })
+		}
+		return pending
+	}
+
+	static findPendingSentRequests(user_id: IUserId): IUserId[] {
+		const selectStmt = db.prepare(
+			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id = ? AND (user_id = ? OR friend_id = ?)'
 		)
 		const rows = selectStmt.all(
 			0,
