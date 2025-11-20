@@ -81,4 +81,3 @@ export async function handleUserOffline(userId: string): Promise<void> {
 		console.error(`Failed to notify user ${userId} offline status:`, message)
 	}
 }
-

@@ -1,7 +1,12 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
-import { addConnection, getTotalConnections } from '../usescases/connectionManager.js'
+import {
+	addConnection,
+	getTotalConnections
+} from '../usescases/connectionManager.js'
 import { routeMessage } from '../usescases/messageRouter.js'
+
+//TODO : tout revoir
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler

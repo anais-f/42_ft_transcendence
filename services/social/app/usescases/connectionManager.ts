@@ -50,7 +50,10 @@ function cancelPendingDisconnect(userId: string): void {
  * @param ws - WebSocket instance
  * @returns true if this is the user's first connection (went online), false if replacing existing
  */
-export async function addConnection(userId: string, ws: WebSocket): Promise<boolean> {
+export async function addConnection(
+	userId: string,
+	ws: WebSocket
+): Promise<boolean> {
 	const existingConn = wsConnections.get(userId)
 	const isFirstConnection = !existingConn
 
