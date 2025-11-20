@@ -43,7 +43,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	)
 
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
-	server.post(
+	server.post<{ Params: { userId: number } }>(
 		'/api/logout/:userId',
 		{
 			schema: {

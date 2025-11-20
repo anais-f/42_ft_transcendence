@@ -5,15 +5,6 @@ import {
 } from '../usescases/connectionManager.js'
 import { handleUserOffline } from '../usescases/presenceService.js'
 
-declare module 'fastify' {
-	interface FastifyRequest {
-		user: {
-			user_id: number
-			login: string
-		}
-	}
-}
-
 /**
  * Handle user logout - mark user as offline and close WebSocket connection
  * Called by Frontend: POST /api/logout/:userId (with JWT, user can only logout themselves)
@@ -25,9 +16,16 @@ export async function handleLogout(
 	reply: FastifyReply
 ): Promise<void> {
 	const targetUserId = String(request.params.userId)
-	const userFromToken = request.user
+	const userFromToken = (request as any).user
 
 	try {
+		if (!userFromToken) {
+			return reply.code(401).send({
+				success: false,
+				message: 'Not authenticated'
+			})
+		}
+
 		const userIdFromToken = String(userFromToken.user_id)
 		if (userIdFromToken !== targetUserId) {
 			console.warn(
