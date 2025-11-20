@@ -22,7 +22,7 @@ export async function handleLogout(
 		if (!userFromToken) {
 			return reply.code(401).send({
 				success: false,
-				message: 'Not authenticated'
+				error: 'Not authenticated'
 			})
 		}
 
@@ -33,7 +33,7 @@ export async function handleLogout(
 			)
 			return reply.code(403).send({
 				success: false,
-				message: 'You can only logout yourself'
+				error: 'You can only logout yourself'
 			})
 		}
 
@@ -57,7 +57,7 @@ export async function handleLogout(
 		console.error(`Failed to handle logout for user ${targetUserId}:`, message)
 		reply.code(500).send({
 			success: false,
-			message: 'Failed to handle logout'
+			error: 'Failed to handle logout'
 		})
 	}
 }
