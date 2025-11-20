@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
-import { addConnection, getTotalConnections } from '../usescases/connectionStore.js'
-import { handleUserOnline, handleUserOffline } from '../usescases/presenceService.js'
+import { addConnection, getTotalConnections } from '../usescases/connectionManager.js'
+import { routeMessage } from '../usescases/messageRouter.js'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -34,24 +34,14 @@ export async function handleWsConnection(
 	const userId = String(payload.user_id)
 	const userLogin = String(payload.login)
 
-	// Add connection to store with offline handler
+	// Add connection (handles online status internally)
 	try {
-		addConnection(userId, socket, (uid, ws) => {
-			handleUserOffline(uid)
-		})
+		await addConnection(userId, socket)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to add connection for user ${userId}:`, message)
 		socket.close(1011, 'Internal server error')
 		return
-	}
-
-	// Notify users service that user is online
-	try {
-		await handleUserOnline(userId)
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to handle user online for ${userId}:`, message)
 	}
 
 	console.log(`✅ [WS] ${userLogin} (${userId}) connected`)
@@ -98,22 +88,7 @@ export async function handleWsConnection(
 			return
 		}
 
-		// Valid JSON message
-		console.log(`📨 [MSG] ${userLogin}: ${message.type || 'unknown'}`)
-
-		// TODO: Route message to appropriate handler via messageRouter
-		// For now, just echo back
-		socket.send(
-			JSON.stringify({
-				type: 'message:echo',
-				data: {
-					from: {
-						userId,
-						login: userLogin
-					},
-					content: message
-				}
-			})
-		)
+		// Valid JSON message - route to appropriate handler
+		routeMessage(userId, message, socket)
 	})
 }

@@ -1,4 +1,6 @@
 import WebSocket from 'ws'
+import { handlePong, startHeartbeat } from './heartbeatService.js'
+import { handleUserOnline, handleUserOffline } from './presenceService.js'
 
 interface UserConnection {
 	ws: WebSocket
@@ -8,19 +10,15 @@ interface UserConnection {
 export const wsConnections = new Map<string, UserConnection>()
 const pendingDisconnectTimers = new Map<string, NodeJS.Timeout>()
 const DISCONNECT_DELAY_MS = 5000
-const HEARTBEAT_INTERVAL_MS = 30000
-const PONG_TIMEOUT_MS = 60000
-let heartbeatInterval: NodeJS.Timeout | null = null
 
 /**
  * Setup event handlers for a WebSocket connection
+ * @param userId - User ID
+ * @param ws - WebSocket instance
  */
 function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
 	ws.on('pong', () => {
-		const conn = wsConnections.get(userId)
-		if (conn) {
-			conn.lastHeartbeat = new Date()
-		}
+		handlePong(userId)
 	})
 
 	ws.on('close', () => {
@@ -34,110 +32,14 @@ function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
 }
 
 /**
- * Start heartbeat interval (ping 30s)
- */
-function startHeartbeat(): void {
-	if (heartbeatInterval) return
-
-	heartbeatInterval = setInterval(() => {
-		const now = Date.now()
-
-		for (const [userId, conn] of wsConnections.entries()) {
-			try {
-				if (conn.ws.readyState === WebSocket.OPEN) {
-					conn.ws.ping()
-					const timeSinceLastPong = now - conn.lastHeartbeat.getTime()
-					if (timeSinceLastPong > PONG_TIMEOUT_MS) {
-						console.warn(
-							`User ${userId} not responding to heartbeat (${timeSinceLastPong}ms), terminating connection`
-						)
-						conn.ws.terminate()
-						removeConnection(userId, conn.ws)
-					}
-				}
-			} catch (e) {
-				const message = e instanceof Error ? e.message : String(e)
-				console.warn(`Heartbeat failed for user ${userId}:`, message)
-				try {
-					removeConnection(userId, conn.ws)
-				} catch (cleanupErr) {}
-			}
-		}
-	}, HEARTBEAT_INTERVAL_MS) as NodeJS.Timeout
-}
-
-/**
- * Stop heartbeat interval
- */
-function stopHeartbeat(): void {
-	if (heartbeatInterval) {
-		clearInterval(heartbeatInterval)
-		heartbeatInterval = null
-	}
-}
-
-/**
  * Cancel pending disconnect timer for a user
+ * @param userId - User ID
  */
 function cancelPendingDisconnect(userId: string): void {
 	const timer = pendingDisconnectTimers.get(userId)
 	if (timer) {
 		clearTimeout(timer)
 		pendingDisconnectTimers.delete(userId)
-	}
-}
-
-/**
- * Notify users service about status change
- */
-async function notifyStatusChange(
-	userId: string,
-	status: 'online' | 'offline'
-): Promise<void> {
-	const base = process.env.USERS_SERVICE_URL
-	const secret = process.env.USERS_API_SECRET
-	if (!base || !secret) {
-		console.error('Missing USERS_SERVICE_URL or USERS_API_SECRET env')
-		return
-	}
-
-	const statusValue = status === 'online' ? 1 : 0
-	const body: { status: number; lastConnection?: string } = {
-		status: statusValue
-	}
-
-	if (status === 'offline') {
-		body.lastConnection = new Date().toISOString()
-	}
-
-	const url = `${base}/api/internal/users/${userId}/status`
-	const headers = {
-		'Content-Type': 'application/json',
-		'X-API-Key': secret
-	}
-	const options = {
-		method: 'PATCH',
-		headers,
-		body: JSON.stringify(body)
-	}
-
-	try {
-		const response = await fetch(url, options)
-
-		if (!response.ok) {
-			const errorText = await response.text()
-			console.error(
-				`[STATUS] Failed to update user ${userId} status to ${status}: ${response.status} - ${errorText}`
-			)
-		} else {
-			console.log(`[STATUS] User ${userId} is now ${status.toUpperCase()}`)
-		}
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(
-			`[STATUS] Error updating user ${userId} status to ${status}:`,
-			message
-		)
 	}
 }
 
@@ -171,12 +73,13 @@ export async function addConnection(userId: string, ws: WebSocket): Promise<bool
 
 	setupWebSocketHandlers(userId, ws)
 
-	console.log(`User ${userId} is now ONLINE`)
-	try {
-		await notifyStatusChange(userId, 'online')
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to notify user ${userId} online status:`, message)
+	if (isFirstConnection) {
+		try {
+			await handleUserOnline(userId)
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error)
+			console.error(`Failed to notify user ${userId} online status:`, message)
+		}
 	}
 
 	return isFirstConnection
@@ -201,8 +104,7 @@ export function removeConnection(userId: string, ws: WebSocket): boolean {
 	const timer = setTimeout(async () => {
 		try {
 			pendingDisconnectTimers.delete(userId)
-			console.log(`User ${userId} disconnect timer expired - marking offline`)
-			await notifyStatusChange(userId, 'offline')
+			await handleUserOffline(userId)
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error)
 			console.error(`Failed to notify user ${userId} offline status:`, message)
@@ -270,6 +172,12 @@ export function broadcast(message: unknown): void {
 	)
 }
 
+/**
+ * Get total number of connected users
+ */
+export function getTotalConnections(): number {
+	return wsConnections.size
+}
 
 /**
  * Cleanup all pending disconnect timers (call on server shutdown)
@@ -282,7 +190,5 @@ export function cleanupAllTimers(): void {
 	pendingDisconnectTimers.clear()
 	console.log('All disconnect timers cleared')
 }
-
-
 
 startHeartbeat()
