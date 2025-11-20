@@ -3,7 +3,9 @@ import { WalerPage } from './pages/walers.js'
 import { HomePage } from './pages/homepage.js'
 import { AboutUsPage } from './pages/aboutUs.js'
 import { RegisterPage } from './pages/register.js'
-import { MyPage } from './pages/MyPage.js'
+import { MyPage } from './pages/mypage.js'
+import { GamePage } from "./pages/gamepage.js"
+
 
 document.addEventListener('DOMContentLoaded', () => {
 	const contentDiv = document.getElementById('content')
@@ -22,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		about: AboutUsPage(),
 		register: RegisterPage(),
 		wales: WalerPage(),
-		me: MyPage()
+		me: MyPage(),
+		game: GamePage(),
 	} satisfies Record<string, string>
 
 	// Build menu

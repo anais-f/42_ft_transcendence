@@ -2,7 +2,7 @@ export const HomePage = (): string => /*html*/ `
 <header>
   <!-- ? -->
 </header>
-<body>
+<div class="min-h-[80vh]">
     <h1 class="text-8xl text-center text-orange-400 bg-[url(/images/pong.avif)] bg-no-repeat bg-center py-48">
       ft_transcendence</h1>
     <div class="flex place-content-center">
@@ -18,8 +18,8 @@ export const HomePage = (): string => /*html*/ `
             Continue with Google</button>
         </a>
     </div>
-</body>
-		<footer class="border-t border-gray-800 text-center text-s text-gray-400 my-24 py-8">
+</div>
+		<footer class="border-t border-gray-800 text-center text-s text-gray-400 my-4 py-4">
 			© 2025 ft_Transcendence — All rights reserved
 		</footer>
 `
