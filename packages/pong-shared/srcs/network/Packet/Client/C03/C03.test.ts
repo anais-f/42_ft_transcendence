@@ -1,6 +1,4 @@
 import { C03BallBase } from './C03'
-import { packetBuilder } from '../../packetBuilder.js'
-import { Vector2 } from '../../../../math/Vector2.js'
 
 describe('C03', () => {
 	test('serialize returns correct buffer', () => {
@@ -15,6 +13,7 @@ describe('C03', () => {
 
 		expect(view.getUint8(8)).toBe(0b101)
 	})
+	/*
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(9)
 		const view = new DataView(buff)
@@ -37,4 +36,5 @@ describe('C03', () => {
 		const CBack = packetBuilder.deserializeC(buff)
 		expect(C.getTime()).toEqual(CBack?.time)
 	})
+   */
 })

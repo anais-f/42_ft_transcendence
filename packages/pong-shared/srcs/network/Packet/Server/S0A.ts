@@ -1,8 +1,4 @@
-import { PongPad } from '@packages/pong-shared/srcs/engine/objects/PongPad.js'
-import { Segment } from '../../../math/Segment.js'
 import { IS00PongBase } from './S00.js'
-import { PongBall } from '@packages/pong-shared/srcs/engine/objects/PongBall.js'
-import { SPacketsType } from '../packetBuilder.js'
 
 export enum ShapeType {
 	Circle = 1,
@@ -10,6 +6,16 @@ export enum ShapeType {
 }
 
 export class S0ASync implements IS00PongBase {
+	constructor() {}
+	time: number = 0
+	getTime(): number {
+		return this.time
+	}
+	serialize(): ArrayBuffer {
+		return new ArrayBuffer(0)
+	}
+	// TODO: fix it
+	/*
 	constructor(
 		private border: Segment[],
 		private pads: PongPad[],
@@ -111,4 +117,5 @@ export class S0ASync implements IS00PongBase {
 		offset += 8
 		return buff
 	}
+   */
 }

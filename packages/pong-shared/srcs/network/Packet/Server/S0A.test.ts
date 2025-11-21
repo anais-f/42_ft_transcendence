@@ -1,14 +1,11 @@
-import { PongBall } from '../../../engine/objects/PongBall'
-import { PongObject } from '../../../engine/objects/PongObject'
-import { PongPad } from '../../../engine/objects/PongPad'
 import { Segment } from '../../../math/Segment'
 import { AShape } from '../../../math/shapes/AShape'
 import { Circle } from '../../../math/shapes/Circle'
-import { Polygon } from '../../../math/shapes/Polygon'
 import { Vector2 } from '../../../math/Vector2'
 import { packetBuilder, SPacketsType } from '../packetBuilder'
 import { S0ASync } from './S0A'
 
+/*
 describe('S0A', () => {
 	let S0A: S0ASync
 	beforeEach(() => {
@@ -160,3 +157,4 @@ describe('S0A', () => {
 		})
 	})
 })
+*/

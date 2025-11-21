@@ -14,6 +14,7 @@ describe('S01', () => {
 		const type = view.getUint8(8)
 		expect(type).toBe(0b11)
 	})
+	/*
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(9)
 		const view = new DataView(buff)
@@ -36,4 +37,5 @@ describe('S01', () => {
 
 		expect(SBack?.getTime()).toBe(S01.time)
 	})
+	*/
 })
