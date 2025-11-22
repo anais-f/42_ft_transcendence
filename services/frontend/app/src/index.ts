@@ -1,5 +1,5 @@
 import '../style.css'
-import { renderHomePage } from './pages/homePage.js'
+import { renderHomePage } from './pages/home.js'
 
 document.addEventListener('DOMContentLoaded', () => {
 

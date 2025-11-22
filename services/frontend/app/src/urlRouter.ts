@@ -1,10 +1,10 @@
 import '../style.css'
-import { WalerPage } from './pages/walers.js'
-import { HomePage } from './pages/homepage.js'
-import { AboutUsPage } from './pages/aboutUs.js'
-import { RegisterPage } from './pages/register.js'
-import { MyPage } from './pages/mypage.js'
-import { GamePage } from "./pages/gamepage.js"
+import { WalerPage } from './pages/old_wale.js'
+import { HomePage } from './pages/old_home.js'
+import { AboutUsPage } from './pages/old_aboutUs.js'
+import { RegisterPage } from './pages/old_register.js'
+import { MyPage } from './pages/old_mypage.js'
+import { GamePage } from "./pages/old_gameP.js"
 
 
 document.addEventListener('DOMContentLoaded', () => {
