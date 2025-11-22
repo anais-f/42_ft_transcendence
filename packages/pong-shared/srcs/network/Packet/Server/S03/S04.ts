@@ -3,8 +3,11 @@ import { IS00PongBase } from '../S00.js'
 import { S03BaseBall } from './S03.js'
 
 export class S04BallVeloChange extends S03BaseBall implements IS00PongBase {
-
-	constructor(S03: S03BaseBall, private velo: Vector2, private factor: number) {
+	constructor(
+		S03: S03BaseBall,
+		private velo: Vector2,
+		private factor: number
+	) {
 		super(S03.getTime())
 	}
 

@@ -80,9 +80,9 @@ describe('game-engine', () => {
 		expect(padSeg1.getP1().getY()).toBeCloseTo(y1 - 4.3)
 		expect(padSeg1.getP2().getY()).toBeCloseTo(y2 - 4.3)
 		expect(padSeg1.getP1().getX()).toEqual(-18)
- 		// reference test
+		// reference test
 		expect(
-		// @ts-ignore
+			// @ts-ignore
 			game.borders.some(
 				(e) =>
 					e.getP1().equals(new Vector2(-18, y1 - 4.3)) &&

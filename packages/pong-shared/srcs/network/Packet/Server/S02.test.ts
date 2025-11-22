@@ -46,7 +46,7 @@ describe('S02', () => {
 			[p2, p3],
 			[p3, p1],
 			[p4, p5],
-			[p5, p6],
+			[p5, p6]
 		]
 
 		// for each segment, read the four float64 values and compare to the original points

@@ -8,7 +8,12 @@ export class S06BallSync extends S03BaseBall implements IS00PongBase {
 	private S05: S05BallPos
 	private S04: S04BallVeloChange
 
-	constructor(pos: Vector2, factor: number, velo: Vector2, ts: number | null = null) {
+	constructor(
+		pos: Vector2,
+		factor: number,
+		velo: Vector2,
+		ts: number | null = null
+	) {
 		const S03 = ts === null ? S03BaseBall.createS03() : new S03BaseBall(ts)
 
 		super(S03.getTime())
