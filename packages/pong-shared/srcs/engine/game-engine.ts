@@ -1,5 +1,5 @@
+import { Circle } from '../math/Circle.js'
 import { Segment } from '../math/Segment.js'
-import { Circle } from '../math/shapes/Circle.js'
 import { Vector2 } from '../math/Vector2.js'
 import { IBall } from './IBall.js'
 import { IScore } from './IScore.js'
@@ -115,6 +115,9 @@ export class GameEngine {
 		}
 
 		++this.TPS_DATA.tickCount
+		if (this.score.p1 + this.score.p2 >= this.score.max) {
+			this.pauseGame()
+		}
 
 		console.log(
 			`pos: {${this.ball.shape.getPos().getX().toFixed(2)} : ${this.ball.shape.getPos().getY().toFixed(2)}} | velo: {${this.ball.velo.getX().toFixed(2)} : ${this.ball.velo.getY().toFixed(2)}}}`

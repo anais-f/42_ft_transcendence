@@ -1,6 +1,6 @@
-import { Vector2 } from '../Vector2.js'
+import { Vector2 } from './Vector2.js'
 import { Circle } from './Circle.js'
-import { Segment } from '../Segment.js'
+import { Segment } from './Segment.js'
 
 describe('Circle', () => {
 	test('create a circle', () => {

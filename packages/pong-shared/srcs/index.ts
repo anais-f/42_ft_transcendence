@@ -4,7 +4,7 @@ export * from './math/Segment.js'
 export * from './define.js'
 
 // Shape
-export * from './math/shapes/Circle.js'
+export * from './math/Circle.js'
 
 // engine
 export * from './engine/game-engine.js'

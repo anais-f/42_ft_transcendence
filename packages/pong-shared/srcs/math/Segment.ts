@@ -1,6 +1,6 @@
 import { EPSILON } from '../define.js'
 import { Vector2 } from './Vector2.js'
-import { Circle } from './shapes/Circle.js'
+import { Circle } from './Circle.js'
 
 export class Segment {
 	constructor(
