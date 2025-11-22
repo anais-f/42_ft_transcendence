@@ -1,10 +1,11 @@
 import { Vector2 } from '@packages/pong-shared/srcs/math/Vector2.js'
+import { SPacketsType } from '../../packetTypes.js'
 import { IS00PongBase } from '../S00.js'
-import { S03BaseBall } from './S03.js'
+import { AS03BaseBall } from './S03.js'
 
-export class S04BallVeloChange extends S03BaseBall implements IS00PongBase {
+export class S04BallVeloChange extends AS03BaseBall implements IS00PongBase {
 	constructor(
-		S03: S03BaseBall,
+		S03: AS03BaseBall,
 		private velo: Vector2,
 		private factor: number
 	) {
@@ -27,7 +28,7 @@ export class S04BallVeloChange extends S03BaseBall implements IS00PongBase {
 
 		buffUint8.set(fakeUint8)
 
-		buffUint8[8] |= 0b1000
+		buffUint8[8] |= SPacketsType.S04
 
 		const view = new DataView(buff)
 		view.setFloat64(9, this.velo.getX(), true)

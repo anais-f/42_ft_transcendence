@@ -1,5 +1,6 @@
 import { Segment } from '../../../math/Segment'
 import { Vector2 } from '../../../math/Vector2'
+import { SPacketsType } from '../packetTypes.js'
 import { S02SegmentUpdate as S02 } from './S02.js'
 
 describe('S02', () => {
@@ -35,7 +36,7 @@ describe('S02', () => {
 		expect(view.getFloat64(0, true)).toBeCloseTo(time, 6)
 
 		// type
-		expect(view.getUint8(8)).toBe(0b11)
+		expect(view.getUint8(8)).toBe(SPacketsType.S02)
 
 		// number of segments
 		expect(view.getUint8(9)).toBe(tab.length)
@@ -64,5 +65,10 @@ describe('S02', () => {
 			expect(x2).toBeCloseTo(pb.getX(), 6)
 			expect(y2).toBeCloseTo(pb.getY(), 6)
 		}
+	})
+
+	test('deserialize + serialize', () => {
+
+
 	})
 })

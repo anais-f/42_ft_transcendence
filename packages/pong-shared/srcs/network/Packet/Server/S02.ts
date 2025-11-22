@@ -1,4 +1,5 @@
 import { Segment } from '../../../math/Segment.js'
+import { SPacketsType } from '../packetTypes.js'
 import { IS00PongBase } from './S00.js'
 
 export class S02SegmentUpdate implements IS00PongBase {
@@ -38,7 +39,7 @@ export class S02SegmentUpdate implements IS00PongBase {
 		const HEADER_SIZE = 10 // 8 + 1 + 1
 
 		view.setFloat64(0, this.time, true)
-		view.setUint8(8, 0b11)
+		view.setUint8(8, SPacketsType.S02)
 
 		view.setUint8(9, nbSegs)
 

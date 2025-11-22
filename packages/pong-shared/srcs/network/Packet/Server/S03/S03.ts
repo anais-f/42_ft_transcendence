@@ -1,4 +1,6 @@
-export class S03BaseBall {
+import { SPacketsType } from '../../packetTypes.js'
+
+export class AS03BaseBall {
 	time: number
 
 	constructor(time: number) {
@@ -10,7 +12,7 @@ export class S03BaseBall {
 	}
 
 	static createS03() {
-		return new S03BaseBall(Date.now())
+		return new AS03BaseBall(Date.now())
 	}
 
 	protected fserialize(): ArrayBuffer {
@@ -18,7 +20,7 @@ export class S03BaseBall {
 		const view = new DataView(buff)
 
 		view.setFloat64(0, this.time, true)
-		view.setUint8(8, 0b101)
+		view.setUint8(8, SPacketsType.S03)
 
 		return buff
 	}

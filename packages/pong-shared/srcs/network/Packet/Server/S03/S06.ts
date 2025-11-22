@@ -1,10 +1,11 @@
 import { Vector2 } from '@packages/pong-shared/srcs/math/Vector2.js'
 import { IS00PongBase } from '../S00.js'
-import { S03BaseBall } from './S03.js'
+import { SPacketsType } from '../../packetTypes.js'
+import { AS03BaseBall } from './S03.js'
 import { S05BallPos } from './S05.js'
 import { S04BallVeloChange } from './S04.js'
 
-export class S06BallSync extends S03BaseBall implements IS00PongBase {
+export class S06BallSync extends AS03BaseBall implements IS00PongBase {
 	private S05: S05BallPos
 	private S04: S04BallVeloChange
 
@@ -14,7 +15,7 @@ export class S06BallSync extends S03BaseBall implements IS00PongBase {
 		velo: Vector2,
 		ts: number | null = null
 	) {
-		const S03 = ts === null ? S03BaseBall.createS03() : new S03BaseBall(ts)
+		const S03 = ts === null ? AS03BaseBall.createS03() : new AS03BaseBall(ts)
 
 		super(S03.getTime())
 		this.S04 = new S04BallVeloChange(S03, velo, factor)

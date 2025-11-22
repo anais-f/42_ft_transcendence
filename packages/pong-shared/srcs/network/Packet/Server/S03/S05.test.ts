@@ -1,11 +1,11 @@
 import { Vector2 } from '../../../../math/Vector2.js'
-import { S03BaseBall } from './S03.js'
+import { AS03BaseBall } from './S03.js'
 import { S05BallPos } from './S05.js'
 
 describe('S05', () => {
 	test('serialize returns correct buffer', () => {
 		const velo = new Vector2(497.34, -232)
-		const S03 = S03BaseBall.createS03()
+		const S03 = AS03BaseBall.createS03()
 		const S04 = new S05BallPos(S03, velo)
 		const buff = S04.serialize()
 

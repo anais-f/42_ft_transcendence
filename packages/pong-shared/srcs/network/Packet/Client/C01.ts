@@ -1,15 +1,15 @@
 import { IC00PongBase } from './C00.js'
 import { padDirection } from '../../../engine/PongPad.js'
-import { CPacketsType } from '../packetBuilder.js'
+import { CPacketsType } from '../packetTypes.js'
 
 export class C01Move implements IC00PongBase {
-	constructor(
+	public constructor(
 		public state: boolean,
 		public dir: padDirection,
 		public time = Date.now()
 	) {}
 
-	getTime(): number {
+	public getTime(): number {
 		return this.time
 	}
 
@@ -18,7 +18,7 @@ export class C01Move implements IC00PongBase {
 	 * type start at 8
 	 * [{start/stop}{up/down}{}{}{}{}{}{}]
 	 */
-	serialize(): ArrayBuffer {
+	public serialize(): ArrayBuffer {
 		const buff = new ArrayBuffer(10) // 8 + 1 + 8 + 8
 		const view = new DataView(buff)
 

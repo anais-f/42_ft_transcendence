@@ -1,12 +1,13 @@
 import { Vector2 } from '../../../../math/Vector2.js'
-import { S03BaseBall } from './S03.js'
+import { SPacketsType } from '../../packetTypes.js'
+import { AS03BaseBall } from './S03.js'
 import { S04BallVeloChange } from './S04.js'
 
 describe('S04', () => {
 	test('serialize returns correct buffer', () => {
 		const velo = new Vector2(497.34, -232)
-		const S03 = S03BaseBall.createS03()
-		const S04 = new S04BallVeloChange(S03, velo)
+		const S03 = AS03BaseBall.createS03()
+		const S04 = new S04BallVeloChange(S03, velo, 1)
 		const buff = S04.serialize()
 
 		const view = new DataView(buff)
@@ -19,7 +20,7 @@ describe('S04', () => {
 		expect(typeof ts).toBe('number')
 		expect(ts).toBeCloseTo(S03.time)
 		expect(ts).toBeCloseTo(S04.time)
-		expect(type).toBe(0b1101)
+		expect(type).toBe(SPacketsType.S04)
 		expect(x).toBeCloseTo(velo.getX())
 		expect(y).toBeCloseTo(velo.getY())
 	})
