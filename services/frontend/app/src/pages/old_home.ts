@@ -1,8 +1,3 @@
-
-
-
-
-
 export const HomePage = (): string => /*html*/ `
 // <header>
 //   <!-- ? -->

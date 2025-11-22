@@ -52,7 +52,7 @@
 // 	}
 
 // 	addStyle(style: string): void {
-// 		if (this.className) 
+// 		if (this.className)
 // 			this.className += ' ' + style
 // 		else
 // 			this.className = style

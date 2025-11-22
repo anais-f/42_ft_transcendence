@@ -18,8 +18,6 @@
 //     img: imgLink as HTMLImageElement
 // })
 
-
-
 // const button: HTMLButtonElement = createButton({
 //     name: 'REGISTER',
 //     type: 'button',
@@ -37,10 +35,5 @@
 //     })
 // })
 
-
 // root.appendChild(link)
 // root.appendChild(button)
-
-
-
-
