@@ -1,6 +1,9 @@
 import { padDirection } from '../../engine/PongPad.js'
+import { Segment } from '../../math/Segment.js'
+import { Vector2 } from '../../math/Vector2.js'
 import { C01Move as C01 } from './Client/CPackets.js'
 import { CPacketsType, SPacketsType } from './packetTypes.js'
+import { S02SegmentUpdate } from './Server/S02.js'
 
 import {
 	S01ServerTickConfirmation as S01,
@@ -43,6 +46,9 @@ export class packetBuilder {
 	): S01 | S03 | S04 | S05 | S06 | null {
 		const view = new DataView(buff)
 		const time = view.getFloat64(0, true)
+		let velo: Vector2
+		let pos: Vector2
+		let factor: number
 
 		try {
 			const type = view.getUint8(8)
@@ -53,14 +59,28 @@ export class packetBuilder {
 				case SPacketsType.S01:
 					return new S01(time)
 				case SPacketsType.S02:
-
-					break
+					const nbseg = view.getUint8(9)
+					const tab: Segment[] = []
+					for (let i = 0; i < nbseg; ++i) {
+						const offset = 10 + i * 32
+						tab.push(new Segment(
+							new Vector2(view.getFloat64(offset, true), view.getFloat64(offset + 8)),
+							new Vector2(view.getFloat64(offset + 16, true), view.getFloat64(offset + 24, true))
+						))
+					}
+					return new S02SegmentUpdate(time, tab)
 				case SPacketsType.S04:
-					break
+					velo = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					factor = view.getFloat64(25, true)
+					return new S04(new S03(time), velo, factor)
 				case SPacketsType.S05:
-					break
+					pos = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					return new S05(new S03(time), pos)
 				case SPacketsType.S06:
-					break
+					velo = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					factor = view.getFloat64(25, true)
+					pos = new Vector2(view.getFloat64(33, true), view.getFloat64(41, true))
+					return new S06(pos, factor, velo, time)
 				default:
 					break
 			}

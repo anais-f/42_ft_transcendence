@@ -47,7 +47,7 @@ export class S06BallSync extends AS03BaseBall implements IS00PongBase {
 
 		buffUint8.set(fakeUint8)
 
-		buffUint8[8] |= 0b11000
+		buffUint8[8] |= SPacketsType.S06
 
 		const view = new DataView(buff)
 		view.setFloat64(9, this.getVelo().getX(), true)
