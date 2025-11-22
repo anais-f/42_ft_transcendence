@@ -34,11 +34,19 @@
     - C00Base:
         - timestamp
     - C01Move:
-        - Direction
+        - uint8:
+            - 0/1 start / stop
+            - 0/1up / down
+            - empty
+            - empty
+            - empty
+            - empty
+            - empty
+            - empty
 
     [ ts ][ type      ][ data ]
     [    ][ 0000 0001 ][ 0o   ] 00
-    [    ][ 0000 0011 ][ 16o  ] 01
+    [    ][ 0000 0011 ][ 10o  ] 01
 
 ### Server to client Packets
 
