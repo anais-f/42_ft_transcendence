@@ -1,5 +1,5 @@
-import { Segment } from '../Segment.js'
-import { Vector2 } from '../Vector2.js'
+import { Segment } from './Segment.js'
+import { Vector2 } from './Vector2.js'
 
 export class Circle {
 	private rad!: number

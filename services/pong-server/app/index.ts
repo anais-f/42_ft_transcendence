@@ -4,7 +4,6 @@ import {
 	Segment,
 	Vector2
 } from '@ft_transcendence/pong-shared'
-import { PongPad } from '@ft_transcendence/pong-shared/engine/IPad.js'
 import {
 	createScore,
 	IScore

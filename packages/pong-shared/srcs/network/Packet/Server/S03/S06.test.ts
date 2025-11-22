@@ -5,7 +5,8 @@ describe('S06', () => {
 	test('serialize returns correct buffer', () => {
 		const pos = new Vector2(3242.23, -32)
 		const velo = new Vector2(-3.23, -34.32)
-		const S06 = new S06BallSync(pos, velo)
+		const factor = 1
+		const S06 = new S06BallSync(pos, factor, velo)
 		const buff = S06.serialize()
 
 		const view = new DataView(buff)
@@ -14,8 +15,9 @@ describe('S06', () => {
 		const type = view.getUint8(8)
 		const vx = view.getFloat64(9, true)
 		const vy = view.getFloat64(17, true)
-		const px = view.getFloat64(25, true)
-		const py = view.getFloat64(33, true)
+		const f = view.getFloat64(25, true)
+		const px = view.getFloat64(33, true)
+		const py = view.getFloat64(41, true)
 
 		expect(typeof ts).toBe('number')
 		expect(ts).toBeCloseTo(S06.time)
@@ -24,6 +26,7 @@ describe('S06', () => {
 		expect(vy).toBeCloseTo(velo.getY())
 		expect(px).toBeCloseTo(pos.getX())
 		expect(py).toBeCloseTo(pos.getY())
+		expect(f).toBeCloseTo(factor)
 	})
 
 	/*

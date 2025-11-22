@@ -31,9 +31,9 @@ export class S02SegmentUpdate implements IS00PongBase {
 	 * ]
 	 */
 	serialize(): ArrayBuffer {
-		const buff = new ArrayBuffer(9)
-		const view = new DataView(buff)
 		const nbSegs = this.segs.length
+		const buff = new ArrayBuffer(10 + (32 * nbSegs))
+		const view = new DataView(buff)
 		const SEG_SIZE = 32
 		const HEADER_SIZE = 10 // 8 + 1 + 1
 
@@ -46,7 +46,6 @@ export class S02SegmentUpdate implements IS00PongBase {
 		for (const s of this.segs) {
 			const segBuff = s.serialize()
 			new Uint8Array(buff, offset, SEG_SIZE).set(new Uint8Array(segBuff))
-			offset += SEG_SIZE
 			offset += SEG_SIZE
 		}
 

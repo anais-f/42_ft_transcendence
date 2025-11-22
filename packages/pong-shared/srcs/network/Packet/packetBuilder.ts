@@ -1,9 +1,4 @@
-import {
-	C03BallBase as C03,
-	C01Move as C01,
-	C04BallVelo as C04,
-	C05BallPos as C05
-} from './Client/CPackets.js'
+import { C01Move as C01 } from './Client/CPackets.js'
 
 import {
 	S01ServerTickConfirmation as S01,
@@ -14,11 +9,7 @@ import {
 
 export enum CPacketsType {
 	C00 = 0b00000001,
-	C01 = 0b00000011,
-	C03 = 0b00000101,
-	C04 = 0b00001101,
-	C05 = 0b00010101,
-	C06 = 0b00011101
+	C01 = 0b00000011
 }
 
 export enum SPacketsType {
@@ -27,14 +18,12 @@ export enum SPacketsType {
 	S03 = 0b00000101,
 	S04 = 0b00001101,
 	S05 = 0b00010101,
-	S06 = 0b00011101,
-	S0A = 0b00000111,
-	S0B = 0b00001001
+	S06 = 0b00011101
 }
 export class packetBuilder {
 	private constructor() {}
 
-	public static deserializeC(buff: ArrayBuffer): C01 | C03 | C04 | C05 | null {
+	public static deserializeC(buff: ArrayBuffer): C01 | null {
 		const view = new DataView(buff)
 
 		try {
@@ -44,14 +33,6 @@ export class packetBuilder {
 				case CPacketsType.C00:
 					break
 				case CPacketsType.C01:
-					break
-				case CPacketsType.C03:
-					break
-				case CPacketsType.C04:
-					break
-				case CPacketsType.C05:
-					break
-				case CPacketsType.C06:
 					break
 				default:
 					break
@@ -72,8 +53,6 @@ export class packetBuilder {
 			switch (type) {
 				case SPacketsType.S00:
 					break
-				case SPacketsType.S0B:
-					throw 'not implemented yet'
 				case SPacketsType.S01:
 					break
 				case SPacketsType.S03:
@@ -83,8 +62,6 @@ export class packetBuilder {
 				case SPacketsType.S05:
 					break
 				case SPacketsType.S06:
-					break
-				case SPacketsType.S0A:
 					break
 				default:
 					break
