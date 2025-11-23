@@ -6,7 +6,6 @@ import { CPacketsType, SPacketsType } from './packetTypes.js'
 import { S02SegmentUpdate } from './Server/S02.js'
 
 import {
-    AS03BaseBall,
 	S01ServerTickConfirmation as S01,
 	AS03BaseBall as S03,
 	S04BallVeloChange as S04,
@@ -79,7 +78,7 @@ export class packetBuilder {
 					}
 					return new S02SegmentUpdate(time, tab)
 				case SPacketsType.S03:
-					return new AS03BaseBall(time)
+					return new S03(time)
 				case SPacketsType.S04:
 					velo = new Vector2(
 						view.getFloat64(9, true),
