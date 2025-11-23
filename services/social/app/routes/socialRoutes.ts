@@ -60,4 +60,40 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handleLogout
 	)
+
+  // POST /api/request-friend - Send a friend request (JWT required)
+  server.post(
+    '/api/request-friend',
+    {
+      preHandler: [jwtAuthMiddleware]
+    },
+    async (request, reply) => {
+      // Placeholder implementation
+      reply.send({ success: true, message: 'Friend request sent (placeholder)' })
+    }
+  )
+
+  // POST /api/accept-friend - Accept a friend request (JWT required)
+  server.post(
+    '/api/accept-friend',
+    {
+      preHandler: [jwtAuthMiddleware]
+    },
+    async (request, reply) => {
+      // Placeholder implementation
+      reply.send({ success: true, message: 'Friend request accepted (placeholder)' })
+    }
+  )
+
+  // POST /api/reject-friend - Reject a friend request (JWT required)
+  server.post(
+    '/api/reject-friend',
+    {
+      preHandler: [jwtAuthMiddleware]
+    },
+    async (request, reply) => {
+      // Placeholder implementation
+      reply.send({ success: true, message: 'Friend request rejected (placeholder)' })
+    }
+  )
 }
