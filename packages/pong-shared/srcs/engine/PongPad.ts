@@ -8,12 +8,20 @@ export enum padDirection {
 
 // NOTE: be carefull with references to Vec2 in Segments (don't forget `.clone()`)
 export class PongPad {
-	constructor(private seg: Segment[]) {}
+	constructor(
+		private seg: Segment[],
+		private border: Segment[] | null
+	) {}
 
 	public move(dir: padDirection, incr: number) {
-		this.seg.forEach((s) => {
-			s.getP1().add(new Vector2(0, incr * dir))
-			s.getP2().add(new Vector2(0, incr * dir))
-		})
+		for (const s of this.seg) {
+			const dist = incr * dir
+			s.getP1().add(new Vector2(0, dist))
+			s.getP2().add(new Vector2(0, dist))
+			if (this.border?.some((b) => b.intersect(s))) {
+				s.getP1().add(new Vector2(0, -dist))
+				s.getP2().add(new Vector2(0, -dist))
+			}
+		}
 	}
 }

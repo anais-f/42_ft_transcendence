@@ -207,4 +207,8 @@ export class Segment {
 		merged.set(new Uint8Array(this.getP2().serialize()), 16)
 		return merged.buffer
 	}
+
+	clone(): Segment {
+		return new Segment(this.getP1().clone(), this.getP2().clone())
+	}
 }
