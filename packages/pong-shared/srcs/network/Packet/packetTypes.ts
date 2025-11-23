@@ -1,4 +1,3 @@
-
 export enum CPacketsType {
 	C00 = 0b00000001,
 	C01 = 0b00000011

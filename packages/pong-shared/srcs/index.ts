@@ -8,6 +8,7 @@ export * from './math/Circle.js'
 
 // engine
 export * from './engine/game-engine.js'
+export * from './engine/PongPad.js'
 
 // CPackets
 export * from './network/Packet/Client/CPackets.js'

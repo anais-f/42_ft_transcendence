@@ -1,4 +1,5 @@
 import { Vector2 } from '../../../../math/Vector2.js'
+import { packetBuilder } from '../../packetBuilder.js'
 import { SPacketsType } from '../../packetTypes.js'
 import { AS03BaseBall } from './S03.js'
 import { S04BallVeloChange } from './S04.js'
@@ -24,16 +25,15 @@ describe('S04', () => {
 		expect(x).toBeCloseTo(velo.getX())
 		expect(y).toBeCloseTo(velo.getY())
 	})
-	/*
+
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(25)
 		const view = new DataView(buff)
 		const timestamp = 123456.789
-		const type = 0b1101
 		const v = new Vector2(324.32, -42)
 
 		view.setFloat64(0, timestamp, true)
-		view.setUint8(8, type)
+		view.setUint8(8, SPacketsType.S04)
 		view.setFloat64(9, v.getX(), true)
 		view.setFloat64(17, v.getY(), true)
 
@@ -62,5 +62,4 @@ describe('S04', () => {
 			throw new Error('Packet is not S04BallVeloChange')
 		}
 	})
-   */
 })

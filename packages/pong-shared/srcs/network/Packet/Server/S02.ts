@@ -5,7 +5,7 @@ import { IS00PongBase } from './S00.js'
 export class S02SegmentUpdate implements IS00PongBase {
 	constructor(
 		public time: number = Date.now(),
-		private segs: Segment[]
+		public segs: Segment[]
 	) {
 		if (segs.length > 255) {
 			throw new Error(`Too many segments max is 255`)

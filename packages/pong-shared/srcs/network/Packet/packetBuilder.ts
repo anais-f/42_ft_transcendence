@@ -6,6 +6,7 @@ import { CPacketsType, SPacketsType } from './packetTypes.js'
 import { S02SegmentUpdate } from './Server/S02.js'
 
 import {
+    AS03BaseBall,
 	S01ServerTickConfirmation as S01,
 	AS03BaseBall as S03,
 	S04BallVeloChange as S04,
@@ -63,23 +64,42 @@ export class packetBuilder {
 					const tab: Segment[] = []
 					for (let i = 0; i < nbseg; ++i) {
 						const offset = 10 + i * 32
-						tab.push(new Segment(
-							new Vector2(view.getFloat64(offset, true), view.getFloat64(offset + 8)),
-							new Vector2(view.getFloat64(offset + 16, true), view.getFloat64(offset + 24, true))
-						))
+						tab.push(
+							new Segment(
+								new Vector2(
+									view.getFloat64(offset, true),
+									view.getFloat64(offset + 8, true)
+								),
+								new Vector2(
+									view.getFloat64(offset + 16, true),
+									view.getFloat64(offset + 24, true)
+								)
+							)
+						)
 					}
 					return new S02SegmentUpdate(time, tab)
+				case SPacketsType.S03:
+					return new AS03BaseBall(time)
 				case SPacketsType.S04:
-					velo = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					velo = new Vector2(
+						view.getFloat64(9, true),
+						view.getFloat64(17, true)
+					)
 					factor = view.getFloat64(25, true)
 					return new S04(new S03(time), velo, factor)
 				case SPacketsType.S05:
 					pos = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
 					return new S05(new S03(time), pos)
 				case SPacketsType.S06:
-					velo = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					velo = new Vector2(
+						view.getFloat64(9, true),
+						view.getFloat64(17, true)
+					)
 					factor = view.getFloat64(25, true)
-					pos = new Vector2(view.getFloat64(33, true), view.getFloat64(41, true))
+					pos = new Vector2(
+						view.getFloat64(33, true),
+						view.getFloat64(41, true)
+					)
 					return new S06(pos, factor, velo, time)
 				default:
 					break

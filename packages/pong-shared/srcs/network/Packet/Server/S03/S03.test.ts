@@ -1,4 +1,5 @@
-import { AS03BaseBall as AS03BaseBall } from './S03.js'
+import { packetBuilder } from '../../packetBuilder.js'
+import { AS03BaseBall } from './S03.js'
 
 describe('S03', () => {
 	test('serialize returns correct buffer', () => {
@@ -15,7 +16,6 @@ describe('S03', () => {
 		expect(type).toBe(0b101)
 	})
 
-	/*
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(9)
 		const view = new DataView(buff)
@@ -27,17 +27,16 @@ describe('S03', () => {
 		view.setUint8(8, type)
 
 		const p = packetBuilder.deserializeS(buff)
-		expect(p).toBeInstanceOf(S03BaseBall)
+		expect(p).toBeInstanceOf(AS03BaseBall)
 		expect(p?.time).toBeCloseTo(timestamp)
 	})
 
 	test('serialize + deserialize', () => {
-		const S03 = S03BaseBall.createS03()
+		const S03 = AS03BaseBall.createS03()
 		// @ts-ignore
 		const buff = S03.fserialize()
 		const SBack = packetBuilder.deserializeS(buff)
 
 		expect(SBack?.getTime()).toBe(S03.time)
 	})
-	*/
 })
