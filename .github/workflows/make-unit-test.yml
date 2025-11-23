@@ -18,7 +18,7 @@ jobs:
 
       - name: Create .env from GitHub Secrets
         run: |
-          cat > .env <<EOF
+          cat > .env.test <<EOF
           PORT=3000
 
           # Users service
