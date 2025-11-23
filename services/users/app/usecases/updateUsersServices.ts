@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from 'file-type'
 import { AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
 import { UsersRepository } from '../repositories/usersRepository.js'
-import * as fs from 'fs/promises'
+import fs from 'fs/promises'
 import * as path from 'path'
 import { randomUUID } from 'crypto'
 
@@ -101,7 +101,7 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
 			: ''
 
-	if (!Buffer.isBuffer(avatarBuffer) || avatarBuffer.length === 0) {
+	if (!Buffer.isBuffer(avatarBuffer)) {
 		throw new AppError('Missing file', 400)
 	}
 

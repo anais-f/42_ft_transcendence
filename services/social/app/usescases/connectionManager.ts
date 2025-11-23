@@ -1,11 +1,10 @@
-import WebSocket from 'ws'
 import { handlePong, startHeartbeat } from './heartbeatService.js'
 import { handleUserOnline, handleUserOffline } from './presenceService.js'
+import WebSocket from 'ws'
 
 interface UserConnection {
 	ws: WebSocket
 	lastHeartbeat: Date
-	watchingFriends: number[]
 }
 
 export const wsConnections = new Map<string, UserConnection>()
@@ -73,7 +72,7 @@ export async function addConnection(
 		}
 	}
 
-	wsConnections.set(userId, { ws, lastHeartbeat: new Date(), watchingFriends: [] })
+	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
 
 	setupWebSocketHandlers(userId, ws)
 
@@ -182,84 +181,5 @@ export function broadcast(message: unknown): void {
 export function getTotalConnections(): number {
 	return wsConnections.size
 }
-
-/**
- * Cleanup all pending disconnect timers (call on server shutdown)
- */
-export function cleanupAllTimers(): void {
-	for (const [userId, timer] of pendingDisconnectTimers.entries()) {
-		clearTimeout(timer)
-		console.log(`Cleared pending timer for user ${userId}`)
-	}
-	pendingDisconnectTimers.clear()
-	console.log('All disconnect timers cleared')
-}
-
-/*----------- A REVOIR -----------*/
-// TODO : // TODO : revoir ce morceau de watch
-/**
- * Register that a user wants to watch updates for a list of friends
- * @param userId - User ID watching
- * @param friendIds - List of friend IDs to watch
- */
-export function watchFriendsList(userId: string, friendIds: number[]): void {
-	const conn = wsConnections.get(userId)
-	if (!conn) {
-		console.warn(`Cannot watch friends list: user ${userId} not connected`)
-		return
-	}
-	conn.watchingFriends = friendIds
-	console.log(`User ${userId} now watching friends: ${friendIds.join(', ')}`)
-}
-
-/**
- * Unregister that a user wants to watch updates
- * @param userId - User ID
- */
-export function unwatchFriendsList(userId: string): void {
-	const conn = wsConnections.get(userId)
-	if (!conn) return
-	conn.watchingFriends = []
-	console.log(`User ${userId} stopped watching friends list`)
-}
-
-/**
- * Send status change notification to all users watching this friend
- * @param friendId - Friend whose status changed
- * @param message - Message to send
- * @returns number of users notified
- */
-export function notifyFriendsWatching(
-	friendId: number,
-	message: unknown
-): number {
-	let notifiedCount = 0
-	const payload =
-		typeof message === 'string' ? message : JSON.stringify(message)
-
-	for (const [userId, conn] of wsConnections.entries()) {
-		// Check if this connection is watching the friend
-		if (conn.watchingFriends.includes(friendId)) {
-			try {
-				if (conn.ws.readyState === WebSocket.OPEN) {
-					conn.ws.send(payload)
-					notifiedCount++
-				}
-			} catch (e) {
-				const msg = e instanceof Error ? e.message : String(e)
-				console.error(`Failed to notify user ${userId}:`, msg)
-			}
-		}
-	}
-
-	if (notifiedCount > 0) {
-		console.log(
-			`[Friends Watching] Notified ${notifiedCount} users about friend ${friendId} status change`
-		)
-	}
-
-	return notifiedCount
-}
-/*---------- FIN A REVOIR ---------*/
 
 startHeartbeat()

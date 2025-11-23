@@ -1,12 +1,12 @@
 import WebSocket from 'ws'
-import { watchFriendsList, unwatchFriendsList } from './connectionManager.js'
 
 export interface Message {
 	type: string
 	data?: unknown
 }
 
-// TODO : TOUT REVOIR
+// TODO : switch case with websocket type convention
+
 /**
  * Route incoming messages to appropriate handlers
  * @param userId - User ID
@@ -22,34 +22,7 @@ export async function routeMessage(
 
 	console.log(`📨 [MSG] User ${userId}: ${messageType}`)
 
-	// Handle watch/unwatch friends list
-  // TODO : revoir ce morceau de watch
-	if (messageType === 'watch:friends_list') {
-		const friendIds = (message.data as any)?.friendIds || []
-		watchFriendsList(userId, friendIds)
-		return
-	}
-
-	if (messageType === 'unwatch:friends_list') {
-		unwatchFriendsList(userId)
-		return
-	}
-
-	// Route by message type prefix
-	if (messageType.startsWith('presence:')) {
-		// TODO: Route to presence handlers
-		// await handlePresenceMessage(userId, message, socket)
-	} else if (messageType.startsWith('friend:')) {
-		// TODO: Route to friend handlers
-		// await handleFriendMessage(userId, message, socket)
-	} else if (messageType.startsWith('invite:')) {
-		// TODO: Route to invitation handlers
-		// await handleInvitationMessage(userId, message, socket)
-	} else if (messageType.startsWith('notify:')) {
-		// TODO: Route to notification handlers
-		// await handleNotificationMessage(userId, message, socket)
-	} else {
-		// Default: echo back
+	if (messageType === 'message:echo') {
 		socket.send(
 			JSON.stringify({
 				type: 'message:echo',
@@ -61,5 +34,8 @@ export async function routeMessage(
 				}
 			})
 		)
-	}
+	} else
+		console.warn(
+			`⚠️ [MSG] Unknown message type from user ${userId}: ${messageType}`
+		)
 }

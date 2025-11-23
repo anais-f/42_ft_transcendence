@@ -5,11 +5,11 @@ import { z } from 'zod'
 import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleWsConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
-import WebSocket from 'ws'
 import {
 	ErrorResponseSchema,
 	SuccessResponseSchema
 } from '@ft_transcendence/common'
+import WebSocket from 'ws'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()

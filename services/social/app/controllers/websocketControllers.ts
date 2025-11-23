@@ -6,7 +6,7 @@ import {
 } from '../usescases/connectionManager.js'
 import { routeMessage } from '../usescases/messageRouter.js'
 
-//TODO : tout revoir
+// TODO : split into smaller functions when notifications are added and refactored logic after add connection
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -27,7 +27,7 @@ export async function handleWsConnection(
 	} catch (err) {
 		socket.send(
 			JSON.stringify({
-				type: 'error',
+				type: 'error:occurred',
 				code: 'INVALID_TOKEN',
 				message: 'Invalid or expired token'
 			})
@@ -39,7 +39,7 @@ export async function handleWsConnection(
 	const userId = String(payload.user_id)
 	const userLogin = String(payload.login)
 
-	// Add connection (handles online status internally)
+	// Add connection
 	try {
 		await addConnection(userId, socket)
 	} catch (error) {
@@ -52,7 +52,7 @@ export async function handleWsConnection(
 	console.log(`✅ [WS] ${userLogin} (${userId}) connected`)
 	console.log(`   Total: ${getTotalConnections()}`)
 
-	// Send welcome message
+	// Send welcome message to client
 	socket.send(
 		JSON.stringify({
 			type: 'connection:established',

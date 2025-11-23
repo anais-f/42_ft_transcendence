@@ -1,2 +1,1 @@
-// notification a envoyer: gestion amis invitations, messages, etc.
-// invitation de game, etc.
+// notification : add friend request notification, accept friend request notification, game notification

@@ -44,9 +44,7 @@ export async function handleLogout(
 				conn.ws.close(1000, 'User logged out')
 			}
 			removeConnection(targetUserId, conn.ws)
-		} else {
-			await handleUserOffline(targetUserId)
-		}
+		} else await handleUserOffline(targetUserId)
 
 		reply.code(200).send({
 			success: true,
