@@ -179,7 +179,7 @@ describe('Users Controllers', () => {
 
 			UsersServices.getPublicUserProfile.mockResolvedValueOnce({
 				user_id: 1,
-				username: 'testuser',
+				username: 'testuser'
 				// Missing required fields: avatar, status, last_connection
 			} as any)
 

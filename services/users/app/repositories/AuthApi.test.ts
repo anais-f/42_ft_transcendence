@@ -21,7 +21,14 @@
  * - Response malformation: JSON parse errors
  */
 
-import { jest, beforeEach, beforeAll, describe, test, expect } from '@jest/globals'
+import {
+	jest,
+	beforeEach,
+	beforeAll,
+	describe,
+	test,
+	expect
+} from '@jest/globals'
 
 let AuthApi: any
 let PublicUserListAuthSchema: any
