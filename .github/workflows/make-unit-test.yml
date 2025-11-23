@@ -35,7 +35,7 @@ jobs:
           TWOFA_API_SECRET=test
           TWOFA_SERVICE_URL=http://2fa:3000
           TWOFA_DB_PATH=/data/db-2fa.sqlite
-          
+
           # Social service
           SOCIAL_API_SECRET=test
           SOCIAL_SERVICE_URL=http://social:3000
@@ -60,7 +60,7 @@ jobs:
           JWT_SECRET=test
           JWT_SECRET_SOCIAL=test
           WS_TOKEN_EXPIRES_SECONDS=30
-          
+
           # Grafana
           GF_SERVER_ROOT_URL=http://localhost:8080/grafana/
           GF_SERVER_SERVE_FROM_SUB_PATH=true
