@@ -178,8 +178,10 @@ describe('Users Controllers', () => {
 			const reply = createMockReply()
 
 			UsersServices.getPublicUserProfile.mockResolvedValueOnce({
-				invalid: 'data'
-			})
+				user_id: 1,
+				username: 'testuser',
+				// Missing required fields: avatar, status, last_connection
+			} as any)
 
 			await getPublicUser(req, reply)
 

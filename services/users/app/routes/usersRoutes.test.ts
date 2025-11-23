@@ -140,68 +140,83 @@ beforeAll(async () => {
 		}
 	}))
 
-	await jest.unstable_mockModule(
-		'../controllers/updateUsersControllers.js',
-		() => ({
-			updateUsername: async (req: any, reply: FastifyReply) => {
-				const UpdateUsersServices = (
-					await import('../usecases/updateUsersServices.js')
-				).UpdateUsersServices
-				const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
-					'@ft_transcendence/common'
-				)
-				try {
-					const userId = req.user?.user_id
-					if (!userId || userId <= 0) {
-						return reply
-							.code(400)
-							.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-					}
-					const { username } = req.body
-					await UpdateUsersServices.updateUsernameProfile(
-						{ user_id: userId },
-						username
-					)
+	// Mock update controllers
+	await jest.unstable_mockModule('../controllers/updateUsersControllers.js', () => ({
+		updateUsername: async (req: any, reply: FastifyReply) => {
+			const UpdateUsersServices = (await import('../usecases/updateUsersServices.js'))
+				.UpdateUsersServices
+			const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+				'@ft_transcendence/common'
+			)
+			try {
+				const userId = req.user?.user_id
+				const { username } = req.body
+				if (!userId || userId <= 0) {
 					return reply
-						.code(200)
-						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-				} catch (error: any) {
-					return reply
-						.code(error.status || 500)
-						.send({ success: false, error: error.message })
+						.code(400)
+						.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 				}
-			},
-			updateAvatar: async (req: any, reply: FastifyReply) => {
-				const UpdateUsersServices = (
-					await import('../usecases/updateUsersServices.js')
-				).UpdateUsersServices
-				const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
-					'@ft_transcendence/common'
+				await UpdateUsersServices.updateUsernameProfile(
+					{ user_id: userId },
+					username
 				)
-				try {
-					const userId = req.user?.user_id
-					if (!userId || userId <= 0) {
-						return reply
-							.code(400)
-							.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-					}
-					await UpdateUsersServices.checkUserAvatar({
-						user_id: userId,
-						avatarBuffer: req.body,
-						originalName: 'test.png',
-						mimeType: req.headers['content-type'] || 'image/png'
-					})
-					return reply
-						.code(200)
-						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-				} catch (error: any) {
-					return reply
-						.code(error.status || 500)
-						.send({ success: false, error: error.message })
-				}
+				return reply
+					.code(200)
+					.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+			} catch (error: any) {
+				return reply
+					.code(error.status || 500)
+					.send({ success: false, error: error.message })
 			}
-		})
-	)
+		},
+		updateAvatar: async (request: any, reply: FastifyReply) => {
+			const UpdateUsersServices = (await import('../usecases/updateUsersServices.js'))
+				.UpdateUsersServices
+			const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+				'@ft_transcendence/common'
+			)
+			try {
+				const userId = request.user?.user_id
+				if (!userId || userId <= 0) {
+					return reply
+						.code(400)
+						.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
+				}
+				await UpdateUsersServices.checkUserAvatar({
+					user_id: userId,
+					avatarBuffer: Buffer.from('mock-avatar-data'),
+					originalName: 'test.png',
+					mimeType: request.headers['content-type'] || 'image/png'
+				})
+				return reply
+					.code(200)
+					.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+			} catch (error: any) {
+				return reply
+					.code(error.status || 500)
+					.send({ success: false, error: error.message })
+			}
+		},
+		updateUserStatus: async (req: any, reply: FastifyReply) => {
+			const UpdateUsersServices = (await import('../usecases/updateUsersServices.js'))
+				.UpdateUsersServices
+			const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+				'@ft_transcendence/common'
+			)
+			try {
+				const { id } = req.params
+				const { status, lastConnection } = req.body
+				await UpdateUsersServices.updateUserStatus(id, status, lastConnection)
+				return reply
+					.code(200)
+					.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+			} catch (error: any) {
+				return reply
+					.code(error.status || 500)
+					.send({ success: false, error: error.message })
+			}
+		}
+	}))
 
 	// Import mocked modules
 	const servicesModule = await import('../usecases/usersServices.js')

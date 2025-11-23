@@ -27,7 +27,7 @@ beforeAll(async () => {
 		}
 	}))
 
-	await jest.unstable_mockModule('./AuthApi.js', () => ({
+	await jest.unstable_mockModule('../repositories/AuthApi.js', () => ({
 		AuthApi: {
 			getAllUsers: jest.fn()
 		}
