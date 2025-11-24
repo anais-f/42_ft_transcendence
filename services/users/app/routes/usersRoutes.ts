@@ -1,4 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	handleUserCreated,
 	getPublicUser,
@@ -19,7 +20,6 @@ import {
 	UpdateUserStatusSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
-import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
@@ -29,6 +29,8 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	await server.route({
 		method: 'POST',
 		url: '/api/internal/users/new-user',
+		preHandler: [apiKeyMiddleware],
+		handler: handleUserCreated,
 		schema: {
 			body: PublicUserAuthSchema,
 			response: {
@@ -38,15 +40,15 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				400: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: apiKeyMiddleware,
-		handler: handleUserCreated
+		}
 	})
 
 	// GET /api/users/:id - Get public user profile (JWT required - authenticated users only)
 	await server.route({
 		method: 'GET',
 		url: '/api/users/:id',
+		preHandler: [jwtAuthMiddleware],
+		handler: getPublicUser,
 		schema: {
 			params: z.object({ id: z.coerce.number().int().positive() }),
 			response: {
@@ -56,15 +58,15 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: jwtAuthMiddleware,
-		handler: getPublicUser
+		}
 	})
 
 	// GET /api/users/me - Get private user profile (JWT protected - own profile only)
 	await server.route({
 		method: 'GET',
 		url: '/api/users/me',
+		preHandler: [jwtAuthMiddleware],
+		handler: getPrivateUser,
 		schema: {
 			response: {
 				200: UserPrivateProfileSchema,
@@ -72,15 +74,15 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: jwtAuthMiddleware,
-		handler: getPrivateUser
+		}
 	})
 
 	// PATCH /api/users/me - Update private user profile (JWT protected - own profile only)
 	await server.route({
 		method: 'PATCH',
 		url: '/api/users/me',
+		preHandler: [jwtAuthMiddleware],
+		handler: updateUsername,
 		schema: {
 			body: UserProfileUpdateUsernameSchema,
 			response: {
@@ -91,15 +93,15 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				409: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: jwtAuthMiddleware,
-		handler: updateUsername
+		}
 	})
 
 	// PATCH /api/users/me/avatar - Update avatar (JWT protected)
 	await server.route({
 		method: 'PATCH',
 		url: '/api/users/me/avatar',
+		preHandler: [jwtAuthMiddleware],
+		handler: updateAvatar,
 		schema: {
 			consumes: ['multipart/form-data', 'image/jpeg', 'image/png'],
 			response: {
@@ -109,15 +111,15 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: jwtAuthMiddleware,
-		handler: updateAvatar
+		}
 	})
 
 	// PATCH /api/internal/users/:id/status - Update user status (API Key protected)
 	await server.route({
 		method: 'PATCH',
 		url: '/api/internal/users/:id/status',
+		preHandler: [apiKeyMiddleware],
+		handler: updateUserStatus,
 		schema: {
 			params: z.object({ id: z.coerce.number().int().positive() }),
 			body: UpdateUserStatusSchema,
@@ -128,8 +130,6 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		},
-		preHandler: apiKeyMiddleware,
-		handler: updateUserStatus
+		}
 	})
 }
