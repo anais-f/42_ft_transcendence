@@ -15,7 +15,7 @@ export class SocialRepository {
 			: [b.user_id, a.user_id]
 	}
 
-	static relationStatus(user_id: IUserId, friend_id: IUserId): number {
+	static getRelationStatus(user_id: IUserId, friend_id: IUserId): number {
 		const selectStmt = db.prepare(
 			'SELECT relation_status FROM relations WHERE (user_id = ? AND friend_id = ?)'
 		)
@@ -60,7 +60,7 @@ export class SocialRepository {
 		}
 	}
 
-	static findFriendsList(user_id: IUserId): IUserId[] {
+	static getFriendsList(user_id: IUserId): IUserId[] {
 		const selectStmt = db.prepare(
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND (user_id = ? OR friend_id = ?)'
 		)
@@ -78,7 +78,7 @@ export class SocialRepository {
 		return friends
 	}
 
-	static findPendingListToApprove(user_id: IUserId): IUserId[] {
+	static getPendingListToApprove(user_id: IUserId): IUserId[] {
 		const selectStmt = db.prepare(
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (user_id = ? OR friend_id = ?)'
 		)
@@ -97,7 +97,7 @@ export class SocialRepository {
 		return pending
 	}
 
-	static findPendingSentRequests(user_id: IUserId): IUserId[] {
+	static getPendingSentRequests(user_id: IUserId): IUserId[] {
 		const selectStmt = db.prepare(
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id = ? AND (user_id = ? OR friend_id = ?)'
 		)
@@ -115,4 +115,13 @@ export class SocialRepository {
 		}
 		return pending
 	}
+
+  static getOriginId(user_id: IUserId, friend_id: IUserId): number | null {
+    const selectStmt = db.prepare(
+        'SELECT origin_id FROM relations WHERE (user_id = ? AND friend_id = ?)'
+    )
+    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+    const row = selectStmt.get(firstId, secondId) as { origin_id: number } | undefined
+    return row ? row.origin_id : null
+  }
 }

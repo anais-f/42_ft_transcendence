@@ -19,6 +19,9 @@ import {
 	responseTimeHistogram
 } from '@ft_transcendence/common'
 
+
+//TODO : revoir les test avec l'env
+
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
