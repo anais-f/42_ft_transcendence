@@ -1,70 +1,107 @@
-import { FastifyRequest, FastifyReply } from "fastify"
-import { FriendService } from "../usecases/friendService.js"
-import { IUserId, AppError } from "@ft_transcendence/common"
+import { FastifyRequest, FastifyReply } from 'fastify'
+import { FriendService } from '../usecases/friendService.js'
+import { IUserId, AppError } from '@ft_transcendence/common'
 
 async function handleFriendAction(
-    req: FastifyRequest,
-    reply: FastifyReply,
-    action: (userId: IUserId, friendId: IUserId) => void,
-    successMessage: string
+	req: FastifyRequest,
+	reply: FastifyReply,
+	action: (userId: IUserId, friendId: IUserId) => void,
+	successMessage: string
 ): Promise<void> {
-  try {
-    const user = req.user as { user_id?: number } | undefined
-    const userIdValue = Number(user?.user_id)
+	try {
+		const user = req.user as { user_id?: number } | undefined
+		const userIdValue = Number(user?.user_id)
 
-    if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
-      return void reply
-          .code(400)
-          .send({ success: false, error: 'Invalid user ID' })
-    }
+		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
+			return void reply
+				.code(400)
+				.send({ success: false, error: 'Invalid user ID' })
+		}
 
-    const { friendId } = req.body as { friendId: number }
-    if (!friendId || !Number.isInteger(friendId) || friendId <= 0) {
-      return void reply
-          .code(400)
-          .send({ success: false, error: 'Invalid friend ID' })
-    }
+		const { friendId } = req.body as { friendId: number }
+		if (!friendId || !Number.isInteger(friendId) || friendId <= 0) {
+			return void reply
+				.code(400)
+				.send({ success: false, error: 'Invalid friend ID' })
+		}
 
-    const userId: IUserId = { user_id: userIdValue }
-    const friendUserId: IUserId = { user_id: friendId }
+		const userId: IUserId = { user_id: userIdValue }
+		const friendUserId: IUserId = { user_id: friendId }
 
-    action(userId, friendUserId)
+		action(userId, friendUserId)
 
-    return void reply
-        .code(200)
-        .send({ success: true, message: successMessage })
-  }
-  catch (error) {
-    console.error(`Error in friend action:`, error)
+		return void reply.code(200).send({ success: true, message: successMessage })
+	} catch (error) {
+		console.error(`Error in friend action:`, error)
 
-    if (error instanceof AppError) {
-      return void reply
-          .code(error.statusCode)
-          .send({ success: false, error: error.message })
-    }
+		if (error instanceof AppError) {
+			return void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+		}
 
-    return void reply
-        .code(500)
-        .send({ success: false, error: 'Internal server error' })
-  }
+		return void reply
+			.code(500)
+			.send({ success: false, error: 'Internal server error' })
+	}
 }
 
-export async function requestFriendController(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  return handleFriendAction(req, reply, FriendService.sendFriendRequest, 'Friend request sent')
+export async function requestFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	return handleFriendAction(
+		req,
+		reply,
+		FriendService.sendFriendRequest,
+		'Friend request sent'
+	)
 }
 
-export async function acceptFriendController(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  return handleFriendAction(req, reply, FriendService.acceptFriendRequest, 'Friend request accepted')
+export async function acceptFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	return handleFriendAction(
+		req,
+		reply,
+		FriendService.acceptFriendRequest,
+		'Friend request accepted'
+	)
 }
 
-export async function rejectFriendController(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  return handleFriendAction(req, reply, FriendService.rejectFriendRequest, 'Friend request rejected')
+export async function rejectFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	return handleFriendAction(
+		req,
+		reply,
+		FriendService.rejectFriendRequest,
+		'Friend request rejected'
+	)
 }
 
-export async function cancelFriendController(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  return handleFriendAction(req, reply, FriendService.cancelFriendRequest, 'Friend request canceled')
+export async function cancelFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	return handleFriendAction(
+		req,
+		reply,
+		FriendService.cancelFriendRequest,
+		'Friend request canceled'
+	)
 }
 
-export async function removeFriendController(req: FastifyRequest, reply: FastifyReply): Promise<void> {
-  return handleFriendAction(req, reply, FriendService.removeFriend, 'Friend removed')
+export async function removeFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	return handleFriendAction(
+		req,
+		reply,
+		FriendService.removeFriend,
+		'Friend removed'
+	)
 }

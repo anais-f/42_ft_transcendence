@@ -3,7 +3,7 @@ import {
 	removeConnection,
 	wsConnections
 } from '../usecases/connectionManager.js'
-import { handleUserOffline } from '../usescases/presenceService.js'
+import { handleUserOffline } from '../usecases/presenceService.js'
 
 /**
  * Handle user logout - mark user as offline and close WebSocket connection

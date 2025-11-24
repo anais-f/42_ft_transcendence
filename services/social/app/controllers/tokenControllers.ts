@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { createWsToken } from '../usescases/tokenService.js'
+import { createWsToken } from '../usecases/tokenService.js'
 
 export async function createTokenController(
 	request: FastifyRequest,

@@ -116,12 +116,14 @@ export class SocialRepository {
 		return pending
 	}
 
-  static getOriginId(user_id: IUserId, friend_id: IUserId): number | null {
-    const selectStmt = db.prepare(
-        'SELECT origin_id FROM relations WHERE (user_id = ? AND friend_id = ?)'
-    )
-    const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
-    const row = selectStmt.get(firstId, secondId) as { origin_id: number } | undefined
-    return row ? row.origin_id : null
-  }
+	static getOriginId(user_id: IUserId, friend_id: IUserId): number | null {
+		const selectStmt = db.prepare(
+			'SELECT origin_id FROM relations WHERE (user_id = ? AND friend_id = ?)'
+		)
+		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+		const row = selectStmt.get(firstId, secondId) as
+			| { origin_id: number }
+			| undefined
+		return row ? row.origin_id : null
+	}
 }
