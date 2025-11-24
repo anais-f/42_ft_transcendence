@@ -10,12 +10,10 @@ export class FriendService {
 		if (userId === friendId)
 			throw new AppError(ERROR_MESSAGES.CANNOT_ADD_YOURSELF, 400)
 
-		// verifier que le friend id existe
 		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted)
 			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
-		// verifier le statut de la relation
 		const existingRelation = SocialRepository.getRelationStatus(
 			userId,
 			friendId
@@ -31,10 +29,10 @@ export class FriendService {
 				//TODO : call le endpointpoint pour accepter l'invitation
 			}
 		}
-		// call la DB pour ajouter la relation
+
 		SocialRepository.addRelation(userId, friendId, userId)
 
-		// TODO: envoyer la notification
+		// TODO: notification
 
 		return
 	}
@@ -70,6 +68,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
+
 		// TODO : notification
 	}
 
@@ -98,8 +97,7 @@ export class FriendService {
 }
 
 /*
-declineFriendRequest(userId, friendId) — check permissions + call deleteRelation()
-removeFriend(userId, friendId) — check permissions + call deleteRelation()
+
 getFriendsList(userId) — call findFriendsList()
 getPendingRequests(userId) — call findPendingListToApprove() + findPendingSentRequests()
  */

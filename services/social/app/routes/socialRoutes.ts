@@ -14,7 +14,6 @@ import {
 	ErrorResponseSchema,
 	SuccessResponseSchema
 } from '@ft_transcendence/common'
-import WebSocket from 'ws'
 import {
 	requestFriendController,
 	rejectFriendController,
@@ -27,166 +26,131 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
 	// POST /api/create-token - Create temporary WS token (JWT required)
-	server.post(
-		'/api/social/create-token',
-		{
-			preHandler: [jwtAuthMiddleware]
-		},
-		createTokenController
-	)
-
-	//TODO : revoir le WS token, le faire expirer et voir le prehandler JWT
+	await server.route({
+		method: 'POST',
+		url: '/api/social/create-token',
+		preHandler: jwtAuthMiddleware,
+		handler: createTokenController,
+		schema: {}
+	})
 
 	// GET /api/ws - WebSocket endpoint (WS token required)
-	server.get(
-		'/api/social/ws',
-		{
-			websocket: true,
-			schema: {
-				querystring: wsQuerySchema
-			}
+	await server.route({
+		method: 'GET',
+		url: '/api/social/ws',
+		websocket: true,
+		schema: {
+			querystring: wsQuerySchema
 		},
-		(
-			socket: WebSocket,
-			request: FastifyRequest<{ Querystring: { token: string } }>
-		) => handleWsConnection(socket, request, fastify)
-	)
+		handler: (socket: any, request: FastifyRequest<{ Querystring: { token: string } }>) =>
+			handleWsConnection(socket, request, fastify)
+	})
 
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
-	server.post<{ Params: { userId: number } }>(
-		'/api/social/logout/:userId',
-		{
-			schema: {
-				params: z.object({ userId: z.coerce.number().int().positive().min(1) }),
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					403: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthOwnerMiddleware]
-		},
-		handleLogout
-	)
+	await server.route({
+		method: 'POST',
+		url: '/api/social/logout/:userId',
+		preHandler: jwtAuthOwnerMiddleware,
+		handler: handleLogout,
+		schema: {
+			params: z.object({ userId: z.coerce.number().int().positive().min(1) }),
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				403: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 
 	// POST /api/request-friend - Send a friend request (JWT required)
-	server.post(
-		'/api/social/request-friend',
-		{
-			schema: {
-				body: UserIdSchema,
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					404: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthMiddleware]
-		},
-		requestFriendController
-	)
+	await server.route({
+		method: 'POST',
+		url: '/api/social/request-friend',
+		preHandler: jwtAuthMiddleware,
+		handler: requestFriendController,
+		schema: {
+			body: UserIdSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 
 	// POST /api/accept-friend - Accept a friend request (JWT required)
-	server.post(
-		'/api/social/accept-friend',
-		{
-			schema: {
-				body: UserIdSchema,
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					404: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthMiddleware]
-		},
-		acceptFriendController
-	)
+	await server.route({
+		method: 'POST',
+		url: '/api/social/accept-friend',
+		preHandler: jwtAuthMiddleware,
+		handler: acceptFriendController,
+		schema: {
+			body: UserIdSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 
 	// POST /api/reject-friend - Reject a friend request (JWT required)
-	server.post(
-		'/api/social/reject-friend',
-		{
-			schema: {
-				body: UserIdSchema,
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					404: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthMiddleware]
-		},
-		rejectFriendController
-	)
+	await server.route({
+		method: 'POST',
+		url: '/api/social/reject-friend',
+		preHandler: jwtAuthMiddleware,
+		handler: rejectFriendController,
+		schema: {
+			body: UserIdSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 
-	// POST /api/reject-friend - Reject a friend request (JWT required)
-	server.post(
-		'/api/social/cancel-friend',
-		{
-			schema: {
-				body: UserIdSchema,
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					404: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthMiddleware]
-		},
-		cancelFriendController
-	)
+	// POST /api/cancel-friend - Cancel a friend request (JWT required)
+	await server.route({
+		method: 'POST',
+		url: '/api/social/cancel-friend',
+		preHandler: jwtAuthMiddleware,
+		handler: cancelFriendController,
+		schema: {
+			body: UserIdSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 
 	// POST /api/remove-friend - Remove a friend (JWT required)
-	server.post(
-		'/api/social/remove-friend',
-		{
-			schema: {
-				body: UserIdSchema,
-				response: {
-					200: SuccessResponseSchema,
-					400: ErrorResponseSchema,
-					401: ErrorResponseSchema,
-					404: ErrorResponseSchema,
-					500: ErrorResponseSchema
-				}
-			},
-			preHandler: [jwtAuthMiddleware]
-		},
-		removeFriendController
-	)
-
-	// GET /api/friends - Get friend list (JWT required)
-	// server.get(
-	//   '/api/social/friends',
-	//   {
-	//     preHandler: [jwtAuthMiddleware]
-	//   },
-	//   async (request, reply) => {
-	//     // Placeholder implementation
-	//     reply.send({ friends: [] }) // Return empty friend list as placeholder
-	//   }
-	// )
-
-	// GET /api/friend-requests - Get incoming friend requests (JWT required)
-	// server.get(
-	//   '/api/social/friend-requests',
-	//   {
-	//     preHandler: [jwtAuthMiddleware]
-	//   },
-	//   async (request, reply) => {
-	//     // Placeholder implementation
-	//     reply.send({ requests: [] }) // Return empty requests list as placeholder
-	//   }
-	// )
+	await server.route({
+		method: 'POST',
+		url: '/api/social/remove-friend',
+		preHandler: jwtAuthMiddleware,
+		handler: removeFriendController,
+		schema: {
+			body: UserIdSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		}
+	})
 }

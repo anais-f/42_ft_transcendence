@@ -39,6 +39,8 @@ function createApp(): FastifyInstance {
 
 	app.register(fastifyCookie)
 
+	app.register(FastifyWebSocket as any)
+
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
 		openapi: {
@@ -55,8 +57,6 @@ function createApp(): FastifyInstance {
 	app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-
-	app.register(FastifyWebSocket as any)
 
 	app.register(socialRoutes)
 
