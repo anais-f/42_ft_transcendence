@@ -1,12 +1,10 @@
 import { UsersServices } from '../usecases/usersServices.js'
-import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
 	UserPrivateProfileSchema,
 	AppError,
-	UserProfileUpdateUsernameSchema,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'

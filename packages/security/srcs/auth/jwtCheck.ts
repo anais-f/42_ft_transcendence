@@ -19,7 +19,7 @@ export function jwtAuthMiddleware(
 					success: false,
 					error: ERROR_MESSAGES.UNAUTHORIZED
 				})
-				return
+				return done()
 			}
 			done()
 		})
@@ -36,7 +36,7 @@ export function jwtAuthMiddleware(
  * @use Routes where users can access and modify only their own resources
  */
 export function jwtAuthOwnerMiddleware(
-	request: FastifyRequest<{ Params: { id: number } }>,
+	request: FastifyRequest<{ Params: { userId: number } }>,
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
@@ -50,7 +50,7 @@ export function jwtAuthOwnerMiddleware(
 		}
 
 		const userId = Number(request.user?.user_id)
-		const paramId = Number(request.params.id)
+		const paramId = Number(request.params.userId)
 
 		if (Number.isNaN(userId) || userId !== paramId) {
 			void reply.code(403).send({

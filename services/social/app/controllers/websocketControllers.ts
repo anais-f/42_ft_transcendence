@@ -3,8 +3,8 @@ import WebSocket from 'ws'
 import {
 	addConnection,
 	getTotalConnections
-} from '../usescases/connectionManager.js'
-import { routeMessage } from '../usescases/messageRouter.js'
+} from '../usecases/connectionManager.js'
+import { routeMessage } from '../usecases/messageRouter.js'
 
 // TODO : split into smaller functions when notifications are added and refactored logic after add connection
 

@@ -39,7 +39,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: apiKeyMiddleware
+			preHandler: [apiKeyMiddleware]
 		},
 		handleUserCreated
 	)
@@ -58,7 +58,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: jwtAuthMiddleware
+			preHandler: [jwtAuthMiddleware]
 		},
 		getPublicUser
 	)
@@ -75,7 +75,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: jwtAuthMiddleware
+			preHandler: [jwtAuthMiddleware]
 		},
 		getPrivateUser
 	)
@@ -95,7 +95,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: jwtAuthMiddleware
+			preHandler: [jwtAuthMiddleware]
 		},
 		updateUsername
 	)
@@ -114,7 +114,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: jwtAuthMiddleware
+			preHandler: [jwtAuthMiddleware]
 		},
 		updateAvatar
 	)
@@ -134,7 +134,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 					500: ErrorResponseSchema
 				}
 			},
-			preHandler: apiKeyMiddleware
+			preHandler: [apiKeyMiddleware]
 		},
 		updateUserStatus
 	)

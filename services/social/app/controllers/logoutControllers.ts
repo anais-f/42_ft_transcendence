@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	removeConnection,
 	wsConnections
-} from '../usescases/connectionManager.js'
+} from '../usecases/connectionManager.js'
 import { handleUserOffline } from '../usescases/presenceService.js'
 
 /**
