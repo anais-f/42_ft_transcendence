@@ -2,18 +2,11 @@ import { createButton } from '../components/button.js'
 import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
 import { createPopupElement, showPopup } from '../components/popUp.js'
+import { user } from '../index.js'
 
-const user = {
-	username: 'UserName',
-	wins: 42,
-	losses: 27,
-	lastLogin: '27-04-1994'
-}
-
-export function renderProfile(): void {
+export function renderProfile(): HTMLElement {
 	const container = document.getElementById('content')
-	if (!container)
-		return
+	if (!container) return document.createElement('div')
 	container.innerHTML = /*html*/ `
 	<section class="pt-2 flex min-h-[80vh]">
 		<aside class=" bg-gray-200 flex flex-col w-1/4 items-center justify-between border-4 border-gray-400">
@@ -34,9 +27,8 @@ export function renderProfile(): void {
 				<span class="col-span-3"></span>
 				<div id="local">
 				</div>
-				<a href="#game" class="col-start-3">
-					<h2 class="text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-2 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl">Remote</h2>
-				</a>
+				<div id="remote" class="col-start-3">
+				</div>
 				<a href="#game" class="col-span-3">
 					<h2 class="text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-2 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl">Tournament</h2>
 				</a>
@@ -57,30 +49,31 @@ export function renderProfile(): void {
 	</section>
 </div>
 </section>
-	`
+`
 
 	const imgProfile = document.getElementById('img-profile')
-	if (!imgProfile)
-		return
+	if (!imgProfile) return document.createElement('div')
 
 	const imgProfilePage: HTMLImageElement = createImg({
 		src: '/images/acancel.jpg',
 		alt: 'user_avatar',
-		className: 'rounded-full w-3/4 aspect-square object-cover flex-shrink-0 border-4 border-gray-400 shadow-xl mx-auto justify-start mt-4',
+		className:
+			'rounded-full w-3/4 aspect-square object-cover flex-shrink-0 border-4 border-gray-400 shadow-xl mx-auto justify-start mt-4',
 		title: 'User Avatar'
 	})
 
 	const PopupSettings: HTMLImageElement = createImg({
 		src: '/images/pong.avif',
-		alt: 'settings_image',
+		alt: 'settings_image'
 	})
 
 	const btnSettings = document.getElementById('btn-settings')
-	if (!btnSettings)
-		return
+	if (!btnSettings) return document.createElement('div')
+
 	const btnSettingsElement: HTMLButtonElement = createButton({
 		name: 'Settings',
-		className: 'bg-gray-300 px-3 py-1 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl',
+		className:
+			'bg-gray-300 px-3 py-1 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl',
 		onClick: (ev: MouseEvent) => {
 			showPopup(PopupSettings, {
 				id: 'popup-overlay',
@@ -88,19 +81,27 @@ export function renderProfile(): void {
 					'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
 			})
 		}
-	
 	})
 
 	const btnLocal = document.getElementById('local')
-	if (!btnLocal)
-		return
+	if (!btnLocal) return document.createElement('div')
 	const btnLocalElement: HTMLButtonElement = createButton({
+		name: 'Local',
+		className:
+			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl size-full'
+	})
+	const btnRemote = document.getElementById('remote')
+	if (!btnRemote) return document.createElement('div')
+	const btnRemoteElement: HTMLButtonElement = createButton({
 		name: 'Remote',
-		className: 'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl p-2',
-		})
-	
-	
+		className:
+			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl size-full'
+	})
+
 	imgProfile.append(imgProfilePage)
 	btnSettings.append(btnSettingsElement)
 	btnLocal.appendChild(btnLocalElement)
+	btnRemote.appendChild(btnRemoteElement)
+
+	return container
 }
