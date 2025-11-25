@@ -1,4 +1,5 @@
 import { Vector2 } from '../../../../math/Vector2.js'
+import { packetBuilder } from '../../packetBuilder.js'
 import { AS03BaseBall } from './S03.js'
 import { S05BallPos } from './S05.js'
 
@@ -23,7 +24,6 @@ describe('S05', () => {
 		expect(x).toBeCloseTo(velo.getX())
 		expect(y).toBeCloseTo(velo.getY())
 	})
-	/*
 
 	test('deserialize', () => {
 		const buff = new ArrayBuffer(25)
@@ -49,7 +49,7 @@ describe('S05', () => {
 
 	test('serialize + deserialize', () => {
 		const v = new Vector2(23, -2)
-		const S03 = S03BaseBall.createS03()
+		const S03 = AS03BaseBall.createS03()
 		const S05 = new S05BallPos(S03, v)
 		const buff = S05.serialize()
 		const S05Back = packetBuilder.deserializeS(buff)
@@ -62,5 +62,4 @@ describe('S05', () => {
 			throw new Error('Packet is not S05BallPos')
 		}
 	})
-	*/
 })

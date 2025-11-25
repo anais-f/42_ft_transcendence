@@ -1,4 +1,5 @@
 import { Vector2 } from '../../../../math/Vector2.js'
+import { packetBuilder } from '../../packetBuilder.js'
 import { S06BallSync } from './S06.js'
 
 describe('S06', () => {
@@ -29,21 +30,23 @@ describe('S06', () => {
 		expect(f).toBeCloseTo(factor)
 	})
 
-	/*
 	test('deserialize', () => {
-		const buff = new ArrayBuffer(41)
+		const buff = new ArrayBuffer(49)
 		const view = new DataView(buff)
 		const timestamp = 123456.789
 		const type = 0b11101
 		const v = new Vector2(324.32, -42)
 		const pos = new Vector2(32.3, 3)
+		const factor = .8
 
 		view.setFloat64(0, timestamp, true)
 		view.setUint8(8, type)
 		view.setFloat64(9, v.getX(), true)
 		view.setFloat64(17, v.getY(), true)
-		view.setFloat64(25, pos.getX(), true)
-		view.setFloat64(33, pos.getY(), true)
+		view.setFloat64(25, factor, true)
+
+		view.setFloat64(33, pos.getX(), true)
+		view.setFloat64(41, pos.getY(), true)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(S06BallSync)
@@ -59,7 +62,8 @@ describe('S06', () => {
 	test('serialize + deserialize', () => {
 		const pos = new Vector2(-23.322, -34)
 		const velo = new Vector2(23.2, 323)
-		const S06 = new S06BallSync(pos, velo)
+		const factor = .8
+		const S06 = new S06BallSync(pos, factor, velo)
 		const buff = S06.serialize()
 		const S06Back = packetBuilder.deserializeS(buff)
 
@@ -72,5 +76,4 @@ describe('S06', () => {
 			throw new Error('Packet is not S06BallSync')
 		}
 	})
-	*/
 })
