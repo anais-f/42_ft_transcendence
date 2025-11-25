@@ -1,11 +1,11 @@
 import { db } from '../database/socialDatabase.js'
-import { IUserId } from '@ft_transcendence/common'
+import { IUserId, RelationStatus } from '@ft_transcendence/common'
 
 // Table relations
 // 0 -> pending
 // 1 -> friends
 
-export type RelationRow = { relation_status: number }
+export type RelationRow = { relation_status: RelationStatus }
 export type RelationUserRow = { user_id: number; friend_id: number }
 
 export class SocialRepository {
@@ -15,7 +15,10 @@ export class SocialRepository {
 			: [b.user_id, a.user_id]
 	}
 
-	static relationStatus(user_id: IUserId, friend_id: IUserId): number {
+	static relationStatus(
+		user_id: IUserId,
+		friend_id: IUserId
+	): RelationStatus | -1 {
 		const selectStmt = db.prepare(
 			'SELECT relation_status FROM relations WHERE (user_id = ? AND friend_id = ?)'
 		)
@@ -33,13 +36,13 @@ export class SocialRepository {
 			'INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)'
 		)
 		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
-		insertStmt.run(firstId, secondId, origin_id.user_id, 0)
+		insertStmt.run(firstId, secondId, origin_id.user_id, RelationStatus.PENDING)
 	}
 
 	static updateRelationStatus(
 		user_id: IUserId,
 		friend_id: IUserId,
-		status: number
+		status: RelationStatus
 	): void {
 		const updateStmt = db.prepare(
 			'UPDATE relations SET relation_status = ? WHERE (user_id = ? AND friend_id = ?)'
@@ -65,7 +68,7 @@ export class SocialRepository {
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND (user_id = ? OR friend_id = ?)'
 		)
 		const rows = selectStmt.all(
-			1,
+			RelationStatus.ACCEPTED,
 			user_id.user_id,
 			user_id.user_id
 		) as RelationUserRow[]
@@ -83,7 +86,7 @@ export class SocialRepository {
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (user_id = ? OR friend_id = ?)'
 		)
 		const rows = selectStmt.all(
-			0,
+			RelationStatus.PENDING,
 			user_id.user_id,
 			user_id.user_id,
 			user_id.user_id
@@ -102,7 +105,7 @@ export class SocialRepository {
 			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id = ? AND (user_id = ? OR friend_id = ?)'
 		)
 		const rows = selectStmt.all(
-			0,
+			RelationStatus.PENDING,
 			user_id.user_id,
 			user_id.user_id,
 			user_id.user_id
