@@ -13,7 +13,8 @@ import {
 	UserIdSchema,
 	ErrorResponseSchema,
 	SuccessResponseSchema,
-	LogoutParamsSchema
+	LogoutParamsSchema,
+  FriendsListResponseSchema
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
@@ -163,4 +164,21 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	})
 
 	// TODO : routes for friends list, friend requests list, etc.
+  // GET /api/social/friends - Get friends list (JWT required)
+  server.route({
+    method: 'GET',
+    url: '/api/social/friends',
+    preHandler: jwtAuthMiddleware,
+    schema: {
+      response: {
+        200: FriendsListResponseSchema,
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema
+      }
+    },
+    getFriendsListController
+  })
+
+
 }
