@@ -1,10 +1,10 @@
 import '../style.css'
-import { WalerPage } from './pages/old_wale.js'
-import { HomePage } from './pages/old_home.js'
-import { AboutUsPage } from './pages/old_aboutUs.js'
-import { RegisterPage } from './pages/old_register.js'
-import { MyPage } from './pages/old_mypage.js'
-import { GamePage } from './pages/old_gameP.js'
+import { WalerPage } from './pages/old_pages/old_wale.js'
+import { HomePage } from './pages/old_pages/old_home.js'
+import { AboutUsPage } from './pages/old_pages/old_aboutUs.js'
+import { RegisterPage } from './pages/old_pages/old_register.js'
+import { MyPage } from './pages/old_pages/old_mypage.js'
+import { GamePage } from './pages/old_pages/old_gameP.js'
 
 document.addEventListener('DOMContentLoaded', () => {
 	const contentDiv = document.getElementById('content')
@@ -18,14 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	const content = contentDiv as HTMLElement
 	const menu = dynamicMenu as HTMLElement
 
-	const pages = {
+	const pages: Record<string, string> = {
 		home: HomePage(),
 		about: AboutUsPage(),
 		register: RegisterPage(),
 		wales: WalerPage(),
 		me: MyPage(),
 		game: GamePage()
-	} satisfies Record<string, string>
+	}
 
 	// Build menu
 	for (const key in pages) {
