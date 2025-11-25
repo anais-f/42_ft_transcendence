@@ -27,13 +27,13 @@ export const UsernameSchema = z
 
 export const UserIdSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1)
+		user_id: z.number().int().positive()
 	})
 	.meta({ description: 'User identifier schema' })
 
 export const PublicUserAuthSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1),
+		user_id: z.number().int().positive(),
 		login: LoginSchema
 	})
 	.strict()
@@ -48,7 +48,7 @@ export const PublicUserListAuthSchema = z
 
 export const UserPublicProfileSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1),
+		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
 		status: z.number().int().nonnegative(),
@@ -58,7 +58,7 @@ export const UserPublicProfileSchema = z
 
 export const UserPrivateProfileSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1),
+		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
 		status: z.number().int().nonnegative(),
