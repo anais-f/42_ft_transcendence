@@ -34,53 +34,42 @@
     - C00Base:
         - timestamp
     - C01Move:
-        - Direction
-    - C03BallBase
-    - C04BallVelo inherit[C03BallPos]:
-        - velo
-    - C05BallPos inherit[C03BallPos]:
-        - coord
-    - C06BallPosVelo inherit[C03BallBase]:
-        - C04
-        - C05
+        - uint8:
+            - 0/1 start / stop
+            - 0/1up / down
+            - empty
+            - empty
+            - empty
+            - empty
+            - empty
+            - empty
 
-    [ timestamp   ][ type      ][ size           ]
-    [ 8o          ][ 1o        ][ depend on type ]
-
-
-    [             ][ 0000 0001 ][ 0O   ] 00
-    [             ][ 0000 0011 ][ 16o  ] 01
-    [             ][ 0000 0101 ][ 0o   ] 03
-    [             ][ 0000 1101 ][ 16o  ] 04
-    [             ][ 0001 0101 ][ 16o  ] 05
-    [             ][ 0001 1101 ][ 32o  ] 06
+    [ ts ][ type      ][ data ]
+    [    ][ 0000 0001 ][ 0o   ] 00
+    [    ][ 0000 0011 ][ 10o  ] 01
 
 ### Server to client Packets
 
     - S00Base:
         - timestamp
-    - S0AInitGame: // WIP
-        - idk
     - S01ServerTickConfirmation:
         - noting
-    - S02oponentsState:
-        - Oponents:
-            - coord
-    - S0BReSync implement[S0AInitGame:]: // WIP
-        - noting
-    - S03BallBase
-    - S04BallVeloChange inherit[S03BallBase]:
-        - velo
-    - S05BallCoordSync inherit[S03BallBase]:
-        - coord
-    - S06BallSync inherit[S03BallBase]:
-        - S04
-        - S05
+    - S02SegmentUpdate
+    - S03BallUpdate
+        - S04BallVelo
+            - velo (vec2)
+            - factor (number)
+        - S05BallPos
+            - pos (vec2)
+        - s06BallState
+            - pos (vec2)
+            - velo (vec2)
+            - factor (number)
 
     [ ts ][ type       ][ data ]
-    [    ][  0000 0001 ][ 0  o ] 00
-    [    ][  0000 0011 ][ 0  o ] 01
-    [    ][  0000 0101 ][ 0  o ] 03
-    [    ][  0000 1101 ][ 16 o ] 04
-    [    ][  0001 0101 ][ 16 o ] 05
-    [    ][  0001 1101 ][ 32 o ] 06
+    [    ][  0000 0001 ][ 0o   ] 00
+    [    ][  0000 0011 ][ 1o   ] 01
+    [    ][  0000 0101 ][ 1o   ] 03
+    [    ][  0000 1101 ][ 33o  ] 04
+    [    ][  0001 0101 ][ 25o  ] 05
+    [    ][  0001 1101 ][ 49o  ] 06

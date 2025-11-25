@@ -1,9 +1,9 @@
+import { Circle } from '../math/Circle.js'
 import { Segment } from '../math/Segment.js'
-import { Polygon } from '../math/shapes/Polygon.js'
 import { Vector2 } from '../math/Vector2.js'
-import { PongBall } from './objects/PongBall.js'
-import { PongObject } from './objects/PongObject.js'
-import { PongPad } from './objects/PongPad.js'
+import { IBall } from './IBall.js'
+import { IScore } from './IScore.js'
+import { IWinZone } from './IWinZone.js'
 
 export class TPS_MANAGER {
 	public TPS_INTERVAL_MS: number
@@ -21,86 +21,24 @@ export enum GameState {
 	Started
 }
 
-// This is because Segment can't intersect with PongObject but PongObject can
-interface IBorderFix {
-	seg: Segment
-	pol: PongObject
-}
-
 export class GameEngine {
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
+	private ball: IBall = {
+		shape: new Circle(new Vector2(), 1.5),
+		velo: new Vector2(Math.random(), Math.random()).normalize()
+	}
 	public startTime
-	public lastBounce: PongObject | null = null
 
-	private border: IBorderFix[] = [
-		GameEngine.buildBorder(
-			new Segment(new Vector2(-20, -10), new Vector2(20, -10))
-		),
-		GameEngine.buildBorder(
-			new Segment(new Vector2(-20, 10), new Vector2(20, 10))
-		)
-	]
-
-	private winBorder: IBorderFix[] = [
-		GameEngine.buildBorder(
-			new Segment(new Vector2(-20, -10), new Vector2(-20, 10))
-		),
-		GameEngine.buildBorder(
-			new Segment(new Vector2(20, -10), new Vector2(20, 10))
-		)
-	]
-	private ball: PongBall = new PongBall(
-		2,
-		new Vector2(Math.random(), Math.random()).normalize()
-	)
-	private pads: PongPad[] = [
-		new PongPad(
-			1,
-			new PongObject(
-				new Polygon(
-					[
-						new Vector2(-0.5, -2),
-						new Vector2(0.5, -2),
-						new Vector2(0.5, 2),
-						new Vector2(-0.5, 2)
-					],
-					new Vector2()
-				),
-				new Vector2(-18, -2)
-			)
-		),
-		new PongPad(
-			2,
-			new PongObject(
-				new Polygon(
-					[
-						new Vector2(-0.5, -2),
-						new Vector2(0.5, -2),
-						new Vector2(0.5, 2),
-						new Vector2(-0.5, 2)
-					],
-					new Vector2()
-				),
-				new Vector2(17, -2)
-			)
-		)
-	]
-
-	public constructor(TPS: number) {
+	public constructor(
+		TPS: number,
+		private score: IScore,
+		private borders: Segment[],
+		private winZones: IWinZone[]
+	) {
 		this.TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
-	}
-
-	private static buildBorder(seg: Segment): IBorderFix {
-		return {
-			seg: seg,
-			pol: new PongObject(
-				new Polygon(seg.getPoints(), new Vector2()),
-				new Vector2()
-			)
-		}
 	}
 
 	private startGame(): void {
@@ -129,46 +67,60 @@ export class GameEngine {
 		}
 	}
 
-	private playTick(): void {
-		function bounceBorder(
-			borders: IBorderFix[],
-			ball: PongBall,
-			skip: PongObject | null
-		): boolean {
-			for (const border of borders) {
-				if (border.pol === skip) {
-					continue
-				}
-				const intersect = ball.getObj().intersect(border.pol)
-				if (intersect !== null) {
-					console.log('bounce')
-					ball.velo = Vector2.reflect(ball.velo, border.seg.getNormal())
-					skip = border.pol
+	private checkWin(seg: Segment): boolean {
+		for (const w of this.winZones) {
+			if (w.seg === seg) {
+				++this.score[`p${w.player as 1 | 2}`]
+				console.log(`score: [ ${this.score.p1} | ${this.score.p2} ]`)
+				return true
+			}
+		}
+		return false
+	}
+
+	// return if point is gained
+	private checkColision(): boolean {
+		for (const border of this.borders) {
+			const hitData = border.intersect(this.ball.shape)
+			if (Array.isArray(hitData) && hitData.length > 0) {
+				if (this.checkWin(border)) {
 					return true
 				}
+
+				const dirToPoint = Vector2.subtract(
+					hitData[0],
+					this.ball.shape.getPos()
+				)
+				const dot = Vector2.dot(border.getNormal(), dirToPoint)
+				const velo: Vector2 = Vector2.reflect(
+					this.ball.velo,
+					border.getNormal()
+				)
+				if (dot < 0) {
+					velo.negate()
+				}
+				this.ball.velo = velo
+				return false
 			}
-			return false
 		}
+		return false
+	}
+
+	private playTick(): void {
+		if (!this.checkColision()) {
+			this.ball.shape.getPos().add(this.ball.velo)
+		} else {
+			this.ball.shape.getPos().setXY(0, 0)
+			this.ball.velo = new Vector2(Math.random(), Math.random()).normalize()
+		}
+
 		++this.TPS_DATA.tickCount
-
-		for (const endBorder of this.winBorder) {
-			const hit = this.ball.getObj().intersect(endBorder.pol)
-			if (hit !== null) {
-				console.log('point gained')
-				this.ball.velo = new Vector2(
-					Math.random() * 1.2,
-					Math.random()
-				).normalize()
-				this.ball.getPos().setXY(0, 0)
-				return
-			}
+		if (this.score.p1 + this.score.p2 >= this.score.max) {
+			this.pauseGame()
 		}
 
-		bounceBorder(this.border, this.ball, this.lastBounce)
-
-		this.ball.getPos().add(this.ball.velo)
 		console.log(
-			`pos:{${this.ball.getPos().getX().toFixed(2)} : ${this.ball.getPos().getY().toFixed(2)}} velo:{${this.ball.velo.getX().toFixed(2)} : ${this.ball.velo.getY().toFixed(2)}}`
+			`pos: {${this.ball.shape.getPos().getX().toFixed(2)} : ${this.ball.shape.getPos().getY().toFixed(2)}} | velo: {${this.ball.velo.getX().toFixed(2)} : ${this.ball.velo.getY().toFixed(2)}}}`
 		)
 	}
 
@@ -200,5 +152,13 @@ export class GameEngine {
 
 	public getTickCount(): number {
 		return this.TPS_DATA.tickCount
+	}
+
+	public getBall(): IBall {
+		return this.ball
+	}
+
+	public getBorders(): Segment[] {
+		return this.borders
 	}
 }

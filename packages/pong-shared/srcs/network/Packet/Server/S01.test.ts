@@ -1,4 +1,5 @@
 import { packetBuilder } from '../packetBuilder.js'
+import { SPacketsType } from '../packetTypes.js'
 import { S01ServerTickConfirmation as S01TC } from './S01.js'
 
 describe('S01', () => {
@@ -19,7 +20,7 @@ describe('S01', () => {
 		const view = new DataView(buff)
 
 		const timestamp = 123456.789
-		const type = 0b11
+		const type = SPacketsType.S01
 
 		view.setFloat64(0, timestamp, true)
 		view.setUint8(8, type)

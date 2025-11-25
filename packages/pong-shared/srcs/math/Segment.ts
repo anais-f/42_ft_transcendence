@@ -1,9 +1,6 @@
 import { EPSILON } from '../define.js'
-import { Ray } from './Ray.js'
 import { Vector2 } from './Vector2.js'
-import { Circle } from './shapes/Circle.js'
-import { Polygon } from './shapes/Polygon.js'
-import { IIntersect } from './IIntersect.js'
+import { Circle } from './Circle.js'
 
 export class Segment {
 	constructor(
@@ -23,30 +20,18 @@ export class Segment {
 		return this.p2
 	}
 
-	intersect(other: Circle, otherNormal: boolean): IIntersect[] | null
-	intersect(other: Segment, otherNormal: boolean): IIntersect[] | null
-	intersect(other: Polygon, otherNormal: boolean): IIntersect[] | null
-	intersect(other: Ray, otherNormal: boolean): IIntersect[] | null
-	intersect(
-		other: Circle | Segment | Polygon | Ray,
-		otherNormal: boolean = false
-	): IIntersect[] | null {
+	intersect(other: Circle): Vector2[] | null
+	intersect(other: Segment): Vector2[] | null
+	intersect(other: Circle | Segment): Vector2[] | null {
 		if (other instanceof Circle) {
-			return this.intersectCircle(other, otherNormal)
+			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
-			return this.intersectSeg(other, otherNormal)
-		} else if (other instanceof Polygon) {
-			return other.intersect(this, !otherNormal)
-		} else if (other instanceof Ray) {
-			return other.intersect(this, !otherNormal)
+			return this.intersectSeg(other)
 		}
 		throw 'invalid Type in segment intersect'
 	}
 
-	private intersectSeg(
-		other: Segment,
-		otherNormal: boolean
-	): IIntersect[] | null {
+	private intersectSeg(other: Segment): Vector2[] | null {
 		const [a1, a2] = [this.p1, this.p2]
 		const [b1, b2] = other.getPoints()
 
@@ -63,27 +48,16 @@ export class Segment {
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
 			const t = d1 / (d1 - d2)
-			const hp = Vector2.add(a1, Vector2.subtract(a2, a1).multiply(t))
-			const intersectionPoint = {
-				hitPoint: hp,
-				normal: otherNormal ? other.getNormal() : this.getNormal()
-			}
-			return [intersectionPoint]
+			return [Vector2.add(a1, Vector2.subtract(a2, a1).multiply(t))]
 		}
 
-		let points: IIntersect[] = []
+		let points: Vector2[] = []
 		if (a1.equals(b1) || a1.equals(b2)) {
-			points.push({
-				hitPoint: a1,
-				normal: otherNormal ? other.getNormal() : this.getNormal()
-			})
+			points.push(a1)
 		}
 
 		if (a2.equals(b1) || a2.equals(b2)) {
-			points.push({
-				hitPoint: a2,
-				normal: otherNormal ? other.getNormal() : this.getNormal()
-			})
+			points.push(a2)
 		}
 
 		const colinear =
@@ -91,25 +65,22 @@ export class Segment {
 			Math.abs(direction(a1, a2, b2)) < EPSILON
 		if (colinear) {
 			const allPoints = [a1, a2, b1, b2]
-			const overlap: IIntersect[] = []
+			const overlap: Vector2[] = []
 			for (let pt of allPoints) {
 				if (
 					Segment.pointIsOnSeg(a1, a2, pt) &&
 					Segment.pointIsOnSeg(b1, b2, pt)
 				) {
-					if (!overlap.some((p) => p.hitPoint.equals(pt))) {
-						overlap.push({
-							hitPoint: pt,
-							normal: otherNormal ? other.getNormal() : this.getNormal()
-						})
+					if (!overlap.some((p) => p.equals(pt))) {
+						overlap.push(pt)
 					}
 				}
 			}
 			if (overlap.length >= 2) {
 				overlap.sort((p1, p2) =>
-					p1.hitPoint.getX() !== p2.hitPoint.getX()
-						? p1.hitPoint.getX() - p2.hitPoint.getX()
-						: p1.hitPoint.getY() - p2.hitPoint.getY()
+					p1.getX() !== p2.getX()
+						? p1.getX() - p2.getX()
+						: p1.getY() - p2.getY()
 				)
 				return overlap
 			}
@@ -122,7 +93,7 @@ export class Segment {
 		return null
 	}
 
-	intersectCircle(other: Circle, otherNormal: boolean): IIntersect[] | null {
+	intersectCircle(other: Circle): Vector2[] | null {
 		const a = this.p1
 		const b = this.p2
 		const center = other.getPos()
@@ -132,16 +103,7 @@ export class Segment {
 		const bIn = Vector2.subtract(b, center).squaredLength() <= radius * radius
 
 		if (aIn && bIn) {
-			return [
-				{
-					hitPoint: a.clone(),
-					normal: otherNormal ? other.getNormalAt(a) : this.getNormal()
-				},
-				{
-					hitPoint: b.clone(),
-					normal: otherNormal ? other.getNormalAt(a) : this.getNormal()
-				}
-			]
+			return [a.clone(), b.clone()]
 		}
 
 		const d = Vector2.subtract(b, a)
@@ -160,20 +122,14 @@ export class Segment {
 		const t1 = (-bCoeff - sqrtDiscriminant) / (2 * aCoeff)
 		const t2 = (-bCoeff + sqrtDiscriminant) / (2 * aCoeff)
 
-		const points: IIntersect[] = []
+		const points: Vector2[] = []
 		if (t1 >= 0 && t1 <= 1) {
 			const hp = Vector2.add(a, Vector2.multiply(d, t1))
-			points.push({
-				hitPoint: hp,
-				normal: otherNormal ? other.getNormalAt(hp) : this.getNormal()
-			})
+			points.push(hp)
 		}
 		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
 			const hp = Vector2.add(a, Vector2.multiply(d, t2))
-			points.push({
-				hitPoint: hp,
-				normal: otherNormal ? other.getNormalAt(hp) : this.getNormal()
-			})
+			points.push(hp)
 		}
 
 		if ((aIn || bIn) && points.length === 1) {
@@ -250,5 +206,9 @@ export class Segment {
 		merged.set(new Uint8Array(this.getP1().serialize()), 0)
 		merged.set(new Uint8Array(this.getP2().serialize()), 16)
 		return merged.buffer
+	}
+
+	clone(): Segment {
+		return new Segment(this.getP1().clone(), this.getP2().clone())
 	}
 }

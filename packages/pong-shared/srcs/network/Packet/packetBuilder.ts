@@ -1,51 +1,24 @@
-import { vi } from 'zod/locales'
+import { padDirection } from '../../engine/PongPad.js'
+import { Segment } from '../../math/Segment.js'
 import { Vector2 } from '../../math/Vector2.js'
-import {
-	C03BallBase as C03,
-	C01Move as C01,
-	C04BallVelo as C04,
-	C05BallPos as C05,
-	C06BallVeloPos as C06
-} from './Client/CPackets.js'
+import { C01Move as C01 } from './Client/CPackets.js'
+import { CPacketsType, SPacketsType } from './packetTypes.js'
+import { S02SegmentUpdate } from './Server/S02.js'
 
 import {
 	S01ServerTickConfirmation as S01,
-	S03BaseBall as S03,
+	AS03BaseBall as S03,
 	S04BallVeloChange as S04,
 	S05BallPos as S05,
 	S06BallSync as S06
 } from './Server/SPackets.js'
-import { S0ASync } from './Server/S0A.js'
-import { Segment } from '../../math/Segment.js'
-import { PongObject } from '../../engine/objects/PongObject.js'
-import { PongPad } from '../../engine/objects/PongPad.js'
-import { PongBall } from '../../engine/objects/PongBall.js'
-import { Circle } from '../../math/shapes/Circle.js'
 
-export enum CPacketsType {
-	C00 = 0b00000001,
-	C01 = 0b00000011,
-	C03 = 0b00000101,
-	C04 = 0b00001101,
-	C05 = 0b00010101,
-	C06 = 0b00011101
-}
-
-export enum SPacketsType {
-	S00 = 0b00000001,
-	S01 = 0b00000011,
-	S03 = 0b00000101,
-	S04 = 0b00001101,
-	S05 = 0b00010101,
-	S06 = 0b00011101,
-	S0A = 0b00000111,
-	S0B = 0b00001001
-}
 export class packetBuilder {
 	private constructor() {}
 
-	public static deserializeC(buff: ArrayBuffer): C01 | C03 | C04 | C05 | null {
+	public static deserializeC(buff: ArrayBuffer): C01 | null {
 		const view = new DataView(buff)
+		const time = view.getFloat64(0, true)
 
 		try {
 			const type = view.getUint8(8)
@@ -54,28 +27,10 @@ export class packetBuilder {
 				case CPacketsType.C00:
 					break
 				case CPacketsType.C01:
-					return new C01(
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true)),
-						view.getFloat64(0, true)
-					)
-				case CPacketsType.C03:
-					return new C03(view.getFloat64(0, true))
-				case CPacketsType.C04:
-					return new C04(
-						new C03(view.getFloat64(0, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
-					)
-				case CPacketsType.C05:
-					return new C05(
-						new C03(view.getFloat64(0, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
-					)
-				case CPacketsType.C06:
-					return new C06(
-						new Vector2(view.getFloat64(25, true), view.getFloat64(33, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true)),
-						view.getFloat64(0, true)
-					)
+					const data = view.getUint8(9)
+					const state = !!(data & 0b10)
+					const dir = data & 0b01 ? padDirection.UP : padDirection.DOWN
+					return new C01(state, dir, time)
 				default:
 					break
 			}
@@ -86,8 +41,14 @@ export class packetBuilder {
 		return null
 	}
 
-	public static deserializeS(buff: ArrayBuffer): S01 | S03 | S04 | S05 | null {
+	public static deserializeS(
+		buff: ArrayBuffer
+	): S01 | S03 | S04 | S05 | S06 | null {
 		const view = new DataView(buff)
+		const time = view.getFloat64(0, true)
+		let velo: Vector2
+		let pos: Vector2
+		let factor: number
 
 		try {
 			const type = view.getUint8(8)
@@ -95,75 +56,50 @@ export class packetBuilder {
 			switch (type) {
 				case SPacketsType.S00:
 					break
-				case SPacketsType.S0B:
-					throw 'not implemented yet'
 				case SPacketsType.S01:
-					return new S01(view.getFloat64(0, true))
-				case SPacketsType.S03:
-					return new S03(view.getFloat64(0, true))
-				case SPacketsType.S04:
-					return new S04(
-						new S03(view.getFloat64(0, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
-					)
-				case SPacketsType.S05:
-					return new S05(
-						new S03(view.getFloat64(0, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
-					)
-				case SPacketsType.S06:
-					return new S06(
-						new Vector2(view.getFloat64(25, true), view.getFloat64(33, true)),
-						new Vector2(view.getFloat64(9, true), view.getFloat64(17, true)),
-						view.getFloat64(0, true)
-					)
-				case SPacketsType.S0A: {
-					const time = view.getFloat64(0, true)
+					return new S01(time)
+				case SPacketsType.S02:
 					const nbseg = view.getUint8(9)
-					let offset = 10
-
-					const seg: Segment[] = []
+					const tab: Segment[] = []
 					for (let i = 0; i < nbseg; ++i) {
-						const x1 = view.getFloat64(offset, true)
-						offset += 8
-						const y1 = view.getFloat64(offset, true)
-						offset += 8
-						const x2 = view.getFloat64(offset, true)
-						offset += 8
-						const y2 = view.getFloat64(offset, true)
-						offset += 8
-						seg.push(new Segment(new Vector2(x1, y1), new Vector2(x2, y2)))
+						const offset = 10 + i * 32
+						tab.push(
+							new Segment(
+								new Vector2(
+									view.getFloat64(offset, true),
+									view.getFloat64(offset + 8, true)
+								),
+								new Vector2(
+									view.getFloat64(offset + 16, true),
+									view.getFloat64(offset + 24, true)
+								)
+							)
+						)
 					}
-
-					const padPlayer1 = view.getUint8(offset)
-					offset += 1
-					const padObj1 = PongObject.deserialize(buff.slice(offset))
-					offset += padObj1.bufferSize
-
-					const padPlayer2 = view.getUint8(offset)
-					offset += 1
-					const padObj2 = PongObject.deserialize(buff.slice(offset))
-					offset += padObj2.bufferSize
-
-					const pad1 = new PongPad(padPlayer1, padObj1)
-					const pad2 = new PongPad(padPlayer2, padObj2)
-
-					const ballObj = PongObject.deserialize(buff.slice(offset))
-					offset += ballObj.bufferSize
-
-					const vx = view.getFloat64(offset, true)
-					offset += 8
-					const vy = view.getFloat64(offset, true)
-					offset += 8
-					const ballVelo = new Vector2(vx, vy)
-
-					const ball = new PongBall(
-						(ballObj.getHitbox()[0] as Circle).getRad(),
-						ballVelo
+					return new S02SegmentUpdate(time, tab)
+				case SPacketsType.S03:
+					return new S03(time)
+				case SPacketsType.S04:
+					velo = new Vector2(
+						view.getFloat64(9, true),
+						view.getFloat64(17, true)
 					)
-
-					return new S0ASync(seg, [pad1, pad2], ball, time)
-				}
+					factor = view.getFloat64(25, true)
+					return new S04(new S03(time), velo, factor)
+				case SPacketsType.S05:
+					pos = new Vector2(view.getFloat64(9, true), view.getFloat64(17, true))
+					return new S05(new S03(time), pos)
+				case SPacketsType.S06:
+					velo = new Vector2(
+						view.getFloat64(9, true),
+						view.getFloat64(17, true)
+					)
+					factor = view.getFloat64(25, true)
+					pos = new Vector2(
+						view.getFloat64(33, true),
+						view.getFloat64(41, true)
+					)
+					return new S06(pos, factor, velo, time)
 				default:
 					break
 			}

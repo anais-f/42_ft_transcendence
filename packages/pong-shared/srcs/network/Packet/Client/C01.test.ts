@@ -1,69 +1,82 @@
-import { Vector2 } from '../../../math/Vector2'
 import { C01Move } from './C01.js'
+import { padDirection } from '../../../engine/PongPad.js'
+import { CPacketsType } from '../packetTypes.js'
 import { packetBuilder } from '../packetBuilder.js'
 
 describe('c01', () => {
 	test('serialize returns correct buffer', () => {
-		const dir = new Vector2(7.54645, -0.5)
-		const C01 = new C01Move(dir)
-		const C01Ts = C01.getTime()
-		const buff: ArrayBuffer = C01.serialize()
-		const view = new DataView(buff)
+		const time = Date.now()
 
-		// Check timestamp (Float64 at 0)
-		const ts = view.getFloat64(0, true)
-		expect(typeof ts).toBe('number')
-		expect(ts).toBeCloseTo(C01Ts)
+		const C01Start = new C01Move(true, padDirection.DOWN, time)
 
-		// Check type (Uint8 at 8)
-		const type = view.getUint8(8)
-		expect(type).toBe(0b11)
+		const viewStart = new DataView(C01Start.serialize())
 
-		// Check direction x (Float64 at 9)
-		const x = view.getFloat64(9, true)
-		expect(x).toBeCloseTo(dir.getX())
+		expect(viewStart.getFloat64(0, true)).toBeCloseTo(C01Start.getTime())
+		expect(viewStart.getUint8(8)).toBe(CPacketsType.C01)
 
-		// Check direction y (Float64 at 17)
-		const y = view.getFloat64(17, true)
-		expect(y).toBeCloseTo(dir.getY())
+		expect(viewStart.getUint8(9) & 0b10).toEqual(0b10)
+		expect(viewStart.getUint8(9) & 0b01).toEqual(0b00)
+
+		const C01Stop = new C01Move(false, padDirection.UP, time)
+		const viewStop = new DataView(C01Stop.serialize())
+		expect(viewStop.getUint8(9) & 0b01).toEqual(0b01)
+		expect(viewStop.getUint8(9) & 0b10).toEqual(0b00)
 	})
 
-	test('deserialize', () => {
-		const buff = new ArrayBuffer(25)
-		const view = new DataView(buff)
+	test('serialize test all', () => {
+		const time = Date.now()
 
-		// Fill with example values
-		const timestamp = 123456.789
-		const type = 0b11
-		const x = 7.54645
-		const y = -0.5
+		const cases = [
+			{
+				state: true,
+				dir: padDirection.UP,
+				expectStartMask: 0b10,
+				expectDirMask: 0b01
+			},
+			{
+				state: true,
+				dir: padDirection.DOWN,
+				expectStartMask: 0b10,
+				expectDirMask: 0b00
+			},
+			{
+				state: false,
+				dir: padDirection.UP,
+				expectStartMask: 0b00,
+				expectDirMask: 0b01
+			},
+			{
+				state: false,
+				dir: padDirection.DOWN,
+				expectStartMask: 0b00,
+				expectDirMask: 0b00
+			}
+		]
 
-		// Write values to buffer
-		view.setFloat64(0, timestamp, true) // timestamp at offset 0
-		view.setUint8(8, type) // type at offset 8
-		view.setFloat64(9, x, true) // x at offset 9
-		view.setFloat64(17, y, true) // y at offset 17
+		for (const c of cases) {
+			const pkt = new C01Move(c.state, c.dir, time)
+			const view = new DataView(pkt.serialize())
+			const data = view.getUint8(9)
 
-		const p = packetBuilder.deserializeC(buff)
-		expect(p).toBeInstanceOf(C01Move)
-		expect(p?.time).toBeCloseTo(timestamp)
-		if (p instanceof C01Move) {
-			expect(p?.getDirection()?.equals(new Vector2(x, y))).toBe(true)
-		} else {
-			throw new Error('Packet is not C01')
+			expect(data & 0b10).toEqual(c.expectStartMask)
+			expect(data & 0b01).toEqual(c.expectDirMask)
 		}
 	})
+
 	test('serialize + deserialize', () => {
-		const dir = new Vector2(-213, 213)
-		const C = new C01Move(dir)
-		const buff = C.serialize()
-		const CBack = packetBuilder.deserializeC(buff)
-		expect(CBack?.getTime()).toEqual(C.getTime())
-		expect(CBack).toBeInstanceOf(C01Move)
-		if (CBack instanceof C01Move) {
-			expect(CBack.getDirection().equals(C.getDirection())).toBe(true)
-		} else {
-			throw new Error('Packet is not C01')
+		const dir = padDirection.UP
+		const time = Date.now()
+		const original = new C01Move(true, dir, time)
+		const buff = original.serialize()
+
+		const reconstructed = packetBuilder.deserializeC(buff)
+		expect(reconstructed).toBeInstanceOf(C01Move)
+		if (!(reconstructed instanceof C01Move)) {
+			throw '...'
 		}
+
+		expect(reconstructed.state).toBe(original.state)
+		expect(reconstructed.dir).toBe(original.dir)
+		expect(reconstructed.getTime()).toBeCloseTo(original.getTime())
 	})
 })
