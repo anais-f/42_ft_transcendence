@@ -12,7 +12,8 @@ import { handleLogout } from '../controllers/logoutControllers.js'
 import {
 	UserIdSchema,
 	ErrorResponseSchema,
-	SuccessResponseSchema
+	SuccessResponseSchema,
+	LogoutParamsSchema
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
@@ -26,12 +27,16 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
 	// POST /api/create-token - Create temporary WS token (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/create-token',
 		preHandler: jwtAuthMiddleware,
-		handler: createTokenController,
-		schema: {}
+		schema: {
+			response: {
+				200: z.object({ token: z.string() })
+			}
+		},
+		handler: createTokenController
 	})
 
 	// GET /api/ws - WebSocket endpoint (WS token required)
@@ -50,13 +55,12 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	})
 
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/logout/:userId',
 		preHandler: jwtAuthOwnerMiddleware,
-		handler: handleLogout,
 		schema: {
-			params: z.object({ userId: z.coerce.number().int().positive().min(1) }),
+			params: LogoutParamsSchema,
 			response: {
 				200: SuccessResponseSchema,
 				400: ErrorResponseSchema,
@@ -64,15 +68,15 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				403: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: handleLogout
 	})
 
 	// POST /api/request-friend - Send a friend request (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/request-friend',
 		preHandler: jwtAuthMiddleware,
-		handler: requestFriendController,
 		schema: {
 			body: UserIdSchema,
 			response: {
@@ -82,15 +86,15 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: requestFriendController
 	})
 
 	// POST /api/accept-friend - Accept a friend request (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/accept-friend',
 		preHandler: jwtAuthMiddleware,
-		handler: acceptFriendController,
 		schema: {
 			body: UserIdSchema,
 			response: {
@@ -100,15 +104,15 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: acceptFriendController
 	})
 
 	// POST /api/reject-friend - Reject a friend request (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/reject-friend',
 		preHandler: jwtAuthMiddleware,
-		handler: rejectFriendController,
 		schema: {
 			body: UserIdSchema,
 			response: {
@@ -118,15 +122,15 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: rejectFriendController
 	})
 
 	// POST /api/cancel-friend - Cancel a friend request (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/cancel-friend',
 		preHandler: jwtAuthMiddleware,
-		handler: cancelFriendController,
 		schema: {
 			body: UserIdSchema,
 			response: {
@@ -136,15 +140,15 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: cancelFriendController
 	})
 
 	// POST /api/remove-friend - Remove a friend (JWT required)
-	await server.route({
+	server.route({
 		method: 'POST',
 		url: '/api/social/remove-friend',
 		preHandler: jwtAuthMiddleware,
-		handler: removeFriendController,
 		schema: {
 			body: UserIdSchema,
 			response: {
@@ -154,6 +158,9 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
-		}
+		},
+		handler: removeFriendController
 	})
+
+	// TODO : routes for friends list, friend requests list, etc.
 }
