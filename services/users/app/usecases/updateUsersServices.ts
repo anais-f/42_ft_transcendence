@@ -2,7 +2,7 @@ import { fileTypeFromBuffer } from 'file-type'
 import { AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
 import { UsersRepository } from '../repositories/usersRepository.js'
 import fs from 'fs/promises'
-import path from 'path'
+import * as path from 'path'
 import { randomUUID } from 'crypto'
 
 export interface CheckUserAvatarParams {
@@ -25,12 +25,14 @@ const ALLOWED_EXTENSIONS: readonly string[] = ['.jpg', '.jpeg', '.png']
 const MAX_SIZE = 5 * 1024 * 1024
 
 export class UpdateUsersServices {
+	/** Update username in user profile */
 	static async updateUsernameProfile(
 		user: { user_id: number },
 		newUsername: string
 	): Promise<void> {
-		if (!user.user_id || user.user_id <= 0)
+		if (!user.user_id || user.user_id <= 0) {
 			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+		}
 
 		await UsersRepository.updateUsername({
 			user_id: user.user_id,
@@ -38,29 +40,74 @@ export class UpdateUsersServices {
 		})
 	}
 
+	/** Update user status (online/offline) */
+	static async updateUserStatus(
+		userId: number,
+		status: 0 | 1,
+		lastConnection?: string
+	): Promise<void> {
+		if (!userId || userId <= 0) {
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+		}
+
+		if (!UsersRepository.existsById({ user_id: userId })) {
+			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		}
+
+		const currentStatus = UsersRepository.getUserStatusById({ user_id: userId })
+
+		if (currentStatus === status) {
+			console.log(`User ${userId} status already ${status}, ignoring update`)
+			return
+		}
+
+		if (status === 0 && !lastConnection) {
+			lastConnection = new Date().toISOString()
+		}
+
+		UsersRepository.updateUserStatus(
+			{ user_id: userId },
+			status,
+			lastConnection
+		)
+		console.log(`User ${userId} status updated to ${status}`)
+	}
+
+	/** Check and update user avatar */
 	static async checkUserAvatar(
 		params: CheckUserAvatarParams
 	): Promise<boolean> {
-		const detectedType = await validateAvatar(params)
-		const paths = await generateAvatarPaths(params.user_id, detectedType)
-		await saveAvatarAndCleanup(paths, params.avatarBuffer, params.user_id)
-
+		const detectedType = await _validateAvatar(params)
+		const paths = await _generateAvatarPaths(params.user_id, detectedType)
+		await _saveAvatarAndCleanup(paths, params.avatarBuffer, params.user_id)
 		return true
 	}
 }
 
-async function validateAvatar(params: CheckUserAvatarParams) {
+// --------------------- Helpers (module-private) ---------------------
+
+/**
+ * Internal helper: validate avatar image
+ */
+async function _validateAvatar(params: CheckUserAvatarParams) {
 	const { user_id, avatarBuffer, originalName, mimeType } = params
 
-	if (!user_id || user_id <= 0)
+	if (!user_id || user_id <= 0) {
 		throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+	}
 
 	const fileExtension =
 		originalName && originalName.includes('.')
 			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
 			: ''
 
-	if (avatarBuffer.length > MAX_SIZE) throw new AppError('File too large', 400)
+	if (!Buffer.isBuffer(avatarBuffer)) {
+		throw new AppError('Missing file', 400)
+	}
+
+	if (avatarBuffer.length > MAX_SIZE) {
+		throw new AppError('File too large', 400)
+	}
 
 	const detectedType = await fileTypeFromBuffer(avatarBuffer)
 	if (!detectedType) {
@@ -91,7 +138,10 @@ async function validateAvatar(params: CheckUserAvatarParams) {
 	return detectedType
 }
 
-async function generateAvatarPaths(
+/**
+ * Internal helper: generate file paths for avatar storage
+ */
+async function _generateAvatarPaths(
 	user_id: number,
 	detectedType: { ext: string | undefined; mime: string }
 ): Promise<AvatarPaths> {
@@ -119,7 +169,10 @@ async function generateAvatarPaths(
 	return { avatarsDir, outPath, tempPath, publicPath, filename }
 }
 
-async function saveAvatarAndCleanup(
+/**
+ * Internal helper: save avatar and cleanup old files
+ */
+async function _saveAvatarAndCleanup(
 	paths: AvatarPaths,
 	avatarBuffer: Buffer,
 	user_id: number

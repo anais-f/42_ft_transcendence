@@ -1,9 +1,10 @@
-import './database/usersDatabase.js'
+import './database/socialDatabase.js'
 import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
-import fastifyMultipart from '@fastify/multipart'
+import fastifyCookie from '@fastify/cookie'
+import FastifyWebSocket from '@fastify/websocket'
 import fs from 'fs'
 import {
 	ZodTypeProvider,
@@ -11,26 +12,24 @@ import {
 	serializerCompiler,
 	jsonSchemaTransform
 } from 'fastify-type-provider-zod'
-import { usersRoutes } from './routes/usersRoutes.js'
-import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
 import {
 	httpRequestCounter,
 	responseTimeHistogram
 } from '@ft_transcendence/common'
+import { socialRoutes } from './routes/socialRoutes.js'
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 function createApp(): FastifyInstance {
 	const app = Fastify({
-		logger: true,
-		bodyLimit: 5 * 1024 * 1024
+		logger: true
 	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
-	const jwtSecret = process.env.JWT_SECRET
+	const jwtSecret = process.env.JWT_SECRET_SOCIAL
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
@@ -38,28 +37,16 @@ function createApp(): FastifyInstance {
 		secret: jwtSecret
 	})
 
-	app.register(fastifyMultipart, {
-		limits: {
-			fileSize: 5 * 1024 * 1024,
-			files: 1
-		}
-	})
-	app.addContentTypeParser(
-		/^image\/.*/,
-		{ parseAs: 'buffer' },
-		(request, payload: Buffer, done) => {
-			done(null, payload)
-		}
-	)
+	app.register(fastifyCookie)
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
 		openapi: {
 			info: {
-				title: 'API for Users Service',
+				title: 'API for Social Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${HOST}/users`, description: 'Local server' }],
+			servers: [{ url: `${HOST}/social`, description: 'Local server' }],
 			components: openapiSwagger.components
 		},
 		transform: jsonSchemaTransform
@@ -69,19 +56,11 @@ function createApp(): FastifyInstance {
 		routePrefix: '/docs'
 	})
 
-	app.register(usersRoutes)
-	return app
-}
+	app.register(FastifyWebSocket as any)
 
-async function initializeUsers(): Promise<void> {
-	try {
-		console.log('Initializing users from auth service...')
-		await UsersServices.syncAllUsersFromAuth()
-		console.log('User initialization complete.')
-	} catch (error) {
-		console.error('Error initializing users:', error)
-		throw error
-	}
+	app.register(socialRoutes)
+
+	return app
 }
 
 export async function start(): Promise<void> {
@@ -114,13 +93,12 @@ export async function start(): Promise<void> {
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
-		await initializeUsers()
 		await app.listen({
 			port: parseInt(process.env.PORT as string),
 			host: '0.0.0.0'
 		})
 		console.log('Listening on port ', process.env.PORT)
-		console.log(`Swagger UI available at ${HOST}/users/docs`)
+		console.log(`Swagger UI available at ${HOST}/social/docs`)
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

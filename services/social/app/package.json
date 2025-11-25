@@ -1,22 +1,18 @@
 {
-	"name": "auth-server-app",
+	"name": "social",
 	"version": "1.0.0",
 	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
 		"test": "node --experimental-vm-modules ./node_modules/.bin/jest --config ./jest.config.ts ./**/*.test.ts",
-		"build": "tsc && tsc-alias",
+		"build": "tsc",
 		"start": "node dist/index.js",
 		"dev": "tsx watch index.ts"
 	},
 	"dependencies": {
+		"@fastify/cookie": "^10.0.0",
 		"@ft_transcendence/common": "*",
-		"argon2": "^0.40.0",
+		"@ft_transcendence/security": "*",
 		"jsonwebtoken": "^9.0.2"
-	},
-	"devDependencies": {
-		"@types/jsonwebtoken": "^9.0.10",
-		"@types/node": "^20.19.11",
-		"better-sqlite3": "^12.4.6"
 	}
 }

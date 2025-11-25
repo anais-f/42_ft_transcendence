@@ -26,13 +26,13 @@ export const UsernameSchema = z
 
 export const UserIdSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1)
+		user_id: z.number().int().positive()
 	})
 	.meta({ description: 'User identifier schema' })
 
 export const PublicUserAuthSchema = z
 	.object({
-		user_id: z.number().int().positive().min(1),
+		user_id: z.number().int().positive(),
 		login: LoginSchema
 	})
 	.strict()
@@ -50,6 +50,7 @@ export const UserPublicProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
+		status: z.number().int().nonnegative(),
 		last_connection: z.string()
 	})
 	.meta({ description: 'Public user profile schema' })
@@ -59,6 +60,7 @@ export const UserPrivateProfileSchema = z
 		user_id: z.number().int().positive(),
 		username: UsernameSchema,
 		avatar: z.string(),
+		status: z.number().int().nonnegative(),
 		last_connection: z.string()
 	})
 	.strict()
@@ -93,6 +95,17 @@ export const UserProfileUpdateSchema = z
 	.strict()
 	.meta({ description: 'Update private user profile schema' })
 
+export const UpdateUserStatusSchema = z
+	.object({
+		status: z.union([z.literal(0), z.literal(1)]),
+		lastConnection: z.string().datetime().optional()
+	})
+	.strict()
+	.refine((data) => data.status !== 0 || !!data.lastConnection, {
+		message: 'lastConnection is required when status is 0 (offline)'
+	})
+	.meta({ description: 'Update user status schema' })
+
 // Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
 
@@ -107,3 +120,11 @@ export type UserPrivateProfileListDTO = z.infer<
 	typeof UserPrivateProfileListSchema
 >
 export type UserPublicProfileDTO = z.infer<typeof UserPublicProfileSchema>
+export type UserProfileUpdateUsernameDTO = z.infer<
+	typeof UserProfileUpdateUsernameSchema
+>
+export type UserProfileUpdateAvatarDTO = z.infer<
+	typeof UserProfileUpdateAvatarSchema
+>
+export type UserProfileUpdateDTO = z.infer<typeof UserProfileUpdateSchema>
+export type UpdateUserStatusDTO = z.infer<typeof UpdateUserStatusSchema>

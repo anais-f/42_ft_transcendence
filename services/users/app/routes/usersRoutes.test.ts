@@ -3,7 +3,7 @@
  * @description Integration tests for Users Routes with JWT and API Key authentication
  *
  * Test Suite Summary:
- * 1. POST /api/users/new-user - API Key protected
+ * 1. POST /api/internal/users/new-user - API Key protected
  * 2. GET /api/users/:id - JWT protected
  * 3. GET /api/users/me - JWT protected (own profile)
  * 4. PATCH /api/users/me - JWT protected (update username)
@@ -140,6 +140,7 @@ beforeAll(async () => {
 		}
 	}))
 
+	// Mock update controllers
 	await jest.unstable_mockModule(
 		'../controllers/updateUsersControllers.js',
 		() => ({
@@ -152,12 +153,12 @@ beforeAll(async () => {
 				)
 				try {
 					const userId = req.user?.user_id
+					const { username } = req.body
 					if (!userId || userId <= 0) {
 						return reply
 							.code(400)
 							.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
 					}
-					const { username } = req.body
 					await UpdateUsersServices.updateUsernameProfile(
 						{ user_id: userId },
 						username
@@ -171,7 +172,7 @@ beforeAll(async () => {
 						.send({ success: false, error: error.message })
 				}
 			},
-			updateAvatar: async (req: any, reply: FastifyReply) => {
+			updateAvatar: async (request: any, reply: FastifyReply) => {
 				const UpdateUsersServices = (
 					await import('../usecases/updateUsersServices.js')
 				).UpdateUsersServices
@@ -179,7 +180,7 @@ beforeAll(async () => {
 					'@ft_transcendence/common'
 				)
 				try {
-					const userId = req.user?.user_id
+					const userId = request.user?.user_id
 					if (!userId || userId <= 0) {
 						return reply
 							.code(400)
@@ -187,10 +188,30 @@ beforeAll(async () => {
 					}
 					await UpdateUsersServices.checkUserAvatar({
 						user_id: userId,
-						avatarBuffer: req.body,
+						avatarBuffer: Buffer.from('mock-avatar-data'),
 						originalName: 'test.png',
-						mimeType: req.headers['content-type'] || 'image/png'
+						mimeType: request.headers['content-type'] || 'image/png'
 					})
+					return reply
+						.code(200)
+						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+				} catch (error: any) {
+					return reply
+						.code(error.status || 500)
+						.send({ success: false, error: error.message })
+				}
+			},
+			updateUserStatus: async (req: any, reply: FastifyReply) => {
+				const UpdateUsersServices = (
+					await import('../usecases/updateUsersServices.js')
+				).UpdateUsersServices
+				const { ERROR_MESSAGES, SUCCESS_MESSAGES } = await import(
+					'@ft_transcendence/common'
+				)
+				try {
+					const { id } = req.params
+					const { status, lastConnection } = req.body
+					await UpdateUsersServices.updateUserStatus(id, status, lastConnection)
 					return reply
 						.code(200)
 						.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
@@ -233,15 +254,15 @@ describe('Users Routes - Authentication & Authorization', () => {
 	})
 
 	// ===========================================
-	// 1. POST /api/users/new-user - API KEY PROTECTED
+	// 1. POST /api/internal/users/new-user - API KEY PROTECTED
 	// ===========================================
-	describe('POST /api/users/new-user - API Key Protection', () => {
+	describe('POST /api/internal/users/new-user - API Key Protection', () => {
 		it('should create user with valid API key - SUCCESS', async () => {
 			UsersServices.createUser.mockResolvedValueOnce(undefined)
 
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': VALID_API_KEY,
 					'content-type': 'application/json'
@@ -259,7 +280,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject without API key - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'content-type': 'application/json'
 				},
@@ -278,7 +299,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject with invalid API key - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': 'wrong-key',
 					'content-type': 'application/json'
@@ -303,6 +324,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			UsersServices.getPublicUserProfile.mockResolvedValueOnce(mockProfile)
@@ -366,6 +388,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			UsersServices.getPrivateUserProfile.mockResolvedValueOnce(mockProfile)
@@ -517,7 +540,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 			UsersServices.createUser.mockResolvedValueOnce(undefined)
 			const apiKeyRoute = await app.inject({
 				method: 'POST',
-				url: '/api/users/new-user',
+				url: '/api/internal/users/new-user',
 				headers: {
 					'x-api-key': VALID_API_KEY,
 					'content-type': 'application/json'
@@ -531,6 +554,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 				user_id: 99,
 				username: 'test',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			})
 			const jwtRoute = await app.inject({
