@@ -1,3 +1,5 @@
+import { UserStatus } from '@ft_transcendence/common'
+
 /**
  * Notify users service about status change
  * @param userId - User ID
@@ -14,8 +16,8 @@ async function notifyStatusChange(
 		return
 	}
 
-	const statusValue = status === 'online' ? 1 : 0
-	const body: { status: number; lastConnection?: string } = {
+	const statusValue = status === 'online' ? UserStatus.ONLINE : UserStatus.OFFLINE
+	const body: { status: UserStatus; lastConnection?: string } = {
 		status: statusValue
 	}
 

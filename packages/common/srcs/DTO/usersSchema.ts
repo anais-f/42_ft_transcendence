@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { UserStatus } from "../interfaces/usersModels.js"
 
 const LOGIN_REGEX = /^[\w-]{4,32}$/
 const USERNAME_REGEX = /^[\w-]{4,32}$/
@@ -101,7 +102,7 @@ export const UpdateUserStatusSchema = z
 		lastConnection: z.string().datetime().optional()
 	})
 	.strict()
-	.refine((data) => data.status !== 0 || !!data.lastConnection, {
+	.refine((data) => data.status !== UserStatus.OFFLINE || !!data.lastConnection, {
 		message: 'lastConnection is required when status is 0 (offline)'
 	})
 	.meta({ description: 'Update user status schema' })

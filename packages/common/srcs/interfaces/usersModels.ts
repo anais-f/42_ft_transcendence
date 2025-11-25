@@ -25,7 +25,7 @@ export interface IPrivateUser {
 	user_id: number
 	username: string
 	avatar: string
-	status: number // e.g., 0 = offline, 1 = online, etc.
+	status: UserStatus // e.g., OFFLINE = 0, ONLINE = 1
 	last_connection: string // ISO timestamp
 }
 
@@ -43,3 +43,13 @@ export type IPublicProfileUser = Pick<
 	IPrivateUser,
 	'user_id' | 'username' | 'avatar' | 'status'
 >
+
+export enum UserStatus {
+  OFFLINE = 0,
+  ONLINE = 1
+}
+
+export enum RelationStatus {
+  PENDING = 0,
+  ACCEPTED = 1
+}

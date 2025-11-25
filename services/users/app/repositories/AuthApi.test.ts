@@ -38,10 +38,6 @@ let AUTH_SERVICE_URL: string
 let AUTH_API_SECRET: string
 
 beforeAll(async () => {
-	// Set environment variables BEFORE importing AuthApi
-	process.env.AUTH_SERVICE_URL = 'http://auth:3000'
-	process.env.AUTH_API_SECRET = 'test-secret-key'
-
 	// Store in local variables for use in tests
 	AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL
 	AUTH_API_SECRET = process.env.AUTH_API_SECRET

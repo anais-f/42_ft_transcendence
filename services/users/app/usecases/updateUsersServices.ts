@@ -1,9 +1,9 @@
-import { fileTypeFromBuffer } from 'file-type'
-import { AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
-import { UsersRepository } from '../repositories/usersRepository.js'
+import {fileTypeFromBuffer} from 'file-type'
+import {AppError, ERROR_MESSAGES, UserStatus} from '@ft_transcendence/common'
+import {UsersRepository} from '../repositories/usersRepository.js'
 import fs from 'fs/promises'
 import * as path from 'path'
-import { randomUUID } from 'crypto'
+import {randomUUID} from 'crypto'
 
 export interface CheckUserAvatarParams {
 	user_id: number
@@ -43,7 +43,7 @@ export class UpdateUsersServices {
 	/** Update user status (online/offline) */
 	static async updateUserStatus(
 		userId: number,
-		status: 0 | 1,
+		status: UserStatus,
 		lastConnection?: string
 	): Promise<void> {
 		if (!userId || userId <= 0) {
@@ -61,7 +61,7 @@ export class UpdateUsersServices {
 			return
 		}
 
-		if (status === 0 && !lastConnection) {
+		if (status === UserStatus.OFFLINE && !lastConnection) {
 			lastConnection = new Date().toISOString()
 		}
 

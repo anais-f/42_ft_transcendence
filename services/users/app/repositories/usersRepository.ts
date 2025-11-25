@@ -9,7 +9,8 @@ import {
 	IPublicUserAuth,
 	UserPublicProfileDTO,
 	ERROR_MESSAGES,
-	AppError
+	AppError,
+  UserStatus
 } from '@ft_transcendence/common'
 
 const defaultAvatar: string = '/avatars/img_default.png'
@@ -73,7 +74,7 @@ export class UsersRepository {
 			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, 0, now)
+		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, UserStatus.OFFLINE, now)
 	}
 
 	/**
@@ -117,10 +118,10 @@ export class UsersRepository {
 
 	static updateUserStatus(
 		user: IUserId,
-		status: number,
+		status: UserStatus,
 		lastConnection?: string
 	): void {
-		if (status === 0 && lastConnection) {
+		if (status === UserStatus.OFFLINE && lastConnection) {
 			const updateStmt = db.prepare(
 				'UPDATE users SET status = ?, last_connection = ? WHERE user_id = ?'
 			)
@@ -170,10 +171,10 @@ export class UsersRepository {
 		return row.avatar
 	}
 
-	static getUserStatusById(user: IUserId): number | undefined {
+	static getUserStatusById(user: IUserId): UserStatus | undefined {
 		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
 		const row = selectStmt.get(user.user_id) as { status: number } | undefined
-		return row?.status
+		return row?.status as UserStatus | undefined
 	}
 
 	/**
