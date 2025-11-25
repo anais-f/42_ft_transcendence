@@ -29,19 +29,19 @@ const pointE = new Vector2(-18, -2)
 const pointF = new Vector2(-18, 2)
 const padSeg1 = new Segment(pointE.clone(), pointF.clone())
 // @ts-ignore - TODO: use pad
-const pad1 = new PongPad([padSeg1])
+//const pad1 = new PongPad([padSeg1])
 
 const pointG = new Vector2(18, -2)
 const pointH = new Vector2(18, 2)
 const padSeg2 = new Segment(pointG.clone(), pointH.clone())
 // @ts-ignore - TODO: use pad
-const pad2 = new PongPad([padSeg2])
+//const pad2 = new PongPad([padSeg2])
 /* -------------- --- ---------------- */
 
 /* -------------- --- ---------------- */
 /* ------------- gameE --------------- */
 // TODO: start lobby management here instead of start a random game
-const scoreData: IScore = createScore(5)
+const scoreData: IScore = createScore(500000)
 let GE = new GameEngine(
 	60,
 	scoreData,
