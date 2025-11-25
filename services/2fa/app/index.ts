@@ -16,12 +16,15 @@ import {
 	disable2FASchema,
 	status2FASchema
 } from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
 })
 
 runMigrations()
+
+setupFastifyMonitoringHooks(app)
 
 function authServiceGuard(req: FastifyRequest, reply: FastifyReply): boolean {
 	const secret = req.headers['authorization']

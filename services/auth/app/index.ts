@@ -1,4 +1,4 @@
-import Fastify, { FastifyRequest, FastifyReply } from 'fastify'
+import Fastify from 'fastify'
 import { runMigrations } from './database/connection.js'
 import {
 	ZodTypeProvider,
@@ -11,10 +11,7 @@ import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import metricPlugin from 'fastify-metrics'
-import {
-	httpRequestCounter,
-	responseTimeHistogram
-} from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { findPublicUserByLogin } from './repositories/userRepository.js'
 import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
@@ -27,36 +24,7 @@ const app = Fastify({
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-app.decorateRequest('startTime', null)
-
-app.addHook(
-	'onRequest',
-	(request: FastifyRequest, reply: FastifyReply, done) => {
-		request.startTime = process.hrtime()
-		done()
-	}
-)
-
-app.addHook('onResponse', (request, reply) => {
-	httpRequestCounter.inc({
-		method: request.method,
-		route: request.url,
-		status_code: reply.statusCode
-	})
-	const startTime = request.startTime
-	if (startTime) {
-		const diff = process.hrtime(startTime)
-		const responseTimeInSeconds = diff[0] + diff[1] / 1e9
-		responseTimeHistogram.observe(
-			{
-				method: request.method,
-				route: request.url,
-				status_code: reply.statusCode
-			},
-			responseTimeInSeconds
-		)
-	}
-})
+setupFastifyMonitoringHooks(app)
 
 // readSecret now provided by @ft_transcendence/common
 

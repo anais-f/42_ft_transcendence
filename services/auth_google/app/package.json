@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@fastify/cors": "^11.1.0",
 		"@fastify/oauth2": "^8.1.2",
+		"@ft_transcendence/monitoring": "*",
 		"@ft_transcendence/common": "*"
 	},
 	"devDependencies": {

@@ -6,7 +6,7 @@
 		"moduleResolution": "nodenext"
 	},
 	"references": [{ "path": "../../../packages/common" }],
-	"include": ["./**/*"],
+	"include": ["./**/*", "../../../packages/monitoring/srcs/types"],
 	"ts-node": {
 		"esm": true
 	}

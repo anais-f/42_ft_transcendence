@@ -5,7 +5,6 @@ import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
 import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
-import { writeFileSync } from 'node:fs'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -15,10 +14,7 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
-import {
-	httpRequestCounter,
-	responseTimeHistogram
-} from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 const SWAGGER_TITTLE = 'API for Users Service'
 const SWAGGER_SERVER_URL = 'http://localhost:8080/users'
@@ -32,6 +28,8 @@ function createApp(): FastifyInstance {
 	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
+
+	setupFastifyMonitoringHooks(app)
 
 	const jwtSecret = process.env.JWT_SECRET
 	if (!jwtSecret) {
@@ -87,31 +85,7 @@ async function initializeUsers(): Promise<void> {
 
 export async function start(): Promise<void> {
 	const app = createApp()
-	app.addHook('onRequest', (request, reply, done) => {
-		;(request as any).startTime = process.hrtime()
-		done()
-	})
-
-	app.addHook('onResponse', (request, reply) => {
-		httpRequestCounter.inc({
-			method: request.method,
-			route: request.url,
-			status_code: reply.statusCode
-		})
-		const startTime = (request as any).startTime
-		if (startTime) {
-			const diff = process.hrtime(startTime)
-			const responseTimeInSeconds = diff[0] + diff[1] / 1e9
-			responseTimeHistogram.observe(
-				{
-					method: request.method,
-					route: request.url,
-					status_code: reply.statusCode
-				},
-				responseTimeInSeconds
-			)
-		}
-	})
+	// remove manual hooks, metrics plugin remains
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()

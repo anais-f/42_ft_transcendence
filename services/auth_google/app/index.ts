@@ -3,10 +3,7 @@ import fastifyOauth2, {
 	OAuth2Namespace,
 	FastifyOAuth2Options
 } from '@fastify/oauth2'
-import {
-	httpRequestCounter,
-	responseTimeHistogram
-} from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import metricPlugin from 'fastify-metrics'
 import { getGoogleCredentials } from './secrets.js'
 
@@ -29,31 +26,7 @@ const fastify: FastifyInstance = Fastify({
 	logger: { level: 'trace' }
 })
 
-fastify.addHook('onRequest', (request, reply, done) => {
-	;(request as any).startTime = process.hrtime()
-	done()
-})
-
-fastify.addHook('onResponse', (request, reply) => {
-	httpRequestCounter.inc({
-		method: request.method,
-		route: request.url,
-		status_code: reply.statusCode
-	})
-	const startTime = (request as any).startTime
-	if (startTime) {
-		const diff = process.hrtime(startTime)
-		const responseTimeInSeconds = diff[0] + diff[1] / 1e9
-		responseTimeHistogram.observe(
-			{
-				method: request.method,
-				route: request.url,
-				status_code: reply.statusCode
-			},
-			responseTimeInSeconds
-		)
-	}
-})
+setupFastifyMonitoringHooks(fastify)
 
 export const oauth2Options: FastifyOAuth2Options = {
 	name: 'googleOAuth2',

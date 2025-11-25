@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@ft_transcendence/common": "*",
+		"@ft_transcendence/monitoring": "*",
 		"better-sqlite3": "^9.4.0",
 		"otplib": "^12.0.1",
 		"qrcode": "^1.5.4"
