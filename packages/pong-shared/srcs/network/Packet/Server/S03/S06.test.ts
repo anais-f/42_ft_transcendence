@@ -37,7 +37,7 @@ describe('S06', () => {
 		const type = 0b11101
 		const v = new Vector2(324.32, -42)
 		const pos = new Vector2(32.3, 3)
-		const factor = .8
+		const factor = 0.8
 
 		view.setFloat64(0, timestamp, true)
 		view.setUint8(8, type)
@@ -62,7 +62,7 @@ describe('S06', () => {
 	test('serialize + deserialize', () => {
 		const pos = new Vector2(-23.322, -34)
 		const velo = new Vector2(23.2, 323)
-		const factor = .8
+		const factor = 0.8
 		const S06 = new S06BallSync(pos, factor, velo)
 		const buff = S06.serialize()
 		const S06Back = packetBuilder.deserializeS(buff)
