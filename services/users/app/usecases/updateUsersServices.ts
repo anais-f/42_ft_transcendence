@@ -1,9 +1,9 @@
-import {fileTypeFromBuffer} from 'file-type'
-import {AppError, ERROR_MESSAGES, UserStatus} from '@ft_transcendence/common'
-import {UsersRepository} from '../repositories/usersRepository.js'
+import { fileTypeFromBuffer } from 'file-type'
+import { AppError, ERROR_MESSAGES, UserStatus } from '@ft_transcendence/common'
+import { UsersRepository } from '../repositories/usersRepository.js'
 import fs from 'fs/promises'
 import * as path from 'path'
-import {randomUUID} from 'crypto'
+import { randomUUID } from 'crypto'
 
 export interface CheckUserAvatarParams {
 	user_id: number

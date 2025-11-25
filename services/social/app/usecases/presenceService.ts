@@ -16,7 +16,8 @@ async function notifyStatusChange(
 		return
 	}
 
-	const statusValue = status === 'online' ? UserStatus.ONLINE : UserStatus.OFFLINE
+	const statusValue =
+		status === 'online' ? UserStatus.ONLINE : UserStatus.OFFLINE
 	const body: { status: UserStatus; lastConnection?: string } = {
 		status: statusValue
 	}

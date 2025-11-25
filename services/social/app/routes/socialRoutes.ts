@@ -1,4 +1,5 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
+import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	jwtAuthMiddleware,
@@ -10,7 +11,6 @@ import { handleWsConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
 import {
 	UserIdSchema,
-	wsQuerySchema,
 	ErrorResponseSchema,
 	SuccessResponseSchema
 } from '@ft_transcendence/common'
@@ -35,15 +35,18 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	})
 
 	// GET /api/ws - WebSocket endpoint (WS token required)
-	await server.route({
-		method: 'GET',
-		url: '/api/social/ws',
-		websocket: true,
-		schema: {
-			querystring: wsQuerySchema
-		},
-		handler: (socket: any, request: FastifyRequest<{ Querystring: { token: string } }>) =>
-			handleWsConnection(socket, request, fastify)
+	// Register websocket without type provider (raw Fastify websocket)
+	fastify.register(async (fastify) => {
+		fastify.get<{ Querystring: { token: string } }>(
+			'/api/social/ws',
+			{ websocket: true },
+			(
+				socket: WebSocket,
+				request: FastifyRequest<{ Querystring: { token: string } }>
+			) => {
+				handleWsConnection(socket, request, fastify)
+			}
+		)
 	})
 
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)

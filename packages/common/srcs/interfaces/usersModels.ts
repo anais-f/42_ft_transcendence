@@ -45,11 +45,11 @@ export type IPublicProfileUser = Pick<
 >
 
 export enum UserStatus {
-  OFFLINE = 0,
-  ONLINE = 1
+	OFFLINE = 0,
+	ONLINE = 1
 }
 
 export enum RelationStatus {
-  PENDING = 0,
-  ACCEPTED = 1
+	PENDING = 0,
+	ACCEPTED = 1
 }

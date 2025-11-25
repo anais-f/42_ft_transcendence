@@ -10,7 +10,7 @@ import {
 	UserPublicProfileDTO,
 	ERROR_MESSAGES,
 	AppError,
-  UserStatus
+	UserStatus
 } from '@ft_transcendence/common'
 
 const defaultAvatar: string = '/avatars/img_default.png'
@@ -74,7 +74,13 @@ export class UsersRepository {
 			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, UserStatus.OFFLINE, now)
+		insertStmt.run(
+			user.user_id,
+			uniqueUsername,
+			defaultAvatar,
+			UserStatus.OFFLINE,
+			now
+		)
 	}
 
 	/**
