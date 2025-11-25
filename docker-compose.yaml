@@ -226,6 +226,32 @@ services:
       retries: 5
       start_period: 10s
 
+  social:
+    restart: on-failure
+    container_name: social
+    build:
+      context: .
+      dockerfile: services/social/Dockerfile
+    depends_on:
+      frontend:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+    networks:
+      - backend
+    volumes:
+      - db_social_data:/data
+    env_file:
+      - .env
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
 networks:
   pong:
     driver: bridge
@@ -235,6 +261,7 @@ networks:
 volumes:
   db_auth_data:
   db_users_data:
+  db_social_data:
   avatars_data:
   grafana_data:
   nginx_logs:

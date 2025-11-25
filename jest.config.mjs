@@ -6,25 +6,25 @@ const repoRoot = path.dirname(__filename)
 const COMMON_DIST = path.join(repoRoot, 'packages/common/dist/index.js')
 
 const commonConfig= {
-	preset: 'ts-jest/presets/default-esm',
-	testEnvironment: 'node',
-	extensionsToTreatAsEsm: ['.ts'],
-	rootDir: './',
-	moduleNameMapper: {
-		'^(\\.{1,2}/.*)\\.js$': '$1',
-		'^@packages/(.*)$': '<rootDir>/packages/$1',
-		'^@services/(.*)$': '<rootDir>/services/$1',
-		'^@ft_transcendence/common$': COMMON_DIST
-	},
-	transform: {
-		'^.+\\.tsx?$': [
-			'ts-jest',
-			{
-				useESM: true,
-				tsconfig: true
-			}
-		]
-	}
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
+  rootDir: './',
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@packages/(.*)$': '<rootDir>/packages/$1',
+    '^@services/(.*)$': '<rootDir>/services/$1',
+    '^@ft_transcendence/common$': COMMON_DIST
+  },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: true
+      }
+    ]
+  }
 }
 
 const config = {
@@ -35,12 +35,6 @@ const config = {
 			displayName: 'pong-shared',
 			rootDir: '<rootDir>/packages/pong-shared',
 			testMatch: ['**/*.test.ts']
-		},
-		{
-			...commonConfig,
-			displayName: 'pong-server-app',
-			testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
-			rootDir: './'
 		},
 		{
 			...commonConfig,

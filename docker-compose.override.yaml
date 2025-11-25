@@ -1,4 +1,8 @@
 services:
+  nginx:
+    volumes:
+      - avatars_data:/usr/share/nginx/html/avatars:ro
+
   install-dependencies:
     container_name: install-dependencies
     build:
@@ -6,6 +10,7 @@ services:
       dockerfile: .dev/Dockerfile.install
     volumes:
       - ./:/app
+
   auth:
     build:
       context: .
@@ -18,19 +23,21 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
   users:
     build:
       context: .
       dockerfile: services/users/Dockerfile.dev
     volumes:
       - ./:/app
-      - avatars_data:/app/avatars
+      - avatars_data:/app/services/users/app/avatars
     environment:
       - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
   auth_google:
     build:
       context: .
@@ -43,3 +50,19 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
+  social:
+    build:
+      context: .
+      dockerfile: services/social/Dockerfile.dev
+    volumes:
+      - ./:/app
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+
+volumes:
+  avatars_data:

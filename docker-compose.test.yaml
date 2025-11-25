@@ -16,7 +16,7 @@ services:
     networks:
       - backend
     env_file:
-      - .env.test
+      - .env
     depends_on:
       install-dependencies:
         condition: service_completed_successfully

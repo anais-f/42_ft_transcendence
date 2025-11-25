@@ -41,14 +41,14 @@ export class GameEngine {
 		this.startTime = Date.now()
 	}
 
-	private startGame(): void {
+	private _startGame(): void {
 		if (this.currentState === GameState.Started) return
 		this.currentState = GameState.Started
 		this.TPS_DATA.previousTime_MS = Date.now()
 		this.startTickLoop()
 	}
 
-	private pauseGame(): void {
+	private _pauseGame(): void {
 		this.currentState = GameState.Paused
 		if (this.tickTimer !== null) {
 			clearInterval(this?.tickTimer)
@@ -59,10 +59,10 @@ export class GameEngine {
 	public setState(gameState: GameState): void {
 		switch (gameState) {
 			case GameState.Started:
-				this.startGame()
+				this._startGame()
 				break
 			case GameState.Paused:
-				this.pauseGame()
+				this._pauseGame()
 				break
 		}
 	}
@@ -116,7 +116,7 @@ export class GameEngine {
 
 		++this.TPS_DATA.tickCount
 		if (this.score.p1 + this.score.p2 >= this.score.max) {
-			this.pauseGame()
+			this._pauseGame()
 		}
 
 		console.log(

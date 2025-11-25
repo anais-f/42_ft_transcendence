@@ -21,16 +21,27 @@
  * - Response malformation: JSON parse errors
  */
 
-import { jest, beforeEach, describe, test, expect } from '@jest/globals'
+import {
+	jest,
+	beforeEach,
+	beforeAll,
+	describe,
+	test,
+	expect
+} from '@jest/globals'
 
 let AuthApi: any
 let PublicUserListAuthSchema: any
 let AppError: any
 let mockFetch: any
-
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://auth:3000'
+let AUTH_SERVICE_URL: string
+let AUTH_API_SECRET: string
 
 beforeAll(async () => {
+	// Store in local variables for use in tests
+	AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL
+	AUTH_API_SECRET = process.env.AUTH_API_SECRET
+
 	mockFetch = jest.fn()
 
 	await jest.unstable_mockModule('node-fetch', () => ({
