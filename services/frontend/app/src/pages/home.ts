@@ -2,10 +2,11 @@ import { createButton } from '../components/button.js'
 import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
 import { createPopupElement, showPopup } from '../components/popUp.js'
+import { user } from '../index.js'
 
-export function renderHomePage(): void {
+export function renderHomePage(): HTMLElement {
 	const container = document.getElementById('content')
-	if (!container) return
+	if (!container) return document.createElement('div')
 	container.innerHTML = /*html*/ `
 	<section class="pt-6">
 		<h1 class="text-5xl font-bold text-center">Transcendence</h1>
@@ -15,7 +16,7 @@ export function renderHomePage(): void {
 	`
 
 	const imgHome = document.getElementById('img-home')
-	if (!imgHome) return
+	if (!imgHome) return document.createElement('div')
 
 	const imgHomePage: HTMLImageElement = createImg({
 		src: '/images/pong.avif',
@@ -24,7 +25,7 @@ export function renderHomePage(): void {
 	})
 
 	const btnHome = document.getElementById('btn-home')
-	if (!btnHome) return
+	if (!btnHome) return document.createElement('div')
 
 	const imgPopUpSin: HTMLImageElement = createImg({
 		src: '/images/lrio.jpg',
@@ -33,7 +34,7 @@ export function renderHomePage(): void {
 
 	const imgPopUpSup: HTMLImageElement = createImg({
 		src: '/images/mjuffard.jpg',
-		alt: 'lolo'
+		alt: 'mimi'
 	})
 
 	const btnSignIn: HTMLButtonElement = createButton({
@@ -41,11 +42,14 @@ export function renderHomePage(): void {
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-4 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-start-1 col-end-2',
 		name: 'Sign In',
 		onClick: (ev: MouseEvent) => {
-			showPopup(imgPopUpSin, {
-				id: 'popup-overlay',
-				className:
-					'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
-			})
+			// showPopup(imgPopUpSin, {
+			// 	id: 'popup-overlay',
+			// 	className:
+			// 		'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
+			// })
+			console.log(user.login)
+			user.login = true
+			console.log(user.login)
 		}
 	})
 
@@ -80,4 +84,5 @@ export function renderHomePage(): void {
 	btnHome.append(btnSignIn)
 	btnHome.append(btnSignUp)
 	btnHome.append(aOAuth)
+	return container
 }
