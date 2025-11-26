@@ -51,7 +51,7 @@ export async function setup2FAController(
 				qr_base64,
 				expires_at: new Date(pendingUntil).toISOString()
 			})
-		} catch (e: any) {
+		} catch (e) {
 			req.log.error(e)
 			return reply.code(500).send({ error: 'Internal error' })
 		}
@@ -101,7 +101,7 @@ export async function setup2FAController(
 					.code(500)
 					.send({ error: '2FA secret decrypt failed - check TOTP_ENC_KEY' })
 			}
-		} catch (e: any) {
+		} catch (e) {
 			req.log.error(e)
 			return reply.code(500).send({ error: 'Internal error' })
 		}
@@ -116,7 +116,7 @@ export async function setup2FAController(
 			const { user_id } = parsed.data
 			const ok = deleteSecret(user_id)
 			return reply.code(200).send({ success: true })
-		} catch (e: any) {
+		} catch (e) {
 			req.log.error(e)
 			return reply.code(500).send({ error: 'Internal error' })
 		}
@@ -131,7 +131,7 @@ export async function setup2FAController(
 			const { user_id } = parsed.data
 			const enc = getSecretEnc(user_id)
 			return reply.code(200).send({ enabled: !!enc })
-		} catch (e: any) {
+		} catch (e) {
 			req.log.error(e)
 			return reply.code(500).send({ error: 'Internal error' })
 		}
