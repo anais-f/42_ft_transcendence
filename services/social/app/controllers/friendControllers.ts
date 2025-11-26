@@ -2,31 +2,26 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
 import { IUserId, AppError } from '@ft_transcendence/common'
 
+// REVOIRBEARER
 async function handleFriendAction(
 	req: FastifyRequest,
 	reply: FastifyReply,
-	action: (userId: IUserId, friendId: IUserId) => Promise<void>,
+	action: (userId: IUserId, friendId: IUserId, bearer?: string) => Promise<void>,
 	successMessage: string
 ): Promise<void> {
 	try {
-		const user = req.user as { user_id?: number } | undefined
-		const userIdValue = Number(user?.user_id)
+		// JWT is already verified by jwtAuthMiddleware, req.user is guaranteed to exist
+		const userIdValue = (req.user as { user_id: number }).user_id
 
-		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
-			return void reply
-				.code(400)
-				.send({ success: false, error: 'Invalid user ID' })
-		}
-
-		const { friendId } = req.body as { friendId: number }
-		if (!friendId || !Number.isInteger(friendId) || friendId <= 0) {
-			return void reply
-				.code(400)
-				.send({ success: false, error: 'Invalid friend ID' })
-		}
+		// Body is already validated and coerced by UserIdCoerceSchema to { user_id: number }
+		// Zod ensures user_id is a positive integer, no undefined
+		const { user_id: friendId } = req.body as { user_id: number }
 
 		const userId: IUserId = { user_id: userIdValue }
 		const friendUserId: IUserId = { user_id: friendId }
+
+		// Do NOT forward Authorization header for service-to-service calls here.
+		// Use the internal API (USERS_API_SECRET) from UsersApi by default.
 
 		await action(userId, friendUserId)
 
@@ -111,16 +106,10 @@ export async function getFriendsListController(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const { userId } = req.params as { userId: string }
-		const userIdValue = Number(userId)
+		// Params are already validated and coerced by UserIdCoerceSchema
+		const { user_id: userId } = req.params as { user_id: number }
 
-		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
-			return void reply
-				.code(400)
-				.send({ success: false, error: 'Invalid user ID' })
-		}
-
-		const userIdObj: IUserId = { user_id: userIdValue }
+		const userIdObj: IUserId = { user_id: userId }
 		const friendsList = await FriendService.getFriendsList(userIdObj)
 
 		return void reply.code(200).send({ friends: friendsList })
@@ -144,17 +133,11 @@ export async function getPendingRequestsController(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const user = req.user as { user_id?: number } | undefined
-		const userIdValue = Number(user?.user_id)
+		// Params are already validated and coerced by UserIdCoerceSchema
+		const { user_id: userId } = req.params as { user_id: number }
 
-		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
-			return void reply
-				.code(400)
-				.send({ success: false, error: 'Invalid user ID' })
-		}
-
-		const userId: IUserId = { user_id: userIdValue }
-		const pendingRequests = await FriendService.getPendingRequests(userId)
+		const userIdObj: IUserId = { user_id: userId }
+		const pendingRequests = await FriendService.getPendingRequests(userIdObj)
 
 		return void reply.code(200).send(pendingRequests)
 	} catch (error) {

@@ -34,9 +34,10 @@ export function jwtAuthMiddleware(
 /**
  * @description Check valid JWT token and ownership
  * @use Routes where users can access and modify only their own resources
+ * @param request FastifyRequest with params containing userId
  */
 export function jwtAuthOwnerMiddleware(
-	request: FastifyRequest<{ Params: { userId: number } }>,
+	request: FastifyRequest,
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
@@ -50,7 +51,10 @@ export function jwtAuthOwnerMiddleware(
 		}
 
 		const userId = Number(request.user?.user_id)
-		const paramId = Number(request.params.userId)
+		// Support both userId and id param names
+		const paramId = Number(
+			(request.params as any)?.userId || (request.params as any)?.id
+		)
 
 		if (Number.isNaN(userId) || userId !== paramId) {
 			void reply.code(403).send({

@@ -37,10 +37,10 @@ export async function handleUserCreated(
 }
 
 export async function getPublicUser(
-	req: FastifyRequest & { params: { id: number } },
+	req: FastifyRequest & { params: { user_id: number } },
 	reply: FastifyReply
 ): Promise<void> {
-	const idNumber = req.params.id
+	const idNumber = req.params.user_id
 	console.log('Fetching user with id number:', idNumber)
 	console.log('requete recu :', req.params)
 

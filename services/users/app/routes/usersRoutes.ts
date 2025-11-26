@@ -47,8 +47,26 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	// GET /api/users/:id - Get public user profile (JWT required - authenticated users only)
 	server.route({
 		method: 'GET',
-		url: '/api/users/:id',
+		url: '/api/users/:user_id',
 		preHandler: [jwtAuthMiddleware],
+		schema: {
+			params: UserIdCoerceSchema,
+			response: {
+				200: UserPublicProfileSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
+		handler: getPublicUser
+	})
+
+	// INTERNAL: GET /api/internal/users/:user_id - Get public user profile for internal service-to-service calls (API Key required)
+	server.route({
+		method: 'GET',
+		url: '/api/internal/users/:user_id',
+		preHandler: [apiKeyMiddleware],
 		schema: {
 			params: UserIdCoerceSchema,
 			response: {
@@ -133,4 +151,6 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handler: updateUserStatus
 	})
+
+  //TODO: routes pour fetch toute la DB des users  (admin only)
 }

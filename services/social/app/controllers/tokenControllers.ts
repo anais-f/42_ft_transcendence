@@ -13,8 +13,5 @@ export async function createTokenController(
 
 	const { wsToken, expiresIn } = createWsToken(request.server, user)
 
-	reply.send({
-		wsToken,
-		expiresIn
-	})
+	reply.send({ wsToken, expiresIn })
 }
