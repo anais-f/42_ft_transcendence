@@ -14,14 +14,16 @@ import {
 	ErrorResponseSchema,
 	SuccessResponseSchema,
 	LogoutParamsSchema,
-  FriendsListResponseSchema
+	FriendsListSchema,
+	UserIdCoerceSchema
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
 	rejectFriendController,
 	acceptFriendController,
 	cancelFriendController,
-	removeFriendController
+	removeFriendController,
+	getFriendsListController
 } from '../controllers/friendControllers.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
@@ -163,22 +165,36 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: removeFriendController
 	})
 
-	// TODO : routes for friends list, friend requests list, etc.
-  // GET /api/social/friends - Get friends list (JWT required)
-  server.route({
-    method: 'GET',
-    url: '/api/social/friends',
-    preHandler: jwtAuthMiddleware,
-    schema: {
-      response: {
-        200: FriendsListResponseSchema,
-        400: ErrorResponseSchema,
-        401: ErrorResponseSchema,
-        500: ErrorResponseSchema
-      }
-    },
-    getFriendsListController
-  })
+	// GET /api/social/friends - Get friends list (JWT required)
+	server.route({
+		method: 'GET',
+		url: '/api/social/friends/:userId',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			params: UserIdCoerceSchema,
+			response: {
+				200: FriendsListSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
+		handler: getFriendsListController
+	})
 
-
+	// GET /api/social/pending-requests - Get pending friend requests (JWT required)
+	// server.route({
+	//   method: 'GET',
+	//   url: '/api/social/pending-requests',
+	//   preHandler: jwtAuthMiddleware,
+	//   schema: {
+	//     response: {
+	//       200: FriendsListResponseSchema,
+	//       400: ErrorResponseSchema,
+	//       401: ErrorResponseSchema,
+	//       500: ErrorResponseSchema
+	//     }
+	//   },
+	//   handler: getFriendsPendingRequestsController
+	// })
 }

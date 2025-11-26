@@ -12,48 +12,56 @@ import { handleUserOffline } from '../usecases/presenceService.js'
  * @param reply - Fastify reply
  */
 export async function handleLogout(
-	request: FastifyRequest<{ Params: { userId: number } }>,
+	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const targetUserId = String(request.params.userId)
-	const userFromToken = (request as any).user
+	const params = request.params as { userId: number }
+	const targetUserIdNum = params.userId
+	const userFromToken = request.user
 
 	try {
 		if (!userFromToken) {
-			return reply.code(401).send({
+			void reply.code(401).send({
 				success: false,
 				error: 'Not authenticated'
 			})
+			return
 		}
 
-		const userIdFromToken = String(userFromToken.user_id)
-		if (userIdFromToken !== targetUserId) {
+		if (userFromToken.user_id !== targetUserIdNum) {
 			console.warn(
-				`Security: User ${userIdFromToken} tried to logout user ${targetUserId}`
+				`Security: User ${userFromToken.user_id} tried to logout user ${targetUserIdNum}`
 			)
-			return reply.code(403).send({
+			void reply.code(403).send({
 				success: false,
 				error: 'You can only logout yourself'
 			})
+			return
 		}
 
-		const conn = wsConnections.get(targetUserId)
+		const targetUserKey = String(targetUserIdNum)
+		const conn = wsConnections.get(targetUserKey)
 
 		if (conn) {
 			if (conn.ws.readyState === 1) {
 				conn.ws.close(1000, 'User logged out')
 			}
-			removeConnection(targetUserId, conn.ws)
-		} else await handleUserOffline(targetUserId)
+			removeConnection(targetUserKey, conn.ws)
+		} else {
+			await handleUserOffline(targetUserKey)
+		}
 
-		reply.code(200).send({
+		void reply.code(200).send({
 			success: true,
-			message: `User ${targetUserId} logged out successfully`
+			message: `User ${targetUserKey} logged out successfully`
 		})
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to handle logout for user ${targetUserId}:`, message)
-		reply.code(500).send({
+		console.error(
+			`Failed to handle logout for user ${targetUserIdNum}:`,
+			message
+		)
+		void reply.code(500).send({
 			success: false,
 			error: 'Failed to handle logout'
 		})

@@ -1,5 +1,10 @@
 import { SocialRepository } from '../repositories/socialRepository.js'
-import { IUserId, AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
+import {
+	IUserId,
+	AppError,
+	ERROR_MESSAGES,
+	IPrivateUser
+} from '@ft_transcendence/common'
 import { UsersApi } from '../repositories/UsersApi.js'
 
 export class FriendService {
@@ -93,6 +98,17 @@ export class FriendService {
 		SocialRepository.deleteRelation(userId, friendId)
 
 		// TODO: notif ?
+	}
+
+	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
+		// verify user exists
+		const userExisted = await UsersApi.userExists(userId)
+		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+
+		const friendIds = SocialRepository.getFriendsList(userId)
+		return await Promise.all(
+			friendIds.map((friendId) => UsersApi.getUserData(friendId))
+		)
 	}
 }
 

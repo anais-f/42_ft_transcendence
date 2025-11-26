@@ -17,7 +17,8 @@ import {
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
 	UserProfileUpdateUsernameSchema,
-	UpdateUserStatusSchema
+	UpdateUserStatusSchema,
+	UserIdCoerceSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
@@ -49,7 +50,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/users/:id',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
-			params: z.object({ id: z.coerce.number().int().positive() }),
+			params: UserIdCoerceSchema,
 			response: {
 				200: UserPublicProfileSchema,
 				400: ErrorResponseSchema,

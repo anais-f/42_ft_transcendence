@@ -31,6 +31,12 @@ export const UserIdSchema = z
 	})
 	.meta({ description: 'User identifier schema' })
 
+export const UserIdCoerceSchema = z
+	.object({
+		user_id: z.coerce.number().int().positive()
+	})
+	.meta({ description: 'User identifier schema with coercion' })
+
 export const PublicUserAuthSchema = z
 	.object({
 		user_id: z.number().int().positive(),

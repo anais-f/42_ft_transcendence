@@ -5,7 +5,7 @@ import { IUserId, AppError } from '@ft_transcendence/common'
 async function handleFriendAction(
 	req: FastifyRequest,
 	reply: FastifyReply,
-	action: (userId: IUserId, friendId: IUserId) => void,
+	action: (userId: IUserId, friendId: IUserId) => Promise<void>,
 	successMessage: string
 ): Promise<void> {
 	try {
@@ -28,7 +28,7 @@ async function handleFriendAction(
 		const userId: IUserId = { user_id: userIdValue }
 		const friendUserId: IUserId = { user_id: friendId }
 
-		action(userId, friendUserId)
+		await action(userId, friendUserId)
 
 		return void reply.code(200).send({ success: true, message: successMessage })
 	} catch (error) {
@@ -104,4 +104,37 @@ export async function removeFriendController(
 		FriendService.removeFriend,
 		'Friend removed'
 	)
+}
+
+export async function getFriendsListController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const { userId } = req.params as { userId: string }
+		const userIdValue = Number(userId)
+
+		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
+			return void reply
+				.code(400)
+				.send({ success: false, error: 'Invalid user ID' })
+		}
+
+		const userIdObj: IUserId = { user_id: userIdValue }
+		const friendsList = await FriendService.getFriendsList(userIdObj)
+
+		return void reply.code(200).send({ friends: friendsList })
+	} catch (error) {
+		console.error(`Error fetching friends list:`, error)
+
+		if (error instanceof AppError) {
+			return void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+		}
+
+		return void reply
+			.code(500)
+			.send({ success: false, error: 'Internal server error' })
+	}
 }
