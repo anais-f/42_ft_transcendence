@@ -8,14 +8,16 @@ import { HomePage } from './pages/old_pages/old_home.js'
 export let user = {
 	username: 'UserName',
 	wins: 42,
-	losses: 27,
+	losses: 21,
 	lastLogin: '27-04-1994',
-	login: true
+	loggedIn: true
 }
 
 let pages: Record<string, () => string | HTMLElement> = {}
 
-document.addEventListener('DOMContentLoaded', () => {
+// export function dynrender(): void {
+	document.addEventListener('DOMContentLoaded', () => {
+		console.log("ALED")
 	const contentDiv = document.getElementById('content')
 	const dynamicMenu = document.getElementById('menu')
 
@@ -25,12 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 	const content: HTMLElement = contentDiv
 	const menu: HTMLElement = dynamicMenu
+	console.log('Rendering page:', user.loggedIn)
 
-	if (user.login === true) {
+	if (user.loggedIn === true) {
+		console.log('User is logged in')
 		pages = {
 			game: renderGame,
 			profile: renderProfile,
-			home: renderHomePage
 		}
 	} else {
 		pages = {
@@ -43,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		li.innerHTML = `<a href="#${key}">${key}</a>`
 		menu.prepend(li)
 	}
-	if (user.login === true) {
+	console.log(user.loggedIn)
+	if (user.loggedIn === true) {
 		const logout =
 			document.getElementById('logout') ?? document.createElement('div')
 		const loBtn = createButton({
@@ -51,8 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			className:
 				'bg-red-500 px-3 py-1 rounded-md border border-red-400 hover:bg-red-400',
 			onClick: () => {
-				user.login = false
-				renderHomePage()
+				user.loggedIn = false
+				logout.remove()
+				console.log(user.loggedIn)
+
 			}
 		})
 		logout.prepend(loBtn)
@@ -66,10 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (typeof res === 'string') {
 			content.innerHTML = res
 		} else {
-			content.append(res)
+
+			content.replaceChildren(res)
 		}
 	}
 
 	window.addEventListener('hashchange', () => render(location.hash))
 	render(location.hash)
 })
+// }
