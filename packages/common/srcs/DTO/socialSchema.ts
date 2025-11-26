@@ -11,3 +11,18 @@ export const FriendsListSchema = z.object({
 		})
 	)
 })
+
+export const PendingFriendsListSchema = z.object({
+	pendingFriends: z.array(
+		z.object({
+			user_id: z.number(),
+			username: z.string().min(1),
+			avatar: z.string().min(1)
+		})
+	)
+})
+
+export type FriendsListDTO = z.infer<typeof FriendsListSchema>['friends']
+export type PendingFriendsListDTO = z.infer<
+	typeof PendingFriendsListSchema
+>['pendingFriends']

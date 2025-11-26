@@ -28,7 +28,10 @@ export class AuthApi {
 		try {
 			response = await fetch(url, options)
 		} catch (err) {
-			throw new AppError('Failed to fetch users from auth: ' + (err as Error).message, 502)
+			throw new AppError(
+				'Failed to fetch users from auth: ' + (err as Error).message,
+				502
+			)
 		}
 
 		if (!response.ok) {

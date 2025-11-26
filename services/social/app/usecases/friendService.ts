@@ -3,7 +3,8 @@ import {
 	IUserId,
 	AppError,
 	ERROR_MESSAGES,
-	IPrivateUser
+	IPrivateUser,
+	PendingFriendsListDTO
 } from '@ft_transcendence/common'
 import { UsersApi } from '../repositories/UsersApi.js'
 
@@ -101,7 +102,6 @@ export class FriendService {
 	}
 
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
-		// verify user exists
 		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
 
@@ -110,10 +110,24 @@ export class FriendService {
 			friendIds.map((friendId) => UsersApi.getUserData(friendId))
 		)
 	}
+
+	static async getPendingRequests(
+		userId: IUserId
+	): Promise<{ pendingFriends: PendingFriendsListDTO }> {
+		const userExisted = await UsersApi.userExists(userId)
+		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+
+		const pendingIds = SocialRepository.getPendingRequests(userId)
+		const pendingFriends = await Promise.all(
+			pendingIds.map((pendingId) => UsersApi.getUserData(pendingId))
+		)
+
+		const filtered = pendingFriends.map(({ user_id, username, avatar }) => ({
+			user_id,
+			username,
+			avatar
+		}))
+
+		return { pendingFriends: filtered }
+	}
 }
-
-/*
-
-getFriendsList(userId) — call findFriendsList()
-getPendingRequests(userId) — call findPendingListToApprove() + findPendingSentRequests()
- */

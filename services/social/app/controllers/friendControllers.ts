@@ -138,3 +138,36 @@ export async function getFriendsListController(
 			.send({ success: false, error: 'Internal server error' })
 	}
 }
+
+export async function getPendingRequestsController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const user = req.user as { user_id?: number } | undefined
+		const userIdValue = Number(user?.user_id)
+
+		if (!userIdValue || !Number.isInteger(userIdValue) || userIdValue <= 0) {
+			return void reply
+				.code(400)
+				.send({ success: false, error: 'Invalid user ID' })
+		}
+
+		const userId: IUserId = { user_id: userIdValue }
+		const pendingRequests = await FriendService.getPendingRequests(userId)
+
+		return void reply.code(200).send(pendingRequests)
+	} catch (error) {
+		console.error(`Error fetching pending requests:`, error)
+
+		if (error instanceof AppError) {
+			return void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+		}
+
+		return void reply
+			.code(500)
+			.send({ success: false, error: 'Internal server error' })
+	}
+}

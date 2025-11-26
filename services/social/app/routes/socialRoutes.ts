@@ -23,8 +23,10 @@ import {
 	acceptFriendController,
 	cancelFriendController,
 	removeFriendController,
-	getFriendsListController
+	getFriendsListController,
+	getPendingRequestsController
 } from '../controllers/friendControllers.js'
+import { PendingFriendsListSchema } from '@packages/common/srcs/index.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -182,19 +184,19 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getFriendsListController
 	})
 
-	// GET /api/social/pending-requests - Get pending friend requests (JWT required)
-	// server.route({
-	//   method: 'GET',
-	//   url: '/api/social/pending-requests',
-	//   preHandler: jwtAuthMiddleware,
-	//   schema: {
-	//     response: {
-	//       200: FriendsListResponseSchema,
-	//       400: ErrorResponseSchema,
-	//       401: ErrorResponseSchema,
-	//       500: ErrorResponseSchema
-	//     }
-	//   },
-	//   handler: getFriendsPendingRequestsController
-	// })
+	// GET /api/social/pending-requests - Get pending friend requests (JWT required, owner only)
+	server.route({
+		method: 'GET',
+		url: '/api/social/pending-requests/me',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			response: {
+				200: PendingFriendsListSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
+		handler: getPendingRequestsController
+	})
 }
