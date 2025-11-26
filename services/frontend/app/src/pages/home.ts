@@ -11,7 +11,7 @@ export function renderHomePage(): HTMLElement {
 	<section class="pt-6">
 		<h1 class="text-5xl font-bold text-center">Transcendence</h1>
 		<div id="img-home"></div>
-		<div id="btn-home" class="grid grid-cols-3 grid-rows-3 p-4 gap-5 size-fit mx-auto"></div>
+		<div id="btn-home" class="grid grid-cols-[1fr_0.1fr_1fr] grid-rows-3 p-4 gap-5 size-fit mx-auto"></div>
 	</section>
 	`
 
@@ -47,9 +47,9 @@ export function renderHomePage(): HTMLElement {
 			// 	className:
 			// 		'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
 			// })
-			console.log(user.login)
-			user.login = true
-			console.log(user.login)
+			console.log(user.loggedIn)
+			user.loggedIn = true
+			console.log(user.loggedIn)
 		}
 	})
 

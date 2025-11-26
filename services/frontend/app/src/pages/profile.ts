@@ -23,29 +23,18 @@ export function renderProfile(): HTMLElement {
 		<main class="flex-1 flex items-center justify-center">
 		<section class="bg-gray-100 p-4 w-[40%] h-fit">
 			<h1 class="text-center text-blue-800 text-2xl">Play</h1>
-			<div class="grid grid-cols-3 grid-rows-3 gap-4">
+			<div class="grid grid-cols-[1fr_0.1fr_1fr] grid-rows-3 gap-4">
 				<span class="col-span-3"></span>
 				<div id="local">
 				</div>
 				<div id="remote" class="col-start-3">
 				</div>
-				<a href="#game" class="col-span-3">
-					<h2 class="text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-2 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl">Tournament</h2>
-				</a>
+				<div id="tournament" class="col-span-3">
+				</div>
 			</div>
 		</section>
 	</main>
-	<section class="flex flex-col items-end justify-end gap-1">
-		<a href="#friends" class="bg-gray-300 mx-3 px-3 rounded-md border border-gray-400  hover:bg-gray-400 shadow-xl">
-			<button>
-				<h2 class="text-blue-700">Friends</h2>
-			</button>
-		</a>
-		<a href="#requests" class="bg-gray-300 mx-2 px-2 rounded-md border border-gray-400  hover:bg-gray-400 shadow-xl">
-			<button>
-				<h2 class="text-blue-700">Requests</h2>
-			</button>
-		</a>
+	<section id="friends-requests" class="flex flex-col items-end justify-end gap-1">
 	</section>
 </div>
 </section>
@@ -98,10 +87,37 @@ export function renderProfile(): HTMLElement {
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl size-full'
 	})
 
+	const btnTournament = document.getElementById('tournament')
+	if (!btnTournament) return document.createElement('div')
+	const btnTournamentElement: HTMLButtonElement = createButton({
+		name: 'Tournament',
+		className:
+			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl size-full'
+	})
+
+	const btnFriends = document.getElementById('friends-requests')
+	if (!btnFriends) return document.createElement('div')
+	const btnFriendsElement: HTMLButtonElement = createButton({
+		name: 'Friends',
+		className:
+			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl w-full'
+	})
+
+	const btnRequests = document.getElementById('friends-requests')
+	if (!btnRequests) return document.createElement('div')
+	const btnRequestsElement: HTMLButtonElement = createButton({
+		name: 'Requests',
+		className:
+			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 rounded-md border border-gray-400 hover:bg-gray-400 text-center shadow-xl w-full'
+	})
+
 	imgProfile.append(imgProfilePage)
 	btnSettings.append(btnSettingsElement)
-	btnLocal.appendChild(btnLocalElement)
-	btnRemote.appendChild(btnRemoteElement)
+	btnLocal.append(btnLocalElement)
+	btnRemote.append(btnRemoteElement)
+	btnTournament.append(btnTournamentElement)
+	btnFriends.append(btnFriendsElement)
+	btnRequests.append(btnRequestsElement)
 
 	return container
 }
