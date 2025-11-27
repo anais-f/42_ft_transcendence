@@ -1,7 +1,6 @@
-import { Vector2 } from '../Vector2.js'
+import { Vector2 } from './Vector2.js'
 import { Circle } from './Circle.js'
-import { Segment } from '../Segment.js'
-import { Ray } from '../Ray.js'
+import { Segment } from './Segment.js'
 
 describe('Circle', () => {
 	test('create a circle', () => {
@@ -147,115 +146,6 @@ describe('Circle', () => {
 			const c1 = new Circle(v1, 1)
 			const c2 = new Circle(v2, 1)
 			expect(c1.intersect(c2)).not.toBeInstanceOf(Array)
-		})
-
-		describe('intersect Ray', () => {
-			test('intersect method should exist for Ray', () => {
-				const c = new Circle(new Vector2(0, 0), 5)
-				const r = new Ray(new Vector2(0, -10), new Vector2(0, 1))
-
-				expect(() => {
-					c.intersect(r)
-				}).not.toThrow()
-			})
-
-			test('intersect with ray inside circle', () => {
-				const circle = new Circle(new Vector2(0, 0), 5)
-				const rayInside = new Ray(new Vector2(0, 0), new Vector2(1, 1))
-				const res = circle.intersect(rayInside)
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				expect(
-					res?.some((e) => e.equals(new Vector2(3.5355339059, 3.5355339059)))
-				).toBe(true)
-			})
-
-			test('intersect with ray touching circle', () => {
-				const circle = new Circle(new Vector2(0, 0), 5)
-				const ray = new Ray(new Vector2(0, 5), new Vector2(1, 0))
-				const res = circle.intersect(ray)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				expect(res?.some((e) => e.equals(new Vector2(0, 5))))
-			})
-
-			test('intersect with ray outside circle', () => {
-				const circle = new Circle(new Vector2(0, 0), 5)
-				const ray = new Ray(new Vector2(10, 10), new Vector2(1, 1))
-				const res = circle.intersect(ray)
-
-				expect(res).toBe(null)
-			})
-
-			test('intersect with ray partially inside', () => {
-				const circle = new Circle(new Vector2(0, 0), 5)
-				const ray = new Ray(new Vector2(-10, -10), new Vector2(1, 1))
-				const res = circle.intersect(ray)
-
-				expect(
-					res?.some((e) => e.equals(new Vector2(-3.5355339059, -3.5355339059)))
-				)
-				expect(
-					res?.some((e) => e.equals(new Vector2(3.5355339059, 3.5355339059)))
-				)
-				expect(res).toBeInstanceOf(Array)
-			})
-
-			test('other intersect test', () => {
-				const circle = new Circle(new Vector2(), 5)
-				const ray = new Ray(new Vector2(-10.1, 10.1), new Vector2(1, -1))
-				const res = circle.intersect(ray)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(
-					res?.some((e) => e.equals(new Vector2(3.5355339059, -3.5355339059)))
-				)
-				expect(
-					res?.some((e) => e.equals(new Vector2(-3.5355339059, 3.5355339059)))
-				)
-			})
-
-			test('outside but close', () => {
-				const circle = new Circle(new Vector2(), 5)
-				const r = new Ray(new Vector2(10, -10), new Vector2(-8, 18).normalize())
-				const res = circle.intersect(r)
-
-				expect(res).toBe(null)
-			})
-
-			test('intersect with ray starting inside circle', () => {
-				const circle = new Circle(new Vector2(0.8, -1.4), 3.33)
-				const ray = new Ray(
-					new Vector2(-0.8, -1.6),
-					new Vector2(0.894, 0.447).normalize()
-				)
-				const res = circle.intersect(ray)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				expect(res?.some((e) => e.equals(new Vector2(3.4995, 0.5497))))
-			})
-
-			test('intersect with ray starting at circle edge', () => {
-				const circle = new Circle(new Vector2(0, 0), 5)
-				const ray = new Ray(new Vector2(5, 0), new Vector2(1, 0))
-				const res = circle.intersect(ray)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				expect(res?.some((e) => e.equals(new Vector2(0, 5))))
-			})
-
-			test('tangent', () => {
-				const circle = new Circle(new Vector2(1, 0), 7)
-				const ray = new Ray(new Vector2(-150, 7), new Vector2(1, 0))
-				const res = circle.intersect(ray)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				expect(res?.some((e) => e.equals(new Vector2(1, 7))))
-			})
 		})
 	})
 

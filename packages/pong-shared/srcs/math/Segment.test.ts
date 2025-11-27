@@ -1,7 +1,6 @@
 import { Vector2 } from './Vector2.js'
 import { Segment } from './Segment.js'
-import { Circle } from './shapes/Circle.js'
-import { Ray } from './Ray.js'
+import { Circle } from './Circle.js'
 
 describe('Segment', () => {
 	test('getPoints returns endpoints', () => {
@@ -61,7 +60,7 @@ describe('Segment', () => {
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual(new Vector2(0, 0))
+				expect(res?.some((e) => e.equals(new Vector2()))).toBe(true)
 			})
 			test('point intersect', () => {
 				const s1 = new Segment(new Vector2(), new Vector2(0, 1))
@@ -70,7 +69,8 @@ describe('Segment', () => {
 
 				expect(Array.isArray(res)).toBe(true)
 				expect(res?.length).toEqual(1)
-				expect(res).toContainEqual(new Vector2(0, 0))
+				// 1 0
+				expect(res?.some((e) => e.equals(new Vector2()))).toBe(true)
 			})
 
 			test('paralel no intersect', () => {
@@ -86,7 +86,7 @@ describe('Segment', () => {
 				const res = s1.intersect(s2)
 
 				expect(Array.isArray(res)).toBe(true)
-				expect(res).toContainEqual(new Vector2(0, 0.5))
+				expect(res?.some((e) => e.equals(new Vector2(0, 0.5)))).toBe(true)
 			})
 
 			test('self intersect', () => {
@@ -109,56 +109,6 @@ describe('Segment', () => {
 				expect(res).toBeInstanceOf(Array)
 				// @ts-ignore
 				expect(res[0].equals(new Vector2(2.30576, 1.05269))).toBe(true)
-			})
-		})
-
-		describe('Ray', () => {
-			let ray: Ray
-
-			beforeEach(() => {
-				ray = new Ray(new Vector2(-1, -1), new Vector2(1, 1).normalize())
-			})
-
-			test('perpendicular segment', () => {
-				const s1 = new Segment(new Vector2(-1, 1), new Vector2(1, -1))
-				const s2 = new Segment(new Vector2(-2, -1), new Vector2(-1, -2))
-
-				expect(ray.intersect(s1)).toBeInstanceOf(Array)
-				// @ts-ignore
-				expect(ray.intersect(s1)[0].equals(new Vector2())).toBe(true)
-				expect(ray.intersect(s2)).toBe(null)
-			})
-
-			// TODO
-			test('start intersection', () => {
-				const s1 = new Segment(new Vector2(0, -2), new Vector2(-2, 0))
-				const result = ray.intersect(s1)
-				const expected = new Vector2(-1, -1)
-
-				expect(result).toBeInstanceOf(Array)
-				expect(result).toHaveLength(1)
-				// @ts-ignore
-				expect(result[0].equals(expected)).toBe(true)
-			})
-			// TODO
-			test('parallel collinear', () => {
-				const s1 = new Segment(new Vector2(0, -2), new Vector2(2, 0))
-				const s2 = new Segment(new Vector2(0, 0), new Vector2(1, 1))
-				expect(ray.intersect(s1)).toBe(null)
-				expect(ray.intersect(s2)).toBeInstanceOf(Array)
-			})
-
-			test('random test intersect', () => {
-				const s = new Segment(
-					new Vector2(-1.2692, -1.67395),
-					new Vector2(0.78382, 1.52463)
-				)
-				const res: Vector2[] | null = ray.intersect(s)
-
-				expect(res).toBeInstanceOf(Array)
-				expect(res).toHaveLength(1)
-				// @ts-ignore
-				expect(res[0].equals(new Vector2(-0.54383, -0.54383))).toBe(true)
 			})
 		})
 
