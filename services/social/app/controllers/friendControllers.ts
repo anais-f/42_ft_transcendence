@@ -2,26 +2,19 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
 import { IUserId, AppError } from '@ft_transcendence/common'
 
-// REVOIRBEARER
+
 async function handleFriendAction(
 	req: FastifyRequest,
 	reply: FastifyReply,
-	action: (userId: IUserId, friendId: IUserId, bearer?: string) => Promise<void>,
+	action: (userId: IUserId, friendId: IUserId) => Promise<void>,
 	successMessage: string
 ): Promise<void> {
 	try {
-		// JWT is already verified by jwtAuthMiddleware, req.user is guaranteed to exist
 		const userIdValue = (req.user as { user_id: number }).user_id
-
-		// Body is already validated and coerced by UserIdCoerceSchema to { user_id: number }
-		// Zod ensures user_id is a positive integer, no undefined
 		const { user_id: friendId } = req.body as { user_id: number }
 
 		const userId: IUserId = { user_id: userIdValue }
 		const friendUserId: IUserId = { user_id: friendId }
-
-		// Do NOT forward Authorization header for service-to-service calls here.
-		// Use the internal API (USERS_API_SECRET) from UsersApi by default.
 
 		await action(userId, friendUserId)
 
@@ -106,7 +99,6 @@ export async function getFriendsListController(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		// Params are already validated and coerced by UserIdCoerceSchema
 		const { user_id: userId } = req.params as { user_id: number }
 
 		const userIdObj: IUserId = { user_id: userId }
@@ -133,7 +125,6 @@ export async function getPendingRequestsController(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		// Params are already validated and coerced by UserIdCoerceSchema
 		const { user_id: userId } = req.params as { user_id: number }
 
 		const userIdObj: IUserId = { user_id: userId }

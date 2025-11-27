@@ -12,12 +12,11 @@ export class FriendService {
 	static async sendFriendRequest(
 		userId: IUserId,
 		friendId: IUserId,
-		bearer?: string
 	): Promise<void> {
 		if (userId === friendId)
 			throw new AppError(ERROR_MESSAGES.CANNOT_ADD_YOURSELF, 400)
 
-		const friendExisted = await UsersApi.userExists(friendId, bearer)
+		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted)
 			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
@@ -47,9 +46,7 @@ export class FriendService {
 	static async acceptFriendRequest(
 		userId: IUserId,
 		friendId: IUserId,
-		bearer?: string
 	): Promise<void> {
-		void bearer
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status === -1)
 			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
@@ -68,9 +65,7 @@ export class FriendService {
 	static async rejectFriendRequest(
 		userId: IUserId,
 		friendId: IUserId,
-		bearer?: string
 	): Promise<void> {
-		void bearer
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
@@ -86,9 +81,7 @@ export class FriendService {
 	static async cancelFriendRequest(
 		userId: IUserId,
 		friendId: IUserId,
-		bearer?: string
 	): Promise<void> {
-		void bearer
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
@@ -102,9 +95,7 @@ export class FriendService {
 	static async removeFriend(
 		userId: IUserId,
 		friendId: IUserId,
-		bearer?: string
 	): Promise<void> {
-		void bearer
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 1) throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
 
@@ -115,9 +106,8 @@ export class FriendService {
 
 	static async getFriendsList(
 		userId: IUserId,
-		bearer?: string
 	): Promise<IPrivateUser[]> {
-		const userExisted = await UsersApi.userExists(userId, bearer)
+		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
 
 		const friendIds = SocialRepository.getFriendsList(userId)
@@ -128,14 +118,13 @@ export class FriendService {
 
 	static async getPendingRequests(
 		userId: IUserId,
-		bearer?: string
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {
-		const userExisted = await UsersApi.userExists(userId, bearer)
+		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
 
 		const pendingIds = SocialRepository.getPendingListToApprove(userId)
 		const pendingFriends = await Promise.all(
-			pendingIds.map((pendingId: IUserId) => UsersApi.getUserData(pendingId, bearer))
+			pendingIds.map((pendingId: IUserId) => UsersApi.getUserData(pendingId))
 		)
 
 		const filtered = pendingFriends.map(
