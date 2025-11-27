@@ -18,13 +18,13 @@ import {
 	PendingFriendsListSchema
 } from '@ft_transcendence/common'
 import {
-	requestFriendController,
-	rejectFriendController,
-	acceptFriendController,
-	cancelFriendController,
-	removeFriendController,
-	getFriendsListController,
-	getPendingRequestsController
+  requestFriendController,
+  rejectFriendController,
+  acceptFriendController,
+  cancelFriendController,
+  removeFriendController,
+  getFriendsListController,
+  getPendingRequestsController, getPendingSentRequestsController
 } from '../controllers/friendControllers.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
@@ -197,4 +197,20 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handler: getPendingRequestsController
 	})
+
+  // GET /api/social/requests-sent - Get sent friend requests (JWT required, owner only)
+  server.route({
+    method: 'GET',
+    url: '/api/social/requests-sent/me',
+    preHandler: jwtAuthMiddleware,
+    schema: {
+      response: {
+        200: PendingFriendsListSchema,
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema
+      }
+    },
+    handler: getPendingSentRequestsController
+  })
 }

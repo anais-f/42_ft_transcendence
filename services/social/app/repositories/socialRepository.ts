@@ -1,5 +1,5 @@
 import { db } from '../database/socialDatabase.js'
-import { IUserId } from '@ft_transcendence/common'
+import { IUserId, RelationStatus } from '@ft_transcendence/common'
 
 // Table relations
 // 0 -> pending
@@ -33,7 +33,7 @@ export class SocialRepository {
 			'INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)'
 		)
 		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
-		insertStmt.run(firstId, secondId, origin_id.user_id, 0)
+		insertStmt.run(firstId, secondId, origin_id.user_id, RelationStatus.PENDING)
 	}
 
 	static updateRelationStatus(

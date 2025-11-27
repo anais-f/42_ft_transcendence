@@ -50,6 +50,10 @@ export class FriendService {
     if (userId.user_id === friendId.user_id)
       throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
 
+    const friendExisted = await UsersApi.userExists(friendId)
+    if (!friendExisted)
+      throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status === -1)
 			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
@@ -72,6 +76,10 @@ export class FriendService {
     if (userId.user_id === friendId.user_id)
       throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
 
+    const friendExisted = await UsersApi.userExists(friendId)
+    if (!friendExisted)
+      throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
@@ -91,6 +99,10 @@ export class FriendService {
     if (userId.user_id === friendId.user_id)
       throw new AppError(ERROR_MESSAGES.CANNOT_CANCEL_YOURSELF, 400)
 
+    const friendExisted = await UsersApi.userExists(friendId)
+    if (!friendExisted)
+      throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
@@ -107,6 +119,10 @@ export class FriendService {
 	): Promise<void> {
     if (userId.user_id === friendId.user_id)
       throw new AppError(ERROR_MESSAGES.CANNOT_DELETE_YOURSELF, 400)
+
+    const friendExisted = await UsersApi.userExists(friendId)
+    if (!friendExisted)
+      throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 1) throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
@@ -157,4 +173,34 @@ export class FriendService {
 
 		return { pendingFriends: filtered }
 	}
+
+  static async getPendingSentRequests(
+    userId: IUserId,
+  ): Promise<IPrivateUser[]> {
+    const userExisted = await UsersApi.userExists(userId)
+    if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+
+    const pendingIds = SocialRepository.getPendingSentRequests(userId)
+    const pendingSentRequests = await Promise.all(
+        pendingIds.map((pendingId: IUserId) => UsersApi.getUserData(pendingId))
+    )
+
+    const filtered = pendingSentRequests.map(
+        ({
+           user_id,
+           username,
+           avatar
+         }: {
+          user_id: number
+          username: string
+          avatar: string
+        }) => ({
+          user_id,
+          username,
+          avatar
+        })
+    )
+
+    return { pendingSentRequests: filtered }
+  }
 }
