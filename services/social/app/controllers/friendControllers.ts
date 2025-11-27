@@ -98,11 +98,13 @@ export async function getFriendsListController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	try {
-		const { user_id: userId } = req.params as { user_id: number }
+	const userObj = (req.user as unknown) as { user_id?: unknown } | undefined
+	if (!userObj || typeof userObj.user_id !== 'number')
+		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
 
-		const userIdObj: IUserId = { user_id: userId }
-		const friendsList = await FriendService.getFriendsList(userIdObj)
+	try {
+		const userId: IUserId = { user_id: userObj.user_id }
+		const friendsList = await FriendService.getFriendsList(userId)
 
 		return void reply.code(200).send({ friends: friendsList })
 	} catch (error) {
@@ -125,9 +127,8 @@ export async function getPendingRequestsController(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const { user_id: userId } = req.params as { user_id: number }
-
-		const userIdObj: IUserId = { user_id: userId }
+		const userIdValue = (req.user as { user_id: number }).user_id
+		const userIdObj: IUserId = { user_id: userIdValue }
 		const pendingRequests = await FriendService.getPendingRequests(userIdObj)
 
 		return void reply.code(200).send(pendingRequests)

@@ -61,7 +61,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
 	server.route({
 		method: 'POST',
-		url: '/api/social/logout/:userId',
+		url: '/api/social/logout/:user_id',
 		preHandler: jwtAuthOwnerMiddleware,
 		schema: {
 			params: LogoutParamsSchema,
@@ -133,7 +133,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /api/cancel-friend - Cancel a friend request (JWT required)
 	server.route({
 		method: 'POST',
-		url: '/api/social/cancel-friend',
+		url: '/api/social/cancel-request-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			body: UserIdCoerceSchema,
@@ -169,10 +169,9 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	// GET /api/social/friends - Get friends list (JWT required)
 	server.route({
 		method: 'GET',
-		url: '/api/social/friends/:userId',
+		url: '/api/social/friends-list/me',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			params: UserIdCoerceSchema,
 			response: {
 				200: FriendsListSchema,
 				400: ErrorResponseSchema,

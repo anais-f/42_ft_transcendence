@@ -13,7 +13,7 @@ export class FriendService {
 		userId: IUserId,
 		friendId: IUserId,
 	): Promise<void> {
-		if (userId === friendId)
+    if (userId.user_id === friendId.user_id)
 			throw new AppError(ERROR_MESSAGES.CANNOT_ADD_YOURSELF, 400)
 
 		const friendExisted = await UsersApi.userExists(friendId)
@@ -47,6 +47,9 @@ export class FriendService {
 		userId: IUserId,
 		friendId: IUserId,
 	): Promise<void> {
+    if (userId.user_id === friendId.user_id)
+      throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status === -1)
 			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
@@ -66,6 +69,9 @@ export class FriendService {
 		userId: IUserId,
 		friendId: IUserId,
 	): Promise<void> {
+    if (userId.user_id === friendId.user_id)
+      throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
@@ -82,11 +88,14 @@ export class FriendService {
 		userId: IUserId,
 		friendId: IUserId,
 	): Promise<void> {
+    if (userId.user_id === friendId.user_id)
+      throw new AppError(ERROR_MESSAGES.CANNOT_CANCEL_YOURSELF, 400)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
-		if (originId === userId.user_id)
+		if (originId !== userId.user_id)
 			throw new AppError(ERROR_MESSAGES.CANNOT_CANCEL_YOURSELF, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
@@ -96,6 +105,9 @@ export class FriendService {
 		userId: IUserId,
 		friendId: IUserId,
 	): Promise<void> {
+    if (userId.user_id === friendId.user_id)
+      throw new AppError(ERROR_MESSAGES.CANNOT_DELETE_YOURSELF, 400)
+
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== 1) throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
 
@@ -112,7 +124,7 @@ export class FriendService {
 
 		const friendIds = SocialRepository.getFriendsList(userId)
 		return await Promise.all(
-			friendIds.map((friendId) => UsersApi.getUserData(friendId, bearer))
+			friendIds.map((friendId) => UsersApi.getUserData(friendId))
 		)
 	}
 
