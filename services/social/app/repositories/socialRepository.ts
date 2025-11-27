@@ -1,10 +1,6 @@
 import { db } from '../database/socialDatabase.js'
 import { IUserId, RelationStatus } from '@ft_transcendence/common'
 
-// Table relations
-// 0 -> pending
-// 1 -> friends
-
 export type RelationRow = { relation_status: number }
 export type RelationUserRow = { user_id: number; friend_id: number }
 

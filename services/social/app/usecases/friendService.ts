@@ -4,7 +4,8 @@ import {
 	AppError,
 	ERROR_MESSAGES,
 	IPrivateUser,
-	PendingFriendsListDTO
+	PendingFriendsListDTO,
+	RelationStatus
 } from '@ft_transcendence/common'
 import { UsersApi } from '../repositories/UsersApi.js'
 
@@ -24,16 +25,19 @@ export class FriendService {
 			userId,
 			friendId
 		)
-		if (existingRelation === 1)
+		if (existingRelation === RelationStatus.FRIENDS)
 			throw new AppError(ERROR_MESSAGES.RELATION_ALREADY_EXISTS, 400)
 
-		if (existingRelation === 0) {
+		if (existingRelation === RelationStatus.PENDING) {
 			const originId = SocialRepository.getOriginId(userId, friendId)
 			if (originId === userId.user_id)
 				throw new AppError(ERROR_MESSAGES.REQUEST_ALREADY_SENT, 400)
-			else {
-				//TODO : call le endpointpoint pour accepter l'invitation
-			}
+			else
+				await SocialRepository.updateRelationStatus(
+					userId,
+					friendId,
+					RelationStatus.FRIENDS
+				)
 		}
 
 		SocialRepository.addRelation(userId, friendId, userId)
@@ -57,7 +61,7 @@ export class FriendService {
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status === -1)
 			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
-		if (status === 1)
+		if (status === RelationStatus.FRIENDS)
 			throw new AppError(ERROR_MESSAGES.RELATION_ALREADY_EXISTS, 400)
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
@@ -81,7 +85,8 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
-		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
+		if (status !== RelationStatus.PENDING)
+			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId === userId.user_id)
@@ -104,7 +109,8 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
-		if (status !== 0) throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
+		if (status !== RelationStatus.PENDING)
+			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId !== userId.user_id)
@@ -122,7 +128,8 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
-		if (status !== 1) throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
+		if (status !== RelationStatus.FRIENDS)
+			throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
 

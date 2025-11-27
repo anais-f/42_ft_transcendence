@@ -99,3 +99,20 @@ Endpoints exposed by the service (extracted from `services/social/app/routes/soc
 - (Optional/disabled) GET /api/social/pending-requests
   - Protection: JWT
   - Purpose: return pending requests to approve / sent requests (route currently commented out)
+
+## WebSocket protocol
+
+The WebSocket endpoint `/api/social/ws` uses a simple JSON message protocol. Clients must authenticate using a temporary token obtained from `/api/social/create-token`.
+Messages sent by the server to clients include:
+
+- `message:echo` — echo response to client pings
+- `message:friend_status` — notifications about friends' presence status changes (online/offline)
+  Clients can send:
+- `message:ping` — to keep the connection alive and receive an echo response
+- `friends:request` - request the current friends list with presence information
+- `friends:accept` - accept a friend request
+- `friends:reject` - reject a friend request
+- `friends:remove` - remove a friend
+- `game:invite` - send a game invite to a friend
+- `game:accept` - accept a game invite
+- `game:reject` - reject a game invite

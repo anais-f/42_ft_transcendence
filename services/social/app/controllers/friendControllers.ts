@@ -15,7 +15,13 @@ async function handleFriendAction(
 		const userIdValue = (req.user as { user_id: number }).user_id
 		const userId: IUserId = { user_id: userIdValue }
 
-		const friendId = req.body.user_id
+		const friendIdRaw = (req.body as any)?.user_id
+		const friendId = Number(friendIdRaw)
+		if (!Number.isInteger(friendId)) {
+			return void reply
+				.code(400)
+				.send({ success: false, error: 'Invalid friend user_id' })
+		}
 		const friendUserId: IUserId = { user_id: friendId }
 
 		await action(userId, friendUserId)

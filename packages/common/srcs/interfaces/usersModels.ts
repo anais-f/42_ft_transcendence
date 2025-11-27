@@ -25,7 +25,7 @@ export interface IPrivateUser {
 	user_id: number
 	username: string
 	avatar: string
-	status: UserStatus // e.g., OFFLINE = 0, ONLINE = 1
+	status: UserStatus
 	last_connection: string // ISO timestamp
 }
 
@@ -51,5 +51,5 @@ export enum UserStatus {
 
 export enum RelationStatus {
 	PENDING = 0,
-	ACCEPTED = 1
+	FRIENDS = 1
 }

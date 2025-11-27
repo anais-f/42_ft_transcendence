@@ -34,6 +34,8 @@ export async function routeMessage(
 				}
 			})
 		)
+	} else if (messageType === 'friend:request') {
+		// Handle friend request message
 	} else
 		console.warn(
 			`⚠️ [MSG] Unknown message type from user ${userId}: ${messageType}`
