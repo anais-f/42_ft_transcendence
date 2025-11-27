@@ -28,45 +28,40 @@ const commonConfig= {
 }
 
 const config = {
-  rootDir: './',
-  projects: [
-    {
-      ...commonConfig,
-      displayName: 'pong-shared',
-      rootDir: '<rootDir>/packages/pong-shared',
-      testMatch: ['**/*.test.ts']
-    },
-    {
-      ...commonConfig,
-      displayName: 'pong-client',
-      rootDir: '<rootDir>/packages/pong-client',
-      testMatch: ['**/*.test.ts']
-    },
-    {
-      ...commonConfig,
-      displayName: 'pong-server',
-      rootDir: '<rootDir>/packages/pong-server',
-      testMatch: ['**/*.test.ts']
-    },
-    {
-      ...commonConfig,
-      displayName: 'pong-server',
-      testMatch: ['<rootDir>/services/pong-server/app/**/*.test.ts'],
-      rootDir: './'
-    },
-    {
-      ...commonConfig,
-      displayName: 'users',
-      rootDir: '<rootDir>/services/users/app',
-      testMatch: ['**/*.test.ts']
-    },
-    {
-      ...commonConfig,
-      displayName: 'auth',
-      rootDir: '<rootDir>/services/auth/app',
-      testMatch: ['**/*.test.ts']
-    }
-  ]
+	rootDir: './',
+	projects: [
+		{
+			...commonConfig,
+			displayName: 'pong-shared',
+			rootDir: '<rootDir>/packages/pong-shared',
+			testMatch: ['**/*.test.ts']
+		},
+		{
+			...commonConfig,
+			displayName: 'users',
+			rootDir: '<rootDir>/services/users/app',
+			testMatch: ['**/*.test.ts']
+		}
+		,
+		{
+			...commonConfig,
+			displayName: 'auth',
+			rootDir: '<rootDir>/services/auth/app',
+			testMatch: ['**/*.test.ts']
+		},
+		{
+			...commonConfig,
+			displayName: 'auth-google',
+			rootDir: '<rootDir>/services/auth_google/app',
+			testMatch: ['**/*.test.ts']
+		},
+		{
+			...commonConfig,
+			displayName: 'common-monitoring',
+			rootDir: '<rootDir>/packages/common/srcs/monitoring',
+			testMatch: ['**/*.test.ts']
+		}
+	]
 }
 
 export default config

@@ -1,8 +1,6 @@
 import { EPSILON } from '../define.js'
-import { Ray } from './Ray.js'
 import { Vector2 } from './Vector2.js'
-import { Circle } from './shapes/Circle.js'
-import { Polygon } from './shapes/Polygon.js'
+import { Circle } from './Circle.js'
 
 export class Segment {
 	constructor(
@@ -24,17 +22,11 @@ export class Segment {
 
 	intersect(other: Circle): Vector2[] | null
 	intersect(other: Segment): Vector2[] | null
-	intersect(other: Polygon): Vector2[] | null
-	intersect(other: Ray): Vector2[] | null
-	intersect(other: Circle | Segment | Polygon | Ray): Vector2[] | null {
+	intersect(other: Circle | Segment): Vector2[] | null {
 		if (other instanceof Circle) {
 			return this.intersectCircle(other)
 		} else if (other instanceof Segment) {
 			return this.intersectSeg(other)
-		} else if (other instanceof Polygon) {
-			return other.intersect(this)
-		} else if (other instanceof Ray) {
-			return other.intersect(this)
 		}
 		throw 'invalid Type in segment intersect'
 	}
@@ -56,17 +48,14 @@ export class Segment {
 			((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
 		) {
 			const t = d1 / (d1 - d2)
-			const intersectionPoint = Vector2.add(
-				a1,
-				Vector2.subtract(a2, a1).multiply(t)
-			)
-			return [intersectionPoint]
+			return [Vector2.add(a1, Vector2.subtract(a2, a1).multiply(t))]
 		}
 
 		let points: Vector2[] = []
 		if (a1.equals(b1) || a1.equals(b2)) {
 			points.push(a1)
 		}
+
 		if (a2.equals(b1) || a2.equals(b2)) {
 			points.push(a2)
 		}
@@ -135,14 +124,16 @@ export class Segment {
 
 		const points: Vector2[] = []
 		if (t1 >= 0 && t1 <= 1) {
-			points.push(Vector2.add(a, Vector2.multiply(d, t1)))
+			const hp = Vector2.add(a, Vector2.multiply(d, t1))
+			points.push(hp)
 		}
 		if (t2 >= 0 && t2 <= 1 && t2 !== t1) {
-			points.push(Vector2.add(a, Vector2.multiply(d, t2)))
+			const hp = Vector2.add(a, Vector2.multiply(d, t2))
+			points.push(hp)
 		}
 
 		if ((aIn || bIn) && points.length === 1) {
-			return [/*aIn ? a : b,*/ points[0]]
+			return [points[0]]
 		}
 
 		if (points.length > 0) {
@@ -207,5 +198,17 @@ export class Segment {
 		const normal = new Vector2(-dy, dx)
 
 		return normal.normalize()
+	}
+
+	public serialize(): ArrayBuffer {
+		// 32o
+		const merged = new Uint8Array(32)
+		merged.set(new Uint8Array(this.getP1().serialize()), 0)
+		merged.set(new Uint8Array(this.getP2().serialize()), 16)
+		return merged.buffer
+	}
+
+	clone(): Segment {
+		return new Segment(this.getP1().clone(), this.getP2().clone())
 	}
 }

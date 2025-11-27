@@ -1,14 +1,12 @@
-import { Ray } from '../Ray.js'
-import { Segment } from '../Segment.js'
-import { Vector2 } from '../Vector2.js'
-import { Polygon } from './Polygon.js'
-import { AShape } from './AShape.js'
+import { Segment } from './Segment.js'
+import { Vector2 } from './Vector2.js'
 
-export class Circle extends AShape {
+export class Circle {
 	private rad!: number
+	private origin: Vector2
 
 	constructor(origin: Vector2 = new Vector2(), rad: number) {
-		super(origin)
+		this.origin = origin
 		this.setRad(rad)
 	}
 
@@ -20,71 +18,27 @@ export class Circle extends AShape {
 		return this.rad
 	}
 
-	setRad(rad: number): void {
+	public setRad(rad: number): void {
 		if (rad <= 0) {
 			throw 'Invlalid Radius'
 		}
 		this.rad = rad
 	}
 
-	intersect(other: Segment): Vector2[] | null
-	intersect(other: Circle): Vector2[] | null
-	intersect(other: Ray): Vector2[] | null
-	intersect(other: Polygon): Vector2[] | null
+	public setOrigin(o: Vector2) {
+		this.origin = o
+	}
 
-	intersect(other: Segment | Ray | Polygon | Circle): Vector2[] | null {
+	public intersect(other: Segment): Vector2[] | null
+	public intersect(other: Circle): Vector2[] | null
+
+	intersect(other: Segment | Circle): Vector2[] | null {
 		if (other instanceof Segment) {
 			return other.intersect(this)
 		} else if (other instanceof Circle) {
 			return this.intersectCircle(other)
-		} else if (other instanceof Ray) {
-			return this.intersectRay(other)
-		} else if (other instanceof Polygon) {
-			return other.intersect(this)
 		}
 		throw 'Invalid type'
-	}
-
-	private intersectRay(other: Ray): Vector2[] | null {
-		function getHitPoint(ray: Ray, t: number): Vector2 {
-			return Vector2.add(
-				ray.getOrigin(),
-				Vector2.multiply(ray.getDirection(), t)
-			)
-		}
-
-		const op = Vector2.subtract(this.getOrigin(), other.getOrigin())
-		const squaredRad = this.getRad() ** 2
-		const dotOp = Vector2.dot(op, op)
-
-		const D = Vector2.dot(other.getDirection(), op)
-		const H2 = dotOp - D ** 2
-
-		if (H2 > squaredRad) {
-			return null
-		}
-
-		const K = Math.sqrt(squaredRad - H2)
-
-		if (dotOp <= squaredRad) {
-			const t = D + K
-			return [getHitPoint(other, t)]
-		}
-
-		const t1 = D - K
-		const t2 = D + K
-
-		if (t1 < 0) {
-			return null
-		}
-
-		const p1 = getHitPoint(other, t1)
-		const p2 = getHitPoint(other, t2)
-
-		if (p1.equals(p2)) {
-			return [p1]
-		}
-		return [p1, p2]
 	}
 
 	private intersectCircle(other: Circle): Vector2[] | null {
@@ -133,6 +87,7 @@ export class Circle extends AShape {
 		) {
 			return [this.getRad() > other.getRad() ? other.getPos() : this.getPos()]
 		}
+
 		return [t1, t2]
 	}
 
@@ -146,6 +101,6 @@ export class Circle extends AShape {
 	}
 
 	public getNormalAt(point: Vector2): Vector2 {
-		return Vector2.subtract(point, this.getOrigin()).normalize()
+		return Vector2.subtract(point, this.origin).normalize()
 	}
 }
