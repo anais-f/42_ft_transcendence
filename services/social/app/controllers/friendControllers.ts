@@ -2,7 +2,6 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
 import { IUserId, AppError } from '@ft_transcendence/common'
 
-
 async function handleFriendAction(
 	req: FastifyRequest,
 	reply: FastifyReply,
@@ -12,12 +11,12 @@ async function handleFriendAction(
 	if (!req.user || typeof (req.user as any).user_id !== 'number')
 		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
 
-  try {
-    const userIdValue = (req.user as { user_id: number }).user_id;
-    const userId: IUserId = { user_id: userIdValue };
+	try {
+		const userIdValue = (req.user as { user_id: number }).user_id
+		const userId: IUserId = { user_id: userIdValue }
 
-    const friendId = req.body.user_id;
-    const friendUserId: IUserId = { user_id: friendId };
+		const friendId = req.body.user_id
+		const friendUserId: IUserId = { user_id: friendId }
 
 		await action(userId, friendUserId)
 
@@ -154,28 +153,29 @@ export async function getPendingRequestsController(
 }
 
 export async function getPendingSentRequestsController(
-  req: FastifyRequest,
-  reply: FastifyReply): Promise<void> {
-  const userIdValue = (req.user as any)?.user_id
-  if (typeof userIdValue !== 'number')
-    return void reply.code(401).send({ success: false, error: 'Unauthorized' })
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	const userIdValue = (req.user as any)?.user_id
+	if (typeof userIdValue !== 'number')
+		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
 
-  try {
-    const userId: IUserId = { user_id: userIdValue }
-    const pendingRequests = await FriendService.getPendingSentRequests(userId)
+	try {
+		const userId: IUserId = { user_id: userIdValue }
+		const pendingRequests = await FriendService.getPendingSentRequests(userId)
 
-    return void reply.code(200).send(pendingRequests)
-  } catch (error) {
-    console.error(`Error fetching pending requests:`, error)
+		return void reply.code(200).send(pendingRequests)
+	} catch (error) {
+		console.error(`Error fetching pending requests:`, error)
 
-    if (error instanceof AppError) {
-      return void reply
-          .code(error.status)
-          .send({ success: false, error: error.message })
-    }
+		if (error instanceof AppError) {
+			return void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+		}
 
-    return void reply
-        .code(500)
-        .send({ success: false, error: 'Internal server error' })
-  }
+		return void reply
+			.code(500)
+			.send({ success: false, error: 'Internal server error' })
+	}
 }

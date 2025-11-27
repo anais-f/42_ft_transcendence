@@ -28,7 +28,7 @@ export const ERROR_MESSAGES = {
 	CANNOT_REMOVE_YOURSELF: 'Cannot remove yourself as a friend',
 	CANNOT_CANCEL_YOURSELF: 'Cannot cancel yourself as a friend',
 	CANNOT_ADD_YOURSELF: 'Cannot add yourself as a friend',
-  CANNOT_DELETE_YOURSELF: 'Cannot delete yourself as a friend',
+	CANNOT_DELETE_YOURSELF: 'Cannot delete yourself as a friend',
 	NOT_FRIENDS: 'You are not friends'
 } as const
 

@@ -152,5 +152,5 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: updateUserStatus
 	})
 
-  //TODO: routes pour fetch toute la DB des users  (admin only)
+	//TODO: routes pour fetch toute la DB des users  (admin only)
 }

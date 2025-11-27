@@ -39,7 +39,7 @@ export async function handleWsConnection(
 	const userId = String(payload.user_id)
 	const userLogin = String(payload.login)
 
-  //TODO : convertir le login en username pour l'envoyer au client
+	//TODO : convertir le login en username pour l'envoyer au client
 
 	// Add connection
 	try {

@@ -18,13 +18,14 @@ import {
 	PendingFriendsListSchema
 } from '@ft_transcendence/common'
 import {
-  requestFriendController,
-  rejectFriendController,
-  acceptFriendController,
-  cancelFriendController,
-  removeFriendController,
-  getFriendsListController,
-  getPendingRequestsController, getPendingSentRequestsController
+	requestFriendController,
+	rejectFriendController,
+	acceptFriendController,
+	cancelFriendController,
+	removeFriendController,
+	getFriendsListController,
+	getPendingRequestsController,
+	getPendingSentRequestsController
 } from '../controllers/friendControllers.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
@@ -37,7 +38,10 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: z.object({ wsToken: z.string(), expiresIn: z.number().int().nonnegative() })
+				200: z.object({
+					wsToken: z.string(),
+					expiresIn: z.number().int().nonnegative()
+				})
 			}
 		},
 		handler: createTokenController
@@ -64,7 +68,6 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/logout/me',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			params: LogoutParamsSchema,
 			response: {
 				200: SuccessResponseSchema,
 				400: ErrorResponseSchema,
@@ -198,19 +201,19 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getPendingRequestsController
 	})
 
-  // GET /api/social/requests-sent - Get sent friend requests (JWT required, owner only)
-  server.route({
-    method: 'GET',
-    url: '/api/social/requests-sent/me',
-    preHandler: jwtAuthMiddleware,
-    schema: {
-      response: {
-        200: PendingFriendsListSchema,
-        400: ErrorResponseSchema,
-        401: ErrorResponseSchema,
-        500: ErrorResponseSchema
-      }
-    },
-    handler: getPendingSentRequestsController
-  })
+	// GET /api/social/requests-sent - Get sent friend requests (JWT required, owner only)
+	server.route({
+		method: 'GET',
+		url: '/api/social/requests-sent/me',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			response: {
+				200: PendingFriendsListSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
+		handler: getPendingSentRequestsController
+	})
 }

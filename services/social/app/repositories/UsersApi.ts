@@ -2,7 +2,6 @@ import fetch from 'node-fetch'
 import { AppError, IUserId, IPrivateUser } from '@ft_transcendence/common'
 import { UserPrivateProfileSchema } from '@ft_transcendence/common'
 
-
 export class UsersApi {
 	/**
 	 * @description Check if a user exists by fetching their public profile
@@ -19,12 +18,12 @@ export class UsersApi {
 				500
 			)
 
-    const url = `${base}/api/internal/users/${user.user_id}`
-    const headers = {
-      'content-type': 'application/json',
-      authorization: secret
-    }
-    const options = { method: 'GET', headers }
+		const url = `${base}/api/internal/users/${user.user_id}`
+		const headers = {
+			'content-type': 'application/json',
+			authorization: secret
+		}
+		const options = { method: 'GET', headers }
 
 		let response
 		try {
@@ -36,7 +35,7 @@ export class UsersApi {
 			)
 		}
 
-    //REVOIR
+		//REVOIR
 		if (response.status === 404) return false
 		if (!response.ok) {
 			let bodyText = ''
@@ -69,13 +68,12 @@ export class UsersApi {
 				500
 			)
 
-    const url = `${base}/api/internal/users/${user.user_id}`
-    const headers = {
-      'content-type': 'application/json',
-      authorization: secret
-    }
-    const options = { method: 'GET', headers }
-
+		const url = `${base}/api/internal/users/${user.user_id}`
+		const headers = {
+			'content-type': 'application/json',
+			authorization: secret
+		}
+		const options = { method: 'GET', headers }
 
 		let response
 		try {
@@ -88,6 +86,7 @@ export class UsersApi {
 		}
 
 		if (response.status === 404) throw new AppError('User not found', 404)
+		// if (!response.ok) throw new AppError(`Users service HTTP ${response.status}`, 502)
 		if (!response.ok) {
 			let bodyText = ''
 			try {

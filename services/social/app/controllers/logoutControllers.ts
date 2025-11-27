@@ -15,7 +15,7 @@ export async function handleLogout(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const userFromToken = (request.user as any)
+	const userFromToken = request.user as any
 	const userIdValue = userFromToken?.user_id
 	if (typeof userIdValue !== 'number') {
 		void reply.code(401).send({ success: false, error: 'Unauthorized' })
