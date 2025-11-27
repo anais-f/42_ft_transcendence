@@ -61,8 +61,8 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
 	server.route({
 		method: 'POST',
-		url: '/api/social/logout/:user_id',
-		preHandler: jwtAuthOwnerMiddleware,
+		url: '/api/social/logout/me',
+		preHandler: jwtAuthMiddleware,
 		schema: {
 			params: LogoutParamsSchema,
 			response: {

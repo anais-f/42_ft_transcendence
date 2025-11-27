@@ -7,39 +7,24 @@ import { handleUserOffline } from '../usecases/presenceService.js'
 
 /**
  * Handle user logout - mark user as offline and close WebSocket connection
- * Called by Frontend: POST /api/logout/:userId (with JWT, user can only logout themselves)
- * @param request - Fastify request with userId (number) in params and JWT
+ * Called by Frontend: POST /api/logout/me (uses JWT to identify the user)
+ * @param request - Fastify request with JWT (user id inside request.user)
  * @param reply - Fastify reply
  */
 export async function handleLogout(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const params = request.params as { userId: number }
-	const targetUserIdNum = params.userId
-	const userFromToken = request.user
+	const userFromToken = (request.user as any)
+	const userIdValue = userFromToken?.user_id
+	if (typeof userIdValue !== 'number') {
+		void reply.code(401).send({ success: false, error: 'Unauthorized' })
+		return
+	}
+
+	const targetUserKey = String(userIdValue)
 
 	try {
-		if (!userFromToken) {
-			void reply.code(401).send({
-				success: false,
-				error: 'Not authenticated'
-			})
-			return
-		}
-
-		if (userFromToken.user_id !== targetUserIdNum) {
-			console.warn(
-				`Security: User ${userFromToken.user_id} tried to logout user ${targetUserIdNum}`
-			)
-			void reply.code(403).send({
-				success: false,
-				error: 'You can only logout yourself'
-			})
-			return
-		}
-
-		const targetUserKey = String(targetUserIdNum)
 		const conn = wsConnections.get(targetUserKey)
 
 		if (conn) {
@@ -57,10 +42,7 @@ export async function handleLogout(
 		})
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.error(
-			`Failed to handle logout for user ${targetUserIdNum}:`,
-			message
-		)
+		console.error(`Failed to handle logout for user ${targetUserKey}:`, message)
 		void reply.code(500).send({
 			success: false,
 			error: 'Failed to handle logout'
