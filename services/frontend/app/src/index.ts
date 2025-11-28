@@ -5,7 +5,7 @@ import { renderGame } from './pages/game.js'
 import { createButton } from './components/button.js'
 import { HomePage } from './pages/old_pages/old_home.js'
 
-export let user = {
+export let userLoc = {
 	username: 'UserName',
 	wins: 42,
 	losses: 21,
@@ -27,9 +27,9 @@ let pages: Record<string, () => string | HTMLElement> = {}
 	}
 	const content: HTMLElement = contentDiv
 	const menu: HTMLElement = dynamicMenu
-	console.log('Rendering page:', user.loggedIn)
+	console.log('Rendering page:', userLoc.loggedIn)
 
-	if (user.loggedIn === true) {
+	if (userLoc.loggedIn === true) {
 		console.log('User is logged in')
 		pages = {
 			game: renderGame,
@@ -46,8 +46,8 @@ let pages: Record<string, () => string | HTMLElement> = {}
 		li.innerHTML = `<a href="#${key}">${key}</a>`
 		menu.prepend(li)
 	}
-	console.log(user.loggedIn)
-	if (user.loggedIn === true) {
+	console.log(userLoc.loggedIn)
+	if (userLoc.loggedIn === true) {
 		const logout =
 			document.getElementById('logout') ?? document.createElement('div')
 		const loBtn = createButton({
@@ -55,9 +55,9 @@ let pages: Record<string, () => string | HTMLElement> = {}
 			className:
 				'bg-red-500 px-3 py-1 rounded-md border border-red-400 hover:bg-red-400',
 			onClick: () => {
-				user.loggedIn = false
+				userLoc.loggedIn = false
 				logout.remove()
-				console.log(user.loggedIn)
+				console.log(userLoc.loggedIn)
 
 			}
 		})

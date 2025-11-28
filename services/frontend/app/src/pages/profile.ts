@@ -2,7 +2,7 @@ import { createButton } from '../components/button.js'
 import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
 import { createPopupElement, showPopup } from '../components/popUp.js'
-import { user } from '../index.js'
+import { userLoc } from '../index.js'
 
 export function renderProfile(): HTMLElement {
 	const container = document.getElementById('content')
@@ -12,10 +12,10 @@ export function renderProfile(): HTMLElement {
 		<aside class=" bg-gray-200 flex flex-col w-1/4 items-center justify-between border-4 border-gray-400">
 			<div id="img-profile"></div>
 			<ul>
-				<li class="my-2">${user.username}</li>
-				<li class="my-2">Wins ${user.wins}</li>
-				<li class="my-2">Losses ${user.losses}</li>
-				<li class="my-2">Last Login ${user.lastLogin}</li>
+				<li class="my-2">${userLoc.username}</li>
+				<li class="my-2">Wins ${userLoc.wins}</li>
+				<li class="my-2">Losses ${userLoc.losses}</li>
+				<li class="my-2">Last Login ${userLoc.lastLogin}</li>
 			</ul>
 			<section id="btn-settings" class="mb-4">
 			</section>

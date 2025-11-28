@@ -4,7 +4,7 @@ import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
 import { createForm } from '../components/form.js'
 import { showPopup } from '../components/popUp.js'
-import { user } from '../index.js'
+import { userLoc } from '../index.js'
 
 export function renderHomePage(): HTMLElement {
 	const container = document.getElementById('content')
@@ -52,9 +52,10 @@ export function renderHomePage(): HTMLElement {
 			const user = {
 				login: data.get('login'),
 				password: data.get('password'),
-				validatePassword: data.get('validate-password')
 			}
-			if (user.password !== user.validatePassword) {
+			const validatePassword = data.get('validate-password')
+			if (user.password !== validatePassword) {
+				formPopUpSignIn.innerHTML += `<p class="text-red-500">Passwords do not match</p>`
 				console.error('Passwords do not match')
 				return
 			}
@@ -67,6 +68,12 @@ export function renderHomePage(): HTMLElement {
 					},
 					body: JSON.stringify(user)
 				})
+				if (res.ok) {
+					userLoc.loggedIn = true
+					window.location.hash = '#profile'
+				} else {
+					formPopUpSignIn.innerHTML += `<p class="text-red-500">Invalid login or password. Please try again.</p>`
+				}
 			} catch (error) {
 				console.error('Error signing in:', error)
 			}
@@ -95,14 +102,26 @@ export function renderHomePage(): HTMLElement {
 			}
 			console.log('Sign Up:', user.login, user.password)
 			try {
-				const res = await fetch('/auth/api/register', {
+				const res = await fetch('/auth/api/login', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify(user)
 				})
+				if (res.ok) {
+					userLoc.loggedIn = true
+					window.location.hash = '#profile'
+				} else {
+					formPopUpSignUp.innerHTML += `<p class="text-red-500">Invalid login or password. Please try again.</p>`
+				}
 			} catch (error) {
+				const errMessage = document.getElementById('form-popup-signup')
+				const message = `<p class="text-red-500">Error signing up. Please try again.</p>`
+				errMessage!.style.paddingBottom = '10px'
+				errMessage!.style.marginBottom = '10px'
+				errMessage!.innerHTML += message
+
 				console.error('Error signing up:', error)
 			}
 			user.login = ''
@@ -138,7 +157,7 @@ export function renderHomePage(): HTMLElement {
 	const aOAuth: HTMLAnchorElement = createLink({
 		className:
 			'p-2 text-blue-700 text-xl text-center self-center hover:text-cyan-700 bg-gray-300  rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-span-3',
-		href: 'https://www.google.com',
+		href: 'http://localhost:3000/auth-google/login/google',
 		img: logoGoogle,
 		title: 'Continue with Google'
 	})
