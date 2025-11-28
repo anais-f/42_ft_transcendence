@@ -10,7 +10,7 @@ export let user = {
 	wins: 42,
 	losses: 21,
 	lastLogin: '27-04-1994',
-	loggedIn: true
+	loggedIn: false
 }
 
 let pages: Record<string, () => string | HTMLElement> = {}
@@ -72,8 +72,7 @@ let pages: Record<string, () => string | HTMLElement> = {}
 		if (typeof res === 'string') {
 			content.innerHTML = res
 		} else {
-
-			content.replaceChildren(res)
+			content.append(res)
 		}
 	}
 
