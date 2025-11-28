@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "node --experimental-vm-modules ./node_modules/.bin/jest --config ./jest.config.ts ./**/*.test.ts",
-		"dev": "vite",
+		"dev": "vite --host --port 3000",
 		"build": "vite build",
 		"preview": "vite preview"
 	},
