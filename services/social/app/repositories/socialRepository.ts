@@ -1,0 +1,121 @@
+import { db } from '../database/socialDatabase.js'
+import { IUserId, RelationStatus } from '@ft_transcendence/common'
+
+// Table relations
+// 0 -> pending
+// 1 -> friends
+
+export type RelationRow = { relation_status: RelationStatus }
+export type RelationUserRow = { user_id: number; friend_id: number }
+
+export class SocialRepository {
+	private static getOrderedPair(a: IUserId, b: IUserId): [number, number] {
+		return a.user_id < b.user_id
+			? [a.user_id, b.user_id]
+			: [b.user_id, a.user_id]
+	}
+
+	static relationStatus(
+		user_id: IUserId,
+		friend_id: IUserId
+	): RelationStatus | -1 {
+		const selectStmt = db.prepare(
+			'SELECT relation_status FROM relations WHERE (user_id = ? AND friend_id = ?)'
+		)
+		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+		const row = selectStmt.get(firstId, secondId) as RelationRow | undefined
+		return row ? row.relation_status : -1
+	}
+
+	static addRelation(
+		user_id: IUserId,
+		friend_id: IUserId,
+		origin_id: IUserId
+	): void {
+		const insertStmt = db.prepare(
+			'INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)'
+		)
+		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+		insertStmt.run(firstId, secondId, origin_id.user_id, RelationStatus.PENDING)
+	}
+
+	static updateRelationStatus(
+		user_id: IUserId,
+		friend_id: IUserId,
+		status: RelationStatus
+	): void {
+		const updateStmt = db.prepare(
+			'UPDATE relations SET relation_status = ? WHERE (user_id = ? AND friend_id = ?)'
+		)
+		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+		updateStmt.run(status, firstId, secondId)
+	}
+
+	static deleteRelation(user_id: IUserId, friend_id: IUserId): void {
+		const deleteStmt = db.prepare(
+			'DELETE FROM relations WHERE user_id = ? AND friend_id = ?'
+		)
+		const [firstId, secondId] = this.getOrderedPair(user_id, friend_id)
+		const result = deleteStmt.run(firstId, secondId)
+
+		if (result.changes === 0) {
+			throw new Error('Relation does not exist')
+		}
+	}
+
+	static findFriendsList(user_id: IUserId): IUserId[] {
+		const selectStmt = db.prepare(
+			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND (user_id = ? OR friend_id = ?)'
+		)
+		const rows = selectStmt.all(
+			RelationStatus.ACCEPTED,
+			user_id.user_id,
+			user_id.user_id
+		) as RelationUserRow[]
+		const friends: IUserId[] = []
+		for (const row of rows) {
+			if (row.user_id === user_id.user_id)
+				friends.push({ user_id: row.friend_id })
+			else friends.push({ user_id: row.user_id })
+		}
+		return friends
+	}
+
+	static findPendingListToApprove(user_id: IUserId): IUserId[] {
+		const selectStmt = db.prepare(
+			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id != ? AND (user_id = ? OR friend_id = ?)'
+		)
+		const rows = selectStmt.all(
+			RelationStatus.PENDING,
+			user_id.user_id,
+			user_id.user_id,
+			user_id.user_id
+		) as RelationUserRow[]
+		const pending: IUserId[] = []
+		for (const row of rows) {
+			if (row.user_id === user_id.user_id)
+				pending.push({ user_id: row.friend_id })
+			else pending.push({ user_id: row.user_id })
+		}
+		return pending
+	}
+
+	static findPendingSentRequests(user_id: IUserId): IUserId[] {
+		const selectStmt = db.prepare(
+			'SELECT user_id, friend_id FROM relations WHERE relation_status = ? AND origin_id = ? AND (user_id = ? OR friend_id = ?)'
+		)
+		const rows = selectStmt.all(
+			RelationStatus.PENDING,
+			user_id.user_id,
+			user_id.user_id,
+			user_id.user_id
+		) as RelationUserRow[]
+		const pending: IUserId[] = []
+		for (const row of rows) {
+			if (row.user_id === user_id.user_id)
+				pending.push({ user_id: row.friend_id })
+			else pending.push({ user_id: row.user_id })
+		}
+		return pending
+	}
+}

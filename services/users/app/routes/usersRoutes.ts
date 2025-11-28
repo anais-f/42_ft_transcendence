@@ -6,7 +6,8 @@ import {
 } from '../controllers/usersControllers.js'
 import {
 	updateUsername,
-	updateAvatar
+	updateAvatar,
+	updateUserStatus
 } from '../controllers/updateUsersControllers.js'
 import {
 	SuccessResponseSchema,
@@ -14,7 +15,8 @@ import {
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
-	UserProfileUpdateUsernameSchema
+	UserProfileUpdateUsernameSchema,
+	UpdateUserStatusSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
@@ -23,9 +25,9 @@ import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
-	// POST /api/users/new-user - Create new user (API Key required)
+	// POST /api/internal/users/new-user - Create new user (API Key required)
 	server.post(
-		'/api/users/new-user',
+		'/api/internal/users/new-user',
 		{
 			schema: {
 				body: PublicUserAuthSchema,
@@ -115,5 +117,25 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			preHandler: jwtAuthMiddleware
 		},
 		updateAvatar
+	)
+
+	// PATCH /api/internal/users/:id/status - Update user status (API Key protected)
+	server.patch(
+		'/api/internal/users/:id/status',
+		{
+			schema: {
+				params: z.object({ id: z.coerce.number().int().positive() }),
+				body: UpdateUserStatusSchema,
+				response: {
+					200: SuccessResponseSchema,
+					400: ErrorResponseSchema,
+					401: ErrorResponseSchema,
+					404: ErrorResponseSchema,
+					500: ErrorResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
+		},
+		updateUserStatus
 	)
 }

@@ -176,4 +176,14 @@ export class Vector2 {
 			Math.max(v1.getY(), v2.getY())
 		)
 	}
+
+	public serialize(): ArrayBuffer {
+		const buff = new ArrayBuffer(16)
+		const view = new DataView(buff)
+
+		view.setFloat64(0, this.x, true)
+		view.setFloat64(8, this.y, true)
+
+		return buff
+	}
 }

@@ -4,7 +4,9 @@ import {
 	AppError,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES,
-	UserProfileUpdateUsernameSchema
+	UserProfileUpdateUsernameSchema,
+	UpdateUserStatusSchema,
+	UpdateUserStatusDTO
 } from '@ft_transcendence/common'
 import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
 
@@ -140,5 +142,45 @@ export async function updateAvatar(
 		void reply
 			.code(500)
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	}
+}
+
+export async function updateUserStatus(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const { id } = req.params as { id: number }
+		const body = req.body as UpdateUserStatusDTO
+
+		const parsed = UpdateUserStatusSchema.safeParse(body)
+		if (!parsed.success) {
+			console.error('UpdateUserStatus validation failed:', parsed.error)
+			void reply.code(400).send({
+				success: false,
+				error: ERROR_MESSAGES.INVALID_USER_DATA
+			})
+			return
+		}
+
+		const { status, lastConnection } = parsed.data
+
+		await UpdateUsersServices.updateUserStatus(id, status, lastConnection)
+
+		void reply
+			.code(200)
+			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
+	} catch (error: any) {
+		if (error instanceof AppError) {
+			void reply
+				.code(error.status)
+				.send({ success: false, error: error.message })
+		} else {
+			console.error('Unexpected error in updateUserStatus:', error)
+			void reply.code(500).send({
+				success: false,
+				error: ERROR_MESSAGES.INTERNAL_ERROR
+			})
+		}
 	}
 }
