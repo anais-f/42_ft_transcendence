@@ -1,7 +1,8 @@
 import { createButton } from '../components/button.js'
 import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
-import { createPopupElement, showPopup } from '../components/popUp.js'
+import { createForm } from '../components/form.js'
+import { showPopup } from '../components/popUp.js'
 import { user } from '../index.js'
 
 export function renderHomePage(): HTMLElement {
@@ -27,29 +28,51 @@ export function renderHomePage(): HTMLElement {
 	const btnHome = document.getElementById('btn-home')
 	if (!btnHome) return document.createElement('div')
 
-	const imgPopUpSin: HTMLImageElement = createImg({
-		src: '/images/lrio.jpg',
-		alt: 'lolo'
-	})
-
 	const imgPopUpSup: HTMLImageElement = createImg({
 		src: '/images/mjuffard.jpg',
 		alt: 'mimi'
 	})
 
+	const formPopUpSignIn: HTMLFormElement = createForm({
+		id: 'form-popup-signin',
+		className: 'flex gap-4',
+		label: ['Login', 'Password'],
+		input: [
+			{ id: 'login', type: 'text', name: 'login', required: true },
+			{ id: 'password', type: 'password', name: 'password', required: true }
+		],
+		button: {
+			text: 'Sign In',
+			type: 'submit',
+			className: 'bg-green-500 p-2 rounded',
+		},
+		onSubmit: async (data: FormData) => {
+			const user = {
+				login: data.get('login'),
+				password: data.get('password')
+			}
+			console.log('Sign In:', user.login, user.password)
+			try {
+				const res = await fetch('/auth/api/register', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(user)
+				})
+			} catch (error) {
+				console.error('Error signing in:', error)
+			}
+			user.login = ''
+			user.password = ''
+		}
+	})
 	const btnSignIn: HTMLButtonElement = createButton({
 		className:
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-4 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-start-1 col-end-2',
 		name: 'Sign In',
 		onClick: (ev: MouseEvent) => {
-			// showPopup(imgPopUpSin, {
-			// 	id: 'popup-overlay',
-			// 	className:
-			// 		'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
-			// })
-			console.log(user.loggedIn)
-			user.loggedIn = true
-			console.log(user.loggedIn)
+			showPopup(formPopUpSignIn)
 		}
 	})
 
@@ -58,11 +81,7 @@ export function renderHomePage(): HTMLElement {
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300  rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-start-3',
 		name: 'Sign Up',
 		onClick: (ev: MouseEvent) => {
-			showPopup(imgPopUpSup, {
-				id: 'popup-overlay',
-				className:
-					'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
-			})
+			// showPopup(formPopUpSignUp)
 		}
 	})
 
@@ -86,3 +105,13 @@ export function renderHomePage(): HTMLElement {
 	btnHome.append(aOAuth)
 	return container
 }
+
+
+// const formPopUpSignIn: HTMLElement = document.getElementById('popup-overlay') ?? document.body
+// 	formPopUpSignIn.innerHTML = /*html*/ `
+// 		<label for="username">Username</label>
+// 		<input type="text" id="username" name="username" required />
+// 		<label for="password">Password</label>
+// 		<input type="password" id="password" name="password" required />
+// 		<button type="submit">Sign In</button>
+// 	`
