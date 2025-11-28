@@ -10,6 +10,33 @@ import {
 import { UsersApi } from '../repositories/UsersApi.js'
 import { NotificationService } from './notificationService.js'
 
+
+async function sendNotification(
+  userId: IUserId,
+  friendId: IUserId,
+  notifyFn: (fromUserId: string, fromUsername: string, toUserId: string) => Promise<boolean>
+): Promise<boolean> {
+  try {
+    const userData = await UsersApi.getUserData(userId)
+    const fromUsername = userData?.username ?? 'Unknown'
+    const sent = await notifyFn(
+      String(userId.user_id),
+      fromUsername,
+      String(friendId.user_id)
+    )
+    if (!sent) {
+      console.log(
+        `User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
+      )
+    }
+    return sent
+  } catch (error) {
+    console.log('Failed to send friend request notification:', error)
+    return false
+  }
+}
+
+
 export class FriendService {
 	static async sendFriendRequest(
 		userId: IUserId,
@@ -39,60 +66,16 @@ export class FriendService {
 					friendId,
 					RelationStatus.FRIENDS
 				)
-				try {
-					const userData = await UsersApi.getUserData(userId)
-					const friendData = await UsersApi.getUserData(friendId)
 
-					const fromUserUsername = userData?.username ?? 'Unknown'
-					const fromFriendUsername = friendData?.username ?? 'Unknown'
-
-					const sentToUser = await NotificationService.friendAccepted(
-						String(userId.user_id),
-						fromUserUsername,
-						String(friendId.user_id)
-					)
-					if (!sentToUser) {
-						console.log(
-							`User ${String(friendId.user_id)}, ${fromUserUsername}, not connected, notification not sent FRIEND`
-						)
-					}
-
-					const sentToFriend = await NotificationService.friendAccepted(
-						String(friendId.user_id),
-						fromFriendUsername,
-						String(userId.user_id)
-					)
-					if (!sentToFriend) {
-						console.log(
-							`User ${String(userId.user_id)}, ${fromFriendUsername}, not connected, notification not sent FRIEND`
-						)
-					}
-				} catch (error) {
-					console.log('Failed to send friend accepted notification:', error)
-				}
+        await sendNotification(userId, friendId, NotificationService.friendAccepted)
+        await sendNotification(friendId, userId, NotificationService.friendAccepted)
 				return
 			}
 		}
 
 		SocialRepository.addRelation(userId, friendId, userId)
 
-		try {
-			const userData = await UsersApi.getUserData(userId)
-			const fromUsername = userData?.username ?? 'Unknown'
-			const sent = await NotificationService.friendRequest(
-				String(userId.user_id),
-				fromUsername,
-				String(friendId.user_id)
-			)
-			if (!sent) {
-				console.log(
-					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
-				)
-			}
-		} catch (error) {
-			console.log('Failed to send friend request notification:', error)
-		}
-
+		await sendNotification(userId, friendId, NotificationService.friendRequest)
 		return
 	}
 
@@ -118,23 +101,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
 
 		SocialRepository.updateRelationStatus(userId, friendId, 1)
-
-		try {
-			const userData = await UsersApi.getUserData(userId)
-			const fromUsername = userData?.username ?? 'Unknown'
-			const sent = await NotificationService.friendAccepted(
-				String(userId.user_id),
-				fromUsername,
-				String(friendId.user_id)
-			)
-			if (!sent) {
-				console.log(
-					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
-				)
-			}
-		} catch (error) {
-			console.log('Failed to send friend request notification:', error)
-		}
+		await sendNotification(userId, friendId, NotificationService.friendAccepted)
 	}
 
 	static async rejectFriendRequest(
@@ -157,23 +124,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
-
-		try {
-			const userData = await UsersApi.getUserData(userId)
-			const fromUsername = userData?.username ?? 'Unknown'
-			const sent = await NotificationService.friendRejected(
-				String(userId.user_id),
-				fromUsername,
-				String(friendId.user_id)
-			)
-			if (!sent) {
-				console.log(
-					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
-				)
-			}
-		} catch (error) {
-			console.log('Failed to send friend request notification:', error)
-		}
+		await sendNotification(userId, friendId, NotificationService.friendRejected)
 	}
 
 	static async cancelFriendRequest(
@@ -211,23 +162,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
-
-		try {
-			const userData = await UsersApi.getUserData(userId)
-			const fromUsername = userData?.username ?? 'Unknown'
-			const sent = await NotificationService.friendRemoved(
-				String(userId.user_id),
-				fromUsername,
-				String(friendId.user_id)
-			)
-			if (!sent) {
-				console.log(
-					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
-				)
-			}
-		} catch (error) {
-			console.log('Failed to send friend request notification:', error)
-		}
+    await sendNotification(userId, friendId, NotificationService.friendRemoved)
 	}
 
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {

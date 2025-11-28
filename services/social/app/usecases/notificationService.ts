@@ -54,7 +54,7 @@ export class NotificationService {
     return sent
   }
 
-  static friendRequest(
+  static async friendRequest(
       fromUserId: string,
       fromUsername: string,
       toUserId: string
@@ -67,7 +67,7 @@ export class NotificationService {
     )
   }
 
-  static friendAccepted(
+  static async friendAccepted(
       fromUserId: string,
       fromUsername: string,
       toUserId: string
@@ -80,7 +80,7 @@ export class NotificationService {
     )
   }
 
-  static friendRemoved(
+  static async friendRemoved(
       fromUserId: string,
       fromUsername: string,
       toUserId: string
@@ -93,7 +93,7 @@ export class NotificationService {
     )
   }
 
-  static friendRejected(
+  static async friendRejected(
       fromUserId: string,
       fromUsername: string,
       toUserId: string
