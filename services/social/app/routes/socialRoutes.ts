@@ -51,7 +51,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	// Register websocket without type provider (raw Fastify websocket)
 	fastify.register(async (fastify) => {
 		fastify.get<{ Querystring: { token: string } }>(
-			'/api/ws',
+			'/api/social/ws',
 			{ websocket: true },
 			(
 				socket: WebSocket,
