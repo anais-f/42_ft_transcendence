@@ -10,6 +10,7 @@
 **/dist/
 **/tsconfig.tsbuildinfo
 **/node_modules/
+package-lock.json
 *.sqlite
 
 TODO
