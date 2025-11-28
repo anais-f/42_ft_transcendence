@@ -91,9 +91,7 @@ export class UsersApi {
 			let bodyText = ''
 			try {
 				bodyText = await response.text()
-			} catch (_) {
-				// ignore
-			}
+			} catch (_) {}
 			throw new AppError(
 				`Users service HTTP ${response.status} - ${bodyText}`,
 				502

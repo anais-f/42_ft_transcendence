@@ -22,6 +22,13 @@ const MessagesTemplates: Record<
 		`${username} has rejected your friend request.`
 }
 
+/**
+ * Send notification to a user
+ * @param type
+ * @param fromUserId
+ * @param fromUsername
+ * @param toUserId
+ */
 function sendNotification(
 	type: NotificationType,
 	fromUserId: string,
@@ -51,6 +58,12 @@ function sendNotification(
 	return sent
 }
 
+/**
+ * Send friend request notification
+ * @param fromUserId
+ * @param fromUsername
+ * @param toUserId
+ */
 export async function friendRequestNotification(
 	fromUserId: string,
 	fromUsername: string,
@@ -64,6 +77,12 @@ export async function friendRequestNotification(
 	)
 }
 
+/**
+ * Send friend accepted notification
+ * @param fromUserId
+ * @param fromUsername
+ * @param toUserId
+ */
 export async function friendAcceptedNotification(
 	fromUserId: string,
 	fromUsername: string,
@@ -77,6 +96,12 @@ export async function friendAcceptedNotification(
 	)
 }
 
+/**
+ * Send friend removed notification
+ * @param fromUserId
+ * @param fromUsername
+ * @param toUserId
+ */
 export async function friendRemovedNotification(
 	fromUserId: string,
 	fromUsername: string,
@@ -90,6 +115,12 @@ export async function friendRemovedNotification(
 	)
 }
 
+/**
+ * Send friend rejected notification
+ * @param fromUserId
+ * @param fromUsername
+ * @param toUserId
+ */
 export async function friendRejectedNotification(
 	fromUserId: string,
 	fromUsername: string,

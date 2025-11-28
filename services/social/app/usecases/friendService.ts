@@ -15,6 +15,12 @@ import {
 	friendRemovedNotification
 } from './notificationService.js'
 
+/**
+ * Send a notification using the provided notify function
+ * @param userId
+ * @param friendId
+ * @param notifyFn
+ */
 async function sendNotification(
 	userId: IUserId,
 	friendId: IUserId,
@@ -45,6 +51,13 @@ async function sendNotification(
 }
 
 export class FriendService {
+	/**
+	 * Send a friend request from userId to friendId
+	 * If a pending request exists from friendId to userId, accept it instead
+	 * @param userId
+	 * @param friendId
+	 * @return void
+	 */
 	static async sendFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -86,6 +99,12 @@ export class FriendService {
 		return
 	}
 
+	/**
+	 * Accept a friend request from friendId to userId
+	 * @param userId
+	 * @param friendId
+	 * @return void
+	 */
 	static async acceptFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -111,6 +130,12 @@ export class FriendService {
 		await sendNotification(userId, friendId, friendAcceptedNotification)
 	}
 
+	/**
+	 * Reject a friend request from friendId to userId
+	 * @param userId
+	 * @param friendId
+	 * @return void
+	 */
 	static async rejectFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -134,6 +159,12 @@ export class FriendService {
 		await sendNotification(userId, friendId, friendRejectedNotification)
 	}
 
+	/**
+	 * Cancel a sent friend request from userId to friendId
+	 * @param userId
+	 * @param friendId
+	 * @return void
+	 */
 	static async cancelFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -156,6 +187,12 @@ export class FriendService {
 		SocialRepository.deleteRelation(userId, friendId)
 	}
 
+	/**
+	 * Remove a friend relationship between userId and friendId
+	 * @param userId
+	 * @param friendId
+	 * @return void
+	 */
 	static async removeFriend(userId: IUserId, friendId: IUserId): Promise<void> {
 		if (userId.user_id === friendId.user_id)
 			throw new AppError(ERROR_MESSAGES.CANNOT_DELETE_YOURSELF, 400)
@@ -172,6 +209,11 @@ export class FriendService {
 		await sendNotification(userId, friendId, friendRemovedNotification)
 	}
 
+	/**
+	 * Get the friends list for a user
+	 * @param userId
+	 * @return IPrivateUser[]
+	 */
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
 		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
@@ -182,6 +224,11 @@ export class FriendService {
 		)
 	}
 
+	/**
+	 * Get pending friend requests for a user
+	 * @param userId
+	 * @return PendingFriendsListDTO
+	 */
 	static async getPendingRequests(
 		userId: IUserId
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {

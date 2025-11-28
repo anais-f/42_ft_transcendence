@@ -2,8 +2,7 @@ import WebSocket from 'ws'
 import { sendToUser } from '../usecases/connectionManager.js'
 import { NotificationPayload } from '@ft_transcendence/common'
 
-// TODO : switch case with websocket type convention
-// maybe pour les invit de game
+// TODO: see if needed for game notifications
 
 /**
  * Route incoming messages to appropriate handlers
