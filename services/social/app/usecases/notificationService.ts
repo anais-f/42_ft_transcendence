@@ -22,87 +22,83 @@ const MessagesTemplates: Record<
 		`${username} has rejected your friend request.`
 }
 
-export class NotificationService {
-  static async sendNotification(
-      type: NotificationType,
-      fromUserId: string,
-      fromUsername: string,
-      toUserId: string
-  ): Promise<boolean> {
-    const notification: NotificationPayload = {
-      type: type,
-      data: {
-        from: {
-          userId: fromUserId,
-          username: fromUsername
-        },
-        timestamp: new Date().toISOString(),
-        message: MessagesTemplates[type](fromUsername)
-      }
-    }
+function sendNotification(
+	type: NotificationType,
+	fromUserId: string,
+	fromUsername: string,
+	toUserId: string
+): boolean {
+	const notification: NotificationPayload = {
+		type: type,
+		data: {
+			from: {
+				userId: fromUserId,
+				username: fromUsername
+			},
+			timestamp: new Date().toISOString(),
+			message: MessagesTemplates[type](fromUsername)
+		}
+	}
 
-    const sent = sendToUser(toUserId, notification)
-    if (sent)
-      console.log(
-          `${type} notification sent to ${toUserId}: ${notification.type}`
-      )
-    else
-      console.log(
-          `User ${toUserId} not connected, ${type} notification not sent NOTIFICATION`
-      )
+	const sent = sendToUser(toUserId, notification)
 
-    return sent
-  }
+	if (sent) {
+		console.log(`${type} notification sent to ${toUserId}`)
+	} else {
+		console.log(`User ${toUserId} not connected, ${type} notification not sent`)
+	}
 
-  static async friendRequest(
-      fromUserId: string,
-      fromUsername: string,
-      toUserId: string
-  ): Promise<boolean> {
-    return this.sendNotification(
-        NotificationType.FriendRequest,
-        fromUserId,
-        fromUsername,
-        toUserId
-    )
-  }
+	return sent
+}
 
-  static async friendAccepted(
-      fromUserId: string,
-      fromUsername: string,
-      toUserId: string
-  ): Promise<boolean> {
-    return this.sendNotification(
-        NotificationType.FriendAccept,
-        fromUserId,
-        fromUsername,
-        toUserId
-    )
-  }
+export async function friendRequestNotification(
+	fromUserId: string,
+	fromUsername: string,
+	toUserId: string
+): Promise<boolean> {
+	return sendNotification(
+		NotificationType.FriendRequest,
+		fromUserId,
+		fromUsername,
+		toUserId
+	)
+}
 
-  static async friendRemoved(
-      fromUserId: string,
-      fromUsername: string,
-      toUserId: string
-  ): Promise<boolean> {
-    return this.sendNotification(
-        NotificationType.FriendRemove,
-        fromUserId,
-        fromUsername,
-        toUserId
-    )
-  }
+export async function friendAcceptedNotification(
+	fromUserId: string,
+	fromUsername: string,
+	toUserId: string
+): Promise<boolean> {
+	return sendNotification(
+		NotificationType.FriendAccept,
+		fromUserId,
+		fromUsername,
+		toUserId
+	)
+}
 
-  static async friendRejected(
-      fromUserId: string,
-      fromUsername: string,
-      toUserId: string
-  ): Promise<boolean> {
-    return this.sendNotification(
-        NotificationType.FriendReject,
-        fromUserId,
-        fromUsername,
-        toUserId
-    )
-  }
+export async function friendRemovedNotification(
+	fromUserId: string,
+	fromUsername: string,
+	toUserId: string
+): Promise<boolean> {
+	return sendNotification(
+		NotificationType.FriendRemove,
+		fromUserId,
+		fromUsername,
+		toUserId
+	)
+}
+
+export async function friendRejectedNotification(
+	fromUserId: string,
+	fromUsername: string,
+	toUserId: string
+): Promise<boolean> {
+	return sendNotification(
+		NotificationType.FriendReject,
+		fromUserId,
+		fromUsername,
+		toUserId
+	)
 }

@@ -8,34 +8,41 @@ import {
 	RelationStatus
 } from '@ft_transcendence/common'
 import { UsersApi } from '../repositories/UsersApi.js'
-import { NotificationService } from './notificationService.js'
-
+import {
+	friendRequestNotification,
+	friendAcceptedNotification,
+	friendRejectedNotification,
+	friendRemovedNotification
+} from './notificationService.js'
 
 async function sendNotification(
-  userId: IUserId,
-  friendId: IUserId,
-  notifyFn: (fromUserId: string, fromUsername: string, toUserId: string) => Promise<boolean>
+	userId: IUserId,
+	friendId: IUserId,
+	notifyFn: (
+		fromUserId: string,
+		fromUsername: string,
+		toUserId: string
+	) => Promise<boolean>
 ): Promise<boolean> {
-  try {
-    const userData = await UsersApi.getUserData(userId)
-    const fromUsername = userData?.username ?? 'Unknown'
-    const sent = await notifyFn(
-      String(userId.user_id),
-      fromUsername,
-      String(friendId.user_id)
-    )
-    if (!sent) {
-      console.log(
-        `User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
-      )
-    }
-    return sent
-  } catch (error) {
-    console.log('Failed to send friend request notification:', error)
-    return false
-  }
+	try {
+		const userData = await UsersApi.getUserData(userId)
+		const fromUsername = userData?.username ?? 'Unknown'
+		const sent = await notifyFn(
+			String(userId.user_id),
+			fromUsername,
+			String(friendId.user_id)
+		)
+		if (!sent) {
+			console.log(
+				`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent`
+			)
+		}
+		return sent
+	} catch (error) {
+		console.log('Failed to send notification:', error)
+		return false
+	}
 }
-
 
 export class FriendService {
 	static async sendFriendRequest(
@@ -67,15 +74,15 @@ export class FriendService {
 					RelationStatus.FRIENDS
 				)
 
-        await sendNotification(userId, friendId, NotificationService.friendAccepted)
-        await sendNotification(friendId, userId, NotificationService.friendAccepted)
+				await sendNotification(userId, friendId, friendAcceptedNotification)
+				await sendNotification(friendId, userId, friendAcceptedNotification)
 				return
 			}
 		}
 
 		SocialRepository.addRelation(userId, friendId, userId)
 
-		await sendNotification(userId, friendId, NotificationService.friendRequest)
+		await sendNotification(userId, friendId, friendRequestNotification)
 		return
 	}
 
@@ -101,7 +108,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
 
 		SocialRepository.updateRelationStatus(userId, friendId, 1)
-		await sendNotification(userId, friendId, NotificationService.friendAccepted)
+		await sendNotification(userId, friendId, friendAcceptedNotification)
 	}
 
 	static async rejectFriendRequest(
@@ -124,7 +131,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
-		await sendNotification(userId, friendId, NotificationService.friendRejected)
+		await sendNotification(userId, friendId, friendRejectedNotification)
 	}
 
 	static async cancelFriendRequest(
@@ -162,7 +169,7 @@ export class FriendService {
 			throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
 
 		SocialRepository.deleteRelation(userId, friendId)
-    await sendNotification(userId, friendId, NotificationService.friendRemoved)
+		await sendNotification(userId, friendId, friendRemovedNotification)
 	}
 
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
