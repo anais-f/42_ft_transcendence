@@ -1,3 +1,4 @@
+import '../../style.css'
 import { createButton } from '../components/button.js'
 import { createLink } from '../components/link.js'
 import { createImg } from '../components/image.js'
@@ -36,20 +37,26 @@ export function renderHomePage(): HTMLElement {
 	const formPopUpSignIn: HTMLFormElement = createForm({
 		id: 'form-popup-signin',
 		className: 'flex gap-4',
-		label: ['Login', 'Password'],
+		label: ['Login', 'Password', 'Validate Password'],
 		input: [
 			{ id: 'login', type: 'text', name: 'login', required: true },
-			{ id: 'password', type: 'password', name: 'password', required: true }
+			{ id: 'password', type: 'password', name: 'password', required: true },
+			{ id: 'validate-password', type: 'password', name: 'validate-password', required: true, separator: true }
 		],
 		button: {
 			text: 'Sign In',
 			type: 'submit',
-			className: 'bg-green-500 p-2 rounded',
+			className: 'bg-green-500 border border-green-600 p-3',
 		},
 		onSubmit: async (data: FormData) => {
 			const user = {
 				login: data.get('login'),
-				password: data.get('password')
+				password: data.get('password'),
+				validatePassword: data.get('validate-password')
+			}
+			if (user.password !== user.validatePassword) {
+				console.error('Passwords do not match')
+				return
 			}
 			console.log('Sign In:', user.login, user.password)
 			try {
@@ -67,6 +74,43 @@ export function renderHomePage(): HTMLElement {
 			user.password = ''
 		}
 	})
+
+	const formPopUpSignUp: HTMLFormElement = createForm({
+		id: 'form-popup-signup',
+		className: 'flex gap-4',
+		label: ['Login', 'Password', 'Validate Password'],
+		input: [
+			{ id: 'login', type: 'text', name: 'login', required: true, separator: true },
+			{ id: 'password', type: 'password', name: 'password', required: true, separator: true },
+		],
+		button: {
+			text: 'Sign Up',
+			type: 'submit',
+			className: 'bg-green-500 border border-green-600 p-3',
+		},
+		onSubmit: async (data: FormData) => {
+			const user = {
+				login: data.get('login'),
+				password: data.get('password')
+			}
+			console.log('Sign Up:', user.login, user.password)
+			try {
+				const res = await fetch('/auth/api/register', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(user)
+				})
+			} catch (error) {
+				console.error('Error signing up:', error)
+			}
+			user.login = ''
+			user.password = ''
+		}
+	})
+
+
 	const btnSignIn: HTMLButtonElement = createButton({
 		className:
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300 p-4 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-start-1 col-end-2',
@@ -81,7 +125,7 @@ export function renderHomePage(): HTMLElement {
 			'text-blue-700 text-xl hover:text-cyan-700 bg-gray-300  rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl col-start-3',
 		name: 'Sign Up',
 		onClick: (ev: MouseEvent) => {
-			// showPopup(formPopUpSignUp)
+			showPopup(formPopUpSignUp)
 		}
 	})
 
