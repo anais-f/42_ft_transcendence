@@ -109,42 +109,10 @@ Messages sent by the server to clients include:
 - `message:friend_status` — notifications about friends' presence status changes (online/offline)
   Clients can send:
 - `message:ping` — to keep the connection alive and receive an echo response
-- `friends:request` - request the current friends list with presence information
-- `friends:accept` - accept a friend request
-- `friends:reject` - reject a friend request
-- `friends:remove` - remove a friend
+- `friend:request` - request the current friends list with presence information
+- `friend:accept` - accept a friend request
+- `friend:reject` - reject a friend request
+- `friend:remove` - remove a friend
 - `game:invite` - send a game invite to a friend
 - `game:accept` - accept a game invite
 - `game:reject` - reject a game invite
-
-
-
-
-
-Small server side notification system for friend events.
-
-\`Message format\`:
-
-- JSON object with:
-  - \`type\`: string (e.g. \`friends:request\`, \`friends:accept\`, \`friends:reject\`)
-  - \`data\`: object with:
-    - \`from\`: { userId, username }
-    - \`to\` (optional): { userId, username }
-    - \`timestamp\`: ISO string
-    - \`message\`: human message
-
-\`How it works\`:
-
-1. Server receives an action (ex: user A requests friendship with user B).
-2. Server builds a notification payload and calls \`sendToUser(B, payload)\`.
-3. If B is connected, client receives the payload in real time.
-
-\`Example client handling\`:
-
-- parse incoming JSON, switch on \`type\`, show UI notification, update local state.
-
-\`Files\`:
-
-- \`repo/services/social/app/usecases/notificationService.ts\` - helpers to build/send notifications
-- \`repo/services/social/app/usecases/connectionManager.ts\` - holds \`sendToUser\` and connections
-- \`repo/services/social/app/controllers/websocketControllers.ts\` - socket setup and message routing

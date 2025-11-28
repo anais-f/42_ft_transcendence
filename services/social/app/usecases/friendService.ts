@@ -8,6 +8,7 @@ import {
 	RelationStatus
 } from '@ft_transcendence/common'
 import { UsersApi } from '../repositories/UsersApi.js'
+import { NotificationService } from './notificationService.js'
 
 export class FriendService {
 	static async sendFriendRequest(
@@ -32,17 +33,65 @@ export class FriendService {
 			const originId = SocialRepository.getOriginId(userId, friendId)
 			if (originId === userId.user_id)
 				throw new AppError(ERROR_MESSAGES.REQUEST_ALREADY_SENT, 400)
-			else
+			else {
 				await SocialRepository.updateRelationStatus(
 					userId,
 					friendId,
 					RelationStatus.FRIENDS
 				)
+				try {
+					const userData = await UsersApi.getUserData(userId)
+					const friendData = await UsersApi.getUserData(friendId)
+
+					const fromUserUsername = userData?.username ?? 'Unknown'
+					const fromFriendUsername = friendData?.username ?? 'Unknown'
+
+					const sentToUser = await NotificationService.friendAccepted(
+						String(userId.user_id),
+						fromUserUsername,
+						String(friendId.user_id)
+					)
+					if (!sentToUser) {
+						console.log(
+							`User ${String(friendId.user_id)}, ${fromUserUsername}, not connected, notification not sent FRIEND`
+						)
+					}
+
+					const sentToFriend = await NotificationService.friendAccepted(
+						String(friendId.user_id),
+						fromFriendUsername,
+						String(userId.user_id)
+					)
+					if (!sentToFriend) {
+						console.log(
+							`User ${String(userId.user_id)}, ${fromFriendUsername}, not connected, notification not sent FRIEND`
+						)
+					}
+				} catch (error) {
+					console.log('Failed to send friend accepted notification:', error)
+				}
+				return
+			}
 		}
 
 		SocialRepository.addRelation(userId, friendId, userId)
 
-		// TODO: notification
+		try {
+			const userData = await UsersApi.getUserData(userId)
+			const fromUsername = userData?.username ?? 'Unknown'
+			const sent = await NotificationService.friendRequest(
+				String(userId.user_id),
+				fromUsername,
+				String(friendId.user_id)
+			)
+			if (!sent) {
+				console.log(
+					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
+				)
+			}
+		} catch (error) {
+			console.log('Failed to send friend request notification:', error)
+		}
 
 		return
 	}
@@ -70,7 +119,22 @@ export class FriendService {
 
 		SocialRepository.updateRelationStatus(userId, friendId, 1)
 
-		//TODO: notification
+		try {
+			const userData = await UsersApi.getUserData(userId)
+			const fromUsername = userData?.username ?? 'Unknown'
+			const sent = await NotificationService.friendAccepted(
+				String(userId.user_id),
+				fromUsername,
+				String(friendId.user_id)
+			)
+			if (!sent) {
+				console.log(
+					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
+				)
+			}
+		} catch (error) {
+			console.log('Failed to send friend request notification:', error)
+		}
 	}
 
 	static async rejectFriendRequest(
@@ -94,7 +158,22 @@ export class FriendService {
 
 		SocialRepository.deleteRelation(userId, friendId)
 
-		// TODO : notification
+		try {
+			const userData = await UsersApi.getUserData(userId)
+			const fromUsername = userData?.username ?? 'Unknown'
+			const sent = await NotificationService.friendRejected(
+				String(userId.user_id),
+				fromUsername,
+				String(friendId.user_id)
+			)
+			if (!sent) {
+				console.log(
+					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
+				)
+			}
+		} catch (error) {
+			console.log('Failed to send friend request notification:', error)
+		}
 	}
 
 	static async cancelFriendRequest(
@@ -133,7 +212,22 @@ export class FriendService {
 
 		SocialRepository.deleteRelation(userId, friendId)
 
-		// TODO: notif ?
+		try {
+			const userData = await UsersApi.getUserData(userId)
+			const fromUsername = userData?.username ?? 'Unknown'
+			const sent = await NotificationService.friendRemoved(
+				String(userId.user_id),
+				fromUsername,
+				String(friendId.user_id)
+			)
+			if (!sent) {
+				console.log(
+					`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent FRIEND`
+				)
+			}
+		} catch (error) {
+			console.log('Failed to send friend request notification:', error)
+		}
 	}
 
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {

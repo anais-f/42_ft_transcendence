@@ -1,10 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import {
-	jwtAuthMiddleware,
-	jwtAuthOwnerMiddleware
-} from '@ft_transcendence/security'
+import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
 import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleWsConnection } from '../controllers/websocketControllers.js'
@@ -12,7 +9,6 @@ import { handleLogout } from '../controllers/logoutControllers.js'
 import {
 	ErrorResponseSchema,
 	SuccessResponseSchema,
-	LogoutParamsSchema,
 	FriendsListSchema,
 	UserIdCoerceSchema,
 	PendingFriendsListSchema

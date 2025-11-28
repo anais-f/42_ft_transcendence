@@ -5,7 +5,7 @@ import {
 	getTotalConnections
 } from '../usecases/connectionManager.js'
 import { routeMessage } from '../usecases/messageRouter.js'
-import { UsersApi } from '@services/social/app/repositories/UsersApi.js'
+import { UsersApi } from '../repositories/UsersApi.js'
 
 // TODO : split into smaller functions when notifications are added and refactored logic after add connection
 
