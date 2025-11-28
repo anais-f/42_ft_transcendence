@@ -64,11 +64,7 @@ export function renderProfile(): HTMLElement {
 		className:
 			'bg-gray-300 px-3 py-1 rounded-md border border-gray-400 hover:bg-gray-400 shadow-xl',
 		onClick: (ev: MouseEvent) => {
-			showPopup(PopupSettings, {
-				id: 'popup-overlay',
-				className:
-					'fixed inset-0 z-50 flex items-center justify-center bg-black/50'
-			})
+			showPopup(PopupSettings)
 		}
 	})
 
