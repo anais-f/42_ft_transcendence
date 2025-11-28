@@ -23,11 +23,11 @@ export function createPopupElement(overlayDef: interfaceOverlay): HTMLElement {
 
 let __escHandler: ((ev: KeyboardEvent) => void) | null = null
 
-export function showPopup(contentNode: Node, overlayDef: interfaceOverlay) {
-	if (document.getElementById(overlayDef.id)) return
+export function showPopup(contentNode: Node) {
+	if (document.getElementById('popup-overlay')) return
 	const overlay = createPopupElement({
-		id: overlayDef.id,
-		className: overlayDef.className,
+		id: 'popup-overlay',
+		className: 'fixed inset-0 z-50 flex items-center justify-center bg-black/50',
 		onClick: () => hidePopup()
 	})
 
