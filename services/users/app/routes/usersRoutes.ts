@@ -153,4 +153,14 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	})
 
 	//TODO: routes pour fetch toute la DB des users  (admin only)
+	// route pour search
+	server.route({
+		method: 'GET',
+		url: '/api/users/search',
+		// preHandler: [jwtAuthMiddleware],
+		schema: {},
+		handler: getUsersController
+	})
+
+	// route pour le webhook du status (online/offline) avec social ?
 }

@@ -10,7 +10,8 @@ import {
 	UserPublicProfileDTO,
 	ERROR_MESSAGES,
 	AppError,
-	UserStatus
+	UserStatus,
+	UsersProfileSearchDTO
 } from '@ft_transcendence/common'
 
 const defaultAvatar: string = '/avatars/img_default.png'
@@ -103,22 +104,12 @@ export class UsersRepository {
 	}
 
 	static updateUsername(user: IUsernameId): void {
-		try {
-			const updateStmt = db.prepare(
-				'UPDATE users SET username = ? WHERE user_id = ?'
-			)
-			const info = updateStmt.run(user.username, user.user_id)
-			if (info.changes === 0) {
-				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-			}
-		} catch (error: any) {
-			if (
-				error?.code === 'SQLITE_CONSTRAINT' ||
-				error?.message?.includes('UNIQUE constraint failed')
-			) {
-				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
-			}
-			throw error
+		const updateStmt = db.prepare(
+			'UPDATE users SET username = ? WHERE user_id = ?'
+		)
+		const info = updateStmt.run(user.username, user.user_id)
+		if (info.changes === 0) {
+			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 		}
 	}
 
@@ -184,7 +175,7 @@ export class UsersRepository {
 	}
 
 	/**
-	 * @description Get all users or users according to their status
+	 * @description Get all users or users
 	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
@@ -199,5 +190,63 @@ export class UsersRepository {
 	static deleteUserById(user: IUserId): void {
 		const deleteStmt = db.prepare('DELETE FROM users WHERE user_id = ?')
 		deleteStmt.run(user.user_id)
+	}
+
+	static getAllUsersPaginated(
+		page: number = 1,
+		limit: number = 10
+	): UsersProfileSearchDTO {
+		const offset = (page - 1) * limit
+
+		// recuperer et compter les utilisateurs
+		const totalStmt = db.prepare('SELECT COUNT(*) as count FROM users')
+		const totalRow = totalStmt.get()
+		const total = totalRow.count
+
+		// liste paginee des utilisateurs
+		const selectStmt = db.prepare(
+			'SELECT user_id, username, avatar FROM users ORDER BY username LIMIT ? OFFSET ?'
+		)
+		const users = selectStmt.all(
+			limit,
+			offset
+		) as UsersProfileSearchDTO['users']
+
+		return {
+			users,
+			total,
+			page,
+			limit
+		}
+	}
+
+	searchByUsername(
+		search: string,
+		page: number = 1,
+		limit: number = 10
+	): UsersProfileSearchDTO {
+		const offset = (page - 1) * limit
+
+		const totalStmt = db.prepare(
+			'SELECT COUNT(*) as count FROM users WHERE username LIKE ?'
+		)
+		const totalRow = totalStmt.get(`%${search}%`)
+		const total = totalRow.count
+
+		const selectStmt = db.prepare(
+			'SELECT user_id, username, avatar FROM users WHERE username LIKE ? ORDER BY username LIMIT ? OFFSET ?'
+		)
+		const users = selectStmt.all(
+			`%${search}%`,
+			limit,
+			offset
+		) as UsersProfileSearchDTO['users']
+
+		return {
+			users,
+			total,
+			page,
+			limit
+		}
 	}
 }
