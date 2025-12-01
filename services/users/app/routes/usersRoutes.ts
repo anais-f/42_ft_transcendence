@@ -139,10 +139,10 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 	// PATCH /api/internal/users/:id/status - Update user status (API Key protected)
 	server.route({
 		method: 'PATCH',
-		url: '/api/internal/users/:id/status',
+		url: '/api/internal/users/:user_id/status',
 		preHandler: [apiKeyMiddleware],
 		schema: {
-			params: z.object({ id: z.coerce.number().int().positive() }),
+			params: UserIdCoerceSchema,
 			body: UpdateUserStatusSchema,
 			response: {
 				200: SuccessResponseSchema,
