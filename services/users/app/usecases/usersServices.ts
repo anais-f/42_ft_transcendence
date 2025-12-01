@@ -6,6 +6,8 @@ import {
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
+  UsersProfileSearchDTO,
+	GetUsersQueryDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 
@@ -71,5 +73,15 @@ export class UsersServices {
 			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
+	}
+
+	static async getUsersSearch(query: GetUsersQueryDTO): Promise<UsersProfileSearchDTO> {
+		const { search, page, limit } = query
+
+		const result = search
+			? UsersRepository.searchByUsername(search, page, limit)
+			: UsersRepository.getAllUsersPaginated(page, limit)
+
+		return result
 	}
 }

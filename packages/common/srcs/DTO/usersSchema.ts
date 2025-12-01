@@ -118,13 +118,13 @@ export const UpdateUserStatusSchema = z
 
 export const GetUsersQuerySchema = z
 	.object({
-		search: z.string().optional(),
+		search: z.string().max(32).optional(),
 		page: z.coerce.number().min(1).default(1),
-		limit: z.coerce.number().min(1).max(100).default(10)
+		limit: z.coerce.number().min(1).max(50).default(10)
 	})
 	.meta({ description: 'Get users query schema' })
 
-export const UsersProfileSearch = z
+export const UsersProfileSearchSchema = z
 	.object({
 		users: z.array(
 			z.object({
@@ -132,7 +132,10 @@ export const UsersProfileSearch = z
 				username: UsernameSchema,
 				avatar: z.string()
 			})
-		)
+		),
+		total: z.number().int().nonnegative(),
+		page: z.number().int().positive(),
+		limit: z.number().int().positive()
 	})
 	.meta({ description: 'User profile search schema' })
 
@@ -159,4 +162,4 @@ export type UserProfileUpdateAvatarDTO = z.infer<
 export type UserProfileUpdateDTO = z.infer<typeof UserProfileUpdateSchema>
 export type UpdateUserStatusDTO = z.infer<typeof UpdateUserStatusSchema>
 export type GetUsersQueryDTO = z.infer<typeof GetUsersQuerySchema>
-export type UsersProfileSearchDTO = z.infer<typeof UsersProfileSearch>
+export type UsersProfileSearchDTO = z.infer<typeof UsersProfileSearchSchema>

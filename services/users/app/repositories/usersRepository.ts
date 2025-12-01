@@ -192,18 +192,21 @@ export class UsersRepository {
 		deleteStmt.run(user.user_id)
 	}
 
+	/**
+	 * @description Get all users with pagination
+	 * @param page
+	 * @param limit
+	 */
 	static getAllUsersPaginated(
 		page: number = 1,
 		limit: number = 10
 	): UsersProfileSearchDTO {
 		const offset = (page - 1) * limit
 
-		// recuperer et compter les utilisateurs
 		const totalStmt = db.prepare('SELECT COUNT(*) as count FROM users')
-		const totalRow = totalStmt.get()
+		const totalRow = totalStmt.get() as { count: number }
 		const total = totalRow.count
 
-		// liste paginee des utilisateurs
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar FROM users ORDER BY username LIMIT ? OFFSET ?'
 		)
@@ -220,24 +223,31 @@ export class UsersRepository {
 		}
 	}
 
-	searchByUsername(
+	/**
+	 * @description Search users by username with pagination
+	 * @param search
+	 * @param page
+	 * @param limit
+	 */
+	static searchByUsername(
 		search: string,
 		page: number = 1,
 		limit: number = 10
 	): UsersProfileSearchDTO {
 		const offset = (page - 1) * limit
+		const searchPattern = `%${search}%`
 
 		const totalStmt = db.prepare(
 			'SELECT COUNT(*) as count FROM users WHERE username LIKE ?'
 		)
-		const totalRow = totalStmt.get(`%${search}%`)
+		const totalRow = totalStmt.get(searchPattern) as { count: number }
 		const total = totalRow.count
 
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar FROM users WHERE username LIKE ? ORDER BY username LIMIT ? OFFSET ?'
 		)
 		const users = selectStmt.all(
-			`%${search}%`,
+			searchPattern,
 			limit,
 			offset
 		) as UsersProfileSearchDTO['users']

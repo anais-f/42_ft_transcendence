@@ -316,9 +316,9 @@ describe('Users Routes - Authentication & Authorization', () => {
 	})
 
 	// ===========================================
-	// 2. GET /api/users/:id - JWT PROTECTED
+	// 2. GET /api/users/profile/:user_id - JWT PROTECTED
 	// ===========================================
-	describe('GET /api/users/:id - JWT Protection', () => {
+	describe('GET /api/users/profile/:user_id - JWT Protection', () => {
 		it('should get public profile with valid JWT - SUCCESS', async () => {
 			const mockProfile = {
 				user_id: 1,
@@ -331,7 +331,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 
 			const response = await app.inject({
 				method: 'GET',
-				url: '/api/users/1',
+				url: '/api/users/profile/1',
 				headers: {
 					authorization: 'Bearer valid.jwt.token'
 				}
@@ -346,7 +346,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject without JWT - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'GET',
-				url: '/api/users/1'
+				url: '/api/users/profile/1'
 			})
 
 			expect(response.statusCode).toBe(401)
@@ -356,7 +356,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject with invalid JWT - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'GET',
-				url: '/api/users/1',
+				url: '/api/users/profile/1',
 				headers: {
 					authorization: 'Bearer invalid.token'
 				}
@@ -369,7 +369,7 @@ describe('Users Routes - Authentication & Authorization', () => {
 		it('should reject malformed authorization header - ERROR 401', async () => {
 			const response = await app.inject({
 				method: 'GET',
-				url: '/api/users/1',
+				url: '/api/users/profile/1',
 				headers: {
 					authorization: 'InvalidFormat token'
 				}

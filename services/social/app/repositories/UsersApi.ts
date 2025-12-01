@@ -18,7 +18,7 @@ export class UsersApi {
 				500
 			)
 
-		const url = `${base}/api/internal/users/${user.user_id}`
+		const url = `${base}/api/internal/users/profile/${user.user_id}`
 		const headers = {
 			'content-type': 'application/json',
 			authorization: secret
@@ -68,7 +68,7 @@ export class UsersApi {
 				500
 			)
 
-		const url = `${base}/api/internal/users/${user.user_id}`
+		const url = `${base}/api/internal/users/profile/${user.user_id}`
 		const headers = {
 			'content-type': 'application/json',
 			authorization: secret

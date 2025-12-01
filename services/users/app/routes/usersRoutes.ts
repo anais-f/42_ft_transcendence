@@ -3,7 +3,8 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	handleUserCreated,
 	getPublicUser,
-	getPrivateUser
+	getPrivateUser,
+  getUsersController
 } from '../controllers/usersControllers.js'
 import {
 	updateUsername,
@@ -18,7 +19,9 @@ import {
 	UserPublicProfileSchema,
 	UserProfileUpdateUsernameSchema,
 	UpdateUserStatusSchema,
-	UserIdCoerceSchema
+	UserIdCoerceSchema,
+  GetUsersQuerySchema,
+  UsersProfileSearchSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
@@ -44,10 +47,10 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: handleUserCreated
 	})
 
-	// GET /api/users/:id - Get public user profile (JWT required - authenticated users only)
+	// GET /api/users/profile/:user_id - Get public user profile (JWT required - authenticated users only)
 	server.route({
 		method: 'GET',
-		url: '/api/users/:user_id',
+		url: '/api/users/profile/:user_id(\\d+)',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
 			params: UserIdCoerceSchema,
@@ -62,10 +65,10 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getPublicUser
 	})
 
-	// INTERNAL: GET /api/internal/users/:user_id - Get public user profile for internal service-to-service calls (API Key required)
+	// INTERNAL: GET /api/internal/users/profile/:user_id - Get public user profile for internal service-to-service calls (API Key required)
 	server.route({
 		method: 'GET',
-		url: '/api/internal/users/:user_id',
+		url: '/api/internal/users/profile/:user_id(\\d+)',
 		preHandler: [apiKeyMiddleware],
 		schema: {
 			params: UserIdCoerceSchema,
@@ -154,11 +157,19 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 
 	//TODO: routes pour fetch toute la DB des users  (admin only)
 	// route pour search
-	server.route({
+  server.route({
 		method: 'GET',
 		url: '/api/users/search',
-		// preHandler: [jwtAuthMiddleware],
-		schema: {},
+		preHandler: [jwtAuthMiddleware],
+		schema: {
+      querystring: GetUsersQuerySchema,
+      response: {
+        200: UsersProfileSearchSchema,
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema
+      }
+    },
 		handler: getUsersController
 	})
 
