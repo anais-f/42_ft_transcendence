@@ -4,5 +4,5 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY packages/*/package*.json ./packages/
 COPY services/*/app/package*.json ./services/*/app/
-EXPOSE 3000
+
 CMD ["npm", "run", "dev", "--workspace=services/frontend/app"]
