@@ -18,9 +18,8 @@ interface StatusChangePayload {
  */
 export async function broadcastStatusChangeToFriends(
 	userId: string,
-	status: UserStatus,
+	status: UserStatus
 ): Promise<void> {
-
 	try {
 		const userIdNum = Number(userId)
 		const userIdObj: IUserId = { user_id: userIdNum }

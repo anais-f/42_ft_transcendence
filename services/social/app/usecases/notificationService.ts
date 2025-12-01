@@ -133,5 +133,3 @@ export async function friendRejectedNotification(
 		toUserId
 	)
 }
-
-

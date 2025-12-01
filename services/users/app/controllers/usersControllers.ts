@@ -7,7 +7,7 @@ import {
 	AppError,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES,
-  GetUsersQuerySchema,
+	GetUsersQuerySchema,
 	GetUsersQueryDTO,
 	UsersProfileSearchSchema
 } from '@ft_transcendence/common'
@@ -121,7 +121,9 @@ export async function getUsersController(
 ): Promise<void> {
 	try {
 		const query = req.query
-		const user = req.user as { user_id?: number; is_admin?: boolean } | undefined
+		const user = req.user as
+			| { user_id?: number; is_admin?: boolean }
+			| undefined
 		const isAdmin = user?.is_admin ?? false
 
 		// Valider la query

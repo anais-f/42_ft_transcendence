@@ -4,7 +4,7 @@ import {
 	handleUserCreated,
 	getPublicUser,
 	getPrivateUser,
-  getUsersController
+	getUsersController
 } from '../controllers/usersControllers.js'
 import {
 	updateUsername,
@@ -20,8 +20,8 @@ import {
 	UserProfileUpdateUsernameSchema,
 	UpdateUserStatusSchema,
 	UserIdCoerceSchema,
-  GetUsersQuerySchema,
-  UsersProfileSearchSchema
+	GetUsersQuerySchema,
+	UsersProfileSearchSchema
 } from '@ft_transcendence/common'
 import { z } from 'zod'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
@@ -157,19 +157,19 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 
 	//TODO: routes pour fetch toute la DB des users  (admin only)
 	// route pour search
-  server.route({
+	server.route({
 		method: 'GET',
 		url: '/api/users/search',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
-      querystring: GetUsersQuerySchema,
-      response: {
-        200: UsersProfileSearchSchema,
-        400: ErrorResponseSchema,
-        401: ErrorResponseSchema,
-        500: ErrorResponseSchema
-      }
-    },
+			querystring: GetUsersQuerySchema,
+			response: {
+				200: UsersProfileSearchSchema,
+				400: ErrorResponseSchema,
+				401: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
 		handler: getUsersController
 	})
 

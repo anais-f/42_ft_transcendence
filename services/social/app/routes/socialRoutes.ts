@@ -1,7 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
 import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleWsConnection } from '../controllers/websocketControllers.js'
@@ -11,7 +11,8 @@ import {
 	SuccessResponseSchema,
 	FriendsListSchema,
 	UserIdCoerceSchema,
-	PendingFriendsListSchema
+	PendingFriendsListSchema,
+	StatusBroadcastSchema
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
@@ -23,6 +24,7 @@ import {
 	getPendingRequestsController,
 	getPendingSentRequestsController
 } from '../controllers/friendControllers.js'
+import { broadcastStatusNotificationController } from '../controllers/notificationControllers.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -212,5 +214,22 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handler: getPendingSentRequestsController
 	})
-}
 
+	// POST /api/internal/notifications/broadcast-status - Internal endpoint to broadcast status changes
+	// Called by Users Service when a user's status changes
+	// No auth needed for internal communication (assumes service-to-service calls are already secured)
+	server.route({
+		method: 'POST',
+		url: '/api/internal/social/broadcast-status',
+		preHandler: [apiKeyMiddleware],
+		schema: {
+			body: StatusBroadcastSchema,
+			response: {
+				200: SuccessResponseSchema,
+				400: ErrorResponseSchema,
+				500: ErrorResponseSchema
+			}
+		},
+		handler: broadcastStatusNotificationController
+	})
+}

@@ -49,8 +49,8 @@ async function notifyStatusChange(
 				status === UserStatus.ONLINE
 					? 'ONLINE'
 					: status === UserStatus.BUSY
-					? 'BUSY'
-					: 'OFFLINE'
+						? 'BUSY'
+						: 'OFFLINE'
 			console.log(`[STATUS] User ${userId} is now ${statusName}`)
 		}
 	} catch (error) {

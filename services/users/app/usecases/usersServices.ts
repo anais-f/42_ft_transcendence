@@ -6,7 +6,7 @@ import {
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
-  UsersProfileSearchDTO,
+	UsersProfileSearchDTO,
 	GetUsersQueryDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
@@ -75,7 +75,9 @@ export class UsersServices {
 		}
 	}
 
-	static async getUsersSearch(query: GetUsersQueryDTO): Promise<UsersProfileSearchDTO> {
+	static async getUsersSearch(
+		query: GetUsersQueryDTO
+	): Promise<UsersProfileSearchDTO> {
 		const { search, page, limit } = query
 
 		const result = search
