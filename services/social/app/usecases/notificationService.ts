@@ -29,7 +29,7 @@ const MessagesTemplates: Record<
  * @param fromUsername
  * @param toUserId
  */
-function sendNotification(
+function sendFriendNotification(
 	type: NotificationType,
 	fromUserId: string,
 	fromUsername: string,
@@ -69,7 +69,7 @@ export async function friendRequestNotification(
 	fromUsername: string,
 	toUserId: string
 ): Promise<boolean> {
-	return sendNotification(
+	return sendFriendNotification(
 		NotificationType.FriendRequest,
 		fromUserId,
 		fromUsername,
@@ -88,7 +88,7 @@ export async function friendAcceptedNotification(
 	fromUsername: string,
 	toUserId: string
 ): Promise<boolean> {
-	return sendNotification(
+	return sendFriendNotification(
 		NotificationType.FriendAccept,
 		fromUserId,
 		fromUsername,
@@ -107,7 +107,7 @@ export async function friendRemovedNotification(
 	fromUsername: string,
 	toUserId: string
 ): Promise<boolean> {
-	return sendNotification(
+	return sendFriendNotification(
 		NotificationType.FriendRemove,
 		fromUserId,
 		fromUsername,
@@ -126,10 +126,12 @@ export async function friendRejectedNotification(
 	fromUsername: string,
 	toUserId: string
 ): Promise<boolean> {
-	return sendNotification(
+	return sendFriendNotification(
 		NotificationType.FriendReject,
 		fromUserId,
 		fromUsername,
 		toUserId
 	)
 }
+
+

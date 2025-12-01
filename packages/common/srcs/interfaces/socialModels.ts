@@ -12,7 +12,7 @@ export interface NotificationPayload {
 	data: {
 		from: {
 			userId: string
-			username: string
+			username?: string
 		}
 		to?: {
 			userId: string

@@ -1,13 +1,14 @@
 import { UserStatus } from '@ft_transcendence/common'
+import { broadcastStatusChangeToFriends } from './broadcasterService.js'
 
 /**
  * Notify users service about status change
  * @param userId - User ID
- * @param status - 'online' or 'offline'
+ * @param status - UserStatus enum value
  */
 async function notifyStatusChange(
 	userId: string,
-	status: 'online' | 'offline'
+	status: UserStatus
 ): Promise<void> {
 	const base = process.env.USERS_SERVICE_URL
 	const secret = process.env.USERS_API_SECRET
@@ -16,13 +17,11 @@ async function notifyStatusChange(
 		return
 	}
 
-	const statusValue =
-		status === 'online' ? UserStatus.ONLINE : UserStatus.OFFLINE
 	const body: { status: UserStatus; lastConnection?: string } = {
-		status: statusValue
+		status: status
 	}
 
-	if (status === 'offline') {
+	if (status === UserStatus.OFFLINE) {
 		body.lastConnection = new Date().toISOString()
 	}
 
@@ -46,7 +45,13 @@ async function notifyStatusChange(
 				`[STATUS] Failed to update user ${userId} status to ${status}: ${response.status} - ${errorText}`
 			)
 		} else {
-			console.log(`[STATUS] User ${userId} is now ${status.toUpperCase()}`)
+			const statusName =
+				status === UserStatus.ONLINE
+					? 'ONLINE'
+					: status === UserStatus.BUSY
+					? 'BUSY'
+					: 'OFFLINE'
+			console.log(`[STATUS] User ${userId} is now ${statusName}`)
 		}
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
@@ -64,7 +69,8 @@ async function notifyStatusChange(
 export async function handleUserOnline(userId: string): Promise<void> {
 	console.log(`User ${userId} is now ONLINE`)
 	try {
-		await notifyStatusChange(userId, 'online')
+		await notifyStatusChange(userId, UserStatus.ONLINE)
+		await broadcastStatusChangeToFriends(userId, UserStatus.ONLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} online status:`, message)
@@ -78,7 +84,8 @@ export async function handleUserOnline(userId: string): Promise<void> {
 export async function handleUserOffline(userId: string): Promise<void> {
 	console.log(`User ${userId} disconnect timer expired - marking offline`)
 	try {
-		await notifyStatusChange(userId, 'offline')
+		await notifyStatusChange(userId, UserStatus.OFFLINE)
+		await broadcastStatusChangeToFriends(userId, UserStatus.OFFLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} offline status:`, message)

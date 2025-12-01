@@ -213,3 +213,4 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getPendingSentRequestsController
 	})
 }
+
