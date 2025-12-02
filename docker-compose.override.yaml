@@ -1,5 +1,7 @@
 services:
   nginx:
+    build:
+      dockerfile: Dockerfile.dev
     volumes:
       - avatars_data:/usr/share/nginx/html/avatars:ro
 
@@ -63,6 +65,30 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
+  pong-server:
+    container_name: pong-server
+    build:
+      context: .
+      dockerfile: services/pong-server/Dockerfile.dev
+    volumes:
+      - ./:/app
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+
+  frontend:
+    volumes:
+      - ./:/app
+    build:
+      dockerfile: services/frontend/Dockerfile.dev
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD-SHELL', 'true']
 
 volumes:
   avatars_data:
