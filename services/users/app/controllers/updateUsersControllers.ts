@@ -173,6 +173,7 @@ export async function updateUserStatus(
 			await SocialApi.notifyUserStatusChange(String(user_id), status)
 		} catch (err) {
 			console.error('Failed to notify social service:', err)
+      // Continue without failing the whole request
 		}
 
 		void reply
