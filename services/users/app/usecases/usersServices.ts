@@ -6,7 +6,7 @@ import {
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
-	UsersProfileSearchDTO,
+	UserSearchResultDTO,
 	GetUsersQueryDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
@@ -75,14 +75,14 @@ export class UsersServices {
 		}
 	}
 
-	static async getUsersSearch(
-		query: GetUsersQueryDTO
-	): Promise<UsersProfileSearchDTO> {
-		const { search, page, limit } = query
+	static async searchUserByExactUsername(
+		username: string
+	): Promise<UserSearchResultDTO> {
+		if (!username || username.trim().length === 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
 
-		const result = search
-			? UsersRepository.searchByUsername(search, page, limit)
-			: UsersRepository.getAllUsersPaginated(page, limit)
+		const result = UsersRepository.searchByExactUsername({ username })
+		if (!result) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 
 		return result
 	}

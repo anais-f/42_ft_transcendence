@@ -30,7 +30,8 @@ export const ERROR_MESSAGES = {
 	CANNOT_ADD_YOURSELF: 'Cannot add yourself as a friend',
 	CANNOT_DELETE_YOURSELF: 'Cannot delete yourself as a friend',
 	NOT_FRIENDS: 'You are not friends',
-	INVALID_QUERY_PARAMETERS: 'Invalid query parameters'
+	INVALID_QUERY_PARAMETERS: 'Invalid query parameters',
+	USERNAME_REQUIRED: 'Username is required'
 } as const
 
 export const SUCCESS_MESSAGES = {

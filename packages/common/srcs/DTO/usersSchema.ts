@@ -116,28 +116,13 @@ export const UpdateUserStatusSchema = z
 	)
 	.meta({ description: 'Update user status schema' })
 
-export const GetUsersQuerySchema = z
+export const UserSearchResultSchema = z
 	.object({
-		search: z.string().max(32).optional(),
-		page: z.coerce.number().min(1).default(1),
-		limit: z.coerce.number().min(1).max(50).default(10)
+		user_id: z.number().int().positive(),
+		username: UsernameSchema,
+		avatar: z.string()
 	})
-	.meta({ description: 'Get users query schema' })
-
-export const UsersProfileSearchSchema = z
-	.object({
-		users: z.array(
-			z.object({
-				user_id: z.number().int().positive(),
-				username: UsernameSchema,
-				avatar: z.string()
-			})
-		),
-		total: z.number().int().nonnegative(),
-		page: z.number().int().positive(),
-		limit: z.number().int().positive()
-	})
-	.meta({ description: 'User profile search schema' })
+	.meta({ description: 'Simple user search result schema' })
 
 // Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
@@ -161,5 +146,4 @@ export type UserProfileUpdateAvatarDTO = z.infer<
 >
 export type UserProfileUpdateDTO = z.infer<typeof UserProfileUpdateSchema>
 export type UpdateUserStatusDTO = z.infer<typeof UpdateUserStatusSchema>
-export type GetUsersQueryDTO = z.infer<typeof GetUsersQuerySchema>
-export type UsersProfileSearchDTO = z.infer<typeof UsersProfileSearchSchema>
+export type UserSearchResultDTO = z.infer<typeof UserSearchResultSchema>

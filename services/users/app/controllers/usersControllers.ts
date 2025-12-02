@@ -4,12 +4,10 @@ import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
 	UserPrivateProfileSchema,
+	UserSearchResultSchema,
 	AppError,
 	ERROR_MESSAGES,
-	SUCCESS_MESSAGES,
-	GetUsersQuerySchema,
-	GetUsersQueryDTO,
-	UsersProfileSearchSchema
+	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
 
 export async function handleUserCreated(
@@ -115,45 +113,23 @@ export async function getPrivateUser(
 	}
 }
 
-export async function getUsersController(
-	req: FastifyRequest<{ Querystring: GetUsersQueryDTO }>,
+/**
+ * @description Search user by exact username
+ * @param req - Fastify request with username in query
+ * @param reply - Fastify reply
+ */
+export async function searchUserByUsernameController(
+	req: FastifyRequest<{ Querystring: { username: string } }>,
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const query = req.query
-		const user = req.user as
-			| { user_id?: number; is_admin?: boolean }
-			| undefined
-		const isAdmin = user?.is_admin ?? false
+		const { username } = req.query
 
-		// Valider la query
-		const safeQuery = GetUsersQuerySchema.safeParse(query)
-		if (!safeQuery.success) {
-			console.error('GetUsersQuery validation failed:', safeQuery.error)
-			void reply.code(400).send({
-				success: false,
-				error: ERROR_MESSAGES.INVALID_QUERY_PARAMETERS
-			})
-			return
-		}
+		const result = await UsersServices.searchUserByExactUsername(username)
 
-		if (!isAdmin && !safeQuery.data.search) {
-			void reply.code(403).send({
-				success: false,
-				error: 'Search parameter is required for non-admin users'
-			})
-			return
-		}
-
-		const rawUsers = await UsersServices.getUsersSearch({
-			search: safeQuery.data.search,
-			page: safeQuery.data.page,
-			limit: safeQuery.data.limit
-		})
-
-		const parsed = UsersProfileSearchSchema.safeParse(rawUsers)
+		const parsed = UserSearchResultSchema.safeParse(result)
 		if (!parsed.success) {
-			console.error('UsersProfileSearch validation failed:', parsed.error)
+			console.error('UserSearchResult validation failed:', parsed.error)
 			void reply.code(500).send({
 				success: false,
 				error: ERROR_MESSAGES.INTERNAL_ERROR
@@ -170,7 +146,7 @@ export async function getUsersController(
 			})
 			return
 		}
-		console.error('Unexpected error in getUsersControllers:', error)
+		console.error('Unexpected error in searchUserByUsernameController:', error)
 		void reply.code(500).send({
 			success: false,
 			error: ERROR_MESSAGES.INTERNAL_ERROR

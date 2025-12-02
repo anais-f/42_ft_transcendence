@@ -1,10 +1,12 @@
 import { FastifyPluginAsync } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
 import {
 	handleUserCreated,
 	getPublicUser,
 	getPrivateUser,
-	getUsersController
+	getUsersController,
+	searchUserByUsernameController
 } from '../controllers/usersControllers.js'
 import {
 	updateUsername,
@@ -21,7 +23,8 @@ import {
 	UpdateUserStatusSchema,
 	UserIdCoerceSchema,
 	GetUsersQuerySchema,
-	UsersProfileSearchSchema
+	UsersProfileSearchSchema,
+	UserSearchResultSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
@@ -154,21 +157,23 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: updateUserStatus
 	})
 
-	//TODO: routes pour fetch toute la DB des users  (admin only)
-	// route pour search
+	// GET /api/users/search-by-username - Search user by exact username
 	server.route({
 		method: 'GET',
-		url: '/api/users/search',
+		url: '/api/users/search-by-username',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
-			querystring: GetUsersQuerySchema,
+			querystring: z.object({
+				username: z.string().min(4).max(32)
+			}),
 			response: {
-				200: UsersProfileSearchSchema,
+				200: UserSearchResultSchema,
 				400: ErrorResponseSchema,
 				401: ErrorResponseSchema,
+				404: ErrorResponseSchema,
 				500: ErrorResponseSchema
 			}
 		},
-		handler: getUsersController
+		handler: searchUserByUsernameController
 	})
 }
