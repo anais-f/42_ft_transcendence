@@ -13,31 +13,6 @@ export function jwtAuthMiddleware(
 	done: HookHandlerDoneFunction
 ): void {
 	try {
-		// if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) {
-		//   console.error('Invalid JWT format')
-		//   return reply.code(401).send({
-		//     success: false,
-		//     error: ERROR_MESSAGES.UNAUTHORIZED
-		//   })
-		// }
-		// // Validation que header et payload sont du JSON valide
-		// const parts = token.split('.')
-		// try {
-		//   // Décoder et parser le header (si malformé = erreur)
-		//   const headerJson = Buffer.from(parts[0], 'base64url').toString('utf8')
-		//   JSON.parse(headerJson)
-		//
-		//   // Décoder et parser le payload (si malformé = erreur)
-		//   const payloadJson = Buffer.from(parts[1], 'base64url').toString('utf8')
-		//   JSON.parse(payloadJson)
-		// } catch (parseError) {
-		//   console.error('Invalid JWT: header or payload is not valid JSON')
-		//   return reply.code(401).send({
-		//     success: false,
-		//     error: ERROR_MESSAGES.UNAUTHORIZED
-		//   })
-		// }
-
 		request.jwtVerify((err: Error | null) => {
 			if (err) {
 				console.error('JWT verification failed:', err.message)
