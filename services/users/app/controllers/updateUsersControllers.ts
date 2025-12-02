@@ -9,6 +9,7 @@ import {
 	UpdateUserStatusDTO
 } from '@ft_transcendence/common'
 import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
+import { SocialApi } from '../repositories/SocialApi.js'
 
 export async function updateUsername(
 	req: FastifyRequest,
@@ -150,7 +151,7 @@ export async function updateUserStatus(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const { id } = req.params as { id: number }
+		const { user_id } = req.params as { user_id: number }
 		const body = req.body as UpdateUserStatusDTO
 
 		const parsed = UpdateUserStatusSchema.safeParse(body)
@@ -165,7 +166,14 @@ export async function updateUserStatus(
 
 		const { status, lastConnection } = parsed.data
 
-		await UpdateUsersServices.updateUserStatus(id, status, lastConnection)
+		await UpdateUsersServices.updateUserStatus(user_id, status, lastConnection)
+
+		// Notify social service to broadcast status change to friends
+		try {
+			await SocialApi.notifyUserStatusChange(String(user_id), status)
+		} catch (err) {
+			console.error('Failed to notify social service:', err)
+		}
 
 		void reply
 			.code(200)
