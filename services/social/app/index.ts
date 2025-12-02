@@ -33,11 +33,16 @@ function createApp(): FastifyInstance {
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
-	app.register(fastifyJwt, {
-		secret: jwtSecret
-	})
 
 	app.register(fastifyCookie)
+
+	app.register(fastifyJwt, {
+		secret: jwtSecret,
+		cookie: {
+			cookieName: 'auth_token',
+			signed: false
+		}
+	})
 
 	app.register(FastifyWebSocket as any)
 
