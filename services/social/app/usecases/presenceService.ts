@@ -45,12 +45,7 @@ async function notifyStatusChange(
 				`[STATUS] Failed to update user ${userId} status to ${status}: ${response.status} - ${errorText}`
 			)
 		} else {
-			const statusName =
-				status === UserStatus.ONLINE
-					? 'ONLINE'
-					: status === UserStatus.BUSY
-						? 'BUSY'
-						: 'OFFLINE'
+			const statusName = status === UserStatus.ONLINE ? 'ONLINE' : 'OFFLINE'
 			console.log(`[STATUS] User ${userId} is now ${statusName}`)
 		}
 	} catch (error) {

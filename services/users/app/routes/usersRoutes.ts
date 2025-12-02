@@ -5,7 +5,6 @@ import {
 	handleUserCreated,
 	getPublicUser,
 	getPrivateUser,
-	getUsersController,
 	searchUserByUsernameController
 } from '../controllers/usersControllers.js'
 import {
@@ -22,8 +21,6 @@ import {
 	UserProfileUpdateUsernameSchema,
 	UpdateUserStatusSchema,
 	UserIdCoerceSchema,
-	GetUsersQuerySchema,
-	UsersProfileSearchSchema,
 	UserSearchResultSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'

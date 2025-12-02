@@ -7,7 +7,6 @@ import {
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
 	UserSearchResultDTO,
-	GetUsersQueryDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 
