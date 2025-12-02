@@ -23,7 +23,6 @@ import {
 	GetUsersQuerySchema,
 	UsersProfileSearchSchema
 } from '@ft_transcendence/common'
-import { z } from 'zod'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
 export const usersRoutes: FastifyPluginAsync = async (fastify) => {
@@ -172,6 +171,4 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handler: getUsersController
 	})
-
-	// route pour le webhook du status (online/offline) avec social ?
 }

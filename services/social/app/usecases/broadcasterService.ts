@@ -14,7 +14,7 @@ interface StatusChangePayload {
 /**
  * Broadcast a status change to all friends of a user
  * @param userId - User ID whose status changed
- * @param status - UserStatus enum value (ONLINE, OFFLINE, or BUSY)
+ * @param status - UserStatus enum value (ONLINE, OFFLINE)
  */
 export async function broadcastStatusChangeToFriends(
 	userId: string,

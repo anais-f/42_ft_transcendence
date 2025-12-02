@@ -23,14 +23,7 @@ export const PendingFriendsListSchema = z.object({
 	)
 })
 
-export const StatusBroadcastSchema = z.object({
-	userId: z.number().int().positive(),
-	status: z.enum(UserStatus),
-	timestamp: z.string().datetime()
-})
-
 export type FriendsListDTO = z.infer<typeof FriendsListSchema>['friends']
 export type PendingFriendsListDTO = z.infer<
 	typeof PendingFriendsListSchema
 >['pendingFriends']
-export type StatusBroadcastDTO = z.infer<typeof StatusBroadcastSchema>
