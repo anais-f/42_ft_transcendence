@@ -1,6 +1,8 @@
 .secret
 .env
 .env.localtest
+.env.test
+
 
 #IDE
 .idea/
@@ -9,7 +11,6 @@
 **/dist/
 **/tsconfig.tsbuildinfo
 **/node_modules/
-package-lock.json
 *.sqlite
 
 TODO

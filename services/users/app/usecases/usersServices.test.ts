@@ -27,7 +27,7 @@ beforeAll(async () => {
 		}
 	}))
 
-	await jest.unstable_mockModule('./AuthApi.js', () => ({
+	await jest.unstable_mockModule('../repositories/AuthApi.js', () => ({
 		AuthApi: {
 			getAllUsers: jest.fn()
 		}
@@ -37,7 +37,7 @@ beforeAll(async () => {
 	AppError = common.AppError
 	ERROR_MESSAGES = common.ERROR_MESSAGES
 	;({ UsersRepository } = await import('../repositories/usersRepository.js'))
-	;({ AuthApi } = await import('./AuthApi.js'))
+	;({ AuthApi } = await import('../repositories/AuthApi.js'))
 	;({ UsersServices } = await import('./usersServices.js'))
 })
 
@@ -145,6 +145,7 @@ describe('UsersServices', () => {
 				user_id: 42,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2024-01-01T00:00:00.000Z'
 			}
 			UsersRepository.getUserById.mockReturnValueOnce(mockProfile)
@@ -154,6 +155,7 @@ describe('UsersServices', () => {
 			expect(result).toHaveProperty('user_id', 42)
 			expect(result).toHaveProperty('username', 'testuser')
 			expect(result).toHaveProperty('avatar')
+			expect(result).toHaveProperty('status', 1)
 			expect(result).toHaveProperty('last_connection')
 		})
 	})

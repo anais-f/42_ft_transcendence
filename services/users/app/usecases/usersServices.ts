@@ -1,5 +1,5 @@
 import { UsersRepository } from '../repositories/usersRepository.js'
-import { AuthApi } from './AuthApi.js'
+import { AuthApi } from '../repositories/AuthApi.js'
 import {
 	IUserId,
 	AppError,
@@ -48,6 +48,7 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
+			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}
@@ -67,6 +68,7 @@ export class UsersServices {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
+			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
 	}

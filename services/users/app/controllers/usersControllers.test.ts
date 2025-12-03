@@ -133,6 +133,7 @@ describe('Users Controllers', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			const req = createMockRequest(null, { id: 1 })
@@ -177,8 +178,10 @@ describe('Users Controllers', () => {
 			const reply = createMockReply()
 
 			UsersServices.getPublicUserProfile.mockResolvedValueOnce({
-				invalid: 'data'
-			})
+				user_id: 1,
+				username: 'testuser'
+				// Missing required fields: avatar, status, last_connection
+			} as any)
 
 			await getPublicUser(req, reply)
 
@@ -199,6 +202,7 @@ describe('Users Controllers', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/img_default.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			const req = createMockRequest(null, null, { user_id: 1 })

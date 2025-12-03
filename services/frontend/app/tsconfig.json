@@ -1,16 +1,14 @@
 {
-	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./",
+		"target": "ES2020",
 		"module": "ES2020",
-		"moduleResolution": "bundler",
+		"moduleResolution": "Bundler",
 		"lib": ["ES2020", "DOM"],
-		"types": []
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "dist",
+		"rootDir": "."
 	},
-	"references": [{ "path": "../../../packages/common" }],
-	"include": ["./**/*"],
-	"ts-node": {
-		"esm": true
-	}
+	"include": ["**/*.ts"],
+	"exclude": ["dist", "node_modules"]
 }

@@ -9,7 +9,8 @@ import {
 	IPublicUserAuth,
 	UserPublicProfileDTO,
 	ERROR_MESSAGES,
-	AppError
+	AppError,
+	UserStatus
 } from '@ft_transcendence/common'
 
 const defaultAvatar: string = '/avatars/img_default.png'
@@ -70,14 +71,20 @@ export class UsersRepository {
 		const uniqueUsername = this.generateUniqueUsername(user.login)
 
 		const insertStmt = db.prepare(
-			'INSERT OR IGNORE INTO users (user_id, username, avatar, last_connection) VALUES (?, ?, ?, ?)'
+			'INSERT OR IGNORE INTO users (user_id, username, avatar, status, last_connection) VALUES (?, ?, ?, ?, ?)'
 		)
 		const now = new Date().toISOString()
-		insertStmt.run(user.user_id, uniqueUsername, defaultAvatar, now)
+		insertStmt.run(
+			user.user_id,
+			uniqueUsername,
+			defaultAvatar,
+			UserStatus.OFFLINE,
+			now
+		)
 	}
 
 	/**
-	 * @description Update methods for last connection or avatars
+	 * @description Update methods for last connection, status, username or avatars
 	 */
 
 	static updateLastConnection(user: IUserConnection): void {
@@ -115,19 +122,43 @@ export class UsersRepository {
 		}
 	}
 
+	static updateUserStatus(
+		user: IUserId,
+		status: UserStatus,
+		lastConnection?: string
+	): void {
+		if (status === UserStatus.OFFLINE && lastConnection) {
+			const updateStmt = db.prepare(
+				'UPDATE users SET status = ?, last_connection = ? WHERE user_id = ?'
+			)
+			const info = updateStmt.run(status, lastConnection, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		} else {
+			const updateStmt = db.prepare(
+				'UPDATE users SET status = ? WHERE user_id = ?'
+			)
+			const info = updateStmt.run(status, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		}
+	}
+
 	/**
 	 * @description Some get methods according to the table fields
 	 */
 	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users WHERE user_id = ?'
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
 	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users WHERE username = ?'
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
 		)
 		return selectStmt.get(username) as IPrivateUser | undefined
 	}
@@ -146,12 +177,20 @@ export class UsersRepository {
 		return row.avatar
 	}
 
+	static getUserStatusById(user: IUserId): UserStatus | undefined {
+		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
+		const row = selectStmt.get(user.user_id) as
+			| { status: UserStatus }
+			| undefined
+		return row?.status
+	}
+
 	/**
 	 * @description Get all users or users according to their status
 	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, last_connection FROM users'
+			'SELECT user_id, username, avatar, status, last_connection FROM users'
 		)
 		return selectStmt.all() as IPrivateUser[]
 	}

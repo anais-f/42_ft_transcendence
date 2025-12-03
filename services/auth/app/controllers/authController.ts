@@ -37,7 +37,7 @@ export async function registerController(
 		const PublicUser = findPublicUserByLogin(parsed.data.login)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
-		const url = `${process.env.USERS_SERVICE_URL}/api/users/new-user`
+		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {

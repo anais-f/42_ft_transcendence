@@ -7,7 +7,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY packages ./packages
 
-RUN npm install
+RUN npm ci
 
 COPY tsconfig.json ./
 
@@ -24,7 +24,7 @@ COPY package.json package-lock.json ./
 COPY services/auth/app/package.json ./services/auth/app/
 COPY packages/common/package.json ./packages/common/
 RUN apk add --no-cache python3 make g++
-RUN npm install
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/

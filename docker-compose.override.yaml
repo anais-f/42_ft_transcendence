@@ -1,4 +1,10 @@
 services:
+  nginx:
+    build:
+      dockerfile: Dockerfile.dev
+    volumes:
+      - avatars_data:/usr/share/nginx/html/avatars:ro
+
   install-dependencies:
     container_name: install-dependencies
     build:
@@ -6,6 +12,7 @@ services:
       dockerfile: .dev/Dockerfile.install
     volumes:
       - ./:/app
+
   auth:
     build:
       context: .
@@ -18,6 +25,7 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
   users:
     build:
       context: .
@@ -30,10 +38,23 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-  2fa:
+  auth_google:
     build:
       context: .
-      dockerfile: services/2fa/Dockerfile.dev
+      dockerfile: services/matchmaking/Dockerfile.dev
+    volumes:
+      - ./:/app
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+
+  social:
+    build:
+      context: .
+      dockerfile: services/social/Dockerfile.dev
     volumes:
       - ./:/app
     environment:
@@ -55,3 +76,27 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
+
+  pong-server:
+    container_name: pong-server
+    build:
+      context: .
+      dockerfile: services/pong-server/Dockerfile.dev
+    volumes:
+      - ./:/app
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+
+  frontend:
+    volumes:
+      - ./:/app
+    build:
+      dockerfile: services/frontend/Dockerfile.dev
+    restart: none
+    depends_on:
+      install-dependencies:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD-SHELL', 'true']

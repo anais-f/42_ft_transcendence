@@ -42,10 +42,10 @@ services:
       - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
       - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules:ro
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.route-prefix=/prometheus"
-      - "--web.external-url=http://localhost:8080/prometheus/"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.route-prefix=/prometheus'
+      - '--web.external-url=http://localhost:8080/prometheus/'
     healthcheck:
       test:
         - CMD-SHELL
@@ -128,4 +128,4 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
-  nginx_logs:     
+  nginx_logs:

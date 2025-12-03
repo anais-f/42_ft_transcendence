@@ -35,8 +35,14 @@ beforeAll(async () => {
 			run: jest.fn((...params: any[]) => {
 				// Simulate INSERT, UPDATE, DELETE operations
 				if (query.includes('INSERT')) {
-					const [user_id, username, avatar, last_connection] = params
-					dbData.users.push({ user_id, username, avatar, last_connection })
+					const [user_id, username, avatar, status, last_connection] = params
+					dbData.users.push({
+						user_id,
+						username,
+						avatar,
+						status,
+						last_connection
+					})
 				} else if (query.includes('UPDATE')) {
 					// Update logic
 				} else if (query.includes('DELETE')) {
@@ -281,6 +287,7 @@ describe('UsersRepository', () => {
 				user_id: 1,
 				username: 'testuser',
 				avatar: '/avatars/test.png',
+				status: 1,
 				last_connection: '2025-01-01T00:00:00.000Z'
 			}
 			const mockGet = jest.fn(() => mockUser)
@@ -292,6 +299,7 @@ describe('UsersRepository', () => {
 			expect(user?.user_id).toBe(1)
 			expect(user?.username).toBe('testuser')
 			expect(user?.avatar).toBe('/avatars/test.png')
+			expect(user?.status).toBe(1)
 			expect(user?.last_connection).toBe('2025-01-01T00:00:00.000Z')
 		})
 
@@ -364,12 +372,14 @@ describe('UsersRepository', () => {
 					user_id: 1,
 					username: 'user1',
 					avatar: '/avatars/img_default.png',
+					status: 1,
 					last_connection: new Date().toISOString()
 				},
 				{
 					user_id: 2,
 					username: 'user2',
 					avatar: '/avatars/img_default.png',
+					status: 1,
 					last_connection: new Date().toISOString()
 				}
 			]

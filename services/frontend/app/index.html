@@ -1,84 +1,132 @@
 <!doctype html>
 <html lang="en">
-  <head>
-	<meta charset="UTF-8" />
-	<title>Transcendence</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="icon" href="data:," />
-		<!-- Fonts for newspaper style -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-		<!-- Tailwind (CDN) config: set serif/sans families before loading script -->
+	<head>
+		<meta charset="UTF-8" />
+		<title>Transcendence</title>
+	</head>
+	<body>
+		<nav>
+			<ul id="menu"></ul>
+		</nav>
+		<div id="content"></div>
+		<script src="/urlRouter.js"></script>
+
+		<canvas
+			id="pong"
+			width="1000"
+			height="538"
+			style="background: black; display: block; margin: auto"
+		></canvas>
+		<a href="/auth-google/login/google">Google Login</a>
+
+		<hr />
+		<section
+			id="login-section"
+			style="max-width: 480px; margin: 16px auto; font-family: sans-serif"
+		>
+			<h2>Login</h2>
+			<form id="login-form">
+				<label>
+					Login
+					<input type="text" id="login" name="login" required minlength="4" />
+				</label>
+				<br />
+				<label>
+					Password
+					<input
+						type="password"
+						id="password"
+						name="password"
+						required
+						minlength="4"
+					/>
+				</label>
+				<br />
+				<button type="submit">Sign in</button>
+			</form>
+			<pre
+				id="login-result"
+				style="
+					background: #111;
+					color: #0f0;
+					padding: 8px;
+					white-space: pre-wrap;
+				"
+			></pre>
+			<div style="margin-top: 8px">
+				<strong>Protected links (require admin cookie):</strong>
+				<ul>
+					<li><a href="/auth/docs/" target="_blank">Auth docs</a></li>
+					<li><a href="/users/docs/" target="_blank">Users docs</a></li>
+					<li><a href="/prometheus/" target="_blank">Prometheus</a></li>
+					<li><a href="/grafana/" target="_blank">Grafana</a></li>
+					<li><a href="/alertmanager/" target="_blank">Alertmanager</a></li>
+					<li><a href="/mtail/" target="_blank">mtail</a></li>
+				</ul>
+			</div>
+		</section>
+
 		<script>
-			window.tailwind = window.tailwind || {}
-			window.tailwind.config = {
-				theme: {
-					extend: {
-						fontFamily: {
-							serif: ['"Playfair Display"', 'serif'],
-							sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif']
-						}
-					}
+			// This function checks the current url and takes the query parameters
+			function getUrlVars() {
+				var url = window.location.href
+				var vars = {}
+				var hashes = url.split('?')[1]
+				if (!hashes) return vars
+				var hash = hashes.split('&')
+				for (var i = 0; i < hash.length; i++) {
+					var params = hash[i].split('=')
+					vars[params[0]] = params[1]
 				}
+				return vars
 			}
+
+			// This function create a new cookie (not used for httpOnly cookies)
+			function setCookie(cname, cvalue, exdays) {
+				const d = new Date()
+				d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000)
+				let expires = 'expires=' + d.toUTCString()
+				document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+			}
+
+			// Google login callback support
+			if (getUrlVars()['access_token']) {
+				setCookie('google_access_token', getUrlVars()['access_token'], 1)
+				console.log('Logged in successfully!')
+			}
+
+			// Handle login form submit
+			document
+				.getElementById('login-form')
+				.addEventListener('submit', async (e) => {
+					e.preventDefault()
+					const login = document.getElementById('login').value
+					const password = document.getElementById('password').value
+					const out = document.getElementById('login-result')
+					out.textContent = 'Logging in...'
+					try {
+						const res = await fetch('/auth/api/login', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ login, password })
+						})
+						const data = await res.json().catch(() => ({}))
+						if (!res.ok) {
+							out.textContent = 'Login failed: ' + (data.error || res.status)
+							return
+						}
+						// Show token info (header.payload only)
+						let payload = {}
+						try {
+							payload = JSON.parse(atob((data.token || '').split('.')[1] || ''))
+						} catch {}
+						out.textContent =
+							'Login OK\n' + JSON.stringify({ payload }, null, 2)
+					} catch (err) {
+						out.textContent =
+							'Error: ' + (err && err.message ? err.message : err)
+					}
+				})
 		</script>
-		<!-- Tailwind (CDN) for quick visual iteration; consider local build for production -->
-		<script src="https://cdn.tailwindcss.com"></script>
-	<style>
-	  :root { color-scheme: light dark; }
-			body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #ffffff; color: #111111; }
-	  @media (prefers-color-scheme: dark) {
-		body { background: #0b0b0b; color: #eaeaea; }
-		.card { border-color: #2a2a2a; background: #141414; }
-		button, a.button { border-color: #3a3a3a; background: #1f1f1f; color: #eaeaea; }
-	  }
-	  .container { max-width: 720px; margin: 40px auto; padding: 0 16px; }
-	  .card { border: 1px solid #ddd; border-radius: 8px; padding: 24px; background: #ffffff; }
-	  h1 { margin: 0 0 8px; font-size: 24px; }
-	  h3 { margin: 12px 0 8px; font-size: 18px; }
-	  p { margin: 0 0 16px; }
-	  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
-	  button, a.button { padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; text-decoration: none; color: inherit; background: #f7f7f7; }
-	  .muted { opacity: .75; font-size: 14px; }
-	  form label { display: block; margin: 8px 0 4px; }
-	  input[type=text], input[type=password] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; background: inherit; color: inherit; }
-	</style>
-  </head>
-  <body>
-	<noscript>Cette application nécessite JavaScript.</noscript>
-	<div id="app" class="container">Chargement…</div>
-	<script>
-	// OAuth bootstrap: handle tokens in query string and route appropriately
-	(function(){
-	  try {
-	    var url = new URL(window.location.href);
-	    var token = url.searchParams.get('token');
-	    var twofa = url.searchParams.get('twofa');
-	    var registered = url.searchParams.get('registered');
-	    if (token) {
-	      if (twofa === '1') {
-	        // store pre-2FA token in sessionStorage, then go to 2FA page
-	        sessionStorage.setItem('ft_pre2fa_token', token);
-	        url.searchParams.delete('token');
-	        url.searchParams.delete('twofa');
-	        history.replaceState(null, '', url.pathname + (url.search?('?'+url.searchParams.toString()):'') + '#/2fa');
-	      } else {
-	        // store final token in localStorage and go home
-	        localStorage.setItem('ft_auth_token', token);
-	        url.searchParams.delete('token');
-	        history.replaceState(null, '', url.pathname + (url.search?('?'+url.searchParams.toString()):'') + '#/');
-	      }
-	    } else if (registered === '1') {
-	      url.searchParams.delete('registered');
-	      history.replaceState(null, '', url.pathname + (url.search?('?'+url.searchParams.toString()):'') + '#/login?registered=1');
-	    }
-	  } catch (e) {
-	    // ignore
-	  }
-	})();
-	</script>
-	<script type="module" src="auth.js?v=20251113b"></script>
-	<script type="module" src="main.js?v=20251113b"></script>
-  </body>
-  </html>
+	</body>
+</html>
