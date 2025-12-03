@@ -117,12 +117,12 @@ describe('validateAdminController', () => {
 describe('authController registerController', () => {
 	beforeEach(() => {
 		jest.resetAllMocks()
-		process.env.AUTH_API_SECRET = 'secret'
+		process.env.INTERNAL_API_SECRET = 'secret'
 		process.env.USERS_SERVICE_URL = 'http://users'
 	})
 
-	test('returns 500 if AUTH_API_SECRET missing', async () => {
-		delete process.env.AUTH_API_SECRET
+	test('returns 500 if INTERNAL_API_SECRET missing', async () => {
+		delete process.env.INTERNAL_API_SECRET
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
 		await registerController(req, reply)

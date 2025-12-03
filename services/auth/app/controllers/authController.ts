@@ -26,13 +26,13 @@ export async function registerController(
 	const { login, password } = parsed.data
 
 	try {
-		const authApiSecret = process.env.AUTH_API_SECRET
+		const authApiSecret = process.env.INTERNAL_API_SECRET
 		if (!authApiSecret) {
-			console.error('AUTH_API_SECRET is not defined in environment variables')
+			console.error('INTERNAL_API_SECRET is not defined in environment variables')
 			return reply.code(500).send({ error: 'Server configuration error' })
 		}
 		await registerUser(login, password)
-		const PublicUser = await findPublicUserByLogin(parsed.data.login)
+		const PublicUser = findPublicUserByLogin(parsed.data.login)
 		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
@@ -72,7 +72,7 @@ export async function registerController(
 			sameSite: 'strict',
 			secure: process.env.NODE_ENV === 'production',
 			path: '/',
-			maxAge: 60 * 15
+			maxAge: 60 * 60
 		})
 		return reply.send({ success: true, token })
 	} catch (e: any) {
@@ -107,7 +107,7 @@ export async function loginController(
 			sameSite: 'strict',
 			secure: process.env.NODE_ENV === 'production',
 			path: '/',
-			maxAge: 60 * 15
+			maxAge: 60 * 60
 		})
 
 		// Decode minimal part to know if admin for cookie (no verification needed here)
@@ -115,83 +115,6 @@ export async function loginController(
 			pre_2fa_required: false,
 			token: res.token
 		})
-	}
-}
-
-export async function registerGoogleController(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
-	console.log('Register Google controller called')
-	const parsed = RegisterGoogleSchema.safeParse(request.body)
-	if (!parsed.success) {
-		console.log('Invalid payload for Google registration:', parsed.error)
-		return reply.code(400).send({ error: 'Invalid payload - register' })
-	}
-	const { google_id } = parsed.data
-	console.log('Google ID received:', google_id)
-	const user = findUserByGoogleId(google_id)
-	console.log('Existing user with this Google ID:', user)
-	if (user) {
-		console.log('Google user already exists, logging in')
-		if (!user.two_fa_enabled) {
-			return {
-				token: signToken(
-					{
-						user_id: user.user_id,
-						login: user.login,
-						is_admin: user.is_admin,
-						type: 'auth'
-					},
-					'1h'
-				)
-			}
-		} else {
-			return {
-				pre_2fa_token: signToken(
-					{
-						user_id: user.user_id,
-						type: '2fa'
-					},
-					'5m'
-				)
-			}
-		}
-	}
-	try {
-		const authApiSecret = process.env.AUTH_API_SECRET
-		if (!authApiSecret) {
-			console.error('AUTH_API_SECRET is not defined in environment variables')
-			return reply.code(500).send({ error: 'Server configuration error' })
-		}
-		await registerGoogleUser(google_id)
-		const PublicUser = await findPublicUserByLogin(`google-${google_id}`)
-		console.log('Pulic user = ', PublicUser)
-		if (PublicUser == undefined)
-			return reply.code(500).send({ error: 'Database error1' })
-		const url = `${process.env.USERS_SERVICE_URL}/api/users/new-user`
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-				authorization: authApiSecret
-			},
-			body: JSON.stringify(PublicUser)
-		})
-
-		if (response.ok == false) {
-			deleteUserById(PublicUser.user_id)
-			return reply.code(400).send({ error: 'Synchronisation user db' })
-		}
-		console.log('Registered google user successfully')
-		return reply.send({ success: true })
-	} catch (e: any) {
-		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-			console.log('Google ID already exists....')
-			return reply.code(409).send({ error: 'Login already exists' })
-		}
-		console.log('Database error during Google registration:', e)
-		return reply.code(500).send({ error: 'Database error' })
 	}
 }
 
