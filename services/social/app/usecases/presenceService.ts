@@ -10,7 +10,7 @@ import {
  * @param status - UserStatus enum value
  */
 async function notifyStatusChange(
-	userId: string,
+	userId: number,
 	status: UserStatus
 ): Promise<void> {
 	const base = process.env.USERS_SERVICE_URL
@@ -64,7 +64,7 @@ async function notifyStatusChange(
  * Handle user coming online
  * @param userId
  */
-export async function handleUserOnline(userId: string): Promise<void> {
+export async function handleUserOnline(userId: number): Promise<void> {
 	console.log(`User ${userId} is now ONLINE`)
 	try {
 		await notifyStatusChange(userId, UserStatus.ONLINE)
@@ -80,7 +80,7 @@ export async function handleUserOnline(userId: string): Promise<void> {
  * Handle user going offline
  * @param userId
  */
-export async function handleUserOffline(userId: string): Promise<void> {
+export async function handleUserOffline(userId: number): Promise<void> {
 	console.log(`User ${userId} disconnect timer expired - marking offline`)
 	try {
 		await notifyStatusChange(userId, UserStatus.OFFLINE)

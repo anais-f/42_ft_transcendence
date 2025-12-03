@@ -10,8 +10,8 @@ let heartbeatInterval: NodeJS.Timeout | null = null
  * Handle pong response from client
  * @param userId - User ID
  */
-export function handlePong(userId: string): void {
-	const conn = wsConnections.get(userId)
+export function handlePong(userId: number): void {
+	const conn = wsConnections.get(String(userId))
 	if (conn) {
 		conn.lastHeartbeat = new Date()
 	}
@@ -37,14 +37,14 @@ export function startHeartbeat(): void {
 							`User ${userId} not responding to heartbeat (${timeSinceLastPong}ms), terminating connection`
 						)
 						conn.ws.terminate()
-						removeConnection(userId, conn.ws)
+						removeConnection(Number(userId), conn.ws)
 					}
 				}
 			} catch (e) {
 				const message = e instanceof Error ? e.message : String(e)
 				console.warn(`Heartbeat failed for user ${userId}:`, message)
 				try {
-					removeConnection(userId, conn.ws)
+					removeConnection(Number(userId), conn.ws)
 				} catch (cleanupErr) {}
 			}
 		}

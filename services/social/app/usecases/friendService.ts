@@ -25,22 +25,18 @@ async function sendNotification(
 	userId: IUserId,
 	friendId: IUserId,
 	notifyFn: (
-		fromUserId: string,
+		fromUserId: number,
 		fromUsername: string,
-		toUserId: string
+		toUserId: number
 	) => Promise<boolean>
 ): Promise<boolean> {
 	try {
 		const userData = await UsersApi.getUserData(userId)
 		const fromUsername = userData?.username ?? 'Unknown'
-		const sent = await notifyFn(
-			String(userId.user_id),
-			fromUsername,
-			String(friendId.user_id)
-		)
+		const sent = await notifyFn(userId.user_id, fromUsername, friendId.user_id)
 		if (!sent) {
 			console.log(
-				`User ${String(friendId.user_id)}, ${fromUsername}, not connected, notification not sent`
+				`User ${friendId.user_id}, ${fromUsername}, not connected, notification not sent`
 			)
 		}
 		return sent

@@ -8,6 +8,7 @@ import { routeMessage } from '../usecases/messageRouter.js'
 import { UsersApi } from '../repositories/UsersApi.js'
 
 // TODO : split into smaller functions when notifications are added and refactored logic after add connection
+// rename la fonction en fonction de son role
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -37,8 +38,8 @@ export async function handleWsConnection(
 		return
 	}
 
-	const userId = String(payload.user_id)
-	const userLogin = String(payload.login)
+	const userId = payload.user_id
+	const userLogin = payload.login
 
 	// Add connection
 	try {
@@ -52,8 +53,8 @@ export async function handleWsConnection(
 
 	let username
 	try {
-		const userData = await UsersApi.getUserData({ user_id: Number(userId) })
-		username = String(userData.username ?? userLogin)
+		const userData = await UsersApi.getUserData({ user_id: userId })
+		username = userData.username ?? userLogin
 	} catch (error) {
 		console.error(`Failed to fetch user data for user ${userId}:`, error)
 		username = userLogin
