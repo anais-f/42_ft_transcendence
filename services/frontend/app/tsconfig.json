@@ -3,10 +3,8 @@
 	"compilerOptions": {
 		"outDir": "dist",
 		"rootDir": ".",
-		"isolatedModules": true
+		"moduleResolution": "nodenext"
 	},
-	//	"references": [{ "path": "../../../packages/pong-shared" }],
-	//	"include": ["index.ts"],
 	"ts-node": {
 		"esm": true
 	}
