@@ -1,53 +1,19 @@
 import './database/socialDatabase.js'
-import Fastify, { FastifyInstance } from 'fastify'
-import Swagger from '@fastify/swagger'
-import SwaggerUI from '@fastify/swagger-ui'
-import fastifyJwt from '@fastify/jwt'
-import fastifyCookie from '@fastify/cookie'
-import FastifyWebSocket from '@fastify/websocket'
-import fs from 'fs'
-import {
-	ZodTypeProvider,
-	validatorCompiler,
-	serializerCompiler,
-	jsonSchemaTransform
-} from 'fastify-type-provider-zod'
+import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import metricPlugin from 'fastify-metrics'
 import {
 	httpRequestCounter,
 	responseTimeHistogram
 } from '@ft_transcendence/common'
 import { socialRoutes } from './routes/socialRoutes.js'
+import { createApp } from '@packages/common/dist/init-server/createApp.js'
+import { loadOpenAPISchema } from '@packages/common/dist/init-server/loadOpenAPISchema.js'
 
-const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
-function createApp(): FastifyInstance {
-	const app = Fastify({
-		logger: true
-	}).withTypeProvider<ZodTypeProvider>()
-	app.setValidatorCompiler(validatorCompiler)
-	app.setSerializerCompiler(serializerCompiler)
-
-	const jwtSecret = process.env.JWT_SECRET_SOCIAL
-	if (!jwtSecret) {
-		throw new Error('JWT_SECRET environment variable is required')
-	}
-
-	app.register(fastifyCookie)
-
-	app.register(fastifyJwt, {
-		secret: jwtSecret,
-		cookie: {
-			cookieName: 'auth_token',
-			signed: false
-		}
-	})
-
-	app.register(FastifyWebSocket as any)
-
-	const openapiSwagger = loadOpenAPISchema()
-	app.register(Swagger as any, {
+const openapiSwagger = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+export async function start(): Promise<void> {
+	const app = createApp(socialRoutes, {
 		openapi: {
 			info: {
 				title: 'API for Social Service',
@@ -57,19 +23,8 @@ function createApp(): FastifyInstance {
 			components: openapiSwagger.components
 		},
 		transform: jsonSchemaTransform
-	})
+	}, process.env.JWT_SECRET_SOCIAL as string)
 
-	app.register(SwaggerUI as any, {
-		routePrefix: '/docs'
-	})
-
-	app.register(socialRoutes)
-
-	return app
-}
-
-export async function start(): Promise<void> {
-	const app = createApp()
 	app.addHook('onRequest', (request, reply, done) => {
 		;(request as any).startTime = process.hrtime()
 		done()
@@ -107,23 +62,6 @@ export async function start(): Promise<void> {
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)
-	}
-}
-
-function loadOpenAPISchema() {
-	try {
-		if (!fs.existsSync(OPENAPI_FILE)) {
-			console.warn(
-				`OpenAPI DTO file not found at ${OPENAPI_FILE} - continuing without OpenAPI components`
-			)
-			return { components: {} }
-		}
-
-		const schemaData = fs.readFileSync(OPENAPI_FILE, 'utf-8')
-		return JSON.parse(schemaData)
-	} catch (error) {
-		console.error('Error loading OpenAPI schema:', error)
-		return { components: {} }
 	}
 }
 

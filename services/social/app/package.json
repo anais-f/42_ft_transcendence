@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@fastify/cookie": "^10.0.0",
 		"@ft_transcendence/common": "*",
+		"@fastify/websocket": "^11.2.0",
 		"@ft_transcendence/security": "*",
 		"jsonwebtoken": "^9.0.2"
 	}
