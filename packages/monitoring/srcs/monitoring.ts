@@ -1,13 +1,23 @@
-import { Counter, Gauge, Histogram, collectDefaultMetrics, register, Registry } from 'prom-client'
+import {
+	Counter,
+	Gauge,
+	Histogram,
+	collectDefaultMetrics,
+	register,
+	Registry
+} from 'prom-client'
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify'
 
 export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 	app.decorateRequest('startTime', null)
 
-	app.addHook('onRequest', (request: FastifyRequest, reply: FastifyReply, done: () => void) => {
-		request.startTime = process.hrtime()
-		done()
-	})
+	app.addHook(
+		'onRequest',
+		(request: FastifyRequest, reply: FastifyReply, done: () => void) => {
+			request.startTime = process.hrtime()
+			done()
+		}
+	)
 
 	app.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply) => {
 		httpRequestCounter.inc({

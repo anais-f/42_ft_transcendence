@@ -1,7 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { authenticator } from 'otplib'
 import { verifyToken, signToken } from '../utils/jwt.js'
-import { setUser2FAEnabled, isUser2FAEnabled } from '../repositories/userRepository.js'
+import {
+	setUser2FAEnabled,
+	isUser2FAEnabled
+} from '../repositories/userRepository.js'
 import { twofaCodeSchema } from '@ft_transcendence/common'
 
 const TWOFA_URL = process.env.TWOFA_SERVICE_URL
@@ -145,7 +148,9 @@ export async function disable2faController(
 	try {
 		const parsed = twofaCodeSchema.safeParse(req.body)
 		if (!parsed.success) {
-			return reply.code(400).send({ error: 'Invalid request body - twofa_code required' })
+			return reply
+				.code(400)
+				.send({ error: 'Invalid request body - twofa_code required' })
 		}
 		const { twofa_code } = parsed.data
 		const verify = await call2fa('/api/2fa/verify', {

@@ -28,7 +28,9 @@ export async function registerController(
 	try {
 		const authApiSecret = process.env.INTERNAL_API_SECRET
 		if (!authApiSecret) {
-			console.error('INTERNAL_API_SECRET is not defined in environment variables')
+			console.error(
+				'INTERNAL_API_SECRET is not defined in environment variables'
+			)
 			return reply.code(500).send({ error: 'Server configuration error' })
 		}
 		await registerUser(login, password)
@@ -45,7 +47,7 @@ export async function registerController(
 			},
 			body: JSON.stringify(PublicUser)
 		})
-	console.log('response', response)
+		console.log('response', response)
 
 		if (response.status === 401) {
 			deleteUserById(PublicUser.user_id)

@@ -16,7 +16,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 		{ preHandler: jwtAuthMiddleware },
 		enable2faController
 	)
-	
+
 	// Verify during setup - requires auth_token
 	app.post(
 		'/api/2fa/verify-setup',

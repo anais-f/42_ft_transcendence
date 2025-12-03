@@ -1,6 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { OAuth2Client } from 'google-auth-library'
-import { findPublicUserByGoogleId, findUserByGoogleId, deleteUserById } from '../repositories/userRepository.js'
+import {
+	findPublicUserByGoogleId,
+	findUserByGoogleId,
+	deleteUserById
+} from '../repositories/userRepository.js'
 import { signToken } from '../utils/jwt.js'
 import { createGoogleUser } from '../repositories/userRepository.js'
 
@@ -12,7 +16,7 @@ export async function googleLoginController(
 ) {
 	try {
 		const { credential } = request.body as { credential: string }
-		
+
 		if (!credential) {
 			return reply.code(400).send({ error: 'Missing Google credential' })
 		}
@@ -22,14 +26,18 @@ export async function googleLoginController(
 			idToken: credential,
 			audience: process.env.GOOGLE_CLIENT_ID
 		})
-		
+
 		const payload = ticket.getPayload()
 		if (!payload || !payload.sub) {
 			return reply.code(401).send({ error: 'Invalid Google token' })
 		}
-		
+
 		const google_id = payload.sub
-		console.log('Google User Info:', { id: google_id, email: payload.email, name: payload.name })
+		console.log('Google User Info:', {
+			id: google_id,
+			email: payload.email,
+			name: payload.name
+		})
 		const user = findUserByGoogleId(google_id)
 		if (user) {
 			console.log('Google user already exists, logging in')
@@ -69,10 +77,9 @@ export async function googleLoginController(
 					path: '/',
 					maxAge: 60 * 5
 				})
-				return reply.send({ pre_2fa_required: true})
+				return reply.send({ pre_2fa_required: true })
 			}
-		}
-		else {
+		} else {
 			const authApiSecret = process.env.INTERNAL_API_SECRET
 			if (!authApiSecret) {
 				console.error('INTERNAL_API_SECRET is not set')
@@ -97,8 +104,7 @@ export async function googleLoginController(
 				return reply
 					.code(500)
 					.send({ error: 'Unauthorized to create user in users service' })
-			}
-			else if (response.ok == false) {
+			} else if (response.ok == false) {
 				deleteUserById(PublicUser.user_id)
 				return reply.code(400).send({ error: 'Synchronisation user db' })
 			}
@@ -122,8 +128,7 @@ export async function googleLoginController(
 			})
 			return reply.send({ pre_2fa_required: false, token: authToken })
 		}
-	}
-	catch (error) {
+	} catch (error) {
 		console.error('Error in Google login:', error)
 		return reply.code(401).send({ error: 'Invalid Google token' })
 	}
@@ -134,7 +139,8 @@ export async function googleCallBackController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	return reply.code(410).send({ 
-		error: 'OAuth 2.0 flow deprecated. Please use POST /api/login-google with Google Sign-In' 
+	return reply.code(410).send({
+		error:
+			'OAuth 2.0 flow deprecated. Please use POST /api/login-google with Google Sign-In'
 	})
 }

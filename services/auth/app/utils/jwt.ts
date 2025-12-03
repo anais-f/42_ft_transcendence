@@ -16,7 +16,7 @@ export function signToken(
 			'JWT_SECRET environment variable is required to sign tokens'
 		)
 	}
-	console.log('JWT Secret:', secret);
+	console.log('JWT Secret:', secret)
 	return jwt.sign(payload, secret, { expiresIn: expiresIn })
 }
 

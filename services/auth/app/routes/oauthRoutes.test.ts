@@ -62,7 +62,8 @@ describe('OAuth Routes', () => {
 
 		it('should handle new Google user registration', async () => {
 			// Mock Google user info
-			global.fetch = jest.fn()
+			global.fetch = jest
+				.fn()
 				.mockResolvedValueOnce({
 					ok: true,
 					json: async () => ({
@@ -149,7 +150,8 @@ describe('OAuth Routes', () => {
 		})
 
 		it('should handle users service sync failure', async () => {
-			global.fetch = jest.fn()
+			global.fetch = jest
+				.fn()
 				// Google user info
 				.mockResolvedValueOnce({
 					ok: true,

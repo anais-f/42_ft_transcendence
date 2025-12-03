@@ -2,14 +2,26 @@ import Fastify from 'fastify'
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import type { Database } from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
-import { ZodTypeProvider, validatorCompiler, serializerCompiler, jsonSchemaTransform } from 'fastify-type-provider-zod'
+import {
+	ZodTypeProvider,
+	validatorCompiler,
+	serializerCompiler,
+	jsonSchemaTransform
+} from 'fastify-type-provider-zod'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import metricPlugin from 'fastify-metrics'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
-import { CreateTournamentSchema, IdParamSchema, RemoveTournamentSchema } from '@ft_transcendence/common'
-import { jwtAuthMiddleware, jwtAuthOwnerMiddleware } from '@ft_transcendence/security'
+import {
+	CreateTournamentSchema,
+	IdParamSchema,
+	RemoveTournamentSchema
+} from '@ft_transcendence/common'
+import {
+	jwtAuthMiddleware,
+	jwtAuthOwnerMiddleware
+} from '@ft_transcendence/security'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
 
@@ -18,18 +30,18 @@ const jwtSecret = process.env.JWT_SECRET
 if (!jwtSecret) {
 	throw new Error('JWT_SECRET environment variable is required')
 }
-console.log('Using JWT Secret:', jwtSecret);
+console.log('Using JWT Secret:', jwtSecret)
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
-		secret: jwtSecret,
-		cookie: {
-			cookieName: 'auth_token',
-			signed: false
-		}
-	})
+	secret: jwtSecret,
+	cookie: {
+		cookieName: 'auth_token',
+		signed: false
+	}
+})
 
 setupFastifyMonitoringHooks(app)
 
@@ -61,26 +73,34 @@ let nextTournamentId = 1
 
 let db: Database
 
-function historyRoutes(app: FastifyInstance)
-{
-	app.get('/api/matchHisotry/:id',{preHandler: jwtAuthMiddleware}, getMatchHistoryController)
+function historyRoutes(app: FastifyInstance) {
+	app.get(
+		'/api/matchHisotry/:id',
+		{ preHandler: jwtAuthMiddleware },
+		getMatchHistoryController
+	)
 }
 
 function tournamentRoutes(app: FastifyInstance) {
-	app.post('/api/createTournament', 
+	app.post(
+		'/api/createTournament',
 		{
 			schema: {
 				body: CreateTournamentSchema
 			},
 			preHandler: jwtAuthMiddleware
 		},
-		createTournamentController)
-	app.post('/api/joinTournament/:id',
+		createTournamentController
+	)
+	app.post(
+		'/api/joinTournament/:id',
 		{
 			preHandler: jwtAuthMiddleware
 		},
-		joinTournamentController)
-	app.post('/api/removeFromTournament/:id',
+		joinTournamentController
+	)
+	app.post(
+		'/api/removeFromTournament/:id',
 		{
 			schema: {
 				body: RemoveTournamentSchema
@@ -89,9 +109,18 @@ function tournamentRoutes(app: FastifyInstance) {
 		},
 		removeFromTournamentController
 	)
-	app.get('/api/startTournament/:id'/*, { preHandler: jwtAuthMiddleware }*/, startTournamentController)
-	app.get('/api/tournament/:id'/*, { preHandler: jwtAuthMiddleware }*/, getTournamentController)
-	app.delete('/api/tournament/:id'/*, { preHandler: jwtAuthOwnerMiddleware }*/, deleteTournamentController)
+	app.get(
+		'/api/startTournament/:id' /*, { preHandler: jwtAuthMiddleware }*/,
+		startTournamentController
+	)
+	app.get(
+		'/api/tournament/:id' /*, { preHandler: jwtAuthMiddleware }*/,
+		getTournamentController
+	)
+	app.delete(
+		'/api/tournament/:id' /*, { preHandler: jwtAuthOwnerMiddleware }*/,
+		deleteTournamentController
+	)
 }
 
 function getMatchHistoryController(
@@ -100,20 +129,24 @@ function getMatchHistoryController(
 ) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' });
+		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	const matchId = IdParamSchema.parse(request.params);
+	const matchId = IdParamSchema.parse(request.params)
 	const db = getDb()
-	const match = db.prepare(`
+	const match = db
+		.prepare(
+			`
 		SELECT mh.id_match, mh.winner_id, mh.played_at, mp.player_id, mp.score
 		FROM match_history mh
 		JOIN match_player mp ON mh.id_match = mp.id_match
 		WHERE mh.id_match = ? AND (mp.player_id = ? OR mh.winner_id = ?)
-	`).all(matchId.id, userId, userId)
+	`
+		)
+		.all(matchId.id, userId, userId)
 	if (match.length === 0) {
-		return reply.status(404).send({ error: 'Match not found or access denied' });
+		return reply.status(404).send({ error: 'Match not found or access denied' })
 	}
-	return reply.send({ success: true, match });
+	return reply.send({ success: true, match })
 }
 
 function deleteTournamentController(
@@ -122,54 +155,52 @@ function deleteTournamentController(
 ) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' });
+		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	const tournamentId = IdParamSchema.parse(request.params);
-	const tournament = tournaments.get(Number(tournamentId.id));
+	const tournamentId = IdParamSchema.parse(request.params)
+	const tournament = tournaments.get(Number(tournamentId.id))
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' });
+		return reply.status(404).send({ error: 'Tournament not found' })
 	}
 	if (userId != tournament.creatorId)
-		return reply.status(403).send({ error: 'Only the creator can delete the tournament' });
-	tournaments.delete(tournament.id);
-	return reply.send({ success: true });
+		return reply
+			.status(403)
+			.send({ error: 'Only the creator can delete the tournament' })
+	tournaments.delete(tournament.id)
+	return reply.send({ success: true })
 }
 
-function getTournamentController(
-	request: FastifyRequest,
-	reply: FastifyReply) {
+function getTournamentController(request: FastifyRequest, reply: FastifyReply) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' });
+		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	const tournamentId = IdParamSchema.parse(request.params);
-	const tournament = tournaments.get(Number(tournamentId.id));
+	const tournamentId = IdParamSchema.parse(request.params)
+	const tournament = tournaments.get(Number(tournamentId.id))
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' });
+		return reply.status(404).send({ error: 'Tournament not found' })
 	}
 	if (!tournament.participants.includes(userId)) {
-		return reply.status(403).send({ error: 'Access denied to this tournament' });
+		return reply.status(403).send({ error: 'Access denied to this tournament' })
 	}
-	return reply.send({ success: true, tournament });
+	return reply.send({ success: true, tournament })
 }
 
 const randomAlphaNumeric = (length: number) => {
-  let s = "";
-  Array.from({ length }).some(() => {
-    s += Math.random().toString(36).slice(2);
-    return s.length >= length;
-  });
-  return s.slice(0, length);
-};
+	let s = ''
+	Array.from({ length }).some(() => {
+		s += Math.random().toString(36).slice(2)
+		return s.length >= length
+	})
+	return s.slice(0, length)
+}
 
-const createInviteCode =  (): string =>
-{
-	const str1 : string = randomAlphaNumeric(4).toUpperCase()
-	const str2 : string = randomAlphaNumeric(4).toLocaleUpperCase()
+const createInviteCode = (): string => {
+	const str1: string = randomAlphaNumeric(4).toUpperCase()
+	const str2: string = randomAlphaNumeric(4).toLocaleUpperCase()
 	for (const tournament of tournaments.values())
-		if (tournament.name === (str1 + '-' + str2))
-			return createInviteCode()
-	return (str1 + '-' + str2)
+		if (tournament.name === str1 + '-' + str2) return createInviteCode()
+	return str1 + '-' + str2
 }
 
 function removeFromTournamentController(
@@ -178,62 +209,66 @@ function removeFromTournamentController(
 ) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' });
+		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	const tournamentId = IdParamSchema.parse(request.params);
-	const parsed = RemoveTournamentSchema.safeParse(request.body);
+	const tournamentId = IdParamSchema.parse(request.params)
+	const parsed = RemoveTournamentSchema.safeParse(request.body)
 	if (!parsed.success) {
-		return reply.status(400).send({ error: parsed.error });
+		return reply.status(400).send({ error: parsed.error })
 	}
-	const tournament = tournaments.get(Number(tournamentId.id));
+	const tournament = tournaments.get(Number(tournamentId.id))
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' });
+		return reply.status(404).send({ error: 'Tournament not found' })
 	}
 	if (userId != tournament.creatorId)
-		return reply.status(403).send({ error: 'Only the creator can remove participants' });
-	const participantIndex = tournament.participants.indexOf(parsed.data.userId);
+		return reply
+			.status(403)
+			.send({ error: 'Only the creator can remove participants' })
+	const participantIndex = tournament.participants.indexOf(parsed.data.userId)
 	if (participantIndex === -1) {
-		return reply.status(400).send({ error: 'User is not in the tournament' });
+		return reply.status(400).send({ error: 'User is not in the tournament' })
 	}
-	tournament.participants.splice(participantIndex, 1);
+	tournament.participants.splice(participantIndex, 1)
 	tournament.participantsBan.push(parsed.data.userId)
-	return reply.send({ success: true, tournament });
+	return reply.send({ success: true, tournament })
 }
 
 function shuffle(array: any[]) {
-  let currentIndex = array.length;
+	let currentIndex = array.length
 
-  while (currentIndex != 0) {
-    let randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
-  }
+	while (currentIndex != 0) {
+		let randomIndex = Math.floor(Math.random() * currentIndex)
+		currentIndex--
+		;[array[currentIndex], array[randomIndex]] = [
+			array[randomIndex],
+			array[currentIndex]
+		]
+	}
 }
 
 function createTournamentTree(id: number) {
-	const tournament = tournaments.get(id);
+	const tournament = tournaments.get(id)
 	if (!tournament) {
-		throw new Error('Tournament not found');
+		throw new Error('Tournament not found')
 	}
-	console.log('Before shuffle:', tournament.participants);
+	console.log('Before shuffle:', tournament.participants)
 	shuffle(tournament.participants)
-	console.log('Shuffled participants:', tournament.participants);
+	console.log('Shuffled participants:', tournament.participants)
 	if (!tournament) {
-		throw new Error('Tournament not found');
+		throw new Error('Tournament not found')
 	}
 	if (tournament.participants.length !== tournament.maxParticipants) {
-		throw new Error('Not enough participants to create the tournament tree');
+		throw new Error('Not enough participants to create the tournament tree')
 	}
 	if (tournament.status !== 'ongoing') {
-		throw new Error('Tournament is not ongoing');
+		throw new Error('Tournament is not ongoing')
 	}
 	let maxRound = Math.log2(tournament.maxParticipants)
 	for (let match = 0; match < tournament.maxParticipants / 2; match++) {
-		const player1Index = match * 2;
-		const player2Index = player1Index + 1;
-		const player1 = tournament.participants[player1Index];
-		const player2 = tournament.participants[player2Index];
+		const player1Index = match * 2
+		const player2Index = player1Index + 1
+		const player1 = tournament.participants[player1Index]
+		const player2 = tournament.participants[player2Index]
 		tournament.matchs.push({
 			round: maxRound,
 			matchNumber: match,
@@ -243,59 +278,68 @@ function createTournamentTree(id: number) {
 		})
 	}
 	for (let round = maxRound - 1; round > 0; --round) {
-		const matchesInRound = tournament.maxParticipants / (2 ** (maxRound - round + 1));
-		console.log('Creating matches for round', round, 'with', matchesInRound, 'matches');
+		const matchesInRound =
+			tournament.maxParticipants / 2 ** (maxRound - round + 1)
+		console.log(
+			'Creating matches for round',
+			round,
+			'with',
+			matchesInRound,
+			'matches'
+		)
 		for (let match = 0; match < matchesInRound; match++) {
-	
 			tournament.matchs.push({
 				previousMatchId1: match * 2,
 				previousMatchId2: match * 2 + 1,
 				round: round,
 				matchNumber: match,
 				status: 'waiting_for_players'
-			});
+			})
 		}
 	}
-	console.log('Tournament Matches:', tournament.matchs);
-	console.log('Tournament tree created successfully');
+	console.log('Tournament Matches:', tournament.matchs)
+	console.log('Tournament tree created successfully')
 }
 
 function startTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const tournamentId = IdParamSchema.parse(request.params);
-	const tournament = tournaments.get(Number(tournamentId.id));
+	const tournamentId = IdParamSchema.parse(request.params)
+	const tournament = tournaments.get(Number(tournamentId.id))
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' });
+		return reply.status(404).send({ error: 'Tournament not found' })
 	}
 	if (tournament.status !== 'pending') {
-		return reply.status(400).send({ error: 'Tournament has already started or finished' });
+		return reply
+			.status(400)
+			.send({ error: 'Tournament has already started or finished' })
 	}
 	if (tournament.participants.length != tournament.maxParticipants) {
-		return reply.status(400).send({ error: 'Not enough participants to start the tournament' });
+		return reply
+			.status(400)
+			.send({ error: 'Not enough participants to start the tournament' })
 	}
-	tournament.status = 'ongoing';
-	createTournamentTree(tournament.id);
-	return reply.send({ success: true, tournament });
+	tournament.status = 'ongoing'
+	createTournamentTree(tournament.id)
+	return reply.send({ success: true, tournament })
 }
 
 function createTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const parsed = CreateTournamentSchema.safeParse(request.body);
+	const parsed = CreateTournamentSchema.safeParse(request.body)
 	if (!parsed.success) {
-		return reply.status(400).send({ error: parsed.error });
+		return reply.status(400).send({ error: parsed.error })
 	}
 	//verifier id creator
-	for (const tournament of tournaments.values())
-	{
-		for (const participant of tournament.participants)
-		{
-			if (participant === parsed.data.creatorId)
-			{
-				return reply.status(400).send({ error: 'User is already in another tournament' });
+	for (const tournament of tournaments.values()) {
+		for (const participant of tournament.participants) {
+			if (participant === parsed.data.creatorId) {
+				return reply
+					.status(400)
+					.send({ error: 'User is already in another tournament' })
 			}
 		}
 	}
@@ -316,37 +360,38 @@ function joinTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const tournamentId = IdParamSchema.parse(request.params);
+	const tournamentId = IdParamSchema.parse(request.params)
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' });
+		return reply.status(401).send({ error: 'Unauthorized' })
 	}
 	//verifier id user
-	for (const tournament of tournaments.values())
-	{
-		for (const participant of tournament.participants)
-		{
-			if (participant === userId)
-			{
-				return reply.status(400).send({ error: 'User is already in another tournament' });
+	for (const tournament of tournaments.values()) {
+		for (const participant of tournament.participants) {
+			if (participant === userId) {
+				return reply
+					.status(400)
+					.send({ error: 'User is already in another tournament' })
 			}
 		}
 	}
-	const tournament = tournaments.get(Number(tournamentId.id));
+	const tournament = tournaments.get(Number(tournamentId.id))
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' });
+		return reply.status(404).send({ error: 'Tournament not found' })
 	}
-	if (tournament.participantsBan.includes(userId) == true){
+	if (tournament.participantsBan.includes(userId) == true) {
 		return reply.status(403).send({ error: 'User is ban from this tournament' })
 	}
 	if (tournament.participants.length >= tournament.maxParticipants) {
-		return reply.status(400).send({ error: 'Tournament is full' });
+		return reply.status(400).send({ error: 'Tournament is full' })
 	}
 	if (tournament.participants.includes(userId)) {
-		return reply.status(400).send({ error: 'User already joined the tournament' });
+		return reply
+			.status(400)
+			.send({ error: 'User already joined the tournament' })
 	}
-	tournament.participants.push(userId);
-	return reply.send({ success: true, tournament });
+	tournament.participants.push(userId)
+	return reply.send({ success: true, tournament })
 }
 
 async function registerRoutes(app: FastifyInstance) {
@@ -376,24 +421,32 @@ function saveMatchToHistory(
 ): number {
 	const db = getDb()
 	const winnerId = scorePlayer1 > scorePlayer2 ? player1Id : player2Id
-	
-	const matchResult = db.prepare(`
+
+	const matchResult = db
+		.prepare(
+			`
 		INSERT INTO match_history (winner_id, is_tournament)
 		VALUES (?, ?)
-	`).run(winnerId, isTournament)
-	
+	`
+		)
+		.run(winnerId, isTournament)
+
 	const matchId = matchResult.lastInsertRowid as number
-	
-	db.prepare(`
+
+	db.prepare(
+		`
 		INSERT INTO match_player (id_match, player_id, score)
 		VALUES (?, ?, ?)
-	`).run(matchId, player1Id, scorePlayer1)
-	
-	db.prepare(`
+	`
+	).run(matchId, player1Id, scorePlayer1)
+
+	db.prepare(
+		`
 		INSERT INTO match_player (id_match, player_id, score)
 		VALUES (?, ?, ?)
-	`).run(matchId, player2Id, scorePlayer2)
-	
+	`
+	).run(matchId, player2Id, scorePlayer2)
+
 	return matchId
 }
 
@@ -449,12 +502,12 @@ async function runServer() {
 
 	const port = Number(process.env.PORT)
 	const host = '0.0.0.0'
-	
+
 	await app.listen({ port, host })
 	console.log(` Matchmaking service running on ${host}:${port}`)
 }
 
-runServer().catch(error => {
+runServer().catch((error) => {
 	console.error('Failed to start Matchmaking service:', error)
 	process.exit(1)
 })

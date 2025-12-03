@@ -197,8 +197,14 @@ describe('Auth Service - Integration Tests', () => {
 			// Check that cookies are cleared (expires in the past)
 			const setCookieHeader = response.headers['set-cookie']
 			if (setCookieHeader) {
-				const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader]
-				expect(cookies.some((c: string) => c.includes('auth_token') && c.includes('Expires'))).toBe(true)
+				const cookies = Array.isArray(setCookieHeader)
+					? setCookieHeader
+					: [setCookieHeader]
+				expect(
+					cookies.some(
+						(c: string) => c.includes('auth_token') && c.includes('Expires')
+					)
+				).toBe(true)
 			}
 		})
 	})
@@ -269,7 +275,9 @@ describe('Auth Service - Integration Tests', () => {
 
 			const setCookieHeader = response.headers['set-cookie']
 			if (setCookieHeader) {
-				const cookieString = Array.isArray(setCookieHeader) ? setCookieHeader[0] : setCookieHeader
+				const cookieString = Array.isArray(setCookieHeader)
+					? setCookieHeader[0]
+					: setCookieHeader
 				expect(cookieString).toContain('HttpOnly')
 				expect(cookieString).toContain('SameSite=Strict')
 			}

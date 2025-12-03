@@ -64,7 +64,9 @@ export function findUserByGoogleId(google_id: string): IUserAuth | undefined {
 	return stmt.get(google_id) as IUserAuth | undefined
 }
 
-export function findPublicUserByGoogleId(google_id: string): PublicUserAuthDTO | undefined {
+export function findPublicUserByGoogleId(
+	google_id: string
+): PublicUserAuthDTO | undefined {
 	const stmt = db().prepare(
 		'SELECT user_id, login FROM users WHERE google_id = ?'
 	)

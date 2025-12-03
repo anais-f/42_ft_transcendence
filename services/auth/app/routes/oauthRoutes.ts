@@ -4,4 +4,3 @@ import { googleCallBackController } from '../controllers/oauthController.js'
 export async function oauthRoutes(app: FastifyInstance) {
 	app.get('/login/google/callback', googleCallBackController)
 }
-

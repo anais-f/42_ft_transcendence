@@ -17,9 +17,9 @@ export const app: FastifyInstance = Fastify({
 }).withTypeProvider<ZodTypeProvider>()
 
 const jwtSecret = process.env.JWT_SECRET
-	if (!jwtSecret) {
-		throw new Error('JWT_SECRET environment variable is required')
-	}
+if (!jwtSecret) {
+	throw new Error('JWT_SECRET environment variable is required')
+}
 
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
