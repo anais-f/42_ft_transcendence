@@ -13,21 +13,23 @@ export function jwtAuthMiddleware(
 	done: HookHandlerDoneFunction
 ): void {
 	try {
-		request.jwtVerify((err: Error | null) => {
-			if (err) {
+		request.jwtVerify()
+			.then(() => {
+				done()
+			})
+			.catch((err: Error) => {
 				void reply.code(401).send({
 					success: false,
 					error: ERROR_MESSAGES.UNAUTHORIZED
 				})
-				return
-			}
-			done()
-		})
+				done()
+			})
 	} catch (err) {
 		void reply.code(401).send({
 			success: false,
 			error: ERROR_MESSAGES.UNAUTHORIZED
 		})
+		done()
 	}
 }
 
