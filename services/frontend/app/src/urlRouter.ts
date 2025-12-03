@@ -1,81 +1,80 @@
-import '../style.css'
-import { WalerPage } from './pages/old_pages/old_wale.js'
-import { HomePage } from './pages/old_pages/old_home.js'
-import { AboutUsPage } from './pages/old_pages/old_aboutUs.js'
-import { RegisterPage } from './pages/old_pages/old_register.js'
-import { MyPage } from './pages/old_pages/old_mypage.js'
-import { GamePage } from './pages/old_pages/old_gameP.js'
+// import '../style.css'
+// import { WalerPage } from './pages/old_pages/old_wale.js'
+// import { HomePage } from './pages/home.js'
 
-document.addEventListener('DOMContentLoaded', () => {
-	const contentDiv = document.getElementById('content')
-	const dynamicMenu = document.getElementById('menu')
 
-	if (!contentDiv || !dynamicMenu) {
-		console.error('Missing #content or #menu in index.html')
-		return
-	}
+// import { GamePage } from './pages/game.js'
 
-	const content = contentDiv as HTMLElement
-	const menu = dynamicMenu as HTMLElement
+// document.addEventListener('DOMContentLoaded', () => {
+// 	const contentDiv = document.getElementById('content')
+// 	const dynamicMenu = document.getElementById('menu')
 
-	const pages: Record<string, string> = {
-		home: HomePage(),
-		about: AboutUsPage(),
-		register: RegisterPage(),
-		wales: WalerPage(),
-		me: MyPage(),
-		game: GamePage()
-	}
+// 	if (!contentDiv || !dynamicMenu) {
+// 		console.error('Missing #content or #menu in index.html')
+// 		return
+// 	}
 
-	// Build menu
-	for (const key in pages) {
-		const li = document.createElement('li')
-		li.innerHTML = `<a href="#${key}">${key}</a>`
-		menu.appendChild(li)
-	}
+// 	const content = contentDiv as HTMLElement
+// 	const menu = dynamicMenu as HTMLElement
 
-	function render(hash: string) {
-		const key = (hash.replace(/^#/, '') || 'home') as keyof typeof pages
-		content.innerHTML = pages[key] ?? pages.home
-	}
+// 	const pages: Record<string, string> = {
+// 		home: HomePage(),
+// 		about: AboutUsPage(),
+// 		register: RegisterPage(),
+// 		wales: WalerPage(),
+// 		me: MyPage(),
+// 		game: GamePage()
+// 	}
 
-	window.addEventListener('hashchange', () => render(location.hash))
-	render(location.hash)
+// 	// Build menu
+// 	for (const key in pages) {
+// 		const li = document.createElement('li')
+// 		li.innerHTML = `<a href="#${key}">${key}</a>`
+// 		menu.appendChild(li)
+// 	}
 
-	// Submit handler (register)
-	content.addEventListener('submit', async (e: Event) => {
-		const form = e.target as HTMLFormElement
-		if (!form || form.id !== 'register-form') return
-		e.preventDefault()
+// 	function render(hash: string) {
+// 		const key = (hash.replace(/^#/, '') || 'home') as keyof typeof pages
+// 		content.innerHTML = pages[key] ?? pages.home
+// 	}
 
-		const login =
-			(
-				document.getElementById('reg-login') as HTMLInputElement
-			)?.value?.trim() ?? ''
-		const password =
-			(document.getElementById('reg-password') as HTMLInputElement)?.value ?? ''
-		const msg = document.getElementById('register-msg') as HTMLElement | null
+// 	window.addEventListener('hashchange', () => render(location.hash))
+// 	render(location.hash)
 
-		if (!login || !password) {
-			if (msg) msg.textContent = 'Missing login or password'
-			return
-		}
+// 	// Submit handler (register)
+// 	content.addEventListener('submit', async (e: Event) => {
+// 		const form = e.target as HTMLFormElement
+// 		if (!form || form.id !== 'register-form') return
+// 		e.preventDefault()
 
-		try {
-			const res = await fetch('/auth/api/register', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ login, password })
-			})
-			if (!res.ok) {
-				const text = await res.text().catch(() => '')
-				if (msg)
-					msg.textContent = `Register failed (${res.status}): ${text || 'error'}`
-				return
-			}
-			if (msg) msg.textContent = 'Account created!'
-		} catch {
-			if (msg) msg.textContent = 'Network error'
-		}
-	})
-})
+// 		const login =
+// 			(
+// 				document.getElementById('reg-login') as HTMLInputElement
+// 			)?.value?.trim() ?? ''
+// 		const password =
+// 			(document.getElementById('reg-password') as HTMLInputElement)?.value ?? ''
+// 		const msg = document.getElementById('register-msg') as HTMLElement | null
+
+// 		if (!login || !password) {
+// 			if (msg) msg.textContent = 'Missing login or password'
+// 			return
+// 		}
+
+// 		try {
+// 			const res = await fetch('/auth/api/register', {
+// 				method: 'POST',
+// 				headers: { 'content-type': 'application/json' },
+// 				body: JSON.stringify({ login, password })
+// 			})
+// 			if (!res.ok) {
+// 				const text = await res.text().catch(() => '')
+// 				if (msg)
+// 					msg.textContent = `Register failed (${res.status}): ${text || 'error'}`
+// 				return
+// 			}
+// 			if (msg) msg.textContent = 'Account created!'
+// 		} catch {
+// 			if (msg) msg.textContent = 'Network error'
+// 		}
+// 	})
+// })
