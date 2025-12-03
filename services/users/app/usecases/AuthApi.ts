@@ -16,9 +16,9 @@ export class AuthApi {
 	 */
 	static async getAllUsers() {
 		const base = process.env.AUTH_SERVICE_URL
-		const secret = process.env.AUTH_API_SECRET
+		const secret = process.env.INTERNAL_API_SECRET
 		if (!base || !secret)
-			throw new AppError('Missing AUTH_SERVICE_URL or AUTH_API_SECRET env', 500)
+			throw new AppError('Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env', 500)
 
 		const url = `${base}/api/users`
 		const headers = {

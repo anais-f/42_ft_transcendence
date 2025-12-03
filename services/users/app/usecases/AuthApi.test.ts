@@ -79,7 +79,7 @@ describe('AuthApi', () => {
 				method: 'GET',
 				headers: {
 					'content-type': 'application/json',
-					authorization: process.env.AUTH_API_SECRET
+					authorization: process.env.INTERNAL_API_SECRET
 				}
 			})
 		})

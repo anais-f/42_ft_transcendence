@@ -3,6 +3,7 @@ import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
+import fastifyCookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
 import {
@@ -31,12 +32,18 @@ function createApp(): FastifyInstance {
 
 	setupFastifyMonitoringHooks(app)
 
+	app.register(fastifyCookie)
+
 	const jwtSecret = process.env.JWT_SECRET
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
 	app.register(fastifyJwt, {
-		secret: jwtSecret
+		secret: jwtSecret,
+		cookie: {
+			cookieName: 'auth_token',
+			signed: false
+		}
 	})
 	app.register(fastifyMultipart, {
 		limits: {
