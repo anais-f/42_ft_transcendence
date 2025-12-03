@@ -9,7 +9,7 @@ interface UserConnection {
 
 export const wsConnections = new Map<string, UserConnection>()
 const pendingDisconnectTimers = new Map<number, NodeJS.Timeout>()
-const DISCONNECT_DELAY_MS = 3000
+const DISCONNECT_DELAY_MS = 2000
 
 /**
  * Setup event handlers for a WebSocket connection

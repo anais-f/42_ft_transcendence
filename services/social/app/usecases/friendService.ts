@@ -38,14 +38,13 @@ async function sendNotification(
 ): Promise<boolean> {
 	try {
 		const userData = await UsersApi.getUserData(userId)
-		const friendData = await UsersApi.getUserData(friendId)
 
 		const fromUsername = userData?.username ?? 'Unknown'
 		const friendInfo = {
-			username: friendData?.username ?? 'Unknown',
-			avatarUrl: friendData?.avatar ?? '',
-			status: friendData?.status,
-			lastSeen: friendData?.last_connection
+			username: userData?.username ?? 'Unknown',
+			avatarUrl: userData?.avatar ?? '',
+			status: userData?.status,
+			lastSeen: userData?.last_connection
 		}
 
 		const isFriendshipUpdate =

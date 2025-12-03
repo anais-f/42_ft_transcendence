@@ -4,7 +4,6 @@ import {
 	addConnection,
 	getTotalConnections
 } from '../usecases/connectionManager.js'
-import { routeMessage } from '../usecases/messageRouter.js'
 import { UsersApi } from '../repositories/UsersApi.js'
 
 // TODO : split into smaller functions when notifications are added and refactored logic after add connection
@@ -14,7 +13,7 @@ import { UsersApi } from '../repositories/UsersApi.js'
  * Handle WebSocket connection: verify token, setup connection, attach message handler
  * This is the ONLY place where WS logic lives - everything else is in services
  */
-export async function handleWsConnection(
+export async function handleSocialWSConnection(
 	socket: WebSocket,
 	request: FastifyRequest<{ Querystring: { token: string } }>,
 	fastify: FastifyInstance
@@ -22,7 +21,6 @@ export async function handleWsConnection(
 	const token = request.query.token
 	const jwtInstance = (fastify as any).jwt
 
-	// Verify and decode JWT token
 	let payload: any
 	try {
 		payload = jwtInstance.verify(token)
@@ -103,9 +101,6 @@ export async function handleWsConnection(
 			)
 			return
 		}
-
-		// Valid JSON message - route to appropriate handler
-		routeMessage(userId, message, socket)
 	})
 
 	socket.on('close', () => {

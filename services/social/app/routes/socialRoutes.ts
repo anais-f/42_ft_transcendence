@@ -4,7 +4,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
 import { createTokenController } from '../controllers/tokenControllers.js'
-import { handleWsConnection } from '../controllers/websocketControllers.js'
+import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
 import {
 	ErrorResponseSchema,
@@ -53,7 +53,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				socket: WebSocket,
 				request: FastifyRequest<{ Querystring: { token: string } }>
 			) => {
-				handleWsConnection(socket, request, fastify)
+				handleSocialWSConnection(socket, request, fastify)
 			}
 		)
 	})

@@ -20,11 +20,26 @@ export class SocialRepository {
 		return row ? row.relation_status : -1
 	}
 
+	static getFriendsCount(user_id: IUserId): number {
+		const selectStmt = db.prepare(
+			'SELECT COUNT(*) as count FROM relations WHERE relation_status = 1 AND (user_id = ? OR friend_id = ?)'
+		)
+		const row = selectStmt.get(user_id.user_id, user_id.user_id) as {
+			count: number
+		}
+		return row.count
+	}
+
 	static addRelation(
 		user_id: IUserId,
 		friend_id: IUserId,
 		origin_id: IUserId
 	): void {
+		if (this.getFriendsCount(user_id) >= 50)
+			throw new Error('User has reached the maximum limit of 50 friends')
+		if (this.getFriendsCount(friend_id) >= 50)
+			throw new Error('Friend has reached the maximum limit of 50 friends')
+
 		const insertStmt = db.prepare(
 			'INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)'
 		)
@@ -37,6 +52,13 @@ export class SocialRepository {
 		friend_id: IUserId,
 		status: number
 	): void {
+		if (status === 1) {
+			if (this.getFriendsCount(user_id) >= 50)
+				throw new Error('User has reached the maximum limit of 50 friends')
+			if (this.getFriendsCount(friend_id) >= 50)
+				throw new Error('Friend has reached the maximum limit of 50 friends')
+		}
+
 		const updateStmt = db.prepare(
 			'UPDATE relations SET relation_status = ? WHERE (user_id = ? AND friend_id = ?)'
 		)
