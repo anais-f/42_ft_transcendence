@@ -142,7 +142,7 @@ describe('authController registerController', () => {
 
 	test('creates user and syncs with users service (happy path)', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({
+		findPublicUserByLoginMock.mockReturnValue({
 			user_id: 10,
 			login: 'newuser'
 		})
@@ -176,7 +176,7 @@ describe('authController registerController', () => {
 
 	test('on users service 401, deletes created user and returns 500', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({
+		findPublicUserByLoginMock.mockReturnValue({
 			user_id: 11,
 			login: 'newuser'
 		})
@@ -197,7 +197,7 @@ describe('authController registerController', () => {
 
 	test('on users service failure, deletes created user and returns 400', async () => {
 		registerUserMock.mockResolvedValue({ success: true })
-		findPublicUserByLoginMock.mockResolvedValue({
+		findPublicUserByLoginMock.mockReturnValue({
 			user_id: 12,
 			login: 'newuser'
 		})

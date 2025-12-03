@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
 import Fastify, { FastifyInstance } from 'fastify'
 import { registerRoutes } from '../routes/registerRoutes.js'
 import cookie from '@fastify/cookie'
+import fastifyJwt from '@fastify/jwt'
 import { runMigrations } from '../database/connection.js'
 import {
 	ZodTypeProvider,
@@ -25,6 +26,13 @@ describe('Auth Service - Integration Tests', () => {
 		app.setSerializerCompiler(serializerCompiler)
 
 		await app.register(cookie, { secret: 'test-secret', parseOptions: {} })
+		await app.register(fastifyJwt, {
+			secret: 's3cr3t',
+			cookie: {
+				cookieName: 'auth_token',
+				signed: false
+			}
+		})
 		await registerRoutes(app)
 	})
 

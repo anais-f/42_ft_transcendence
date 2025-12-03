@@ -2,6 +2,8 @@ import Fastify from 'fastify'
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import type { Database } from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
+import { mkdirSync } from 'fs'
+import { dirname } from 'path'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -187,17 +189,12 @@ function getTournamentController(request: FastifyRequest, reply: FastifyReply) {
 }
 
 const randomAlphaNumeric = (length: number) => {
-	let s = ''
-	Array.from({ length }).some(() => {
-		s += Math.random().toString(36).slice(2)
-		return s.length >= length
-	})
-	return s.slice(0, length)
+	const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 }
 
 const createInviteCode = (): string => {
 	const str1: string = randomAlphaNumeric(4).toUpperCase()
-	const str2: string = randomAlphaNumeric(4).toLocaleUpperCase()
+	const str2: string = randomAlphaNumeric(4).toUpperCase()
 	for (const tournament of tournaments.values())
 		if (tournament.name === str1 + '-' + str2) return createInviteCode()
 	return str1 + '-' + str2
@@ -407,6 +404,8 @@ function getDb(): Database {
 				'MATCHMAKING_DB_PATH environment variable is required to connect to the database'
 			)
 		}
+		// Ensure directory exists
+		mkdirSync(dirname(path), { recursive: true })
 		db = new BetterSqlite3(path)
 	}
 	return db

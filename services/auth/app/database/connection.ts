@@ -1,5 +1,7 @@
 import BetterSqlite3 from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
+import { mkdirSync } from 'fs'
+import { dirname } from 'path'
 
 let db: Database
 
@@ -11,6 +13,8 @@ export function getDb(): Database {
 				'AUTH_DB_PATH environment variable is required to connect to the database'
 			)
 		}
+		// Ensure directory exists
+		mkdirSync(dirname(path), { recursive: true })
 		db = new BetterSqlite3(path)
 	}
 	return db
