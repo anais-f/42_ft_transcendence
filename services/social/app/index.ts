@@ -2,18 +2,18 @@ import './database/socialDatabase.js'
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import metricPlugin from 'fastify-metrics'
 import {
+    createWsApp,
+	loadOpenAPISchema,
 	httpRequestCounter,
 	responseTimeHistogram
 } from '@ft_transcendence/common'
 import { socialRoutes } from './routes/socialRoutes.js'
-import { createApp } from '@packages/common/dist/init-server/createApp.js'
-import { loadOpenAPISchema } from '@packages/common/dist/init-server/loadOpenAPISchema.js'
 
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 const openapiSwagger = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
 export async function start(): Promise<void> {
-	const app = createApp(socialRoutes, {
+	const app = createWsApp(socialRoutes, {
 		openapi: {
 			info: {
 				title: 'API for Social Service',
