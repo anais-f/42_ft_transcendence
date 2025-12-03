@@ -17,7 +17,21 @@ export const ERROR_MESSAGES = {
 	FORBIDDEN: 'Forbidden',
 	INVALID_TOKEN_USER: 'Invalid token user',
 	USERNAME_ALREADY_TAKEN: 'Username already taken',
-	MISSING_FILE: 'Missing file'
+	MISSING_FILE: 'Missing file',
+	INVALID_FRIEND_ID: 'Invalid friend ID',
+	RELATION_ALREADY_EXISTS: 'Relation already exists',
+	REQUEST_ALREADY_SENT: 'Friend request already exists',
+	RELATION_NOT_FOUND: 'Relation not found',
+	NO_PENDING_REQUEST: 'No pending friend request',
+	CANNOT_ACCEPT_YOURSELF: 'Cannot accept yourself as a friend',
+	CANNOT_REJECT_YOURSELF: 'Cannot reject yourself as a friend',
+	CANNOT_REMOVE_YOURSELF: 'Cannot remove yourself as a friend',
+	CANNOT_CANCEL_YOURSELF: 'Cannot cancel yourself as a friend',
+	CANNOT_ADD_YOURSELF: 'Cannot add yourself as a friend',
+	CANNOT_DELETE_YOURSELF: 'Cannot delete yourself as a friend',
+	NOT_FRIENDS: 'You are not friends',
+	INVALID_QUERY_PARAMETERS: 'Invalid query parameters',
+	USERNAME_REQUIRED: 'Username is required'
 } as const
 
 export const SUCCESS_MESSAGES = {

@@ -18,6 +18,9 @@ import {
 	httpRequestCounter,
 	responseTimeHistogram
 } from '@ft_transcendence/common'
+import fastifyCookie from '@fastify/cookie'
+
+//TODO : revoir les test avec l'env
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
@@ -34,8 +37,15 @@ function createApp(): FastifyInstance {
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
+
+	app.register(fastifyCookie)
+
 	app.register(fastifyJwt, {
-		secret: jwtSecret
+		secret: jwtSecret,
+		cookie: {
+			cookieName: 'auth_token',
+			signed: false
+		}
 	})
 
 	app.register(fastifyMultipart, {

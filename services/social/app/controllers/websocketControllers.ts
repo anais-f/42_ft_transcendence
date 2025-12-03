@@ -3,8 +3,9 @@ import WebSocket from 'ws'
 import {
 	addConnection,
 	getTotalConnections
-} from '../usescases/connectionManager.js'
-import { routeMessage } from '../usescases/messageRouter.js'
+} from '../usecases/connectionManager.js'
+import { routeMessage } from '../usecases/messageRouter.js'
+import { UsersApi } from '../repositories/UsersApi.js'
 
 // TODO : split into smaller functions when notifications are added and refactored logic after add connection
 
@@ -49,7 +50,16 @@ export async function handleWsConnection(
 		return
 	}
 
-	console.log(`✅ [WS] ${userLogin} (${userId}) connected`)
+	let username
+	try {
+		const userData = await UsersApi.getUserData({ user_id: Number(userId) })
+		username = String(userData.username ?? userLogin)
+	} catch (error) {
+		console.error(`Failed to fetch user data for user ${userId}:`, error)
+		username = userLogin
+	}
+
+	console.log(`✅ [WS] ${username} (${userId}) connected`)
 	console.log(`   Total: ${getTotalConnections()}`)
 
 	// Send welcome message to client
@@ -58,14 +68,14 @@ export async function handleWsConnection(
 			type: 'connection:established',
 			data: {
 				userId,
-				login: userLogin,
+				username,
 				totalConnected: getTotalConnections(),
 				timestamp: new Date().toISOString()
 			}
 		})
 	)
 
-	// Handle incoming messages from client
+	// Handle incoming messages from client, écoute et renvoie sur le router des messages
 	socket.on('message', (rawData: WebSocket.Data) => {
 		const rawMessage = rawData.toString()
 
@@ -77,16 +87,16 @@ export async function handleWsConnection(
 			// Not JSON, treat as plain text message
 			// Sanitize and truncate the raw message for safe logging
 			const safe = rawMessage.replace(/\s+/g, ' ').trim().slice(0, 200)
-			console.log(`📨 [MSG] ${userLogin}: ${safe}`)
+			console.log(`📨 [MSG] ${username}: ${safe}`)
 			socket.send(
 				JSON.stringify({
 					type: 'message:echo',
 					data: {
 						from: {
 							userId,
-							login: userLogin
+							login: username
 						},
-						content: rawMessage
+						content: safe
 					}
 				})
 			)
@@ -95,5 +105,9 @@ export async function handleWsConnection(
 
 		// Valid JSON message - route to appropriate handler
 		routeMessage(userId, message, socket)
+	})
+
+	socket.on('close', () => {
+		console.log(`❌ [WS] ${username} (${userId}) disconnected`)
 	})
 }

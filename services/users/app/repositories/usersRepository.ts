@@ -8,6 +8,7 @@ import {
 	IPrivateUser,
 	IPublicUserAuth,
 	UserPublicProfileDTO,
+	UserSearchResultDTO,
 	ERROR_MESSAGES,
 	AppError,
 	UserStatus
@@ -103,22 +104,12 @@ export class UsersRepository {
 	}
 
 	static updateUsername(user: IUsernameId): void {
-		try {
-			const updateStmt = db.prepare(
-				'UPDATE users SET username = ? WHERE user_id = ?'
-			)
-			const info = updateStmt.run(user.username, user.user_id)
-			if (info.changes === 0) {
-				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-			}
-		} catch (error: any) {
-			if (
-				error?.code === 'SQLITE_CONSTRAINT' ||
-				error?.message?.includes('UNIQUE constraint failed')
-			) {
-				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
-			}
-			throw error
+		const updateStmt = db.prepare(
+			'UPDATE users SET username = ? WHERE user_id = ?'
+		)
+		const info = updateStmt.run(user.username, user.user_id)
+		if (info.changes === 0) {
+			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 		}
 	}
 
@@ -156,6 +147,7 @@ export class UsersRepository {
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
+	// TODO : change to userpublicprofil dto ?
 	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
@@ -179,14 +171,12 @@ export class UsersRepository {
 
 	static getUserStatusById(user: IUserId): UserStatus | undefined {
 		const selectStmt = db.prepare('SELECT status FROM users WHERE user_id = ?')
-		const row = selectStmt.get(user.user_id) as
-			| { status: UserStatus }
-			| undefined
-		return row?.status
+		const row = selectStmt.get(user.user_id) as { status: number } | undefined
+		return row?.status as UserStatus | undefined
 	}
 
 	/**
-	 * @description Get all users or users according to their status
+	 * @description Get all users or users
 	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
@@ -201,5 +191,17 @@ export class UsersRepository {
 	static deleteUserById(user: IUserId): void {
 		const deleteStmt = db.prepare('DELETE FROM users WHERE user_id = ?')
 		deleteStmt.run(user.user_id)
+	}
+
+	static searchByExactUsername(
+		username: IUsername
+	): UserSearchResultDTO | null {
+		const selectStmt = db.prepare(
+			'SELECT user_id, username, avatar FROM users WHERE username = ?'
+		)
+		const row = selectStmt.get(username.username) as
+			| UserSearchResultDTO
+			| undefined
+		return row || null
 	}
 }

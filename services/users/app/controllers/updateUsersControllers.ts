@@ -150,7 +150,7 @@ export async function updateUserStatus(
 	reply: FastifyReply
 ): Promise<void> {
 	try {
-		const { id } = req.params as { id: number }
+		const { user_id } = req.params as { user_id: number }
 		const body = req.body as UpdateUserStatusDTO
 
 		const parsed = UpdateUserStatusSchema.safeParse(body)
@@ -165,7 +165,7 @@ export async function updateUserStatus(
 
 		const { status, lastConnection } = parsed.data
 
-		await UpdateUsersServices.updateUserStatus(id, status, lastConnection)
+		await UpdateUsersServices.updateUserStatus(user_id, status, lastConnection)
 
 		void reply
 			.code(200)
