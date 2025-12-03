@@ -71,8 +71,6 @@ services:
     build:
       dockerfile: services/frontend/Dockerfile.dev
     restart: none
-    ports:
-      - "3000:3000"
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
@@ -91,18 +89,5 @@ services:
       install-dependencies:
         condition: service_completed_successfully
 
-  frontend:
-    volumes:
-      - ./:/app
-    build:
-      dockerfile: services/frontend/Dockerfile.dev
-    restart: none
-    depends_on:
-      install-dependencies:
-        condition: service_completed_successfully
-    healthcheck:
-      test: ['CMD-SHELL', 'true']
-
 volumes:
   avatars_data:
-
