@@ -27,6 +27,7 @@
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"
 	},
 	"workspaces": [
+		"services/frontend/app",
 		"packages/common",
 		"packages/pong-shared",
 		"packages/security",
