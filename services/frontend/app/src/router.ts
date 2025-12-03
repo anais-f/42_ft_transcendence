@@ -1,4 +1,4 @@
-import '../style.css'
+
 import { LoginPage } from "./pages/login.js"
 import { HomePage } from "./pages/home.js"
 import { GamePage } from "./pages/game.js"
