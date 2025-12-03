@@ -67,7 +67,7 @@ export const HomePage = (): string => /*html*/ `
             <h1 class="text-lg py-2">Title</h1>
             <p class="text-sm pb-2">The head of our team during the project development</p>
         </div>
-        <img src="/images/image 10.png" alt="AHHHHH !" class="w-full object-cover opacity-50 select-none">
+        <img src="/images/image_10.png" alt="AHHHHH !" class="w-full object-cover opacity-50 select-none">
     </div>
     <div class="col-span-1">
          <h1 class="text-2xl pt-4 pb-1">WANTED</h1>
