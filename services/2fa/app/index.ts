@@ -9,11 +9,26 @@ import {
 import { registerRoutes } from './routes/2faRoutes.js'
 import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
+import fastifyCookie from '@fastify/cookie'
+import fastifyJwt from '@fastify/jwt'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
 }).withTypeProvider<ZodTypeProvider>()
 
+const jwtSecret = process.env.JWT_SECRET
+	if (!jwtSecret) {
+		throw new Error('JWT_SECRET environment variable is required')
+	}
+
+app.register(fastifyCookie)
+app.register(fastifyJwt, {
+	secret: jwtSecret,
+	cookie: {
+		cookieName: 'auth_token',
+		signed: false
+	}
+})
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
