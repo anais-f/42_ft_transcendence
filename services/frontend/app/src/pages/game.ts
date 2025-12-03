@@ -1,24 +1,12 @@
-export function renderGame(): HTMLElement {
-	const container = document.getElementById('content')
-	if (!container) return document.createElement('div')
+export const GamePage = (): string => /*html*/ `
 
-	container.classList.add(
-		'flex',
-		'items-center',
-		'justify-center',
-		'min-h-[85vh]'
-	)
+<div class="min-h-[80vh] w-full flex items-center justify-center">
+    <canvas
+        id="pong"
+        width="1000"
+        height="600"
+        style="background: blue; display: block; margin: auto"
+      ></canvas>
+</div>
 
-	const canvas = document.createElement('canvas')
-	canvas.id = 'pong'
-	canvas.width = 1000
-	canvas.height = 600
-	canvas.style.background = 'blue'
-	canvas.style.display = 'block'
-	canvas.style.margin = 'auto'
-	canvas.className = 'items-center'
-
-	container.innerHTML = ''
-	container.append(canvas)
-	return container
-}
+`
