@@ -1,4 +1,5 @@
-import { FastifyInstance } from 'fastify'
+import { FastifyRequest, FastifyReply } from 'fastify'
+import { FastifyInstance } from 'fastify';
 
 export const WS_TOKEN_EXPIRES_SECONDS = Number(
 	process.env.WS_TOKEN_EXPIRES_SECONDS ?? 30
@@ -37,4 +38,16 @@ export function createWsToken(
 		wsToken,
 		expiresIn: WS_TOKEN_EXPIRES_SECONDS
 	}
+}
+export async function createTokenController(request: FastifyRequest, reply: FastifyReply): Promise<void>
+{
+	const user = request.user as { user_id: number; login: string }
+	if (!user) {
+		reply.status(401).send({Error: 'Unauthorized' })
+		return
+	}
+
+	const { wsToken, expiresIn } = createWsToken(request.server, user)
+
+	reply.send({ wsToken, expiresIn })
 }

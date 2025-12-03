@@ -50,6 +50,8 @@ services:
   pong-server:
     restart: on-failure
     container_name: pong-server
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: ./services/pong-server/Dockerfile

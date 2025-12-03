@@ -4,7 +4,6 @@ import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
 import { z } from 'zod'
-import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleWsConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
 import {
@@ -12,7 +11,8 @@ import {
 	SuccessResponseSchema,
 	FriendsListSchema,
 	UserIdCoerceSchema,
-	PendingFriendsListSchema
+	PendingFriendsListSchema,
+    createTokenController
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
