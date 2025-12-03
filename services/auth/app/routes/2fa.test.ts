@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
+import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals'
 import Fastify, { FastifyInstance } from 'fastify'
 import { registerRoutes } from '../routes/registerRoutes.js'
 import cookie from '@fastify/cookie'
@@ -15,6 +15,17 @@ describe('2FA Functionality Tests', () => {
 	let authToken: string
 
 	beforeAll(async () => {
+		// Setup environment variables
+		process.env.INTERNAL_API_SECRET = 'test-secret'
+		process.env.USERS_SERVICE_URL = 'http://users'
+		
+		// Mock fetch for users service calls
+		global.fetch = jest.fn().mockResolvedValue({
+			ok: true,
+			status: 200,
+			json: async () => ({ success: true })
+		} as any)
+
 		// Setup test database
 		runMigrations()
 
@@ -28,7 +39,7 @@ describe('2FA Functionality Tests', () => {
 
 		await app.register(cookie, { secret: 'test-secret', parseOptions: {} })
 		await app.register(fastifyJwt, {
-			secret: 's3cr3t',
+			secret: process.env.JWT_SECRET || 's3cr3t',
 			cookie: {
 				cookieName: 'auth_token',
 				signed: false

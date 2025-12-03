@@ -14,6 +14,10 @@ describe('OAuth Routes', () => {
 	let app: FastifyInstance
 
 	beforeAll(async () => {
+		// Setup environment variables
+		process.env.INTERNAL_API_SECRET = 'test-secret'
+		process.env.USERS_SERVICE_URL = 'http://users'
+
 		// Setup test database
 		runMigrations()
 
@@ -27,7 +31,7 @@ describe('OAuth Routes', () => {
 
 		await app.register(cookie, { secret: 'test-secret', parseOptions: {} })
 		await app.register(fastifyJwt, {
-			secret: 's3cr3t',
+			secret: process.env.JWT_SECRET || 's3cr3t',
 			cookie: {
 				cookieName: 'auth_token',
 				signed: false
