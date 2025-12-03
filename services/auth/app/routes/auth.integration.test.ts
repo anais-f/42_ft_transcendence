@@ -17,7 +17,7 @@ describe('Auth Service - Integration Tests', () => {
 		// Setup environment variables
 		process.env.INTERNAL_API_SECRET = 'test-secret'
 		process.env.USERS_SERVICE_URL = 'http://users'
-		
+
 		// Mock fetch for users service calls
 		global.fetch = jest.fn().mockResolvedValue({
 			ok: true,

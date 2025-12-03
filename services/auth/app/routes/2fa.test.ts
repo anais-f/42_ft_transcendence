@@ -19,7 +19,7 @@ describe('2FA Functionality Tests', () => {
 		process.env.INTERNAL_API_SECRET = 'test-secret'
 		process.env.USERS_SERVICE_URL = 'http://users'
 		process.env.TWOFA_SERVICE_URL = 'http://2fa'
-		
+
 		// Mock fetch for both users service and 2FA service calls
 		global.fetch = jest.fn().mockImplementation((url: string) => {
 			// Mock 2FA service setup call
@@ -29,7 +29,8 @@ describe('2FA Functionality Tests', () => {
 					status: 200,
 					json: async () => ({
 						otpauth_url: 'otpauth://totp/test',
-						qr_base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+						qr_base64:
+							'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
 						expires_at: Date.now() + 300000
 					})
 				} as any)

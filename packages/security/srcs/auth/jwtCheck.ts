@@ -13,7 +13,8 @@ export function jwtAuthMiddleware(
 	done: HookHandlerDoneFunction
 ): void {
 	try {
-		request.jwtVerify()
+		request
+			.jwtVerify()
 			.then(() => {
 				done()
 			})

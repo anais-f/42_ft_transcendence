@@ -79,9 +79,9 @@ describe('authController login', () => {
 		const reply = buildReply()
 		await loginController(req, reply)
 		expect(reply.setCookie).toHaveBeenCalled()
-		expect(reply.send).toHaveBeenCalledWith({ 
+		expect(reply.send).toHaveBeenCalledWith({
 			pre_2fa_required: false,
-			token: 'jwt.token' 
+			token: 'jwt.token'
 		})
 	})
 })
@@ -171,7 +171,10 @@ describe('authController registerController', () => {
 			'test-token',
 			expect.objectContaining({ httpOnly: true })
 		)
-		expect(reply.send).toHaveBeenCalledWith({ success: true, token: 'test-token' })
+		expect(reply.send).toHaveBeenCalledWith({
+			success: true,
+			token: 'test-token'
+		})
 	})
 
 	test('on users service 401, deletes created user and returns 500', async () => {
