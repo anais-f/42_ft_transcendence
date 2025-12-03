@@ -189,7 +189,12 @@ function getTournamentController(request: FastifyRequest, reply: FastifyReply) {
 }
 
 const randomAlphaNumeric = (length: number) => {
-	const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+	let s = ''
+	for (let i = 0; i < length; i++) {
+		s += chars.charAt(Math.floor(Math.random() * chars.length))
+	}
+	return s
 }
 
 const createInviteCode = (): string => {
