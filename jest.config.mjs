@@ -69,12 +69,6 @@ const config = {
 		},
 		{
 			...commonConfig,
-			displayName: 'auth-google',
-			rootDir: '<rootDir>/services/auth_google/app',
-			testMatch: ['**/*.test.ts']
-		},
-		{
-			...commonConfig,
 			displayName: 'common-monitoring',
 			rootDir: '<rootDir>/packages/common/srcs/monitoring',
 			testMatch: ['**/*.test.ts']
