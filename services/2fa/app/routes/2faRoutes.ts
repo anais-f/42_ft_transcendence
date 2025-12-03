@@ -1,5 +1,9 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import {
+	setup2FASchema,
+	verify2FASchema,
+	disable2FASchema,
+	status2FASchema,
 	setup2FAResponseSchema,
 	verify2FAResponseSchema,
 	disable2FAResponseSchema,
@@ -10,14 +14,19 @@ import { setup2FAController,
 		disable2FAController,
 		status2FAController
  } from '../controllers/2facontrollers.js'
+import { apiKeyMiddleware } from '@ft_transcendence/security'
 
 export async function registerRoutes(app: FastifyInstance) {
 	app.post(
 		'/api/2fa/setup',
 		{
 			schema: {
-				body: setup2FAResponseSchema
-			}
+				body: setup2FASchema,
+				response: {
+					200: setup2FAResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
 		},
 		setup2FAController
 		)
@@ -25,8 +34,12 @@ export async function registerRoutes(app: FastifyInstance) {
 		'/api/2fa/verify',
 		{
 			schema: {
-				body: verify2FAResponseSchema
-			}
+				body: verify2FASchema,
+				response: {
+					200: verify2FAResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
 		},
 		verify2FAController
 		)
@@ -34,8 +47,12 @@ export async function registerRoutes(app: FastifyInstance) {
 		'/api/2fa/disable',
 		{
 			schema: {
-				body: disable2FAResponseSchema
-			}
+				body: disable2FASchema,
+				response: {
+					200: disable2FAResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
 		},
 		disable2FAController
 		)
@@ -43,8 +60,12 @@ export async function registerRoutes(app: FastifyInstance) {
 		'/api/2fa/status',
 		{
 			schema: {
-				body: status2FAResponseSchema
-			}
+				body: status2FASchema,
+				response: {
+					200: status2FAResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
 		},
 		status2FAController
 		)

@@ -17,24 +17,10 @@ import {
 } from '../repositories/twofaRepository.js'
 import qrcode from 'qrcode'
 
-function authServiceGuard(req: FastifyRequest, reply: FastifyReply): boolean {
-	const secret = req.headers['authorization']
-	if (!process.env.TWOFA_API_SECRET) {
-		reply.code(500).send({ error: '2FA_API_SECRET not configured' })
-		return false
-	}
-	if (secret !== process.env.TWOFA_API_SECRET) {
-		reply.code(401).send({ error: 'Unauthorized' })
-		return false
-	}
-	return true
-}
-
 export async function setup2FAController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ) {
-		if (!authServiceGuard(req, reply)) return
 		try {
 			const parsed = setup2FASchema.safeParse(req.body)
 			if (!parsed.success)
@@ -61,16 +47,16 @@ export async function setup2FAController(
 		req: FastifyRequest,
 		reply: FastifyReply
 	) {
-		if (!authServiceGuard(req, reply)) return
 		try {
 			const parsed = verify2FASchema.safeParse(req.body)
 			if (!parsed.success)
 				return reply.code(400).send({ error: 'Invalid payload' })
 			const { user_id, twofa_code } = parsed.data
-
-			// 1) Try to finalize a pending setup (activation flow)
 			const pending = getPendingSecretEnc(user_id)
 			if (pending) {
+				if (req.headers.cookie?.includes('auth_token=') === false) {
+					return reply.code(401).send({ error: 'Auth token missing' })
+				}
 				if (pending.pending_until && Date.now() > pending.pending_until) {
 					deleteSecret(user_id)
 					return reply.code(410).send({ error: 'Setup expired' })
@@ -91,6 +77,9 @@ export async function setup2FAController(
 			const activeEnc = getSecretEnc(user_id)
 			if (!activeEnc) return reply.code(404).send({ error: 'No 2FA secret' })
 			try {
+				if (req.headers.cookie?.includes('2fa_token=') === false) {
+					return reply.code(401).send({ error: '2FA token missing' })
+				}
 				const activeSecret = decryptSecret(activeEnc)
 				const ok = authenticator.check(twofa_code, activeSecret)
 				if (!ok) return reply.code(401).send({ error: 'Invalid code' })
@@ -108,7 +97,6 @@ export async function setup2FAController(
 	}
 
 	export async function disable2FAController (req: FastifyRequest, reply: FastifyReply) {
-		if (!authServiceGuard(req, reply)) return
 		try {
 			const parsed = disable2FASchema.safeParse(req.body)
 			if (!parsed.success)
@@ -123,7 +111,6 @@ export async function setup2FAController(
 	}
 
 	export async function status2FAController (req: FastifyRequest, reply: FastifyReply) {
-		if (!authServiceGuard(req, reply)) return
 		try {
 			const parsed = status2FASchema.safeParse(req.body)
 			if (!parsed.success)
