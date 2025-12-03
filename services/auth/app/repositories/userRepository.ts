@@ -64,6 +64,13 @@ export function findUserByGoogleId(google_id: string): IUserAuth | undefined {
 	return stmt.get(google_id) as IUserAuth | undefined
 }
 
+export function findPublicUserByGoogleId(google_id: string): PublicUserAuthDTO | undefined {
+	const stmt = db().prepare(
+		'SELECT user_id, login FROM users WHERE google_id = ?'
+	)
+	return stmt.get(google_id) as PublicUserAuthDTO | undefined
+}
+
 export function changeUserPassword(id: number, passwordHash: string): boolean {
 	const stmt = db().prepare('UPDATE users SET password = ? WHERE user_id = ?')
 	const info = stmt.run(passwordHash, id)
