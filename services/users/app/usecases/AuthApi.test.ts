@@ -53,6 +53,8 @@ beforeAll(async () => {
 describe('AuthApi', () => {
 	beforeEach(() => {
 		mockFetch.mockClear()
+		process.env.AUTH_SERVICE_URL = AUTH_SERVICE_URL
+		process.env.INTERNAL_API_SECRET = 'test-secret'
 	})
 
 	// ==================== SECTION 1: SUCCESSFUL CASES ====================

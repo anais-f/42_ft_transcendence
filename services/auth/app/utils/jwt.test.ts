@@ -36,7 +36,7 @@ describe('jwt utils', () => {
 		)
 		expect(token).toBe('signed.jwt')
 		expect(signSpy).toHaveBeenCalledWith(
-			{ user_id: 2, login: 'bob', is_admin: true },
+			{ user_id: 2, login: 'bob', is_admin: true, type: 'auth' },
 			's3cr3t',
 			expect.objectContaining({ expiresIn: '1h' })
 		)

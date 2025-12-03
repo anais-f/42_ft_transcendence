@@ -69,8 +69,8 @@ const config = {
 		},
 		{
 			...commonConfig,
-			displayName: 'common-monitoring',
-			rootDir: '<rootDir>/packages/common/srcs/monitoring',
+			displayName: 'monitoring',
+			rootDir: '<rootDir>/packages/monitoring',
 			testMatch: ['**/*.test.ts']
 		}
 	]

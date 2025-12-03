@@ -27,13 +27,15 @@ const verifyPasswordMock: jest.MockedFunction<
 	(hash: string, pwd: string) => Promise<boolean>
 > = jest.fn()
 const signTokenMock: jest.MockedFunction<(payload: any) => string> = jest.fn()
+const isUser2FAEnabledMock: jest.MockedFunction<(id: number) => boolean> = jest.fn()
 
 await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 	__esModule: true,
 	createUser: createUserMock,
 	findUserByLogin: findUserByLoginMock,
 	createAdminUser: createAdminUserMock,
-	createGoogleUser: createGoogleUserMock
+	createGoogleUser: createGoogleUserMock,
+	isUser2FAEnabled: isUser2FAEnabledMock
 }))
 await jest.unstable_mockModule('../utils/password.js', () => ({
 	__esModule: true,
