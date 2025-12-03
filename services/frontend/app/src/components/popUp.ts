@@ -1,6 +1,7 @@
 interface interfaceOverlay {
 	id: string
 	className: string
+	content?: string
 	onClick?: (ev: MouseEvent) => void
 }
 
@@ -23,7 +24,7 @@ export function createPopupElement(overlayDef: interfaceOverlay): HTMLElement {
 
 let __escHandler: ((ev: KeyboardEvent) => void) | null = null
 
-export function showPopup(contentNode: Node) {
+export function showPopup(contentNode: HTMLElement) {
 	if (document.getElementById('popup-overlay')) return
 	const overlay = createPopupElement({
 		id: 'popup-overlay',
@@ -35,11 +36,10 @@ export function showPopup(contentNode: Node) {
 	panel.className =
 		'bg-white p-4 rounded shadow max-w-[90%] max-h-[90%] overflow-auto'
 	panel.append(contentNode)
-	overlay.append(panel)
 
 	document.body.append(overlay)
 	document.body.style.overflow = 'hidden'
-
+	overlay.append(panel)
 	__escHandler = (ev) => {
 		if (ev.key === 'Escape') hidePopup()
 	}
