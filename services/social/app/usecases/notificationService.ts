@@ -31,12 +31,22 @@ const MessagesTemplates: Record<
  * @param friendInfo - Optional friend info to include in the friendListUpdate
  */
 function sendFriendNotification(
-	type: NotificationType,
+	type:
+		| NotificationType.FriendAccept
+		| NotificationType.FriendRemove
+		| NotificationType.FriendRequest
+		| NotificationType.FriendReject,
 	fromUserId: number,
 	fromUsername: string,
-	toUserId: number
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): boolean {
-	const notification: NotificationPayload = {
+	const notification = {
 		type: type,
 		data: {
 			from: {
@@ -46,7 +56,9 @@ function sendFriendNotification(
 			timestamp: new Date().toISOString(),
 			message: MessagesTemplates[type](fromUsername)
 		}
-	}
+	} as NotificationPayload
+
+	if (friendInfo) notification.data.friendListUpdate = friendInfo
 
 	const sent = sendToUser(toUserId, notification)
 
@@ -64,17 +76,25 @@ function sendFriendNotification(
  * @param fromUserId
  * @param fromUsername
  * @param toUserId
+ * @param friendInfo - Friend info to include in friendListUpdate
  */
 export async function friendRequestNotification(
 	fromUserId: number,
 	fromUsername: string,
-	toUserId: number
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): Promise<boolean> {
 	return sendFriendNotification(
 		NotificationType.FriendRequest,
 		fromUserId,
 		fromUsername,
-		toUserId
+		toUserId,
+		friendInfo
 	)
 }
 
@@ -88,13 +108,20 @@ export async function friendRequestNotification(
 export async function friendAcceptedNotification(
 	fromUserId: number,
 	fromUsername: string,
-	toUserId: number
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): Promise<boolean> {
 	return sendFriendNotification(
 		NotificationType.FriendAccept,
 		fromUserId,
 		fromUsername,
-		toUserId
+		toUserId,
+		friendInfo
 	)
 }
 

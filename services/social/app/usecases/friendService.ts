@@ -27,18 +27,43 @@ async function sendNotification(
 	notifyFn: (
 		fromUserId: number,
 		fromUsername: string,
-		toUserId: number
+		toUserId: number,
+		friendInfo?: {
+			username: string
+			avatarUrl: string
+			status?: number
+			lastSeen?: string
+		}
 	) => Promise<boolean>
 ): Promise<boolean> {
 	try {
 		const userData = await UsersApi.getUserData(userId)
+		const friendData = await UsersApi.getUserData(friendId)
+
 		const fromUsername = userData?.username ?? 'Unknown'
-		const sent = await notifyFn(userId.user_id, fromUsername, friendId.user_id)
+		const friendInfo = {
+			username: friendData?.username ?? 'Unknown',
+			avatarUrl: friendData?.avatar ?? '',
+			status: friendData?.status,
+			lastSeen: friendData?.last_connection
+		}
+
+		const isFriendshipUpdate =
+			notifyFn === friendAcceptedNotification ||
+			notifyFn === friendRemovedNotification
+
+		const sent = await notifyFn(
+			userId.user_id,
+			fromUsername,
+			friendId.user_id,
+			isFriendshipUpdate ? friendInfo : undefined
+		)
 		if (!sent) {
 			console.log(
 				`User ${friendId.user_id}, ${fromUsername}, not connected, notification not sent`
 			)
 		}
+
 		return sent
 	} catch (error) {
 		console.log('Failed to send notification:', error)
@@ -92,6 +117,7 @@ export class FriendService {
 		SocialRepository.addRelation(userId, friendId, userId)
 
 		await sendNotification(userId, friendId, friendRequestNotification)
+
 		return
 	}
 

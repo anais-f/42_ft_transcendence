@@ -18,7 +18,11 @@ export enum NotificationType {
  * to = the user who receives the notification
  */
 export interface NotificationPayload {
-	type: string
+	type:
+		| NotificationType.FriendAccept
+		| NotificationType.FriendRemove
+		| NotificationType.FriendRequest
+		| NotificationType.FriendReject
 	data: {
 		from: {
 			userId: number
@@ -26,22 +30,15 @@ export interface NotificationPayload {
 		}
 		to?: {
 			userId: number
-			username: string
+			username?: string
 		}
 		timestamp: string
 		message: string
 		friendListUpdate?: {
-			action:
-				| NotificationType.FriendAccept
-				| NotificationType.FriendRemove
-				| NotificationType.FriendRequest
-				| NotificationType.FriendReject
-			friendInfo?: {
-				username: string
-				avatarUrl: string
-				status?: number
-				lastSeen?: string
-			}
+			username: string
+			avatarUrl: string
+			status?: number
+			lastSeen?: string
 		}
 	}
 }
