@@ -1,8 +1,8 @@
 import '../style.css'
-import { LoginPage } from "./pages/old_pages/old_login.js"
-import { HomePage } from "./pages/old_pages/old_home.js"
-import { GamePage } from "./pages/old_pages/old_game.js"
-import { LobbyPage } from "./pages/old_pages/old_lobby.js"
+import { LoginPage } from "./pages/login.js"
+import { HomePage } from "./pages/home.js"
+import { GamePage } from "./pages/game.js"
+import { LobbyPage } from "./pages/lobby.js"
 
 document.addEventListener('DOMContentLoaded', () => {
 	const contentDiv = document.getElementById('content');
