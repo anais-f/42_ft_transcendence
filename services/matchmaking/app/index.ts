@@ -198,8 +198,8 @@ const randomAlphaNumeric = (length: number) => {
 }
 
 const createInviteCode = (): string => {
-	const str1: string = randomAlphaNumeric(4).toUpperCase()
-	const str2: string = randomAlphaNumeric(4).toUpperCase()
+	const str1: string = randomAlphaNumeric(4)
+	const str2: string = randomAlphaNumeric(4)
 	for (const tournament of tournaments.values())
 		if (tournament.name === str1 + '-' + str2) return createInviteCode()
 	return str1 + '-' + str2
