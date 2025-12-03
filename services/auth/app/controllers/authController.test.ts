@@ -79,7 +79,10 @@ describe('authController login', () => {
 		const reply = buildReply()
 		await loginController(req, reply)
 		expect(reply.setCookie).toHaveBeenCalled()
-		expect(reply.send).toHaveBeenCalledWith({ token: 'jwt.token' })
+		expect(reply.send).toHaveBeenCalledWith({ 
+			pre_2fa_required: false,
+			token: 'jwt.token' 
+		})
 	})
 })
 
@@ -119,6 +122,7 @@ describe('authController registerController', () => {
 		jest.resetAllMocks()
 		process.env.INTERNAL_API_SECRET = 'secret'
 		process.env.USERS_SERVICE_URL = 'http://users'
+		signTokenMock.mockReturnValue('test-token')
 	})
 
 	test('returns 500 if INTERNAL_API_SECRET missing', async () => {
@@ -145,7 +149,11 @@ describe('authController registerController', () => {
 		fetchMock.mockResolvedValue({ ok: true, status: 200 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
-		const reply: any = { send: jest.fn(), code: jest.fn().mockReturnThis() }
+		const reply: any = {
+			send: jest.fn(),
+			code: jest.fn().mockReturnThis(),
+			setCookie: jest.fn().mockReturnThis()
+		}
 
 		await registerController(req, reply)
 
@@ -154,7 +162,16 @@ describe('authController registerController', () => {
 			'http://users/api/users/new-user',
 			expect.any(Object)
 		)
-		expect(reply.send).toHaveBeenCalledWith({ success: true })
+		expect(signTokenMock).toHaveBeenCalledWith(
+			{ user_id: 10, login: 'newuser', is_admin: false, type: 'auth' },
+			'1h'
+		)
+		expect(reply.setCookie).toHaveBeenCalledWith(
+			'auth_token',
+			'test-token',
+			expect.objectContaining({ httpOnly: true })
+		)
+		expect(reply.send).toHaveBeenCalledWith({ success: true, token: 'test-token' })
 	})
 
 	test('on users service 401, deletes created user and returns 500', async () => {
@@ -166,7 +183,11 @@ describe('authController registerController', () => {
 		fetchMock.mockResolvedValue({ ok: false, status: 401 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
-		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
+		const reply: any = {
+			code: jest.fn().mockReturnThis(),
+			send: jest.fn(),
+			setCookie: jest.fn().mockReturnThis()
+		}
 
 		await registerController(req, reply)
 
@@ -183,7 +204,11 @@ describe('authController registerController', () => {
 		fetchMock.mockResolvedValue({ ok: false, status: 500 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
-		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
+		const reply: any = {
+			code: jest.fn().mockReturnThis(),
+			send: jest.fn(),
+			setCookie: jest.fn().mockReturnThis()
+		}
 
 		await registerController(req, reply)
 

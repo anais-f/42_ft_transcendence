@@ -80,11 +80,15 @@ describe('auth register/login usecases', () => {
 		signTokenMock.mockReturnValue('jwt.token.value')
 		const res = await loginUser('alice', 'pw')
 		expect(verifyPasswordMock).toHaveBeenCalledWith('hash', 'pw')
-		expect(signTokenMock).toHaveBeenCalledWith({
-			user_id: 5,
-			login: 'alice',
-			is_admin: false
-		})
+		expect(signTokenMock).toHaveBeenCalledWith(
+			{
+				user_id: 5,
+				login: 'alice',
+				is_admin: false,
+				type: 'auth'
+			},
+			'1h'
+		)
 		expect(res).toEqual({ token: 'jwt.token.value' })
 	})
 

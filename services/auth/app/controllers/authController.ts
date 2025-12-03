@@ -35,7 +35,6 @@ export async function registerController(
 		}
 		await registerUser(login, password)
 		const PublicUser = findPublicUserByLogin(parsed.data.login)
-		console.log('Pulic user = ', PublicUser)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 		const url = `${process.env.USERS_SERVICE_URL}/api/users/new-user`
