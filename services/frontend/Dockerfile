@@ -26,10 +26,14 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-RUN npm install -g http-server
+RUN npm install -g serve
 
-COPY --from=build-app /build/services/frontend/app/dist ./dist
+COPY --from=build-app /build/services/frontend/app/dist .
+
+# COPY --from=build-app /build/services/frontend/app/index.html ./
+# COPY --from=build-app /build/services/frontend/app/dist/src ./src
+# COPY --from=build-app /build/services/frontend/app/style.css ./
 
 EXPOSE 3000
 
-CMD ["http-server", "dist", "-p", "3000", "-c-1", "--cors"]
+CMD ["serve", "-s", ".", "-l", "3000"]
