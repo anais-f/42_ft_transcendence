@@ -15,11 +15,24 @@ import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { findPublicUserByLogin } from './repositories/userRepository.js'
 import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
-import { readSecret } from '@ft_transcendence/common'
+import fastifyJwt from '@fastify/jwt'
 
 const app = Fastify({
 	logger: true
 }).withTypeProvider<ZodTypeProvider>()
+
+app.register(cookie)
+const jwtSecret = process.env.JWT_SECRET
+if (!jwtSecret) {
+	throw new Error('JWT_SECRET environment variable is required')
+}
+app.register(fastifyJwt, {
+	secret: jwtSecret,
+	cookie: {
+		cookieName: 'auth_token',
+		signed: false
+	}
+})
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
@@ -36,9 +49,9 @@ async function runServer() {
 	const openapiFilePath = process.env.DTO_OPENAPI_FILE
 	// prefer env variables for CI/local, fall back to docker secrets if present
 	const login_admin =
-		process.env.LOGIN_ADMIN || readSecret('login_admin') || undefined
+		process.env.LOGIN_ADMIN
 	const password_admin =
-		process.env.PASSWORD_ADMIN || readSecret('password_admin') || undefined
+		process.env.PASSWORD_ADMIN
 	if (!login_admin || !password_admin) {
 		throw new Error(
 			'Admin credentials are not defined. Set LOGIN_ADMIN and PASSWORD_ADMIN in your .env or Docker secrets. See .env.example'
@@ -65,10 +78,19 @@ async function runServer() {
 	await app.register(SwaggerUI, {
 		routePrefix: '/docs'
 	})
-	if (findPublicUserByLogin('admin') === undefined) {
+	if (findPublicUserByLogin(login_admin) === undefined) {
 		registerAdminUser(login_admin, password_admin)
 	}
-	await app.register(cookie, { secret: 'test', parseOptions: {} })
+	
+	// Vérifier les credentials Google (pour google-auth-library)
+	const googleClientId = process.env.GOOGLE_CLIENT_ID
+	
+	if (googleClientId) {
+		console.log('Google Sign-In configured with Client ID:', googleClientId.substring(0, 20) + '...')
+	} else {
+		console.warn('GOOGLE_CLIENT_ID not found, Google Sign-In will be disabled')
+	}
+	
 	await registerRoutes(app)
 	const port = Number(process.env.PORT)
 	if (!port) {
