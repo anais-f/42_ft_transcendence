@@ -21,9 +21,6 @@
 		"test": "jest",
 		"clean": "rimraf dist"
 	},
-	"devDependencies": {
-		"typescript": "^5.1.6"
-	},
 	"dependencies": {
 		"bottleneck": "^2.19.5"
 	}
