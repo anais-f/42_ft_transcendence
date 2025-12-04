@@ -464,7 +464,7 @@
 // 			round INTEGER DEFAULT NULL,
 // 			id_tournament INTEGER DEFAULT NULL
 // 		);
-		
+
 // 		CREATE TABLE IF NOT EXISTS match_player (
 // 			id_match INTEGER NOT NULL,
 // 			player_id INTEGER NOT NULL,
