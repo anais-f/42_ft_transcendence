@@ -64,6 +64,8 @@ beforeAll(async () => {
 describe('AuthApi', () => {
 	beforeEach(() => {
 		mockFetch.mockClear()
+		process.env.AUTH_SERVICE_URL = AUTH_SERVICE_URL
+		process.env.INTERNAL_API_SECRET = 'test-secret'
 	})
 
 	// ==================== SECTION 1: SUCCESSFUL CASES ====================
@@ -90,7 +92,7 @@ describe('AuthApi', () => {
 				method: 'GET',
 				headers: {
 					'content-type': 'application/json',
-					authorization: process.env.AUTH_API_SECRET
+					authorization: process.env.INTERNAL_API_SECRET
 				}
 			})
 		})

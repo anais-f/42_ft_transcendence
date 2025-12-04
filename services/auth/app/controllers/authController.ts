@@ -26,14 +26,15 @@ export async function registerController(
 	const { login, password } = parsed.data
 
 	try {
-		const authApiSecret = process.env.AUTH_API_SECRET
+		const authApiSecret = process.env.INTERNAL_API_SECRET
 		if (!authApiSecret) {
-			console.error('AUTH_API_SECRET is not defined in environment variables')
+			console.error(
+				'INTERNAL_API_SECRET is not defined in environment variables'
+			)
 			return reply.code(500).send({ error: 'Server configuration error' })
 		}
 		await registerUser(login, password)
-		const PublicUser = await findPublicUserByLogin(parsed.data.login)
-		console.log('Pulic user = ', PublicUser)
+		const PublicUser = findPublicUserByLogin(parsed.data.login)
 		if (PublicUser == undefined)
 			return reply.code(500).send({ error: 'Database error1' })
 		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
@@ -57,7 +58,24 @@ export async function registerController(
 			return reply.code(400).send({ error: 'Synchronisation user db' })
 		}
 
-		return reply.send({ success: true })
+		// Auto-login on successful registration
+		const token = signToken(
+			{
+				user_id: PublicUser.user_id,
+				login: PublicUser.login,
+				is_admin: false,
+				type: 'auth'
+			},
+			'1h'
+		)
+		reply.setCookie('auth_token', token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 60
+		})
+		return reply.send({ success: true, token })
 	} catch (e: any) {
 		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			return reply.code(409).send({ error: 'Login already exists' })
@@ -75,95 +93,29 @@ export async function loginController(
 	const { login, password } = parsed.data
 	const res = await loginUser(login, password)
 	if (!res) return reply.code(401).send({ error: 'Invalid credentials' })
-
-	// Set user auth cookie
-	reply.setCookie('auth_token', res.token, {
-		httpOnly: true,
-		sameSite: 'strict',
-		secure: process.env.NODE_ENV === 'production',
-		path: '/',
-		maxAge: 60 * 15
-	})
-
-	// Decode minimal part to know if admin for cookie (no verification needed here)
-	try {
-		const payload: any = JSON.parse(
-			Buffer.from(res.token.split('.')[1], 'base64').toString()
-		)
-		if (payload.is_admin) {
-			reply.setCookie('admin_auth', res.token, {
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: process.env.NODE_ENV === 'production',
-				path: '/',
-				maxAge: 60 * 60
-			})
-		}
-	} catch {
-		// ignore payload decoding errors
-	}
-
-	return reply.send({ token: res.token })
-}
-
-export async function registerGoogleController(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
-	console.log('Register Google controller called')
-	const parsed = RegisterGoogleSchema.safeParse(request.body)
-	if (!parsed.success) {
-		console.log('Invalid payload for Google registration:', parsed.error)
-		return reply.code(400).send({ error: 'Invalid payload - register' })
-	}
-	const { google_id } = parsed.data
-	console.log('Google ID received:', google_id)
-	const user = findUserByGoogleId(google_id)
-	console.log('Existing user with this Google ID:', user)
-	if (user) {
-		console.log('Google user already exists, logging in')
-		return {
-			token: signToken({
-				user_id: user.user_id,
-				login: user.login,
-				is_admin: user.is_admin
-			})
-		}
-	}
-	try {
-		const authApiSecret = process.env.AUTH_API_SECRET
-		if (!authApiSecret) {
-			console.error('AUTH_API_SECRET is not defined in environment variables')
-			return reply.code(500).send({ error: 'Server configuration error' })
-		}
-		await registerGoogleUser(google_id)
-		const PublicUser = await findPublicUserByLogin(`google-${google_id}`)
-		console.log('Pulic user = ', PublicUser)
-		if (PublicUser == undefined)
-			return reply.code(500).send({ error: 'Database error1' })
-		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-				authorization: authApiSecret
-			},
-			body: JSON.stringify(PublicUser)
+	else if (res.pre_2fa_token) {
+		reply.setCookie('twofa_token', res.pre_2fa_token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 5
+		})
+		return reply.send({ pre_2fa_required: true })
+	} else if (res.token) {
+		reply.setCookie('auth_token', res.token, {
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
+			maxAge: 60 * 60
 		})
 
-		if (response.ok == false) {
-			deleteUserById(PublicUser.user_id)
-			return reply.code(400).send({ error: 'Synchronisation user db' })
-		}
-		console.log('Registered google user successfully')
-		return reply.send({ success: true })
-	} catch (e: any) {
-		if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-			console.log('Google ID already exists....')
-			return reply.code(409).send({ error: 'Login already exists' })
-		}
-		console.log('Database error during Google registration:', e)
-		return reply.code(500).send({ error: 'Database error' })
+		// Decode minimal part to know if admin for cookie (no verification needed here)
+		return reply.send({
+			pre_2fa_required: false,
+			token: res.token
+		})
 	}
 }
 
@@ -172,7 +124,7 @@ export async function validateAdminController(
 	reply: FastifyReply
 ) {
 	try {
-		const cookieToken = request.cookies?.admin_auth as string | undefined
+		const cookieToken = request.cookies?.auth_token
 		const authHeader = request.headers.authorization
 		let token: string | undefined = cookieToken
 		if (!token && authHeader && authHeader.startsWith('Bearer ')) {
@@ -188,5 +140,18 @@ export async function validateAdminController(
 		return reply.code(200).send({ success: true })
 	} catch (e) {
 		return reply.code(401).send({ success: false, error: 'Invalid token' })
+	}
+}
+
+export async function logoutController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	try {
+		reply.clearCookie('auth_token', { path: '/' })
+		reply.clearCookie('twofa_token', { path: '/' })
+		return reply.code(200).send({ success: true })
+	} catch (e) {
+		return reply.code(500).send({ success: false })
 	}
 }

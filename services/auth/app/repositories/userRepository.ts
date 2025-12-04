@@ -51,7 +51,7 @@ export function deleteUserById(id: number): boolean {
 	return info.changes > 0
 }
 
-export function createGoogleUser(google_id: string) {
+export function createGoogleUser(google_id: string): void {
 	let login = `google-${google_id}`
 	const stmt = db().prepare(
 		'INSERT INTO users (login, google_id) VALUES (?, ?)'
@@ -59,13 +59,39 @@ export function createGoogleUser(google_id: string) {
 	stmt.run(login, google_id)
 }
 
-export function findUserByGoogleId(google_id: string) {
+export function findUserByGoogleId(google_id: string): IUserAuth | undefined {
 	const stmt = db().prepare('SELECT * FROM users WHERE google_id = ?')
 	return stmt.get(google_id) as IUserAuth | undefined
+}
+
+export function findPublicUserByGoogleId(
+	google_id: string
+): PublicUserAuthDTO | undefined {
+	const stmt = db().prepare(
+		'SELECT user_id, login FROM users WHERE google_id = ?'
+	)
+	return stmt.get(google_id) as PublicUserAuthDTO | undefined
 }
 
 export function changeUserPassword(id: number, passwordHash: string): boolean {
 	const stmt = db().prepare('UPDATE users SET password = ? WHERE user_id = ?')
 	const info = stmt.run(passwordHash, id)
 	return info.changes > 0
+}
+
+// 2FA flag management
+export function setUser2FAEnabled(id: number, enabled: boolean): boolean {
+	const stmt = db().prepare(
+		'UPDATE users SET two_fa_enabled = ? WHERE user_id = ?'
+	)
+	const info = stmt.run(enabled ? 1 : 0, id)
+	return info.changes > 0
+}
+
+export function isUser2FAEnabled(id: number): boolean {
+	const stmt = db().prepare(
+		'SELECT two_fa_enabled FROM users WHERE user_id = ?'
+	)
+	const row = stmt.get(id) as { two_fa_enabled: number } | undefined
+	return !!row && row.two_fa_enabled === 1
 }
