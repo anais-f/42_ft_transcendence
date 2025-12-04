@@ -21,7 +21,6 @@ export async function googleLoginController(
 			return reply.code(400).send({ error: 'Missing Google credential' })
 		}
 
-		// Vérifier le token JWT avec Google
 		const ticket = await client.verifyIdToken({
 			idToken: credential,
 			audience: process.env.GOOGLE_CLIENT_ID
@@ -132,15 +131,4 @@ export async function googleLoginController(
 		console.error('Error in Google login:', error)
 		return reply.code(401).send({ error: 'Invalid Google token' })
 	}
-}
-
-// Garder l'ancien controller pour compatibilité (peut être supprimé plus tard)
-export async function googleCallBackController(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
-	return reply.code(410).send({
-		error:
-			'OAuth 2.0 flow deprecated. Please use POST /api/login-google with Google Sign-In'
-	})
 }

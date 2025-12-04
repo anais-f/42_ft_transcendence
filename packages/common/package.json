@@ -19,8 +19,5 @@
 	"scripts": {
 		"build": "tsc --project tsconfig.json && npm run generate:openapi",
 		"generate:openapi": "node ./dist/DTO/generateOpenApi.js"
-	},
-	"devDependencies": {
-		"typescript": "^5.1.6"
 	}
 }
