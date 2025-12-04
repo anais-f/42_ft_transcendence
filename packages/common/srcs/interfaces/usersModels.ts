@@ -48,3 +48,8 @@ export enum UserStatus {
 	OFFLINE = 0,
 	ONLINE = 1
 }
+
+export enum RelationStatus {
+	PENDING = 0,
+	FRIENDS = 1
+}
