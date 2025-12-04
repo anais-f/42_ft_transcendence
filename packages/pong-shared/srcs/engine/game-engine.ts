@@ -118,9 +118,6 @@ export class GameEngine {
 			this._pauseGame()
 		}
 
-		// console.log(
-		// 	`pos: {${this.ball.shape.getPos().getX().toFixed(2)} : ${this.ball.shape.getPos().getY().toFixed(2)}} | velo: {${this.ball.velo.getX().toFixed(2)} : ${this.ball.velo.getY().toFixed(2)}}`
-		// )
 	}
 
 	private startTickLoop(): void {
