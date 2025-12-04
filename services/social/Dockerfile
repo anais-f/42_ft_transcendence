@@ -15,7 +15,8 @@ COPY packages/ ./packages/
 
 # Build required workspace packages
 RUN npm run build --workspace=packages/common \
-    && npm run build --workspace=packages/security
+    && npm run build --workspace=packages/security \
+    && npm run build --workspace=packages/monitoring
 #-------------------------------------------------------------#
 # Build app
 FROM node:22-alpine AS build-app
@@ -28,6 +29,7 @@ COPY package.json package-lock.json ./
 COPY services/social/app/package.json ./services/social/app/
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
+COPY packages/monitoring/package.json ./packages/monitoring/
 RUN npm ci
 
 COPY tsconfig.json ./
@@ -37,8 +39,9 @@ COPY services/ ./services/
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 COPY --from=build-packages /build/packages/common/openapiDTO.json ./packages/common/openapiDTO.json
 COPY --from=build-packages /build/packages/security/dist ./packages/security/dist
+COPY --from=build-packages /build/packages/monitoring/dist ./packages/monitoring/dist
 
-RUN npm run build --workspace=social
+RUN npm run build --workspace=services/social/app
 
 #-------------------------------------------------------------#
 # prod
@@ -53,6 +56,7 @@ COPY --from=build-app /build/services/social/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
 COPY --from=build-app /build/packages/common/ ./packages/common/
 COPY --from=build-app /build/packages/security/ ./packages/security/
+COPY --from=build-app /build/packages/monitoring/ ./packages/monitoring/
 COPY --from=build-app /build/packages/common/openapiDTO.json ./dist/openapiDTO.json
 
 EXPOSE 3000

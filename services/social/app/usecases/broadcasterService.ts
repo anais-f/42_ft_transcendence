@@ -1,26 +1,11 @@
-import { sendToUser, broadcast } from './connectionManager.js'
+import { broadcast, sendToUser } from './connectionManager.js'
 import { SocialRepository } from '../repositories/socialRepository.js'
-import { IUserId, UserStatus } from '@ft_transcendence/common'
-
-interface StatusChangePayload {
-	type: 'user:status-changed'
-	data: {
-		userId: number
-		status: number
-		timestamp: string
-		lastSeen?: string
-	}
-}
-
-// interface PresenceChangePayload {
-// 	type: 'user:status-changed'
-// 	data: {
-// 		userId: number
-// 		status: number
-// 		timestamp: string
-// 		lastSeen?: string
-// 	}
-// }
+import {
+	IUserId,
+	StatusChangePayload,
+	UserStatus,
+	WSMessageType
+} from '@ft_transcendence/common'
 
 /**
  * Broadcast a status change to all friends of a user
@@ -28,31 +13,29 @@ interface StatusChangePayload {
  * @param status - UserStatus enum value (ONLINE, OFFLINE)
  */
 export async function broadcastStatusChangeToFriends(
-	userId: string,
+	userId: number,
 	status: UserStatus
 ): Promise<void> {
 	try {
-		const userIdNum = Number(userId)
-		const userIdObj: IUserId = { user_id: userIdNum }
+		const userIdObj: IUserId = { user_id: userId }
 
 		const friends = SocialRepository.getFriendsList(userIdObj)
 
-		const statusValue = status
 		const timestamp = new Date().toISOString()
 
-		const payload: StatusChangePayload = {
-			type: 'user:status-changed',
+		const payload = {
+			type: WSMessageType.USER_STATUS_CHANGE,
 			data: {
-				userId: userIdNum,
-				status: statusValue,
+				userId: userId,
+				status: status,
 				timestamp: timestamp,
 				...(status === UserStatus.OFFLINE && { lastSeen: timestamp })
 			}
-		}
+		} as StatusChangePayload
 
 		let sentCount = 0
 		for (const friend of friends) {
-			const sent = sendToUser(String(friend.user_id), payload)
+			const sent = sendToUser(friend.user_id, payload)
 			if (sent) {
 				sentCount++
 			}
@@ -76,23 +59,21 @@ export async function broadcastStatusChangeToFriends(
  * @param status - UserStatus enum value (ONLINE, OFFLINE)
  */
 export async function broadcastPresenceToAll(
-	userId: string,
+	userId: number,
 	status: UserStatus
 ): Promise<void> {
 	try {
-		const userIdNum = Number(userId)
 		const timestamp = new Date().toISOString()
 
-		const payload: StatusChangePayload = {
-			type: 'user:status-changed',
+		const payload = {
+			type: WSMessageType.USER_STATUS_CHANGE,
 			data: {
-				userId: userIdNum,
+				userId: userId,
 				status: status,
 				timestamp: timestamp,
 				...(status === UserStatus.OFFLINE && { lastSeen: timestamp })
-				// add lastSeen only if going offline
 			}
-		}
+		} as StatusChangePayload
 
 		broadcast(payload)
 

@@ -7,7 +7,7 @@ export const SuccessResponseSchema = z.object({
 
 export const ErrorResponseSchema = z
 	.object({
-		success: z.boolean().optional(),
+		success: z.boolean(),
 		error: z.string()
 	})
 	.strict()

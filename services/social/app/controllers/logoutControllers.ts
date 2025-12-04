@@ -22,27 +22,25 @@ export async function handleLogout(
 		return
 	}
 
-	const targetUserKey = String(userIdValue)
-
 	try {
-		const conn = wsConnections.get(targetUserKey)
+		const conn = wsConnections.get(String(userIdValue))
 
 		if (conn) {
 			if (conn.ws.readyState === 1) {
 				conn.ws.close(1000, 'User logged out')
 			}
-			removeConnection(targetUserKey, conn.ws)
+			removeConnection(userIdValue, conn.ws)
 		} else {
-			await handleUserOffline(targetUserKey)
+			await handleUserOffline(userIdValue)
 		}
 
 		void reply.code(200).send({
 			success: true,
-			message: `User ${targetUserKey} logged out successfully`
+			message: `User ${userIdValue} logged out successfully`
 		})
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to handle logout for user ${targetUserKey}:`, message)
+		console.error(`Failed to handle logout for user ${userIdValue}:`, message)
 		void reply.code(500).send({
 			success: false,
 			error: 'Failed to handle logout'

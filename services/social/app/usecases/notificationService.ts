@@ -1,24 +1,20 @@
-import { NotificationPayload } from '@ft_transcendence/common'
+import { NotificationPayload, WSMessageType } from '@ft_transcendence/common'
 import { sendToUser } from '../usecases/connectionManager.js'
 
-export enum NotificationType {
-	FriendRequest = 'friend:request',
-	FriendAccept = 'friend:accept',
-	FriendRemove = 'friend:remove',
-	FriendReject = 'friend:reject'
-}
-
 const MessagesTemplates: Record<
-	NotificationType,
+	| WSMessageType.FRIEND_ACCEPT
+	| WSMessageType.FRIEND_REJECT
+	| WSMessageType.FRIEND_REQUEST
+	| WSMessageType.FRIEND_REMOVE,
 	(username: string) => string
 > = {
-	[NotificationType.FriendRequest]: (username: string) =>
+	[WSMessageType.FRIEND_REQUEST]: (username: string) =>
 		`${username} has sent you a friend request.`,
-	[NotificationType.FriendAccept]: (username: string) =>
+	[WSMessageType.FRIEND_ACCEPT]: (username: string) =>
 		`${username} has accepted your friend request.`,
-	[NotificationType.FriendRemove]: (username: string) =>
+	[WSMessageType.FRIEND_REMOVE]: (username: string) =>
 		`${username} has removed your friendship.`,
-	[NotificationType.FriendReject]: (username: string) =>
+	[WSMessageType.FRIEND_REJECT]: (username: string) =>
 		`${username} has rejected your friend request.`
 }
 
@@ -28,14 +24,25 @@ const MessagesTemplates: Record<
  * @param fromUserId
  * @param fromUsername
  * @param toUserId
+ * @param friendInfo - Optional friend info to include in the friendListUpdate
  */
 function sendFriendNotification(
-	type: NotificationType,
-	fromUserId: string,
+	type:
+		| WSMessageType.FRIEND_ACCEPT
+		| WSMessageType.FRIEND_REJECT
+		| WSMessageType.FRIEND_REQUEST
+		| WSMessageType.FRIEND_REMOVE,
+	fromUserId: number,
 	fromUsername: string,
-	toUserId: string
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): boolean {
-	const notification: NotificationPayload = {
+	const notification = {
 		type: type,
 		data: {
 			from: {
@@ -45,7 +52,9 @@ function sendFriendNotification(
 			timestamp: new Date().toISOString(),
 			message: MessagesTemplates[type](fromUsername)
 		}
-	}
+	} as NotificationPayload
+
+	if (friendInfo) notification.data.friendListUpdate = friendInfo
 
 	const sent = sendToUser(toUserId, notification)
 
@@ -63,17 +72,25 @@ function sendFriendNotification(
  * @param fromUserId
  * @param fromUsername
  * @param toUserId
+ * @param friendInfo - Friend info to include in friendListUpdate
  */
 export async function friendRequestNotification(
-	fromUserId: string,
+	fromUserId: number,
 	fromUsername: string,
-	toUserId: string
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): Promise<boolean> {
 	return sendFriendNotification(
-		NotificationType.FriendRequest,
+		WSMessageType.FRIEND_REQUEST,
 		fromUserId,
 		fromUsername,
-		toUserId
+		toUserId,
+		friendInfo
 	)
 }
 
@@ -82,17 +99,25 @@ export async function friendRequestNotification(
  * @param fromUserId
  * @param fromUsername
  * @param toUserId
+ * @param friendInfo - Friend info to include in friendListUpdate
  */
 export async function friendAcceptedNotification(
-	fromUserId: string,
+	fromUserId: number,
 	fromUsername: string,
-	toUserId: string
+	toUserId: number,
+	friendInfo?: {
+		username: string
+		avatarUrl: string
+		status?: number
+		lastSeen?: string
+	}
 ): Promise<boolean> {
 	return sendFriendNotification(
-		NotificationType.FriendAccept,
+		WSMessageType.FRIEND_ACCEPT,
 		fromUserId,
 		fromUsername,
-		toUserId
+		toUserId,
+		friendInfo
 	)
 }
 
@@ -103,12 +128,12 @@ export async function friendAcceptedNotification(
  * @param toUserId
  */
 export async function friendRemovedNotification(
-	fromUserId: string,
+	fromUserId: number,
 	fromUsername: string,
-	toUserId: string
+	toUserId: number
 ): Promise<boolean> {
 	return sendFriendNotification(
-		NotificationType.FriendRemove,
+		WSMessageType.FRIEND_REMOVE,
 		fromUserId,
 		fromUsername,
 		toUserId
@@ -122,12 +147,12 @@ export async function friendRemovedNotification(
  * @param toUserId
  */
 export async function friendRejectedNotification(
-	fromUserId: string,
+	fromUserId: number,
 	fromUsername: string,
-	toUserId: string
+	toUserId: number
 ): Promise<boolean> {
 	return sendFriendNotification(
-		NotificationType.FriendReject,
+		WSMessageType.FRIEND_REJECT,
 		fromUserId,
 		fromUsername,
 		toUserId

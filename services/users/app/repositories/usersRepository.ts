@@ -107,9 +107,19 @@ export class UsersRepository {
 		const updateStmt = db.prepare(
 			'UPDATE users SET username = ? WHERE user_id = ?'
 		)
-		const info = updateStmt.run(user.username, user.user_id)
-		if (info.changes === 0) {
-			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		try {
+			const info = updateStmt.run(user.username, user.user_id)
+			if (info.changes === 0) {
+				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+			}
+		} catch (error: any) {
+			if (error instanceof AppError) {
+				throw error
+			}
+			if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
+			}
+			throw error
 		}
 	}
 

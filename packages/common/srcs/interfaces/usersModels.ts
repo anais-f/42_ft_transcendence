@@ -9,11 +9,12 @@ export interface IUserAuth {
 	password?: string
 	google_id?: string
 	is_admin: boolean
+	two_fa_enabled: boolean
 }
 
 export type IPublicUserAuth = Omit<
 	IUserAuth,
-	'is_admin' | 'password' | 'google_id'
+	'is_admin' | 'password' | 'google_id' | 'two_fa_enabled'
 >
 
 /**
@@ -47,4 +48,9 @@ export type IPublicProfileUser = Pick<
 export enum UserStatus {
 	OFFLINE = 0,
 	ONLINE = 1
+}
+
+export enum RelationStatus {
+	PENDING = 0,
+	FRIENDS = 1
 }

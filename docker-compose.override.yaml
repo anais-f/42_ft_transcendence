@@ -40,10 +40,10 @@ services:
       install-dependencies:
         condition: service_completed_successfully
 
-  auth_google:
+  social:
     build:
       context: .
-      dockerfile: services/auth_google/Dockerfile.dev
+      dockerfile: services/social/Dockerfile.dev
     volumes:
       - ./:/app
     environment:
@@ -53,10 +53,10 @@ services:
       install-dependencies:
         condition: service_completed_successfully
 
-  social:
+  matchmaking:
     build:
       context: .
-      dockerfile: services/social/Dockerfile.dev
+      dockerfile: services/matchmaking/Dockerfile.dev
     volumes:
       - ./:/app
     environment:
