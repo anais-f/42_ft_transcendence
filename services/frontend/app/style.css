@@ -5,7 +5,7 @@
 @layer base {
   @font-face {
     font-family: 'HoldMoney';
-    src: url('/assets/fonts/hold-money/HoldMoney-Regular.ttf') format('truetype');
+    src: url('/assets/fonts/HoldMoney/HoldMoney-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
