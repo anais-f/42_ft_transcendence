@@ -13,10 +13,7 @@ import {
 	jsonSchemaTransform
 } from 'fastify-type-provider-zod'
 import metricPlugin from 'fastify-metrics'
-import {
-	httpRequestCounter,
-	responseTimeHistogram
-} from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { socialRoutes } from './routes/socialRoutes.js'
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
@@ -36,7 +33,7 @@ function createApp(): FastifyInstance {
 	app.register(fastifyJwt, {
 		secret: jwtSecret
 	})
-
+	setupFastifyMonitoringHooks(app)
 	app.register(fastifyCookie)
 
 	const openapiSwagger = loadOpenAPISchema()
@@ -65,31 +62,6 @@ function createApp(): FastifyInstance {
 
 export async function start(): Promise<void> {
 	const app = createApp()
-	app.addHook('onRequest', (request, reply, done) => {
-		;(request as any).startTime = process.hrtime()
-		done()
-	})
-
-	app.addHook('onResponse', (request, reply) => {
-		httpRequestCounter.inc({
-			method: request.method,
-			route: request.url,
-			status_code: reply.statusCode
-		})
-		const startTime = (request as any).startTime
-		if (startTime) {
-			const diff = process.hrtime(startTime)
-			const responseTimeInSeconds = diff[0] + diff[1] / 1e9
-			responseTimeHistogram.observe(
-				{
-					method: request.method,
-					route: request.url,
-					status_code: reply.statusCode
-				},
-				responseTimeInSeconds
-			)
-		}
-	})
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()

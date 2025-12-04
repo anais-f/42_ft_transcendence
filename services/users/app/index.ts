@@ -3,6 +3,7 @@ import Fastify, { FastifyInstance } from 'fastify'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
+import fastifyCookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
 import fs from 'fs'
 import {
@@ -14,10 +15,7 @@ import {
 import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
-import {
-	httpRequestCounter,
-	responseTimeHistogram
-} from '@ft_transcendence/common'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
@@ -30,12 +28,20 @@ function createApp(): FastifyInstance {
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
+	setupFastifyMonitoringHooks(app)
+
+	app.register(fastifyCookie)
+
 	const jwtSecret = process.env.JWT_SECRET
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
 	app.register(fastifyJwt, {
-		secret: jwtSecret
+		secret: jwtSecret,
+		cookie: {
+			cookieName: 'auth_token',
+			signed: false
+		}
 	})
 
 	app.register(fastifyMultipart, {
@@ -86,31 +92,7 @@ async function initializeUsers(): Promise<void> {
 
 export async function start(): Promise<void> {
 	const app = createApp()
-	app.addHook('onRequest', (request, reply, done) => {
-		;(request as any).startTime = process.hrtime()
-		done()
-	})
-
-	app.addHook('onResponse', (request, reply) => {
-		httpRequestCounter.inc({
-			method: request.method,
-			route: request.url,
-			status_code: reply.statusCode
-		})
-		const startTime = (request as any).startTime
-		if (startTime) {
-			const diff = process.hrtime(startTime)
-			const responseTimeInSeconds = diff[0] + diff[1] / 1e9
-			responseTimeHistogram.observe(
-				{
-					method: request.method,
-					route: request.url,
-					status_code: reply.statusCode
-				},
-				responseTimeInSeconds
-			)
-		}
-	})
+	// remove manual hooks, metrics plugin remains
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
