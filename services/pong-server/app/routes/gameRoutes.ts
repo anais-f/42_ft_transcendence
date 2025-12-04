@@ -1,13 +1,12 @@
-import { FastifyPluginAsync } from "fastify";
-import {  jwtAuthMiddleware } from '@ft_transcendence/security'
-import { createTokenController } from '@ft_transcendence/common'
+import { FastifyPluginAsync } from 'fastify'
+import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
-	
 	server.route({
 		method: 'POST',
 		url: '/api/pong-server/create-token',
@@ -22,6 +21,4 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		},
 		handler: createTokenController
 	})
-
-
 }

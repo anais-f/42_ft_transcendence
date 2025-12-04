@@ -1,5 +1,3 @@
-export * from './init-server/tokenController.js'
-export * from './init-server/createApp.js'
 export * from './init-server/loadOpenAPISchema.js'
 
 export * from './DTO/authSchema.js'

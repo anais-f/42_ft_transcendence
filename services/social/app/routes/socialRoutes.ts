@@ -11,9 +11,9 @@ import {
 	FriendsListSchema,
 	UserIdCoerceSchema,
 	PendingFriendsListSchema,
-	createTokenSchema,
-    createTokenController
+	createTokenSchema
 } from '@ft_transcendence/common'
+import { createTokenController } from '@ft_transcendence/security'
 import {
 	requestFriendController,
 	rejectFriendController,

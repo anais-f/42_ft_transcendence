@@ -12,20 +12,20 @@ export function jwtAuthMiddleware(
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
-	request.jwtVerify()
-	.then(() => {
-		done()
-	})
-	.catch((err: Error) => {
-		console.error('JWT verification failed:', err.message)
-		void reply.code(401).send({
-			success: false,
-			error: ERROR_MESSAGES.UNAUTHORIZED
+	request
+		.jwtVerify()
+		.then(() => {
+			done()
 		})
-		done()
-	})
+		.catch((err: Error) => {
+			console.error('JWT verification failed:', err.message)
+			void reply.code(401).send({
+				success: false,
+				error: ERROR_MESSAGES.UNAUTHORIZED
+			})
+			done()
+		})
 }
-
 
 /**
  * @description Check valid JWT token and ownership
