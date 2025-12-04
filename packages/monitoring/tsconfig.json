@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"declarationMap": true,
 		"outDir": "dist",
-		"rootDir": "srcs",
+		"rootDir": "srcs"
 	},
 	"include": ["srcs/**/*"]
 }
