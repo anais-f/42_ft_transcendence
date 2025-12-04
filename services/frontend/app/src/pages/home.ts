@@ -28,9 +28,9 @@ export const HomePage = (): string => /*html*/ `
 <div class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<h1 class="text-2xl py-4">PROFILE</h1>
-		<img src=${fr3.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black grayscale-[75%]">
+		<img src=${user.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black grayscale-[75%]">
 		<div class="flex flex-row justify-between w-full my-2">
-			<h1 class="text-xl">${fr1.username}</h1>
+			<h1 class="text-xl">${user.username}</h1>
 			<h1 class="text-lg">27 yo</h1>
 		</div>
 		<div class="news_paragraph">
