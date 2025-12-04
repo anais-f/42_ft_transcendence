@@ -20,8 +20,5 @@
 		"build": "tsc --project tsconfig.json",
 		"test": "jest",
 		"clean": "rimraf dist"
-	},
-	"devDependencies": {
-		"typescript": "^5.1.6"
 	}
 }
