@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { z } from 'zod'
+import { createTokenSchema, ErrorResponseSchema } from '@ft_transcendence/common'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -13,10 +13,8 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: z.object({
-					wsToken: z.string(),
-					expiresIn: z.number().int().nonnegative()
-				})
+				200: createTokenSchema,
+				401: ErrorResponseSchema
 			}
 		},
 		handler: createTokenController

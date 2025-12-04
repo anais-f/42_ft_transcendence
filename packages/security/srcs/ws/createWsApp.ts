@@ -23,7 +23,6 @@ export function createWsApp(
 		.withTypeProvider<ZodTypeProvider>()
 		.setValidatorCompiler(validatorCompiler)
 		.setSerializerCompiler(serializerCompiler)
-	app
 		.register(fastifyCookie)
 		.register(fastifyJwt, {
 			secret: jwtSecret

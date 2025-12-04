@@ -1,6 +1,4 @@
 import fs from 'fs'
-import { FastifyRequest, FastifyReply } from 'fastify'
-import { FastifyInstance } from 'fastify'
 
 export function loadOpenAPISchema(OPENAPI_FILE: string) {
 	try {

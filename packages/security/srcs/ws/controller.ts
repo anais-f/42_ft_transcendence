@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { FastifyInstance } from 'fastify'
 import { createWsToken } from './createWsToken.js'
+import { ERROR_MESSAGES } from '@packages/common/dist/index.js';
 
 export async function createTokenController(
 	request: FastifyRequest,
@@ -8,11 +8,9 @@ export async function createTokenController(
 ): Promise<void> {
 	const user = request.user as { user_id: number; login: string }
 	if (!user) {
-		reply.status(401).send({ Error: 'Unauthorized' })
+		reply.status(401).send({ sucess: false, error: ERROR_MESSAGES.UNAUTHORIZED })
 		return
 	}
 
-	const { wsToken, expiresIn } = createWsToken(request.server, user)
-
-	reply.send({ wsToken, expiresIn })
+	reply.send(createWsToken(request.server, user))
 }

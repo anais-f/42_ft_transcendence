@@ -1,5 +1,4 @@
-export * from './init-server/loadOpenAPISchema.js'
-
+export * from './DTO/loadOpenAPISchema.js'
 export * from './DTO/authSchema.js'
 export * from './DTO/ResponseSchema.js'
 export * from './DTO/usersSchema.js'
