@@ -32,6 +32,7 @@ services:
       dockerfile: services/users/Dockerfile.dev
     volumes:
       - ./:/app
+      - avatars_data:/app/services/users/app/avatars
     environment:
       - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
@@ -88,3 +89,6 @@ services:
         condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', 'true']
+
+volumes:
+  avatars_data:
