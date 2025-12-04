@@ -67,12 +67,13 @@ services:
         condition: service_completed_successfully
 
   pong-server:
-    container_name: pong-server
     build:
       context: .
       dockerfile: services/pong-server/Dockerfile.dev
     volumes:
       - ./:/app
+    environment:
+      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
     restart: none
     depends_on:
       install-dependencies:

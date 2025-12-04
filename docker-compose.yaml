@@ -54,7 +54,7 @@ services:
       - .env
     build:
       context: .
-      dockerfile: ./services/pong-server/Dockerfile
+      dockerfile: services/pong-server/Dockerfile
     depends_on:
       frontend:
         condition: service_healthy
