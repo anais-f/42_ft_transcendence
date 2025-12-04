@@ -117,7 +117,6 @@ export class GameEngine {
 		if (this.score.p1 + this.score.p2 >= this.score.max) {
 			this._pauseGame()
 		}
-
 	}
 
 	private startTickLoop(): void {
