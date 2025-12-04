@@ -39,7 +39,7 @@ COPY --from=build-packages /build/packages/pong-shared/dist ./packages/pong-shar
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 COPY --from=build-packages /build/packages/security/dist ./packages/security/dist
 
-RUN npm run build --workspace=pong-server-app
+RUN npm run build --workspace=pong-server
 
 #-------------------------------------------------------------#
 # prod
