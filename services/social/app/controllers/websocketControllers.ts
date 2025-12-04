@@ -1,8 +1,7 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
-import { WSMessageType } from '@ft_transcendence/common'
-import { WSCloseCodes } from '@packages/common/srcs/interfaces/websocketModels.js'
+import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
