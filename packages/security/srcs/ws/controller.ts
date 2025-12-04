@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { createWsToken } from './createWsToken.js'
-import { ERROR_MESSAGES } from  '@ft_transcendence/common'
+import { ERROR_MESSAGES } from '@ft_transcendence/common'
 
 export async function createTokenController(
 	request: FastifyRequest,
