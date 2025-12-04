@@ -1,8 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
-import { z } from 'zod'
+import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
@@ -11,7 +10,8 @@ import {
 	SuccessResponseSchema,
 	FriendsListSchema,
 	UserIdCoerceSchema,
-	PendingFriendsListSchema
+	PendingFriendsListSchema,
+	createTokenSchema
 } from '@ft_transcendence/common'
 import {
 	requestFriendController,
@@ -27,24 +27,21 @@ import {
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
-	// POST /api/create-token - Create temporary WS token (JWT required)
+	// POST /api/social/create-token
 	server.route({
 		method: 'POST',
 		url: '/api/social/create-token',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: z.object({
-					wsToken: z.string(),
-					expiresIn: z.number().int().nonnegative()
-				})
+				200: createTokenSchema,
+				401: ErrorResponseSchema
 			}
 		},
 		handler: createTokenController
 	})
 
-	// GET /api/ws - WebSocket endpoint (WS token required)
-	// Register websocket without type provider (raw Fastify websocket)
+	// GET /api/social/ws - WebSocket endpoint
 	fastify.register(async (fastify) => {
 		fastify.get<{ Querystring: { token: string } }>(
 			'/api/social/ws',
@@ -58,7 +55,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		)
 	})
 
-	// POST /api/logout/:userId - Mark user as offline (JWT required, can only logout self)
+	// POST /api/social/logout/me
 	server.route({
 		method: 'POST',
 		url: '/api/social/logout/me',
@@ -75,7 +72,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: handleLogout
 	})
 
-	// POST /api/request-friend - Send a friend request (JWT required)
+	// POST /api/social/request-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/request-friend',
@@ -93,7 +90,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: requestFriendController
 	})
 
-	// POST /api/accept-friend - Accept a friend request (JWT required)
+	// POST /api/social/accept-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/accept-friend',
@@ -111,7 +108,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: acceptFriendController
 	})
 
-	// POST /api/reject-friend - Reject a friend request (JWT required)
+	// POST /api/social/reject-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/reject-friend',
@@ -129,7 +126,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: rejectFriendController
 	})
 
-	// POST /api/cancel-friend - Cancel a friend request (JWT required)
+	// POST /api/social/cancel-request-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/cancel-request-friend',
@@ -147,7 +144,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: cancelFriendController
 	})
 
-	// POST /api/remove-friend - Remove a friend (JWT required)
+	// POST /api/social/remove-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/remove-friend',
@@ -165,7 +162,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: removeFriendController
 	})
 
-	// GET /api/social/friends - Get friends list (JWT required)
+	// GET /api/social/friends-list/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/friends-list/me',
@@ -181,7 +178,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getFriendsListController
 	})
 
-	// GET /api/social/pending-requests - Get pending friend requests (JWT required, owner only)
+	// GET /api/social/pending-requests/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/pending-requests/me',
@@ -197,7 +194,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		handler: getPendingRequestsController
 	})
 
-	// GET /api/social/requests-sent - Get sent friend requests (JWT required, owner only)
+	// GET /api/social/requests-sent/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/requests-sent/me',

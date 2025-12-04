@@ -1,13 +1,8 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
-import {
-	addConnection,
-	getTotalConnections
-} from '../usecases/connectionManager.js'
-import { UsersApi } from '../repositories/UsersApi.js'
-
-// TODO : split into smaller functions when notifications are added and refactored logic after add connection
-// rename la fonction en fonction de son role
+import { initializeConnection } from '../usecases/websocketService.js'
+import { WSMessageType } from '@ft_transcendence/common'
+import { WSCloseCodes } from '@packages/common/srcs/interfaces/websocketModels.js'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -27,69 +22,55 @@ export async function handleSocialWSConnection(
 	} catch (err) {
 		socket.send(
 			JSON.stringify({
-				type: 'error:occurred',
+				type: WSMessageType.ERROR_OCCURRED,
 				code: 'INVALID_TOKEN',
 				message: 'Invalid or expired token'
 			})
 		)
-		socket.close(1008, 'Authentication failed')
+		socket.close(
+			1008,
+			WSCloseCodes.POLICY_VIOLATION + ': Invalid or expired token'
+		)
 		return
 	}
 
 	const userId = payload.user_id
 	const userLogin = payload.login
 
-	// Add connection
+	let username: string
 	try {
-		await addConnection(userId, socket)
+		const result = await initializeConnection(socket, userId, userLogin)
+		username = result.username
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		console.error(`Failed to add connection for user ${userId}:`, message)
-		socket.close(1011, 'Internal server error')
 		return
 	}
 
-	let username
-	try {
-		const userData = await UsersApi.getUserData({ user_id: userId })
-		username = userData.username ?? userLogin
-	} catch (error) {
-		console.error(`Failed to fetch user data for user ${userId}:`, error)
-		username = userLogin
-	}
+	setupMessageHandler(socket, userId, username)
+	setupCloseHandler(socket, userId, username)
+}
 
-	console.log(`✅ [WS] ${username} (${userId}) connected`)
-	console.log(`   Total: ${getTotalConnections()}`)
-
-	// Send welcome message to client
-	socket.send(
-		JSON.stringify({
-			type: 'connection:established',
-			data: {
-				userId,
-				username,
-				totalConnected: getTotalConnections(),
-				timestamp: new Date().toISOString()
-			}
-		})
-	)
-
-	// Handle incoming messages from client, écoute et renvoie sur le router des messages
+/**
+ * Setup message listener for incoming WebSocket messages
+ * @param socket WebSocket connection
+ * @param userId User ID
+ * @param username Username
+ */
+function setupMessageHandler(
+	socket: WebSocket,
+	userId: number,
+	username: string
+): void {
 	socket.on('message', (rawData: WebSocket.Data) => {
 		const rawMessage = rawData.toString()
 
-		// Try to parse as JSON, fallback to plain text
-		let message: any
 		try {
-			message = JSON.parse(rawMessage)
+			JSON.parse(rawMessage)
 		} catch (e) {
-			// Not JSON, treat as plain text message
-			// Sanitize and truncate the raw message for safe logging
 			const safe = rawMessage.replace(/\s+/g, ' ').trim().slice(0, 200)
-			console.log(`📨 [MSG] ${username}: ${safe}`)
+			console.log(`[MSG] ${username}: ${safe}`)
 			socket.send(
 				JSON.stringify({
-					type: 'message:echo',
+					type: WSMessageType.MESSAGE_ECHO,
 					data: {
 						from: {
 							userId,
@@ -102,8 +83,20 @@ export async function handleSocialWSConnection(
 			return
 		}
 	})
+}
 
+/**
+ * Setup close listener for WebSocket disconnection
+ * @param socket WebSocket connection
+ * @param userId User ID
+ * @param username Username
+ */
+function setupCloseHandler(
+	socket: WebSocket,
+	userId: number,
+	username: string
+): void {
 	socket.on('close', () => {
-		console.log(`❌ [WS] ${username} (${userId}) disconnected`)
+		console.log(`[WS] ${username} (${userId}) disconnected`)
 	})
 }
