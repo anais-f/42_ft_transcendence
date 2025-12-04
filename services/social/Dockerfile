@@ -8,7 +8,7 @@ COPY package.json package-lock.json ./
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
 
-RUN apk add --no-cache python3 make g++ && npm install
+RUN apk add --no-cache python3 make g++ && npm ci
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -28,7 +28,7 @@ COPY package.json package-lock.json ./
 COPY services/social/app/package.json ./services/social/app/
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
-RUN npm install
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
