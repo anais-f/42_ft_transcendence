@@ -10,7 +10,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	
 	server.route({
 		method: 'POST',
-		url: '/api/game/create-token',
+		url: '/api/pong-server/create-token',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {

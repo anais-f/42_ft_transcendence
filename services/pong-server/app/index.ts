@@ -14,7 +14,7 @@ async function start(): Promise<void>
 				title: 'api for game',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${process.env.HOST as string || 'http://127.0.0.1:8080'}/game`, description: 'idk' }],
+			servers: [{ url: `${process.env.HOST as string}/pong-server`, description: 'idk' }],
 			components: openapiSwager.components
 		},
 		transform: jsonSchemaTransform
