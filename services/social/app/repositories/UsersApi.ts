@@ -35,7 +35,7 @@ export class UsersApi {
 			)
 		}
 
-		//REVOIR
+		//To check
 		if (response.status === 404) return false
 		if (!response.ok) {
 			let bodyText = ''
