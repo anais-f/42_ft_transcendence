@@ -71,7 +71,6 @@ export class GameEngine {
 		for (const w of this.winZones) {
 			if (w.seg === seg) {
 				++this.score[`p${w.player as 1 | 2}`]
-				// console.log(`score: [ ${this.score.p1} | ${this.score.p2} ]`)
 				return true
 			}
 		}
