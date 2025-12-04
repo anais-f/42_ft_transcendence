@@ -1,11 +1,7 @@
-import { sendToUser, broadcast } from './connectionManager.js'
-import { SocialRepository } from '../repositories/socialRepository.js'
-import {
-	IUserId,
-	UserStatus,
-	StatusChangePayload,
-	NotificationType
-} from '@ft_transcendence/common'
+import {broadcast, sendToUser} from './connectionManager.js'
+import {SocialRepository} from '../repositories/socialRepository.js'
+import {IUserId, StatusChangePayload, UserStatus} from '@ft_transcendence/common'
+import {WSMessageType} from "@packages/common/srcs/interfaces/websocketModels.js";
 
 /**
  * Broadcast a status change to all friends of a user
@@ -23,15 +19,15 @@ export async function broadcastStatusChangeToFriends(
 
 		const timestamp = new Date().toISOString()
 
-		const payload: StatusChangePayload = {
-			type: 'user:status-changed',
+		const payload = {
+			type: WSMessageType.USER_STATUS_CHANGE,
 			data: {
 				userId: userId,
 				status: status,
 				timestamp: timestamp,
 				...(status === UserStatus.OFFLINE && { lastSeen: timestamp })
 			}
-		}
+		} as StatusChangePayload
 
 		let sentCount = 0
 		for (const friend of friends) {
@@ -65,15 +61,15 @@ export async function broadcastPresenceToAll(
 	try {
 		const timestamp = new Date().toISOString()
 
-		const payload: StatusChangePayload = {
-			type: 'user:status-changed',
+		const payload = {
+			type: WSMessageType.USER_STATUS_CHANGE,
 			data: {
 				userId: userId,
 				status: status,
 				timestamp: timestamp,
 				...(status === UserStatus.OFFLINE && { lastSeen: timestamp })
 			}
-		}
+		} as StatusChangePayload
 
 		broadcast(payload)
 
@@ -88,38 +84,3 @@ export async function broadcastPresenceToAll(
 		)
 	}
 }
-
-// export async function broadcastFriendListChange(
-// 	userId: string,
-// 	targetUserId: string,
-// 	action: NotificationType.FriendAccept | NotificationType.FriendReject | NotificationType.FriendRequest | NotificationType.FriendRemove,
-// 	friendInfo?: { username: string; avatarUrl?: string }
-// ): Promise<void> {
-// 	try {
-// 		const userIdNum = Number(userId)
-// 		const targetUserIdNum = Number(targetUserId)
-// 		const timestamp = new Date().toISOString()
-//
-// 		const payload: FriendListChangePayload = {
-// 			type: 'user:friend-list-updated',
-// 			data: {
-// 				userId: userIdNum,
-// 				targetUserId: targetUserIdNum,
-// 				action: action,
-// 				timestamp: timestamp,
-// 				...(friendInfo && { friendInfo })
-// 			}
-// 		}
-//
-// 		sendToUser(targetUserId, payload)
-// 		console.log(
-// 			`[BROADCAST] Friend list change (${action}) for user ${userId} sent to user ${targetUserId}`
-// 		)
-// 	} catch (error) {
-// 		const message = error instanceof Error ? error.message : String(error)
-// 		console.error(
-// 			`[BROADCAST] Failed to broadcast friend list change for user ${userId}:`,
-// 			message
-// 		)
-// 	}
-// }
