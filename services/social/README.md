@@ -1,118 +1,193 @@
 # Service `social`
 
-This document describes the `social` service of the Transcendence project: its purpose, the environment variables required (with a distinction for tests), a short note about the database, and the exposed endpoints.
+## Service Overview
 
-## Purpose of the service
+The `social` service handles user relationships, presence management, and real-time social features within the Transcendence ecosystem. It serves as the central hub for all social interactions between users, managing friend relationships and providing real-time communication capabilities.
 
-The `social` service handles user relationships, presence and realtime social features:
+## Service Purpose
 
-- Manage friend relationships (requests, accept/reject, cancel, remove)
-- Provide friends lists and pending requests
-- Maintain presence status (online/offline) and handle logout events
-- Provide a WebSocket endpoint for realtime presence/notifications via temporary tokens
-- Act as the owner of social-related business logic and aggregate user data by calling the `users` service
+The `social` service manages:
 
-## Environment variables
+- **Friend relationship management**: Friend requests, acceptance/rejection, cancellation, and removal
+- **Friends list and pending requests**: Comprehensive views of social connections
+- **Real-time presence tracking**: Online/offline status and activity monitoring
+- **WebSocket communication**: Real-time notifications and presence updates via temporary tokens
+- **Social business logic aggregation**: Combines user data by calling the `users` service
+- **Logout event handling**: Proper cleanup of presence and session data
 
-Below are the environment variables used by the service. Variables marked "(required for tests)" indicate values that need to be defined to run local unit/integration tests (or for mocks that rely on these values).
+The service acts as the owner of social-related business logic and maintains clear separation between authenticated user actions and internal service operations.
 
-Variables required for normal service operation
+## Environment Variables
+
+### Variables required for normal operation
 
 - `USERS_SERVICE_URL`: URL of the users service (used by `UsersApi` to fetch user profiles)
-- `USERS_API_SECRET`: secret/API key to authenticate calls to the users service
-- `JWT_SECRET_SOCIAL`: JWT secret used by the social service for token validation (if configured)
-- `SOCIAL_DB_PATH`: path to the social database file (used by `socialDatabase.ts`, typically a sqlite path)
-- `HOST` / `PORT`: host and port the service binds to (defaults are often provided in code)
-- `DTO_OPENAPI_FILE` (optional): path to OpenAPI/DTO file used at startup
-- `WS_TOKEN_EXPIRES_SECONDS` (optional, default used if not set): lifetime of temporary WS tokens in seconds
+- `INTERNAL_API_SECRET`: Secret/API key to protect internal endpoints
+- `JWT_SECRET_SOCIAL`: JWT secret used by the social service for token validation
+- `SOCIAL_DB_PATH`: Path to the social database file (used by `socialDatabase.ts`, typically SQLite)
+- `HOST` / `PORT`: Host and port the service binds to (defaults often provided in code)
+- `DTO_OPENAPI_FILE` (optional): Path to OpenAPI/DTO file used at startup
+- `WS_TOKEN_EXPIRES_SECONDS` (optional): Lifetime of temporary WebSocket tokens in seconds (default used if not set)
 
-Variables required only for tests (or strongly useful for tests)
+## Database
 
-- `USERS_SERVICE_URL` and `USERS_API_SECRET` (required for integration tests that call `UsersApi`; for unit tests prefer using mocks instead)
-- Test DB path (e.g. `TEST_SOCIAL_DB_PATH` or configure `SOCIAL_DB_PATH` to point to a temp/test DB)
-- Any storage/backing variables if presence/avatar persistence is tested against a real backend
+The social service uses a lightweight **SQLite** database (configured via `SOCIAL_DB_PATH`) to store relationships and presence data. Key components:
 
-Testing best practices
+### Relations Table
 
-- Mock `UsersApi` responses for unit tests to avoid network dependency in CI.
-- Mock WebSocket connections or use an in-process test harness for websocket logic.
-- Use a separate test DB file for integration tests and clean it between runs.
+Stores friend relationships with columns:
 
-## Database (brief)
+- `user_id`: The user who initiated or is part of the relationship
+- `friend_id`: The target user in the relationship
+- `origin_id`: The user who originally sent the friend request
+- `relation_status`: Relationship state
+  - `0` = pending request
+  - `1` = accepted friends
 
-The social service uses a lightweight database (configured via `SOCIAL_DB_PATH`) to store relations and presence. Key concepts:
+### Presence Tracking
 
-- `relations` table stores friend relationships with columns like `user_id`, `friend_id`, `origin_id`, `relation_status`
-  - `relation_status` values: `0` = pending, `1` = friends
-- Presence / connection state is tracked to provide `status` and `last_connection` in friend lists (aggregated from the `users` service and the social presence store)
+Connection state is tracked to provide `status` and `last_connection` information in friend lists, aggregated from both the `users` service and the social presence store.
 
-See `services/social/app/repositories/socialRepository.ts` for SQL queries and table usage.
+See `services/social/app/repositories/socialRepository.ts` for detailed SQL queries and table usage.
+
+## Architecture
+
+The service follows a clean architecture pattern:
+
+- **Routes** (`routes/socialRoutes.ts`): Endpoint definitions and WebSocket setup
+- **Controllers** (`controllers/`): Request processing and WebSocket handling
+- **Use Cases** (`usecases/`): Business logic for social operations
+- **Repositories** (`repositories/`): Data access layer for social data
+- **Types** (`types/`): TypeScript type definitions for social entities
 
 ## Endpoints
 
-Endpoints exposed by the service (extracted from `services/social/app/routes/socialRoutes.ts`):
+### Authentication and Token Management
 
-- POST /api/social/create-token
-  - Protection: JWT (`jwtAuthMiddleware`)
-  - Response: `{ token: string }` — creates a temporary token to authenticate WebSocket connections
+#### `POST /api/social/create-token`
 
-- GET /api/social/ws?token=<token>
-  - WebSocket endpoint (raw Fastify websocket)
-  - Querystring: `token` (temporary WS token created by `/api/social/create-token`)
-  - Purpose: realtime presence / notifications channel
+- **Protection**: JWT (`jwtAuthMiddleware`)
+- **Response**: `{ token: string }` — Creates a temporary token to authenticate WebSocket connections
+- **Purpose**: Generate secure tokens for WebSocket authentication
 
-- POST /api/social/logout/:userId
-  - Protection: JWT owner middleware (`jwtAuthOwnerMiddleware`) — only the owner can logout themselves
-  - Params: `userId` (path param)
-  - Purpose: mark a user as offline
+#### `GET /api/social/ws?token=<token>`
 
-- POST /api/social/request-friend
-  - Protection: JWT
-  - Body: `{ user_id: number }` (id of the friend)
-  - Purpose: send a friend request
+- **Type**: WebSocket endpoint (raw Fastify WebSocket)
+- **Query parameters**: `token` (temporary WebSocket token created by `/api/social/create-token`)
+- **Purpose**: Real-time presence and notifications channel
+- **Features**: Handles connection lifecycle, presence updates, and real-time messaging
 
-- POST /api/social/accept-friend
-  - Protection: JWT
-  - Body: `{ user_id: number }`
-  - Purpose: accept a pending friend request
+### Session Management
 
-- POST /api/social/reject-friend
-  - Protection: JWT
-  - Body: `{ user_id: number }`
-  - Purpose: reject a pending friend request
+#### `POST /api/social/logout/me`
 
-- POST /api/social/cancel-friend
-  - Protection: JWT
-  - Body: `{ user_id: number }`
-  - Purpose: cancel a previously sent friend request
+- **Protection**: JWT (`jwtAuthMiddleware`)
+- **Purpose**: Mark the authenticated user as offline and clean up presence data
+- **Behavior**: Updates user status and notifies connected friends via WebSocket
 
-- POST /api/social/remove-friend
-  - Protection: JWT
-  - Body: `{ user_id: number }`
-  - Purpose: remove an existing friend
+### Friend Relationship Management
 
-- GET /api/social/friends/:userId
-  - Protection: JWT
-  - Params: `userId` (coerced to number)
-  - Response: `FriendsListSchema` — an object `{ friends: [...] }` with each friend containing `user_id`, `username`, `avatar`, `status`, `last_connection`
+#### `POST /api/social/request-friend`
 
-- (Optional/disabled) GET /api/social/pending-requests
-  - Protection: JWT
-  - Purpose: return pending requests to approve / sent requests (route currently commented out)
+- **Protection**: JWT
+- **Body**: `{ user_id: number }` (ID of the user to send request to)
+- **Purpose**: Send a friend request to another user
+- **Validation**: Prevents duplicate requests and self-requests
 
-## WebSocket protocol
+#### `POST /api/social/accept-friend`
 
-The WebSocket endpoint `/api/social/ws` uses a simple JSON message protocol. Clients must authenticate using a temporary token obtained from `/api/social/create-token`.
-Messages sent by the server to clients include:
+- **Protection**: JWT
+- **Body**: `{ user_id: number }` (ID of the user whose request to accept)
+- **Purpose**: Accept a pending friend request
+- **Behavior**: Changes relationship status from pending to friends
 
-- `message:echo` — echo response to client pings
-- `message:friend_status` — notifications about friends' presence status changes (online/offline)
-  Clients can send:
-- `message:ping` — to keep the connection alive and receive an echo response
-- `friend:request` - request the current friends list with presence information
-- `friend:accept` - accept a friend request
-- `friend:reject` - reject a friend request
-- `friend:remove` - remove a friend
-- `game:invite` - send a game invite to a friend
-- `game:accept` - accept a game invite
-- `game:reject` - reject a game invite
+#### `POST /api/social/reject-friend`
+
+- **Protection**: JWT
+- **Body**: `{ user_id: number }` (ID of the user whose request to reject)
+- **Purpose**: Reject a pending friend request
+- **Behavior**: Removes the pending relationship entirely
+
+#### `POST /api/social/cancel-request-friend`
+
+- **Protection**: JWT
+- **Body**: `{ user_id: number }` (ID of the user to cancel request to)
+- **Purpose**: Cancel a previously sent friend request
+- **Behavior**: Allows users to retract their own sent requests
+
+#### `POST /api/social/remove-friend`
+
+- **Protection**: JWT
+- **Body**: `{ user_id: number }` (ID of the friend to remove)
+- **Purpose**: Remove an existing friend relationship
+- **Behavior**: Completely removes the friendship for both users
+
+### Social Data Retrieval
+
+#### `GET /api/social/friends-list/me`
+
+- **Protection**: JWT
+- **Response**: `FriendsListSchema` — Object containing `{ friends: [...] }`
+- **Friend data includes**: `user_id`, `username`, `avatar`, `status`, `last_connection`
+- **Purpose**: Retrieve the authenticated user's complete friends list with current presence
+
+#### `GET /api/social/pending-requests/me`
+
+- **Protection**: JWT
+- **Response**: `PendingFriendsListSchema` — List of incoming pending friend requests
+- **Purpose**: View friend requests that need to be accepted or rejected
+
+#### `GET /api/social/requests-sent/me`
+
+- **Protection**: JWT
+- **Response**: `PendingFriendsListSchema` — List of outgoing pending friend requests
+- **Purpose**: View friend requests the user has sent that are still pending
+
+## Data Schemas
+
+The service uses comprehensive Zod schemas for validation:
+
+- `createTokenSchema`: WebSocket token response format
+- `FriendsListSchema`: Complete friends list with presence data
+- `PendingFriendsListSchema`: Pending requests (both incoming and outgoing)
+- `UserIdCoerceSchema`: User ID validation and type coercion
+- `SuccessResponseSchema` / `ErrorResponseSchema`: Standard API responses
+
+## WebSocket Features
+
+### Real-time Communication
+
+- **Token-based authentication**: Secure WebSocket connections using temporary tokens
+- **Presence broadcasting**: Real-time status updates to connected friends
+- **Connection lifecycle management**: Proper handling of connect/disconnect events
+- **Error handling**: Robust error management for WebSocket operations
+
+### Security
+
+- **Temporary tokens**: WebSocket tokens have configurable expiration times
+- **JWT validation**: All initial connections validated through JWT middleware
+- **Connection isolation**: Users only receive updates relevant to their social graph
+
+## Integration with Ecosystem
+
+The `social` service integrates with:
+
+- **Users service**: Fetches complete user profile data for friend lists
+- **Auth service**: Validates JWT tokens for authentication
+- **Frontend**: Provides WebSocket endpoints for real-time UI updates
+- **Game services**: Can notify about game status changes and invitations
+
+## Real-time Features
+
+- **Live presence updates**: Friends see when users come online/offline in real-time
+- **Instant notifications**: Friend requests and responses are delivered immediately
+- **Status synchronization**: Game status, online/offline state synced across all connections
+- **Efficient broadcasting**: Only sends updates to users who need them (friends)
+
+## Security Considerations
+
+- **API protection**: All endpoints protected by JWT authentication
+- **Input validation**: Strict validation using Zod schemas
+- **Relationship integrity**: Prevents invalid relationship states
+- **Rate limiting ready**: Architecture supports rate limiting implementation
+- **Token security**: WebSocket tokens are temporary and single-use

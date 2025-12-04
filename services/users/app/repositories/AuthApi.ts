@@ -22,8 +22,8 @@ export class AuthApi {
 
 		const url = `${base}/api/users`
 		const headers = {
-			'content-type': 'application/json',
-			authorization: secret
+			'content-type': 'application/json'
+			// authorization: secret
 		}
 		const options = { method: 'GET', headers: headers }
 

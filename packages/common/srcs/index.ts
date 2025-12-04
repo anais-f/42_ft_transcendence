@@ -15,5 +15,3 @@ export * from './interfaces/usersModels.js'
 export * from './interfaces/jwtModels.js'
 
 export * from './utils/secrets.js'
-
-

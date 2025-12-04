@@ -41,7 +41,7 @@ function createApp(): FastifyInstance {
 		}
 	})
 
-  setupFastifyMonitoringHooks(app)
+	setupFastifyMonitoringHooks(app)
 
 	app.register(FastifyWebSocket as any)
 
@@ -61,8 +61,6 @@ function createApp(): FastifyInstance {
 	app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-
-	app.register(FastifyWebSocket as any)
 
 	app.register(socialRoutes)
 

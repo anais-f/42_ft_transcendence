@@ -1,9 +1,11 @@
-import {NotificationPayload, WSMessageType} from '@ft_transcendence/common'
-import {sendToUser} from '../usecases/connectionManager.js'
-
+import { NotificationPayload, WSMessageType } from '@ft_transcendence/common'
+import { sendToUser } from '../usecases/connectionManager.js'
 
 const MessagesTemplates: Record<
-	WSMessageType.FRIEND_ACCEPT | WSMessageType.FRIEND_REJECT | WSMessageType.FRIEND_REQUEST | WSMessageType.FRIEND_REMOVE,
+	| WSMessageType.FRIEND_ACCEPT
+	| WSMessageType.FRIEND_REJECT
+	| WSMessageType.FRIEND_REQUEST
+	| WSMessageType.FRIEND_REMOVE,
 	(username: string) => string
 > = {
 	[WSMessageType.FRIEND_REQUEST]: (username: string) =>
@@ -25,7 +27,11 @@ const MessagesTemplates: Record<
  * @param friendInfo - Optional friend info to include in the friendListUpdate
  */
 function sendFriendNotification(
-	type: WSMessageType.FRIEND_ACCEPT | WSMessageType.FRIEND_REJECT | WSMessageType.FRIEND_REQUEST | WSMessageType.FRIEND_REMOVE,
+	type:
+		| WSMessageType.FRIEND_ACCEPT
+		| WSMessageType.FRIEND_REJECT
+		| WSMessageType.FRIEND_REQUEST
+		| WSMessageType.FRIEND_REMOVE,
 	fromUserId: number,
 	fromUsername: string,
 	toUserId: number,

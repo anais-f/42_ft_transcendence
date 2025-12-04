@@ -1,6 +1,11 @@
 import { broadcast, sendToUser } from './connectionManager.js'
 import { SocialRepository } from '../repositories/socialRepository.js'
-import { IUserId, StatusChangePayload, UserStatus, WSMessageType } from '@ft_transcendence/common'
+import {
+	IUserId,
+	StatusChangePayload,
+	UserStatus,
+	WSMessageType
+} from '@ft_transcendence/common'
 
 /**
  * Broadcast a status change to all friends of a user
