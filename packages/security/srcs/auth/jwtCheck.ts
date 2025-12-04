@@ -4,7 +4,7 @@ import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { ERROR_MESSAGES } from '@ft_transcendence/common'
 
 /**
- * @description Check valid JWT token
+ * @description Check valid JWT token from httpOnly cookie or Authorization header
  * @use Routes accessible to authenticated users
  */
 export function jwtAuthMiddleware(

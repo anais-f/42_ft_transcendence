@@ -92,7 +92,6 @@ async function initializeUsers(): Promise<void> {
 
 export async function start(): Promise<void> {
 	const app = createApp()
-	// remove manual hooks, metrics plugin remains
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()

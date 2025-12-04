@@ -71,7 +71,6 @@ export class GameEngine {
 		for (const w of this.winZones) {
 			if (w.seg === seg) {
 				++this.score[`p${w.player as 1 | 2}`]
-				console.log(`score: [ ${this.score.p1} | ${this.score.p2} ]`)
 				return true
 			}
 		}
@@ -118,10 +117,6 @@ export class GameEngine {
 		if (this.score.p1 + this.score.p2 >= this.score.max) {
 			this._pauseGame()
 		}
-
-		console.log(
-			`pos: {${this.ball.shape.getPos().getX().toFixed(2)} : ${this.ball.shape.getPos().getY().toFixed(2)}} | velo: {${this.ball.velo.getX().toFixed(2)} : ${this.ball.velo.getY().toFixed(2)}}`
-		)
 	}
 
 	private startTickLoop(): void {

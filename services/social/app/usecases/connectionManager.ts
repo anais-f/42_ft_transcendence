@@ -8,15 +8,15 @@ interface UserConnection {
 }
 
 export const wsConnections = new Map<string, UserConnection>()
-const pendingDisconnectTimers = new Map<string, NodeJS.Timeout>()
-const DISCONNECT_DELAY_MS = 5000
+const pendingDisconnectTimers = new Map<number, NodeJS.Timeout>()
+const DISCONNECT_DELAY_MS = 2000
 
 /**
  * Setup event handlers for a WebSocket connection
  * @param userId - User ID
  * @param ws - WebSocket instance
  */
-function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
+function setupWebSocketHandlers(userId: number, ws: WebSocket): void {
 	ws.on('pong', () => {
 		handlePong(userId)
 	})
@@ -35,7 +35,7 @@ function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
  * Cancel pending disconnect timer for a user
  * @param userId - User ID
  */
-function cancelPendingDisconnect(userId: string): void {
+function cancelPendingDisconnect(userId: number): void {
 	const timer = pendingDisconnectTimers.get(userId)
 	if (timer) {
 		clearTimeout(timer)
@@ -51,10 +51,10 @@ function cancelPendingDisconnect(userId: string): void {
  * @returns true if this is the user's first connection (went online), false if replacing existing
  */
 export async function addConnection(
-	userId: string,
+	userId: number,
 	ws: WebSocket
 ): Promise<boolean> {
-	const existingConn = wsConnections.get(userId)
+	const existingConn = wsConnections.get(String(userId))
 	const isFirstConnection = !existingConn
 
 	if (!isFirstConnection) {
@@ -72,7 +72,7 @@ export async function addConnection(
 		}
 	}
 
-	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
+	wsConnections.set(String(userId), { ws, lastHeartbeat: new Date() })
 
 	setupWebSocketHandlers(userId, ws)
 
@@ -94,14 +94,14 @@ export async function addConnection(
  * @param ws - WebSocket instance (to verify it's the current one)
  * @returns true if this was the user's only connection (went offline), false if connection was already gone
  */
-export function removeConnection(userId: string, ws: WebSocket): boolean {
-	const currentConn = wsConnections.get(userId)
+export function removeConnection(userId: number, ws: WebSocket): boolean {
+	const currentConn = wsConnections.get(String(userId))
 
 	if (!currentConn || currentConn.ws !== ws) {
 		return false
 	}
 
-	wsConnections.delete(userId)
+	wsConnections.delete(String(userId))
 
 	cancelPendingDisconnect(userId)
 	const timer = setTimeout(async () => {
@@ -129,8 +129,8 @@ export function removeConnection(userId: string, ws: WebSocket): boolean {
  * @param message - Message to send (string or object)
  * @returns true if message was sent, false otherwise
  */
-export function sendToUser(userId: string, message: unknown): boolean {
-	const conn = wsConnections.get(userId)
+export function sendToUser(userId: number, message: unknown): boolean {
+	const conn = wsConnections.get(String(userId))
 	if (!conn) return false
 
 	const payload =
@@ -180,6 +180,14 @@ export function broadcast(message: unknown): void {
  */
 export function getTotalConnections(): number {
 	return wsConnections.size
+}
+
+export function getOnlineUsers(): number[] {
+	const onlineUsers: number[] = []
+	for (const userId of wsConnections.keys()) {
+		onlineUsers.push(Number(userId))
+	}
+	return onlineUsers
 }
 
 startHeartbeat()

@@ -30,11 +30,20 @@ function createApp(): FastifyInstance {
 	if (!jwtSecret) {
 		throw new Error('JWT_SECRET environment variable is required')
 	}
-	app.register(fastifyJwt, {
-		secret: jwtSecret
-	})
-	setupFastifyMonitoringHooks(app)
+
 	app.register(fastifyCookie)
+
+	app.register(fastifyJwt, {
+		secret: jwtSecret,
+		cookie: {
+			cookieName: 'auth_token',
+			signed: false
+		}
+	})
+
+	setupFastifyMonitoringHooks(app)
+
+	app.register(FastifyWebSocket as any)
 
 	const openapiSwagger = loadOpenAPISchema()
 	app.register(Swagger as any, {
@@ -52,8 +61,6 @@ function createApp(): FastifyInstance {
 	app.register(SwaggerUI as any, {
 		routePrefix: '/docs'
 	})
-
-	app.register(FastifyWebSocket as any)
 
 	app.register(socialRoutes)
 
