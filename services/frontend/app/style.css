@@ -4,8 +4,8 @@
 
 @layer base {
   @font-face {
-    font-family: 'Amado';
-    src: url('/assets/fonts/Amado/Amado.ttf') format('truetype');
+    font-family: 'HoldMoney';
+    src: url('/assets/fonts/hold-money/HoldMoney-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -23,7 +23,7 @@
 
 @layer utilities {
   .title_font {
-    @apply font-[] text-4xl;
+    @apply font-[HoldMoney] text-5xl;
   }
   .news_paragraph {
     @apply text-black opacity-15 select-none text-justify
