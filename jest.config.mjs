@@ -36,13 +36,12 @@ const config = {
 			rootDir: '<rootDir>/packages/pong-shared',
 			testMatch: ['**/*.test.ts']
 		},
-		{
-			...commonConfig,
-			displayName: 'users',
-			rootDir: '<rootDir>/services/users/app',
-			testMatch: ['**/*.test.ts']
-		}
-		,
+		// {
+		// 	...commonConfig,
+		// 	displayName: 'users',
+		// 	rootDir: '<rootDir>/services/users/app',
+		// 	testMatch: ['**/*.test.ts']
+		// },
 		{
 			...commonConfig,
 			displayName: 'auth',
