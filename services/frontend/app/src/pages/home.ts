@@ -1,36 +1,36 @@
 const user = {
 	username: 'Acancel',
-	avatar: '/images/acancel.jpg'
+	avatar: '/assets/images/acancel.jpg'
 }
 
 const fr1 = {
 	username: 'Anfichet',
-	avatar: '/images/anfichet.jpeg',
+	avatar: '/assets/images/anfichet.jpeg',
 	alt: 'Nanou_avatar',
 	status: 'Online'
 }
 
 const fr2 = {
 	username: 'Mjuffard',
-	avatar: '/images/mjuffard.jpg',
+	avatar: '/assets/images/mjuffard.jpg',
 	alt: 'Mich_avatar',
 	status: 'Online'
 }
 
 const fr3 = {
 	username: 'Lrio',
-	avatar: '/images/lrio.jpg',
+	avatar: '/assets/images/lrio.jpg',
 	alt: 'Lohhiiccc_avatar',
 	status: 'Offline'
 }
 
-export const HomePage = (): string => /*html*/ ` 
+export const HomePage = (): string => /*html*/ `
 <div class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<h1 class="text-2xl py-4">PROFILE</h1>
-		<img src=${user.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black">
+		<img src=${fr3.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black grayscale-[75%]">
 		<div class="flex flex-row justify-between w-full my-2">
-			<h1 class="text-xl">${user.username}</h1>
+			<h1 class="text-xl">${fr1.username}</h1>
 			<h1 class="text-lg">27 yo</h1>
 		</div>
 		<div class="news_paragraph">
@@ -67,7 +67,7 @@ export const HomePage = (): string => /*html*/ `
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">The head of our team during the project development</p>
 		</div>
-		<img src="/images/image_10.png" alt="AHHHHH !" class="w-full object-cover opacity-50 select-none">
+		<img src="/assets/images/image_10.png" alt="AHHHHH !" class="w-full object-cover opacity-50 select-none">
 	</div>
 	<div class="col-span-1">
 		 <h1 class="text-2xl pt-4 pb-1">WANTED</h1>
@@ -115,9 +115,9 @@ export const HomePage = (): string => /*html*/ `
 					<img src=${fr1.avatar} alt=${fr1.alt} class=" w-[10%] aspect-square object-cover border-1 border-black m-4">
 					<div class="m-4">
 						<p>${fr1.username}</p>
-						<div class="flex flex-row mx-2 w-full justify-between">
-							<button id="accept_fr_btn" type="button" class="generic_btn px-6">Accept</button>
-							<button id="decline_fr_btn" type="button" class="generic_btn px-6 mx-6">Decline</button>
+						<div class="flex flex-row w-full justify-between gap-4">
+							<button id="accept_fr_btn" type="button" class="generic_btn text-xs px-4 py-1 flex-1 w-20">Accept</button>
+							<button id="decline_fr_btn" type="button" class="generic_btn text-xs px-4 py-1 flex-1 w-20">Decline</button>
 						</div>
 					</div>
 				</li>
@@ -127,7 +127,9 @@ export const HomePage = (): string => /*html*/ `
 </div>
 `
 
-//  <div class="flex h-[85vh] w-full justify-around gap-4 p-4">
+//  <div class="flex h-[85vh] w-full justify-around gap-4 p-4">/* image 1 */
+
+
 //     <aside class=" bg-green-200/30 p-4 flex flex-col w-1/6 items-center justify-between border-4 border-gray-400">
 //         <div class="flex flex-col items-center gap-4">
 //             <img src=${user.avatar} alt="User's avatar" class=" w-3/4 aspect-square object-cover flex-shrink-0 border-4 border-gray-400 shadow-xl">
@@ -185,4 +187,5 @@ export const HomePage = (): string => /*html*/ `
 //         </a>
 //     </section>
 // </div>
+
 

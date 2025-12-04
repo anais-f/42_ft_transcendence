@@ -3,6 +3,7 @@ import { LoginPage } from "./pages/login.js"
 import { HomePage } from "./pages/home.js"
 import { GamePage } from "./pages/game.js"
 import { LobbyPage } from "./pages/lobby.js"
+import { SettingPage } from "./pages/settings.js"
 
 document.addEventListener('DOMContentLoaded', () => {
 	const contentDiv = document.getElementById('content');
