@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: 'Amado';
+    src: url('/assets/fonts/Amado/Amado.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+}
+
 @layer components {
   .submission_btn {
 	@apply bg-green-500 border border-green-600 p-3 hover:bg-green-600;
@@ -13,7 +23,7 @@
 
 @layer utilities {
   .title_font {
-    @apply font-[Rye] text-4xl;
+    @apply font-[] text-4xl;
   }
   .news_paragraph {
     @apply text-black opacity-15 select-none text-justify

@@ -4,3 +4,14 @@ export default {
 	theme: { extend: {} },
 	plugins: [],
 };
+
+
+module.exports = {
+  theme: {
+    extend: {
+      fontFamily: {
+        amado: ['Amado', 'sans-serif'],
+      },
+    },
+  },
+};
