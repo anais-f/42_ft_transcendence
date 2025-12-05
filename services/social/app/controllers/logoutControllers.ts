@@ -15,15 +15,15 @@ export async function handleLogout(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const userFromToken = request.user as any
-	const userIdValue = userFromToken?.user_id
-	if (typeof userIdValue !== 'number') {
+	if (!request.user) {
 		void reply.code(401).send({ success: false, error: 'Unauthorized' })
 		return
 	}
 
+	const userIdValue = (request.user as { user_id: number }).user_id
+
 	try {
-		const conn = wsConnections.get(String(userIdValue))
+		const conn = wsConnections.get(userIdValue)
 
 		if (conn) {
 			if (conn.ws.readyState === 1) {

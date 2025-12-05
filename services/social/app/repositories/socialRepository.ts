@@ -35,9 +35,14 @@ export class SocialRepository {
 		friend_id: IUserId,
 		origin_id: IUserId
 	): void {
-		if (this.getFriendsCount(user_id) >= 50)
+		const [userCount, friendCount] = [
+			this.getFriendsCount(user_id),
+			this.getFriendsCount(friend_id)
+		]
+
+		if (userCount >= 20)
 			throw new Error('User has reached the maximum limit of 50 friends')
-		if (this.getFriendsCount(friend_id) >= 50)
+		if (friendCount >= 20)
 			throw new Error('Friend has reached the maximum limit of 50 friends')
 
 		const insertStmt = db.prepare(
@@ -53,9 +58,14 @@ export class SocialRepository {
 		status: number
 	): void {
 		if (status === 1) {
-			if (this.getFriendsCount(user_id) >= 50)
+			const [userCount, friendCount] = [
+				this.getFriendsCount(user_id),
+				this.getFriendsCount(friend_id)
+			]
+
+			if (userCount >= 20)
 				throw new Error('User has reached the maximum limit of 50 friends')
-			if (this.getFriendsCount(friend_id) >= 50)
+			if (friendCount >= 20)
 				throw new Error('Friend has reached the maximum limit of 50 friends')
 		}
 

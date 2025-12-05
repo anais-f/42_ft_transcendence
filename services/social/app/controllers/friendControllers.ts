@@ -8,20 +8,14 @@ async function handleFriendAction(
 	action: (userId: IUserId, friendId: IUserId) => Promise<void>,
 	successMessage: string
 ): Promise<void> {
-	if (!req.user || typeof (req.user as any).user_id !== 'number')
+	if (!req.user)
 		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
 
 	try {
 		const userIdValue = (req.user as { user_id: number }).user_id
 		const userId: IUserId = { user_id: userIdValue }
 
-		const friendIdRaw = (req.body as any)?.user_id
-		const friendId = Number(friendIdRaw)
-		if (!Number.isInteger(friendId)) {
-			return void reply
-				.code(400)
-				.send({ success: false, error: 'Invalid friend user_id' })
-		}
+		const friendId = (req.body as { user_id: number }).user_id
 		const friendUserId: IUserId = { user_id: friendId }
 
 		await action(userId, friendUserId)
@@ -106,9 +100,10 @@ export async function getFriendsListController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const userIdValue = (req.user as any)?.user_id
-	if (typeof userIdValue !== 'number')
+	if (!req.user)
 		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
+
+	const userIdValue = (req.user as { user_id: number }).user_id
 
 	try {
 		const userId: IUserId = { user_id: userIdValue }
@@ -134,9 +129,10 @@ export async function getPendingRequestsController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const userIdValue = (req.user as any)?.user_id
-	if (typeof userIdValue !== 'number')
+	if (!req.user)
 		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
+
+	const userIdValue = (req.user as { user_id: number }).user_id
 
 	try {
 		const userId: IUserId = { user_id: userIdValue }
@@ -162,9 +158,10 @@ export async function getPendingSentRequestsController(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const userIdValue = (req.user as any)?.user_id
-	if (typeof userIdValue !== 'number')
+	if (!req.user)
 		return void reply.code(401).send({ success: false, error: 'Unauthorized' })
+
+	const userIdValue = (req.user as { user_id: number }).user_id
 
 	try {
 		const userId: IUserId = { user_id: userIdValue }

@@ -101,7 +101,7 @@ export class FriendService {
 			if (originId === userId.user_id)
 				throw new AppError(ERROR_MESSAGES.REQUEST_ALREADY_SENT, 400)
 			else {
-				await SocialRepository.updateRelationStatus(
+				SocialRepository.updateRelationStatus(
 					userId,
 					friendId,
 					RelationStatus.FRIENDS

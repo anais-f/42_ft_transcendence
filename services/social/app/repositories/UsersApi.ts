@@ -30,7 +30,8 @@ export class UsersApi {
 			response = await fetch(url, options)
 		} catch (err) {
 			throw new AppError(
-				'Failed to check user existence: ' + (err as Error).message,
+				'Failed to check user existence: ' +
+					(err instanceof Error ? err.message : String(err)),
 				502
 			)
 		}
@@ -80,7 +81,8 @@ export class UsersApi {
 			response = await fetch(url, options)
 		} catch (err) {
 			throw new AppError(
-				'Failed to fetch user data: ' + (err as Error).message,
+				'Failed to fetch user data: ' +
+					(err instanceof Error ? err.message : String(err)),
 				502
 			)
 		}

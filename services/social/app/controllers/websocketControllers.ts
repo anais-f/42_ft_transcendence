@@ -1,7 +1,11 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
-import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
+import {
+	WSMessageType,
+	WSCloseCodes,
+	IJwtPayload
+} from '@ft_transcendence/common'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -15,9 +19,9 @@ export async function handleSocialWSConnection(
 	const token = request.query.token
 	const jwtInstance = (fastify as any).jwt
 
-	let payload: any
+	let payload: IJwtPayload
 	try {
-		payload = jwtInstance.verify(token)
+		payload = jwtInstance.verify(token) as IJwtPayload
 	} catch (err) {
 		socket.send(
 			JSON.stringify({
@@ -63,23 +67,17 @@ function setupMessageHandler(
 		const rawMessage = rawData.toString()
 
 		try {
-			JSON.parse(rawMessage)
+			const message = JSON.parse(rawMessage)
+			console.log(`[WS] Valid JSON command from ${username}:`, message)
 		} catch (e) {
-			const safe = rawMessage.replace(/\s+/g, ' ').trim().slice(0, 200)
-			console.log(`[MSG] ${username}: ${safe}`)
+			console.warn(`[WS] Invalid message from ${username}, rejected`)
 			socket.send(
 				JSON.stringify({
-					type: WSMessageType.MESSAGE_ECHO,
-					data: {
-						from: {
-							userId,
-							login: username
-						},
-						content: safe
-					}
+					type: WSMessageType.ERROR_OCCURRED,
+					code: 'INVALID_FORMAT',
+					message: 'Only JSON messages are accepted'
 				})
 			)
-			return
 		}
 	})
 }
