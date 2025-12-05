@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
 import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
+import { handleWsConnection } from '@ft_transcendence/security'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
@@ -12,28 +13,10 @@ export async function handleSocialWSConnection(
 	request: FastifyRequest<{ Querystring: { token: string } }>,
 	fastify: FastifyInstance
 ): Promise<void> {
-	const token = request.query.token
-	const jwtInstance = (fastify as any).jwt
+	let payload = await handleWsConnection(socket, request, fastify)
+	if (!payload) return
 
-	let payload: any
-	try {
-		payload = jwtInstance.verify(token)
-	} catch (err) {
-		socket.send(
-			JSON.stringify({
-				type: WSMessageType.ERROR_OCCURRED,
-				code: 'INVALID_TOKEN',
-				message: 'Invalid or expired token'
-			})
-		)
-		socket.close(
-			1008,
-			WSCloseCodes.POLICY_VIOLATION + ': Invalid or expired token'
-		)
-		return
-	}
-
-	const userId = payload.user_id
+	const userId = Number(payload.user_id)
 	const userLogin = payload.login
 
 	let username: string

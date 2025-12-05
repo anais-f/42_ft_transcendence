@@ -1,4 +1,4 @@
-import fastifyWebsocket from '@fastify/websocket' // this import isnt useless
+import '@fastify/websocket'
 import WebSocket from 'ws'
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
@@ -34,10 +34,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 				socket: WebSocket,
 				request: FastifyRequest<{ Querystring: { token: string } }>
 			) => {
-				console.log('???????????????????????????///////////')
-				handleGameWsConnection(socket, request, fastify, () => {
-					console.log('hey: connected')
-				})
+				void handleGameWsConnection(socket, request, fastify)
 			}
 		)
 	})

@@ -1,36 +1,15 @@
 import WebSocket from 'ws'
 import { FastifyRequest, FastifyInstance } from 'fastify'
-import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
-
+import { handleWsConnection } from '@ft_transcendence/security'
 
 export async function handleGameWsConnection(
 	socket: WebSocket,
 	request: FastifyRequest<{ Querystring: { token: string } }>,
-	fastify: FastifyInstance,
-	methode: Function | null
+	fastify: FastifyInstance
 ): Promise<void> {
-	const token = request.query.token
-	const jwtI = (fastify as any).jwt
-	
-	let payload: any
-	try {
-		payload = jwtI.verify(token)
-	} catch (err) {
-		socket.send(
-			JSON.stringify({
-				type: WSMessageType.ERROR_OCCURRED,
-				code: 'INVALID_TOKEN',
-				message: 'Invalid or expired token'
-			})
-		)
-		socket.close(
-			1008,
-			WSCloseCodes.POLICY_VIOLATION + ': Invalid or expired token'
-		)
+	// @ts-ignore
+	let payload = await handleWsConnection(socket, request, fastify)
+	if (!payload) {
 		return
-	}
-
-	if (null !== methode) {
-		try { methode() } catch (_) { return }
 	}
 }
