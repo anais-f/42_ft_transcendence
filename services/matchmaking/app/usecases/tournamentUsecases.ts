@@ -17,7 +17,6 @@ export function createInviteCode(): string {
 	return str1 + '-' + str2
 }
 
-
 function shuffle(array: any[]) {
 	let currentIndex = array.length
 
