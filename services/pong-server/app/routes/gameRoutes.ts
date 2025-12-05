@@ -6,7 +6,8 @@ import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	createTokenSchema,
-	ErrorResponseSchema
+	ErrorResponseSchema,
+	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers'
 
@@ -27,15 +28,11 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	})
 
 	server.register(async (fastify) => {
-		fastify.get<{ Querystring: { token: string } }>(
+		fastify.get<IWsJwtTokenQuery>(
 			'/api/pong-server/ws',
 			{ websocket: true },
-			(
-				socket: WebSocket,
-				request: FastifyRequest<{ Querystring: { token: string } }>
-			) => {
-				void handleGameWsConnection(socket, request, fastify)
-			}
+			(socket: WebSocket, request: FastifyRequest<IWsJwtTokenQuery>) =>
+				handleGameWsConnection(socket, request, fastify)
 		)
 	})
 }

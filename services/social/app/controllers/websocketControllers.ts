@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
-import { WSMessageType } from '@ft_transcendence/common'
+import { IWsJwtTokenQuery, WSMessageType } from '@ft_transcendence/common'
 import { handleWsConnection } from '@ft_transcendence/security'
 
 /**
@@ -10,7 +10,7 @@ import { handleWsConnection } from '@ft_transcendence/security'
  */
 export async function handleSocialWSConnection(
 	socket: WebSocket,
-	request: FastifyRequest<{ Querystring: { token: string } }>,
+	request: FastifyRequest<IWsJwtTokenQuery>,
 	fastify: FastifyInstance
 ): Promise<void> {
 	let payload = await handleWsConnection(socket, request, fastify)

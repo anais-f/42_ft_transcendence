@@ -5,3 +5,9 @@ export interface IJwtPayload {
 	iat: number
 	exp: number
 }
+
+export interface IWsJwtTokenQuery {
+	Querystring: {
+		token: string
+	}
+}

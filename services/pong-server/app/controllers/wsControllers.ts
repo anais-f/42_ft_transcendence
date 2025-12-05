@@ -1,13 +1,13 @@
 import WebSocket from 'ws'
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import { handleWsConnection } from '@ft_transcendence/security'
+import { IWsJwtTokenQuery } from '@ft_transcendence/common'
 
 export async function handleGameWsConnection(
 	socket: WebSocket,
-	request: FastifyRequest<{ Querystring: { token: string } }>,
+	request: FastifyRequest<IWsJwtTokenQuery>,
 	fastify: FastifyInstance
 ): Promise<void> {
-	// @ts-ignore
 	let payload = await handleWsConnection(socket, request, fastify)
 	if (!payload) {
 		return
