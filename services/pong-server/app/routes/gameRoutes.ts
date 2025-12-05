@@ -1,4 +1,6 @@
-import { FastifyPluginAsync } from 'fastify'
+import fastifyWebsocket from '@fastify/websocket' // this import isnt useless
+import WebSocket from 'ws'
+import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
@@ -6,6 +8,7 @@ import {
 	createTokenSchema,
 	ErrorResponseSchema
 } from '@ft_transcendence/common'
+import { handleGameWsConnection } from '../controllers/wsControllers'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -21,5 +24,21 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			}
 		},
 		handler: createTokenController
+	})
+
+	server.register(async (fastify) => {
+		fastify.get<{ Querystring: { token: string } }>(
+			'/api/pong-server/ws',
+			{ websocket: true },
+			(
+				socket: WebSocket,
+				request: FastifyRequest<{ Querystring: { token: string } }>
+			) => {
+				console.log('???????????????????????????///////////')
+				handleGameWsConnection(socket, request, fastify, () => {
+					console.log('hey: connected')
+				})
+			}
+		)
 	})
 }
