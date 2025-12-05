@@ -1,12 +1,12 @@
 import WebSocket from 'ws'
 import { FastifyRequest, FastifyInstance } from 'fastify'
-import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
+import { WSMessageType, WSCloseCodes, IJwtPayload } from '@ft_transcendence/common'
 
 export async function handleWsConnection(
 	socket: WebSocket,
 	request: FastifyRequest<{ Querystring: { token: string } }>,
 	fastify: FastifyInstance
-): Promise<{ user_id: string; login: string } | null> {
+): Promise<IJwtPayload | null> {
 	const token = request.query.token
 	const jwtI = (fastify as any).jwt
 

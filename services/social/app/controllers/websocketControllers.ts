@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
-import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
+import { WSMessageType } from '@ft_transcendence/common'
 import { handleWsConnection } from '@ft_transcendence/security'
 
 /**
@@ -16,7 +16,7 @@ export async function handleSocialWSConnection(
 	let payload = await handleWsConnection(socket, request, fastify)
 	if (!payload) return
 
-	const userId = Number(payload.user_id)
+	const userId = payload.user_id
 	const userLogin = payload.login
 
 	let username: string
