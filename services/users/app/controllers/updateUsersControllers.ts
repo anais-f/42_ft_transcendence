@@ -47,7 +47,7 @@ export async function updateUsername(
 		void reply
 			.code(200)
 			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply
 				.code(error.status)
@@ -131,7 +131,7 @@ export async function updateAvatar(
 			success: true,
 			message: SUCCESS_MESSAGES.USER_UPDATED
 		})
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply
 				.code(error.status)
@@ -170,7 +170,7 @@ export async function updateUserStatus(
 		void reply
 			.code(200)
 			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply
 				.code(error.status)

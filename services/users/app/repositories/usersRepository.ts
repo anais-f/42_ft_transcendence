@@ -107,20 +107,23 @@ export class UsersRepository {
 		const updateStmt = db.prepare(
 			'UPDATE users SET username = ? WHERE user_id = ?'
 		)
+		let info
 		try {
-			const info = updateStmt.run(user.username, user.user_id)
-			if (info.changes === 0) {
-				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-			}
-		} catch (error: any) {
-			if (error instanceof AppError) {
-				throw error
-			}
-			if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+			info = updateStmt.run(user.username, user.user_id)
+		} catch (error: unknown) {
+			if (
+				typeof error === 'object' &&
+				error !== null &&
+				'code' in error &&
+				error.code === 'SQLITE_CONSTRAINT_UNIQUE'
+			) {
 				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
 			}
 			throw error
 		}
+
+		if (info.changes === 0)
+			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
 	}
 
 	static updateUserStatus(
@@ -157,15 +160,16 @@ export class UsersRepository {
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
 
-	// TODO : change to userpublicprofil dto ?
-	static getUserByUsername(username: IUsername): IPrivateUser | undefined {
+	static getUserByUsername(
+		username: IUsername
+	): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
 		)
-		return selectStmt.get(username) as IPrivateUser | undefined
+		return selectStmt.get(username) as UserPublicProfileDTO | undefined
 	}
 
-	static getLastConnectionById(user: IUserId): string {
+	static getLastConnectionById(user: IUserId): string | undefined {
 		const selectStmt = db.prepare(
 			'SELECT last_connection FROM users WHERE user_id = ?'
 		)
@@ -173,7 +177,7 @@ export class UsersRepository {
 		return row.last_connection
 	}
 
-	static getAvatarById(user: IUserId): string {
+	static getAvatarById(user: IUserId): string | undefined {
 		const selectStmt = db.prepare('SELECT avatar FROM users WHERE user_id = ?')
 		const row = selectStmt.get(user.user_id) as { avatar: string }
 		return row.avatar

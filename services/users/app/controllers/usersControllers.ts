@@ -10,6 +10,7 @@ import {
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
 
+//TODO: voir le retour d'erreur 200 quand un user existe deja
 export async function handleUserCreated(
 	req: FastifyRequest,
 	reply: FastifyReply
@@ -60,7 +61,7 @@ export async function getPublicUser(
 		}
 
 		void reply.code(200).send(parsed.data)
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply
 				.code(error.status)
@@ -99,7 +100,7 @@ export async function getPrivateUser(
 		}
 
 		void reply.code(200).send(parsed.data)
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply
 				.code(error.status)
@@ -138,7 +139,7 @@ export async function searchUserByUsernameController(
 		}
 
 		void reply.code(200).send(parsed.data)
-	} catch (error: any) {
+	} catch (error: unknown) {
 		if (error instanceof AppError) {
 			void reply.code(error.status).send({
 				success: false,
