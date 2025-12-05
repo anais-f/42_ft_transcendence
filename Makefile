@@ -18,7 +18,7 @@ build-monitoring:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) build
 
 .PHONY: up-monitoring
-up-monitoring:
+up-monitoring: verif-env
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) up -d
 
 .PHONY: test
@@ -32,7 +32,7 @@ build:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
 
 .PHONY: up
-up:
+up: verif-env
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: debug
@@ -66,7 +66,7 @@ build-dev:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
 
 .PHONY: up-dev
-up-dev:
+up-dev: verif-env
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
 	
 .PHONY: reset-db
