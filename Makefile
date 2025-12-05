@@ -72,3 +72,7 @@ up-dev:
 .PHONY: reset-db
 reset-db: down
 	cd ~/goinfre/docker/volumes && docker volume rm * ; cd -
+
+.PHONY: verif-env
+verif-env:
+	./scripts/check-env.sh
