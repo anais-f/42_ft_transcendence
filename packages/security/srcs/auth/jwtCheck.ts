@@ -4,7 +4,7 @@ import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
 import { ERROR_MESSAGES } from '@ft_transcendence/common'
 
 /**
- * @description Check valid JWT token
+ * @description Check valid JWT token from httpOnly cookie or Authorization header
  * @use Routes accessible to authenticated users
  */
 export function jwtAuthMiddleware(
@@ -12,26 +12,19 @@ export function jwtAuthMiddleware(
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
-	try {
-		request
-			.jwtVerify()
-			.then(() => {
-				done()
-			})
-			.catch((err: Error) => {
-				void reply.code(401).send({
-					success: false,
-					error: ERROR_MESSAGES.UNAUTHORIZED
-				})
-				done()
-			})
-	} catch (err) {
-		void reply.code(401).send({
-			success: false,
-			error: ERROR_MESSAGES.UNAUTHORIZED
+	request
+		.jwtVerify()
+		.then(() => {
+			done()
 		})
-		done()
-	}
+		.catch((err: Error) => {
+			console.error('JWT verification failed:', err.message)
+			void reply.code(401).send({
+				success: false,
+				error: ERROR_MESSAGES.UNAUTHORIZED
+			})
+			done()
+		})
 }
 
 /**

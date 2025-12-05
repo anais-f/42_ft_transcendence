@@ -1,3 +1,4 @@
+import { FastifyRequest, FastifyReply } from 'fastify'
 import { FastifyInstance } from 'fastify'
 
 export const WS_TOKEN_EXPIRES_SECONDS = Number(

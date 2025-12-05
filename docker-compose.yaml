@@ -47,9 +47,11 @@ services:
   pong-server:
     restart: on-failure
     container_name: pong-server
+    env_file:
+      - .env
     build:
       context: .
-      dockerfile: ./services/pong-server/Dockerfile
+      dockerfile: services/pong-server/Dockerfile
     depends_on:
       frontend:
         condition: service_healthy
@@ -61,6 +63,8 @@ services:
       timeout: 3s
       retries: 12
       start_period: 15s
+    networks:
+      - backend
 
   users:
     restart: on-failure
