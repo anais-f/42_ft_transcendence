@@ -23,7 +23,7 @@ up-monitoring: verif-env
 
 .PHONY: test
 test: down build
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up || (make down && exit 1)
+	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
