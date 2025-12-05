@@ -1,8 +1,8 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
+import fastifyWebsocket from '@fastify/websocket' // this import isnt useless
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
-import { createTokenController } from '../controllers/tokenControllers.js'
 import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
 import { handleLogout } from '../controllers/logoutControllers.js'
 import {
@@ -13,6 +13,7 @@ import {
 	PendingFriendsListSchema,
 	createTokenSchema
 } from '@ft_transcendence/common'
+import { createTokenController } from '@ft_transcendence/security'
 import {
 	requestFriendController,
 	rejectFriendController,

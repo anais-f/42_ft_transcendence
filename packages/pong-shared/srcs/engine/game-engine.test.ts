@@ -1,16 +1,16 @@
 import { jest } from '@jest/globals'
-import { GameEngine, GameState, TPS_MANAGER } from './game-engine.js'
+import { GameEngine, GameState } from './game-engine.js'
 import { Segment } from '../math/Segment.js'
 import { Vector2 } from '../math/Vector2.js'
 import { padDirection, PongPad } from './PongPad.js'
 import { createScore, IScore } from './IScore.js'
 
-describe('TPS_MANAGER', () => {
-	test('init', () => {
-		const TPS = new TPS_MANAGER(20)
-		expect(TPS.previousTime_MS).toBe(0)
-		expect(TPS.TPS_INTERVAL_MS).toBe(50)
-	})
+jest.mock('bottleneck', () => {
+	return class MockBottleneck {
+		schedule(task: any) {
+			return Promise.resolve(task())
+		}
+	}
 })
 
 describe('game-engine', () => {
@@ -37,8 +37,8 @@ describe('game-engine', () => {
 	beforeAll(() => {
 		padSeg2 = new Segment(pointG.clone(), pointH.clone())
 		padSeg1 = new Segment(pointE.clone(), pointF.clone())
-		pad1 = new PongPad([padSeg1])
-		pad2 = new PongPad([padSeg2])
+		pad1 = new PongPad([padSeg1], null)
+		pad2 = new PongPad([padSeg2], null)
 		game = new GameEngine(
 			60,
 			scoreData,
@@ -55,13 +55,15 @@ describe('game-engine', () => {
 		expect(game?.getState()).toEqual(GameState.Paused)
 	})
 
-	test('loop', () => {
+	test('loop', async () => {
 		const spyGameTicks = jest.spyOn(GameEngine.prototype as any, 'playTick')
 
 		jest.useFakeTimers()
 		game?.setState(GameState.Started)
 
-		jest.advanceTimersByTime(100)
+		jest.advanceTimersByTime(1000)
+
+		await jest.runAllTimersAsync()
 
 		game?.setState(GameState.Paused)
 		jest.useRealTimers()

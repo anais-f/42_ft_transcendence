@@ -20,5 +20,8 @@
 		"build": "tsc --project tsconfig.json",
 		"test": "jest",
 		"clean": "rimraf dist"
+	},
+	"dependencies": {
+		"bottleneck": "^2.19.5"
 	}
 }
