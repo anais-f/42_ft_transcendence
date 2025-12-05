@@ -46,6 +46,7 @@ export function getUserMatchHistoryController(
 		JOIN match_player mp ON mh.id_match = mp.id_match
 		WHERE mp.player_id = ?
 		ORDER BY mh.played_at DESC
+		LIMIT 20
 	`
 		)
 		.all(targetUserId)
