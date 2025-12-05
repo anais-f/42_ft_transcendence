@@ -6,6 +6,7 @@ import {
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
+	UserSearchResultDTO,
 	ERROR_MESSAGES
 } from '@ft_transcendence/common'
 
@@ -71,5 +72,17 @@ export class UsersServices {
 			status: localUser.status,
 			last_connection: localUser.last_connection
 		}
+	}
+
+	static async searchUserByExactUsername(
+		username: string
+	): Promise<UserSearchResultDTO> {
+		if (!username || username.trim().length === 0)
+			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+
+		const result = UsersRepository.searchByExactUsername({ username })
+		if (!result) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+
+		return result
 	}
 }

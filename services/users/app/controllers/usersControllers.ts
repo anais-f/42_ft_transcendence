@@ -1,12 +1,11 @@
 import { UsersServices } from '../usecases/usersServices.js'
-import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import {
 	PublicUserAuthDTO,
 	UserPublicProfileSchema,
 	UserPrivateProfileSchema,
+	UserSearchResultSchema,
 	AppError,
-	UserProfileUpdateUsernameSchema,
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES
 } from '@ft_transcendence/common'
@@ -39,10 +38,10 @@ export async function handleUserCreated(
 }
 
 export async function getPublicUser(
-	req: FastifyRequest & { params: { id: number } },
+	req: FastifyRequest & { params: { user_id: number } },
 	reply: FastifyReply
 ): Promise<void> {
-	const idNumber = req.params.id
+	const idNumber = req.params.user_id
 	console.log('Fetching user with id number:', idNumber)
 	console.log('requete recu :', req.params)
 
@@ -111,5 +110,46 @@ export async function getPrivateUser(
 		void reply
 			.code(500)
 			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	}
+}
+
+/**
+ * @description Search user by exact username
+ * @param req - Fastify request with username in query
+ * @param reply - Fastify reply
+ */
+export async function searchUserByUsernameController(
+	req: FastifyRequest<{ Querystring: { username: string } }>,
+	reply: FastifyReply
+): Promise<void> {
+	try {
+		const { username } = req.query
+
+		const result = await UsersServices.searchUserByExactUsername(username)
+
+		const parsed = UserSearchResultSchema.safeParse(result)
+		if (!parsed.success) {
+			console.error('UserSearchResult validation failed:', parsed.error)
+			void reply.code(500).send({
+				success: false,
+				error: ERROR_MESSAGES.INTERNAL_ERROR
+			})
+			return
+		}
+
+		void reply.code(200).send(parsed.data)
+	} catch (error: any) {
+		if (error instanceof AppError) {
+			void reply.code(error.status).send({
+				success: false,
+				error: error.message
+			})
+			return
+		}
+		console.error('Unexpected error in searchUserByUsernameController:', error)
+		void reply.code(500).send({
+			success: false,
+			error: ERROR_MESSAGES.INTERNAL_ERROR
+		})
 	}
 }

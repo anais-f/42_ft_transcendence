@@ -9,11 +9,12 @@ export interface IUserAuth {
 	password?: string
 	google_id?: string
 	is_admin: boolean
+	two_fa_enabled: boolean
 }
 
 export type IPublicUserAuth = Omit<
 	IUserAuth,
-	'is_admin' | 'password' | 'google_id'
+	'is_admin' | 'password' | 'google_id' | 'two_fa_enabled'
 >
 
 /**
@@ -25,7 +26,7 @@ export interface IPrivateUser {
 	user_id: number
 	username: string
 	avatar: string
-	status: UserStatus // replaced number with enum to use consistent UserStatus values
+	status: UserStatus
 	last_connection: string // ISO timestamp
 }
 
@@ -51,5 +52,5 @@ export enum UserStatus {
 
 export enum RelationStatus {
 	PENDING = 0,
-	ACCEPTED = 1
+	FRIENDS = 1
 }

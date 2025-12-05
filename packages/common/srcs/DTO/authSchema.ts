@@ -21,6 +21,18 @@ export const RegisterGoogleSchema = z
 	})
 	.strict()
 
+export const LogoutParamsSchema = z.object({
+	userId: z.coerce.number().int().positive().min(1)
+})
+
+export const PasswordBodySchema = z
+	.object({
+		password: z.string().min(6).max(128)
+	})
+	.strict()
+
+export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>
 export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>
+export type LogoutParamsDTO = z.infer<typeof LogoutParamsSchema>
