@@ -8,8 +8,8 @@ export const HomePage = (): string => /*html*/ `
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
-		<button id="settings_btn" type="button" class="generic_btn my-2">Settings</button>
-		<button id="logout_btn" type="button" class="generic_btn">Logout</button>
+		<button id="settings_btn" type="button" class="generic_btn my-2" onclick="navigate('/settings')">Settings</button>
+		<button id="logout_btn" type="button" class="generic_btn" onclick="navigate('/login')">Logout</button>
 	</div>
 	<div class="col-span-1">
 		<div class="news_paragraph pt-4">
@@ -17,8 +17,8 @@ export const HomePage = (): string => /*html*/ `
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
-		<button id="remote_btn" type="button" class="generic_btn my-2">Remote</button>
-		<button id="tournament_btn" type="button" class="generic_btn">Tournament</button>
+		<button id="remote_btn" type="button" class="generic_btn my-2" onclick="navigate('/lobby')">Remote</button>
+		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/game')">Tournament</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
@@ -31,7 +31,7 @@ export const HomePage = (): string => /*html*/ `
 		<h1 class="text-2xl py-2">FEELING LONELY ?</h1>
 		<p class="text-lg">You can join a game by enter the lobby code below</p>
 		<form id="join_lobby_form" class="flex flex-col gap-2">
-			 <input id="join_lobby" type="text" name="join_lobby" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER LOBBY CODE HERE" required>
+			 <input id="join_lobby" type="text" name="join_lobby" class="px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER LOBBY CODE HERE" required>
 			 <button id="join_btn" class="generic_btn" type="submit">Join</button>
 		 </form>
 		<div class="news_paragraph pt-4">
@@ -42,7 +42,7 @@ export const HomePage = (): string => /*html*/ `
 	</div>
 	<div class="col-span-1">
 		 <h1 class="text-2xl pt-4 pb-1">WANTED</h1>
-		 <form id="search_usr_form" class="flex flex-col gap-2">
+		 <form id="search_usr_form" class="flex flex-col gap-2" action="">
 			 <input id="search_usr" type="text" name="search_usr" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER A USERNAME TO SEARCH HERE" required>
 			 <button id="search_btn" class="generic_btn" type="submit">Search</button>
 		 </form>

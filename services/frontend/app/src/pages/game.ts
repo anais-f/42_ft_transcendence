@@ -29,11 +29,11 @@ export const GamePage = (): string => /*html*/ `
 let p1 = {
 	username: 'PlayerOne',
 	avatar: '/assets/images/rhino.png',
-	score : 2
+	score: 2
 }
 
 let p2 = {
 	username: 'PlayerTwo',
 	avatar: '/assets/images/bear.png',
-	score : 1
+	score: 1
 }

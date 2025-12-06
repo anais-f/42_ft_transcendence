@@ -42,7 +42,9 @@ export const ProfilePage = (): string => /*html*/ `
 					</tr>
 				</thead>
 				<tbody>
-					${history.map(game => `
+					${history
+						.map(
+							(game) => `
 					<tr>
 						<td class="border border-black px-2 text-center">${game.date}</td>
 						<td class="border border-black px-2 text-center">${game.player1}</td>
@@ -51,7 +53,9 @@ export const ProfilePage = (): string => /*html*/ `
 						<td class="border border-black px-2 text-center">${game.player2}</td>
 						<td class="border border-black px-2 text-center">${game.result}</td>
 					</tr>
-					`).join('')}
+					`
+						)
+						.join('')}
 				</tbody>
 			</table>
 		</div>
@@ -63,20 +67,54 @@ const user = {
 	avatar: '/assets/images/avatar.png',
 	username: 'Mammoth',
 	status: 'Online',
-	last_seen: '05/12/2025 12:32am',
-
+	last_seen: '05/12/2025 12:32am'
 }
 
 const stats = {
 	games_played: 256,
 	wins: 198,
-	losses: 58,
+	losses: 58
 }
 
 const history = [
-	{ date: '2025-05-01', player1: 'Mammoth', score1: 21, score2: 15, player2: 'Tiger', result: 'Win' },
-	{ date: '2025-05-02', player1: 'Mammoth', score1: 18, score2: 21, player2: 'Eagle', result: 'Loss' },
-	{ date: '2025-05-03', player1: 'Mammoth', score1: 22, score2: 20, player2: 'Shark', result: 'Win' },
-	{ date: '2025-05-04', player1: 'Mammoth', score1: 19, score2: 21, player2: 'Lion', result: 'Loss' },
-	{ date: '2025-05-05', player1: 'Mammoth', score1: 23, score2: 22, player2: 'Wolf', result: 'Win' },
+	{
+		date: '2025-05-01',
+		player1: 'Mammoth',
+		score1: 21,
+		score2: 15,
+		player2: 'Tiger',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-02',
+		player1: 'Mammoth',
+		score1: 18,
+		score2: 21,
+		player2: 'Eagle',
+		result: 'Loss'
+	},
+	{
+		date: '2025-05-03',
+		player1: 'Mammoth',
+		score1: 22,
+		score2: 20,
+		player2: 'Shark',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-04',
+		player1: 'Mammoth',
+		score1: 19,
+		score2: 21,
+		player2: 'Lion',
+		result: 'Loss'
+	},
+	{
+		date: '2025-05-05',
+		player1: 'Mammoth',
+		score1: 23,
+		score2: 22,
+		player2: 'Wolf',
+		result: 'Win'
+	}
 ]
