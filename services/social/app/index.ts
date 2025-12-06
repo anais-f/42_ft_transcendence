@@ -10,6 +10,7 @@ import { startHeartbeat } from './usecases/heartbeatService.js'
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 const openapiSwagger = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+
 export async function start(): Promise<void> {
 	const app = createWsApp(
 		socialRoutes,
@@ -37,7 +38,6 @@ export async function start(): Promise<void> {
 		console.log('Listening on port ', process.env.PORT)
 		console.log(`Swagger UI available at ${HOST}/social/docs`)
 
-		// Start WebSocket heartbeat monitoring
 		startHeartbeat()
 		console.log('WebSocket heartbeat monitoring started')
 	} catch (err) {

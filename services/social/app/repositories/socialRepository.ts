@@ -1,5 +1,6 @@
 import { db } from '../database/socialDatabase.js'
 import { IUserId, RelationStatus } from '@ft_transcendence/common'
+import createHttpError from 'http-errors'
 
 export type RelationRow = { relation_status: number }
 export type RelationUserRow = { user_id: number; friend_id: number }
@@ -41,9 +42,13 @@ export class SocialRepository {
 		]
 
 		if (userCount >= 20)
-			throw new Error('User has reached the maximum limit of 50 friends')
+			throw createHttpError.BadRequest(
+				'User has reached the maximum limit of 20 friends'
+			)
 		if (friendCount >= 20)
-			throw new Error('Friend has reached the maximum limit of 50 friends')
+			throw createHttpError.BadRequest(
+				'Friend has reached the maximum limit of 20 friends'
+			)
 
 		const insertStmt = db.prepare(
 			'INSERT INTO relations (user_id, friend_id, origin_id, relation_status) VALUES (?, ?, ?, ?)'
@@ -64,9 +69,13 @@ export class SocialRepository {
 			]
 
 			if (userCount >= 20)
-				throw new Error('User has reached the maximum limit of 50 friends')
+				throw createHttpError.BadRequest(
+					'User has reached the maximum limit of 20 friends'
+				)
 			if (friendCount >= 20)
-				throw new Error('Friend has reached the maximum limit of 50 friends')
+				throw createHttpError.BadRequest(
+					'Friend has reached the maximum limit of 20 friends'
+				)
 		}
 
 		const updateStmt = db.prepare(
@@ -84,7 +93,7 @@ export class SocialRepository {
 		const result = deleteStmt.run(firstId, secondId)
 
 		if (result.changes === 0) {
-			throw new Error('Relation does not exist')
+			throw createHttpError.NotFound('Relation does not exist')
 		}
 	}
 

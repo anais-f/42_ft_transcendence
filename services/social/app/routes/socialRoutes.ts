@@ -5,8 +5,6 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
 import {
-	ErrorResponseSchema,
-	SuccessResponseSchema,
 	FriendsListSchema,
 	UserIdCoerceSchema,
 	PendingFriendsListSchema,
@@ -35,8 +33,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: createTokenSchema,
-				401: ErrorResponseSchema
+				200: createTokenSchema
 			}
 		},
 		handler: createTokenController
@@ -59,14 +56,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/request-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserIdCoerceSchema
 		},
 		handler: requestFriendController
 	})
@@ -77,14 +67,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/accept-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserIdCoerceSchema
 		},
 		handler: acceptFriendController
 	})
@@ -95,14 +78,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/reject-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserIdCoerceSchema
 		},
 		handler: rejectFriendController
 	})
@@ -113,14 +89,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/cancel-request-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserIdCoerceSchema
 		},
 		handler: cancelFriendController
 	})
@@ -131,14 +100,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/social/remove-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserIdCoerceSchema
 		},
 		handler: removeFriendController
 	})
@@ -150,10 +112,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: FriendsListSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: FriendsListSchema
 			}
 		},
 		handler: getFriendsListController
@@ -166,10 +125,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: PendingFriendsListSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: PendingFriendsListSchema
 			}
 		},
 		handler: getPendingRequestsController
@@ -182,10 +138,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: PendingFriendsListSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: PendingFriendsListSchema
 			}
 		},
 		handler: getPendingSentRequestsController

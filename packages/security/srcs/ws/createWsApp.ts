@@ -9,20 +9,23 @@ import {
 	serializerCompiler
 } from 'fastify-type-provider-zod'
 import fastifyJwt from '@fastify/jwt'
+import { setupErrorHandler } from '@ft_transcendence/common'
 
 export function createWsApp(
 	appRoutes: any,
 	swager_data: any,
 	jwtSecret: string
 ): FastifyInstance {
-	if (!jwtSecret) {
-		throw new Error('bad JWT secret')
-	}
+	if (!jwtSecret) throw new Error('bad JWT secret')
 
-	const app = Fastify({ logger: true })
-		.withTypeProvider<ZodTypeProvider>()
-		.setValidatorCompiler(validatorCompiler)
-		.setSerializerCompiler(serializerCompiler)
+	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
+
+	app.setValidatorCompiler(validatorCompiler)
+	app.setSerializerCompiler(serializerCompiler)
+
+	setupErrorHandler(app)
+
+	app
 		.register(fastifyCookie)
 		.register(fastifyJwt, {
 			secret: jwtSecret,
