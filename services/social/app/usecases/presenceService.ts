@@ -62,6 +62,10 @@ async function notifyStatusChange(
 
 /**
  * Handle user coming online
+ * Sends two types of broadcasts:
+ * 1. To friends: Update their "My Friends" list with status
+ * 2. To all: Update public profile pages where this user's status is visible
+ * Note: Friends receive both notifications (intentional for different UI contexts)
  * @param userId
  */
 export async function handleUserOnline(userId: number): Promise<void> {
@@ -78,6 +82,7 @@ export async function handleUserOnline(userId: number): Promise<void> {
 
 /**
  * Handle user going offline
+ * Sends two types of broadcasts (see handleUserOnline for details)
  * @param userId
  */
 export async function handleUserOffline(userId: number): Promise<void> {

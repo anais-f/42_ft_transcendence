@@ -1,10 +1,8 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
-import fastifyWebsocket from '@fastify/websocket' // this import isnt useless
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
-import { handleLogout } from '../controllers/logoutControllers.js'
 import {
 	ErrorResponseSchema,
 	SuccessResponseSchema,
@@ -54,23 +52,6 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				handleSocialWSConnection(socket, request, fastify)
 			}
 		)
-	})
-
-	// POST /api/social/logout/me
-	server.route({
-		method: 'POST',
-		url: '/api/social/logout/me',
-		preHandler: jwtAuthMiddleware,
-		schema: {
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				403: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
-		},
-		handler: handleLogout
 	})
 
 	// POST /api/social/request-friend

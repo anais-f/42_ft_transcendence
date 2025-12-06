@@ -25,7 +25,11 @@ export function createWsApp(
 		.setSerializerCompiler(serializerCompiler)
 		.register(fastifyCookie)
 		.register(fastifyJwt, {
-			secret: jwtSecret
+			secret: jwtSecret,
+			cookie: {
+				cookieName: 'auth_token',
+				signed: false
+			}
 		})
 		.register(Swagger as any, swager_data)
 		.register(SwaggerUI as any, {

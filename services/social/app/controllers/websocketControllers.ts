@@ -49,11 +49,12 @@ export async function handleSocialWSConnection(
 	}
 
 	setupMessageHandler(socket, userId, username)
-	setupCloseHandler(socket, userId, username)
 }
 
 /**
  * Setup message listener for incoming WebSocket messages
+ * TODO: Currently a placeholder - implement message handling logic if needed
+ * For now, WebSocket is used for server->client notifications only
  * @param socket WebSocket connection
  * @param userId User ID
  * @param username Username
@@ -69,6 +70,7 @@ function setupMessageHandler(
 		try {
 			const message = JSON.parse(rawMessage)
 			console.log(`[WS] Valid JSON command from ${username}:`, message)
+			// TODO: Add Zod validation and implement message routing
 		} catch (e) {
 			console.warn(`[WS] Invalid message from ${username}, rejected`)
 			socket.send(
@@ -79,21 +81,5 @@ function setupMessageHandler(
 				})
 			)
 		}
-	})
-}
-
-/**
- * Setup close listener for WebSocket disconnection
- * @param socket WebSocket connection
- * @param userId User ID
- * @param username Username
- */
-function setupCloseHandler(
-	socket: WebSocket,
-	userId: number,
-	username: string
-): void {
-	socket.on('close', () => {
-		console.log(`[WS] ${username} (${userId}) disconnected`)
 	})
 }

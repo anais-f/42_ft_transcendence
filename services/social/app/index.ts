@@ -5,6 +5,7 @@ import metricPlugin from 'fastify-metrics'
 import { socialRoutes } from './routes/socialRoutes.js'
 import { loadOpenAPISchema } from '@ft_transcendence/common'
 import { createWsApp } from '@ft_transcendence/security'
+import { startHeartbeat } from './usecases/heartbeatService.js'
 
 const HOST = process.env.HOST || 'http://localhost:8080'
 
@@ -35,6 +36,10 @@ export async function start(): Promise<void> {
 		})
 		console.log('Listening on port ', process.env.PORT)
 		console.log(`Swagger UI available at ${HOST}/social/docs`)
+
+		// Start WebSocket heartbeat monitoring
+		startHeartbeat()
+		console.log('WebSocket heartbeat monitoring started')
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

@@ -1,4 +1,4 @@
-import { handlePong, startHeartbeat } from './heartbeatService.js'
+import { handlePong } from './heartbeatService.js'
 import { handleUserOnline, handleUserOffline } from './presenceService.js'
 import WebSocket from 'ws'
 
@@ -22,6 +22,7 @@ function setupWebSocketHandlers(userId: number, ws: WebSocket): void {
 	})
 
 	ws.on('close', () => {
+		console.log(`connection disconnected for user ${userId}`)
 		removeConnection(userId, ws)
 	})
 
@@ -72,9 +73,9 @@ export async function addConnection(
 		}
 	}
 
-	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
-
 	setupWebSocketHandlers(userId, ws)
+
+	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
 
 	if (isFirstConnection) {
 		try {
@@ -189,5 +190,3 @@ export function getOnlineUsers(): number[] {
 	}
 	return onlineUsers
 }
-
-startHeartbeat()
