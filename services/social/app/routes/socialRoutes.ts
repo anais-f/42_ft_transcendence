@@ -9,7 +9,8 @@ import {
 	FriendsListSchema,
 	UserIdCoerceSchema,
 	PendingFriendsListSchema,
-	createTokenSchema
+	createTokenSchema,
+	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { createTokenController } from '@ft_transcendence/security'
 import {
@@ -42,13 +43,10 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 
 	// GET /api/social/ws - WebSocket endpoint
 	fastify.register(async (fastify) => {
-		fastify.get<{ Querystring: { token: string } }>(
+		fastify.get<IWsJwtTokenQuery>(
 			'/api/social/ws',
 			{ websocket: true },
-			(
-				socket: WebSocket,
-				request: FastifyRequest<{ Querystring: { token: string } }>
-			) => {
+			(socket: WebSocket, request: FastifyRequest<IWsJwtTokenQuery>) => {
 				handleSocialWSConnection(socket, request, fastify)
 			}
 		)
