@@ -4,8 +4,19 @@ interface FormProps {
 	action?: string
 	method?: string
 	label?: string[]
-	input?: { id: string; type: string; name: string; required?: boolean;  separator?: boolean; }[]
-	button?: { text: string; type: 'submit' | 'button'; className?: string; onClick?: (ev: MouseEvent) => void }
+	input?: {
+		id: string
+		type: string
+		name: string
+		required?: boolean
+		separator?: boolean
+	}[]
+	button?: {
+		text: string
+		type: 'submit' | 'button'
+		className?: string
+		onClick?: (ev: MouseEvent) => void
+	}
 	onSubmit?: (data: FormData) => void
 }
 
@@ -15,7 +26,7 @@ export function createForm(props: FormProps): HTMLFormElement {
 	form.className = props.className
 	if (props.action) form.action = props.action
 	if (props.method) form.method = props.method
-	 if (props.label || props.input) {
+	if (props.label || props.input) {
 		const labels = props.label ?? []
 		const inputs = props.input ?? []
 
@@ -40,7 +51,7 @@ export function createForm(props: FormProps): HTMLFormElement {
 				form.appendChild(field)
 			})
 		} else {
-			labels.forEach(label => {
+			labels.forEach((label) => {
 				const field = document.createElement('div')
 				field.className = 'gap-4 border border-gray-400'
 				const labelElement = document.createElement('label')
@@ -55,8 +66,7 @@ export function createForm(props: FormProps): HTMLFormElement {
 		const button = document.createElement('button')
 		button.textContent = props.button.text
 		button.type = props.button.type
-		if (props.button.className) 
-			button.className = props.button.className
+		if (props.button.className) button.className = props.button.className
 		if (props.button.type === 'button' && props.button.onClick)
 			button.addEventListener('click', props.button.onClick)
 

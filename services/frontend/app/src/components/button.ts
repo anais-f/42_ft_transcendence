@@ -16,26 +16,3 @@ export function createButton(props: ButtonProps): HTMLButtonElement {
 	if (props.onClick) button.addEventListener('click', props.onClick)
 	return button
 }
-
-// class Button implements ButtonProps {
-// 	label?: string
-// 	className?: string
-// 	name?: string
-// 	type?: 'button' | 'submit' | 'reset'
-// 	disabled?: boolean
-// 	onClick?: (ev: MouseEvent) => void
-
-// 	constructor(props: ButtonProps = {}) {
-// 		this.label = props.label
-// 		this.className = props.className
-// 		this.name = props.name
-// 		this.type = props.type ?? 'button'
-// 		this.disabled = props.disabled ?? false
-// 		this.onClick = props.onClick
-// 	}
-
-// 	setClassName(className: string): void {
-// 		this.className = className
-// 	}
-
-// }

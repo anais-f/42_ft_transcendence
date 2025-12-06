@@ -28,7 +28,8 @@ export function showPopup(contentNode: HTMLElement) {
 	if (document.getElementById('popup-overlay')) return
 	const overlay = createPopupElement({
 		id: 'popup-overlay',
-		className: 'fixed inset-0 z-50 flex items-center justify-center bg-black/50',
+		className:
+			'fixed inset-0 z-50 flex items-center justify-center bg-black/50',
 		onClick: () => hidePopup()
 	})
 
