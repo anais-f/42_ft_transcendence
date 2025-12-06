@@ -1,4 +1,5 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
+import '@fastify/websocket'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
@@ -43,7 +44,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 
 	// GET /api/social/ws - WebSocket endpoint
 	fastify.register(async (fastify) => {
-		fastify.get<IWsJwtTokenQuery>(
+		fastify.get(
 			'/api/social/ws',
 			{ websocket: true },
 			(socket: WebSocket, request: FastifyRequest<IWsJwtTokenQuery>) => {

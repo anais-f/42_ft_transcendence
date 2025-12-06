@@ -3,11 +3,6 @@ import WebSocket from 'ws'
 import { initializeConnection } from '../usecases/websocketService.js'
 import { IWsJwtTokenQuery, WSMessageType } from '@ft_transcendence/common'
 import { handleWsConnection } from '@ft_transcendence/security'
-import {
-	WSMessageType,
-	WSCloseCodes,
-	IJwtPayload
-} from '@ft_transcendence/common'
 
 /**
  * Handle WebSocket connection: verify token, setup connection, attach message handler
