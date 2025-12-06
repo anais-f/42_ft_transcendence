@@ -65,17 +65,6 @@ services:
     depends_on:
       install-dependencies:
         condition: service_completed_successfully
-  frontend:
-    volumes:
-      - ./:/app
-    build:
-      dockerfile: services/frontend/Dockerfile.dev
-    restart: none
-    depends_on:
-      install-dependencies:
-        condition: service_completed_successfully
-    healthcheck:
-      test: ["CMD-SHELL", "true"]
 
   pong-server:
     build:
