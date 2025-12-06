@@ -1,79 +1,25 @@
 <!doctype html>
 <html lang="fr">
-
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<link href="https://fonts.googleapis.com/css2?family=Birthstone&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Rye&display=swap" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="/style.css">
-	<link rel="icon" href="/assets/favicon/favicon.ico" />
-	<title>Ft Transcendence</title>
-</head>
-
-<body class="h-[100vh] px-12 py-6">
-	<header class="border-t-2 border-b-2 border-gray-800 text-3xl p-4 m-1 flex justify-between">
-		<h4 class="flex mr-4 text-sm">Page 1</h4>
-		<h1 class="flex title_font">FT-TRANSCENDENCE</h1>
-		<h4 id="date" class="flex ml-4 text-sm"></h4>
-	</header>
-	<div class="h-[85vh] font-[Newsreader]">
-		<div id="content" class="flex flex-col items-center"></div>
-	</div>
-	<script type="module" src="/src/router.js"></script>
-</body>
-
-</html>
-
-<!-- V2
-<!doctype html>
-<html lang="fr">
 	<head>
-		<meta charset="UTF-8" />
+		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>Transcendence</title>
-		<meta name="description" content="Transcendence SPA - Pong" />
-		<link rel="icon" href="./favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Birthstone&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Rye&display=swap"/>
+		<link rel="stylesheet" type="text/css" href="/style.css"/>
+		<link rel="icon" href="/assets/favicon/favicon.ico" />
+		<title>Ft Transcendence</title>
 	</head>
-	<body class="min-h-screen bg-amber-100/95 text-black antialiased font-[Newsreader]">
-		<a
-			href="#content"
-			class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-blue-600 text-white px-3 py-1 rounded"
-		>Go to content</a>
-		<header class="border-b border-gray-800 bg-gray-300/50 backdrop-blur">
-			<nav class="container mx-auto px-4">
-				<div class="h-14 flex items-center justify-between">
-					<a href="#home" class="font-bold tracking-wide text-2xl text-gray-800"
-						>Transcendence</a
-					>
-					<ul id="menu" class="flex gap-4 text-ml"></ul>
-				</div>
-			</nav>
+	
+	<body class="h-[100vh] px-12 py-6">
+		<header class="border-t-2 border-b-2 border-gray-800 text-3xl p-4 m-1 flex justify-between">
+			<h4 class="flex mr-4 text-sm">Page 1</h4>
+			<a href="/" title="Return Home" class="no-underline">
+				<h1 class="flex title_font">FT-TRANSCENDENCE</h1>
+			</a>
+			<h4 id="date" class="flex ml-4 text-sm"></h4>
 		</header>
-		<main id="content" class="px-4 py-6">
-		</main>
-		<script type="module" src="./src/urlRouter.ts"></script>
+		<div class="h-[85vh] font-[Newsreader]">
+			<div id="content" class="flex flex-col items-center"></div>
+		</div>
+		<script src="/src/router.js" type="module"></script>
 	</body>
-</html> -->
-
-<!-- V1 -->
-<!-- <!doctype html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <title>Transcendence</title> 
-    </head>
-    <body>
-      <nav>
-        <ul id="menu"></ul>
-      </nav>
-      <div id="content"></div>
-      <script type="module" src="src/urlRouter.js"></script>
-       <canvas
-        id="pong"
-        width="1000"
-        height="538"
-        
-        style="background: blue; display: block; margin: auto"
-      ></canvas>
-    </body>
-  </html> -->
+</html>
