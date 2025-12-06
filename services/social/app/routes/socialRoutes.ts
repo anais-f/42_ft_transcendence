@@ -1,5 +1,5 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
-import  '@fastify/websocket'
+import '@fastify/websocket'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
