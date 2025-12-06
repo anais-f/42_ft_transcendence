@@ -1,9 +1,9 @@
 import fetch from 'node-fetch'
 import {
 	PublicUserListAuthDTO,
-	PublicUserListAuthSchema,
-	AppError
+	PublicUserListAuthSchema
 } from '@ft_transcendence/common'
+import createHttpError from 'http-errors'
 
 export class AuthApi {
 	/**
@@ -15,9 +15,8 @@ export class AuthApi {
 		const base = process.env.AUTH_SERVICE_URL
 		const secret = process.env.INTERNAL_API_SECRET
 		if (!base || !secret)
-			throw new AppError(
-				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env',
-				500
+			throw createHttpError.InternalServerError(
+				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
 			)
 
 		const url = `${base}/api/users`
@@ -31,22 +30,19 @@ export class AuthApi {
 		try {
 			response = await fetch(url, options)
 		} catch (err) {
-			throw new AppError(
-				'Failed to fetch users from auth: ' + (err as Error).message,
-				502
+			throw createHttpError.BadGateway(
+				'Failed to fetch users from auth: ' + (err as Error).message
 			)
 		}
 
-		if (!response.ok) {
-			throw new AppError(`Auth service HTTP ${response.status}`, 502)
-		}
+		if (!response.ok)
+			throw createHttpError.BadGateway(`Auth service HTTP ${response.status}`)
 
 		const raw = (await response.json()) as PublicUserListAuthDTO
 		const parsed = PublicUserListAuthSchema.safeParse(raw)
 		if (!parsed.success)
-			throw new AppError(
-				'Invalid response shape from auth service: ' + parsed.error.message,
-				500
+			throw createHttpError.InternalServerError(
+				'Invalid response shape from auth service: ' + parsed.error.message
 			)
 
 		return parsed.data.users

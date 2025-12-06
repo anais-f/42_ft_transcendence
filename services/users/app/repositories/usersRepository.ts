@@ -9,10 +9,9 @@ import {
 	IPublicUserAuth,
 	UserPublicProfileDTO,
 	UserSearchResultDTO,
-	ERROR_MESSAGES,
-	AppError,
 	UserStatus
 } from '@ft_transcendence/common'
+import createHttpError from 'http-errors'
 
 const defaultAvatar: string = '/avatars/img_default.png'
 
@@ -56,7 +55,9 @@ export class UsersRepository {
 			candidateUsername = `${baseUsername}${counter}`
 
 			if (counter > 10000) {
-				throw new AppError('Unable to generate unique username', 500)
+				throw createHttpError.InternalServerError(
+					'Unable to generate unique username'
+				)
 			}
 		}
 
@@ -117,13 +118,12 @@ export class UsersRepository {
 				'code' in error &&
 				error.code === 'SQLITE_CONSTRAINT_UNIQUE'
 			) {
-				throw new AppError(ERROR_MESSAGES.USERNAME_ALREADY_TAKEN, 409)
+				throw createHttpError.Conflict('Username already taken')
 			}
 			throw error
 		}
 
-		if (info.changes === 0)
-			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		if (info.changes === 0) throw createHttpError.NotFound('User not found')
 	}
 
 	static updateUserStatus(
@@ -137,16 +137,14 @@ export class UsersRepository {
 			)
 			const info = updateStmt.run(status, lastConnection, user.user_id)
 			if (info.changes === 0) {
-				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+				throw createHttpError.NotFound('User not found')
 			}
 		} else {
 			const updateStmt = db.prepare(
 				'UPDATE users SET status = ? WHERE user_id = ?'
 			)
 			const info = updateStmt.run(status, user.user_id)
-			if (info.changes === 0) {
-				throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-			}
+			if (info.changes === 0) throw createHttpError.NotFound('User not found')
 		}
 	}
 
