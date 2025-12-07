@@ -10,13 +10,18 @@ import {
 } from 'fastify-type-provider-zod'
 import fastifyJwt from '@fastify/jwt'
 
+interface JwtSecrets {
+	main: string
+	service: string
+}
+
 export function createWsApp(
 	appRoutes: any,
 	swager_data: any,
-	jwtSecret: string
+	jwtSecrets: JwtSecrets
 ): FastifyInstance {
-	if (!jwtSecret) {
-		throw new Error('bad JWT secret')
+	if (!jwtSecrets.main || !jwtSecrets.service) {
+		throw new Error('Missing JWT secrets')
 	}
 
 	const app = Fastify({ logger: true })
@@ -25,12 +30,18 @@ export function createWsApp(
 		.setSerializerCompiler(serializerCompiler)
 
 		.register(fastifyCookie)
+
 		.register(fastifyJwt, {
-			secret: jwtSecret,
+			secret: jwtSecrets.main,
 			cookie: {
 				cookieName: 'auth_token',
 				signed: false
 			}
+		})
+
+		.register(fastifyJwt, {
+			secret: jwtSecrets.service,
+			namespace: 'ws'
 		})
 
 		.register(Swagger as any, swager_data)
