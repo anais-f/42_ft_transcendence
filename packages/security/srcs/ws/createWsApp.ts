@@ -20,25 +20,25 @@ export function createWsApp(
 	}
 
 	const app = Fastify({ logger: true })
-	.withTypeProvider<ZodTypeProvider>()
-	.setValidatorCompiler(validatorCompiler)
-	.setSerializerCompiler(serializerCompiler)
+		.withTypeProvider<ZodTypeProvider>()
+		.setValidatorCompiler(validatorCompiler)
+		.setSerializerCompiler(serializerCompiler)
 
-	.register(fastifyCookie)
-	.register(fastifyJwt, {
-		secret: jwtSecret,
-		cookie: {
-			cookieName: 'auth_token',
-			signed: false
-		}
-	})
+		.register(fastifyCookie)
+		.register(fastifyJwt, {
+			secret: jwtSecret,
+			cookie: {
+				cookieName: 'auth_token',
+				signed: false
+			}
+		})
 
-	.register(Swagger as any, swager_data)
-	.register(SwaggerUI as any, {
-		routePrefix: '/docs'
-	})
-	.register(FastifyWebSocket as any)
-	.register(appRoutes as any)
+		.register(Swagger as any, swager_data)
+		.register(SwaggerUI as any, {
+			routePrefix: '/docs'
+		})
+		.register(FastifyWebSocket as any)
+		.register(appRoutes as any)
 
 	return app
 }

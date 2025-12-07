@@ -8,9 +8,7 @@ export async function createTokenController(
 ): Promise<void> {
 	const user = request.user as { user_id: number; login: string }
 	if (!user) {
-		reply
-			.code(401)
-			.send({ sucess: false, error: ERROR_MESSAGES.UNAUTHORIZED })
+		reply.code(401).send({ sucess: false, error: ERROR_MESSAGES.UNAUTHORIZED })
 		return
 	}
 

@@ -24,7 +24,6 @@ function generateCode(): string {
  *  - throw: Error('unknown game code')
  *  - throw: Error('unauthorized')
  *
- * TODO: verify pID
  */
 export function requestGame(request: {
 	code: string | null
