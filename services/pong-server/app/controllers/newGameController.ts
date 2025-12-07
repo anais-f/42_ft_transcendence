@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { requestGame } from '../game/gameManager.js'
 import { ERROR_MESSAGES } from '@ft_transcendence/common'
+import { requestGame } from '../game/gameManager/GM.js';
 
 export async function createNewGameController(request: FastifyRequest, reply: FastifyReply): Promise<void> {
 	const user = request.user as { user_id: number; login: string };

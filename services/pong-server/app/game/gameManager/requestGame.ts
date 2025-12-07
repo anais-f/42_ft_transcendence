@@ -1,14 +1,5 @@
 import { randomString } from 'node_modules/zod/v4/core/util.cjs'
-import { IGameData } from '../utils/createGame'
-
-export const games = new Map<
-	string,
-	{
-		p1: undefined | number
-		p2: undefined | number
-		gameInstance: IGameData | undefined
-	}
->()
+import { games } from './gamesData.js'
 
 /*
  * Function to generate a random game code in the format XXXX-XXXX
@@ -58,31 +49,3 @@ export function requestGame(request: {
 
 	return code
 }
-
-/*
- * Function to add a second player to a game instance
- * return:
- *  nothing
- * error:
- *  - throw: Error('game full')
- */
-export function addPlayerToGame(gameCode: string, playerId: number) {
-	if (!games.has(gameCode)) {
-		throw new Error('unknown game code')
-	}
-
-	// Know bug here: !gameData.p2 but gameData can be null
-	const gameData = games.get(gameCode)
-	if (gameData?.p2) {
-		gameData.p2 = playerId
-	}
-	throw Error('game full')
-}
-
-
-
-/*
- * TODO:
- *  join multiple game protection
- *  create + join another game (what append to the previous game)
- */
