@@ -54,6 +54,17 @@ const router: Record<Pages,Route> = {
 	}
 };
 
+// Date of the day display
+const dateDiv = document.getElementById('date')
+if (dateDiv) {
+	dateDiv.textContent = new Date().toLocaleDateString('en-EN', {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'short',
+		year: 'numeric'
+	})
+}
+
 function overloadPushState() {
   const pushState = history.pushState;
   history.pushState = function(state, title, url) {
