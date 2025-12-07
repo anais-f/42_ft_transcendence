@@ -16,7 +16,7 @@ export async function handleWsConnection(
 	const jwtI = (fastify as any).jwt
 
 	try {
-		return jwtI.verify(token)
+		return jwtI.ws.verify(token)
 	} catch (err) {
 		socket.send(
 			JSON.stringify({
