@@ -12,5 +12,4 @@ export async function handleGameWsConnection(
 	if (!payload) {
 		return
 	}
-	console.log(payload)
 }
