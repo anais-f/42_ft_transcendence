@@ -56,7 +56,7 @@ Logically these maps can handle friendly games and tournament games.
 - Automatically deletes the game if both players have left
 - Silent fail if the player is not in any game
 
-### `requestSpecifiqueGame({ pID1, pID2 })`
+### `requestMatchGame({ pID1, pID2 })`
 
 - Creates a new game with both players pre-assigned
 - Useful for tournament matches where both players are known in advance
@@ -69,15 +69,15 @@ Logically these maps can handle friendly games and tournament games.
 
 ## Error Summary
 
-| Function                | Error                        | Cause                                    |
-| ----------------------- | ---------------------------- | ---------------------------------------- |
-| `requestGame`           | `'unknown game code'`        | Provided code doesn't exist              |
-| `requestGame`           | `'player already in a game'` | Player is already in a game              |
-| `addPlayerToGame`       | `'unknown game code'`        | Game code doesn't exist                  |
-| `addPlayerToGame`       | `'player already in a game'` | Player is already in another game        |
-| `addPlayerToGame`       | `'game full'`                | `p2` slot is already occupied            |
-| `requestSpecifiqueGame` | `'player already in a game'` | Either player is already in another game |
-| `requestSpecifiqueGame` | `'unknown player'`           | Player verification failed (TODO)        |
+| Function           | Error                        | Cause                                    |
+| ------------------ | ---------------------------- | ---------------------------------------- |
+| `requestGame`      | `'unknown game code'`        | Provided code doesn't exist              |
+| `requestGame`      | `'player already in a game'` | Player is already in a game              |
+| `addPlayerToGame`  | `'unknown game code'`        | Game code doesn't exist                  |
+| `addPlayerToGame`  | `'player already in a game'` | Player is already in another game        |
+| `addPlayerToGame`  | `'game full'`                | `p2` slot is already occupied            |
+| `requestMatchGame` | `'player already in a game'` | Either player is already in another game |
+| `requestMatchGame` | `'unknown player'`           | Player verification failed (TODO)        |
 
 ---
 

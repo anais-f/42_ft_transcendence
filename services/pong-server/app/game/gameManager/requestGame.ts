@@ -65,7 +65,7 @@ export function requestGame(request: {
  *  - throw: Error('unknown player')
  *  - throw: Error('player already in a game')
  */
-export function requestSpecifiqueGame(request: {
+export function requestMatchGame(request: {
 	pID1: number
 	pID2: number
 }): string {
