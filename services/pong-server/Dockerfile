@@ -9,7 +9,8 @@ COPY packages/pong-shared/package.json ./packages/pong-shared/
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
 
-RUN apk add --no-cache python3 make g++ && npm install
+RUN apk add --no-cache python3 make g++
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
@@ -29,7 +30,8 @@ COPY packages/pong-shared/package.json ./packages/pong-shared/
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
 
-RUN apk add --no-cache python3 make g++ && npm install
+RUN apk add --no-cache python3 make g++ 
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY packages/ ./packages/
