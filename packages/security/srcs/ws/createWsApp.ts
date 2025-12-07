@@ -18,10 +18,10 @@ export function createWsApp(
 ): FastifyInstance {
 	if (!jwtSecret) throw new Error('bad JWT secret')
 
-	const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
-
-	app.setValidatorCompiler(validatorCompiler)
-	app.setSerializerCompiler(serializerCompiler)
+	const app = Fastify({ logger: true })
+		.withTypeProvider<ZodTypeProvider>()
+		.setValidatorCompiler(validatorCompiler)
+		.setSerializerCompiler(serializerCompiler)
 
 	setupErrorHandler(app)
 

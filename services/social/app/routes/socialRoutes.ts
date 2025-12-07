@@ -41,7 +41,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 
 	// GET /api/social/ws - WebSocket endpoint
 	fastify.register(async (fastify) => {
-		fastify.get(
+		fastify.get<IWsJwtTokenQuery>(
 			'/api/social/ws',
 			{ websocket: true },
 			(socket: WebSocket, request: FastifyRequest<IWsJwtTokenQuery>) => {
