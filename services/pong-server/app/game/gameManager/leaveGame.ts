@@ -12,8 +12,8 @@ export function leaveGame(playerId: number) {
 
 	const gameData = games.get(gameCode)
 	if (gameData) {
-		if (gameData.p1 === playerId) gameData.p1 = undefined
-		if (gameData.p2 === playerId) gameData.p2 = undefined
+		if (gameData.p1?.id === playerId) gameData.p1 = undefined
+		if (gameData.p2?.id === playerId) gameData.p2 = undefined
 
 		if (!gameData.p1 && !gameData.p2) {
 			games.delete(gameCode)

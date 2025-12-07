@@ -1,10 +1,14 @@
 import { IGameData } from '../../utils/createGame'
 
+interface Iplayer {
+	id: number
+	connState: boolean
+}
 export const games = new Map<
 	string,
 	{
-		p1: undefined | number
-		p2: undefined | number
+		p1: Iplayer | undefined
+		p2: Iplayer | undefined
 		gameInstance: IGameData | undefined
 	}
 >()

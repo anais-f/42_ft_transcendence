@@ -6,11 +6,13 @@ import { games, playerToGame } from './gamesData.js'
  *  nothing
  * error:
  *  - throw: Error('game full')
- *  - throw: Error('unknow game code')
- *  - throw: Error(player already in a game')
+ *  - throw: Error('unknown game code')
+ *  - throw: Error('player already in a game')
  */
 export function addPlayerToGame(gameCode: string, playerId: number) {
-	if (!games.has(gameCode)) {
+	const gameData = games.get(gameCode)
+
+	if (!gameData) {
 		throw new Error('unknown game code')
 	}
 
@@ -18,11 +20,11 @@ export function addPlayerToGame(gameCode: string, playerId: number) {
 		throw new Error('player already in a game')
 	}
 
-	const gameData = games.get(gameCode)
-	if (!gameData?.p2) {
-		gameData!.p2 = playerId
+	if (!gameData.p2) {
+		gameData.p2 = { id: playerId, connState: false }
 		playerToGame.set(playerId, gameCode)
 		return
 	}
-	throw Error('game full')
+
+	throw new Error('game full')
 }
