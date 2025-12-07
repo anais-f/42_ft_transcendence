@@ -6,10 +6,11 @@ import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	createTokenSchema,
-	ErrorResponseSchema,
-	IWsJwtTokenQuery
+	IWsJwtTokenQuery,
+    NewGameSchema
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers'
+import { createNewGameController } from '../controllers/newGameController'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -20,11 +21,24 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: createTokenSchema,
-				401: ErrorResponseSchema
+				201: createTokenSchema,
+				//401: ErrorResponseSchema // TODO: throw
 			}
 		},
 		handler: createTokenController
+	})
+
+	server.route({
+		method: 'POST',
+		url: '/api/pong-server/new-game',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			response: {
+				201: NewGameSchema,
+				//401: ErrorResponseSchema // TODO: throw
+			}
+		},
+		handler: createNewGameController
 	})
 
 	server.register(async (fastify) => {
