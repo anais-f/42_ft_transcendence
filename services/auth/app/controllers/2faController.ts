@@ -16,16 +16,25 @@ async function call2fa(path: string, body: any) {
 		throw createHttpError.InternalServerError('TWOFA_SERVICE_URL not set')
 	if (!INTERNAL_API_SECRET)
 		throw createHttpError.InternalServerError('INTERNAL_API_SECRET not set')
-	const res = await fetch(`${TWOFA_URL}${path}`, {
-		method: 'POST',
-		headers: {
-			'content-type': 'application/json',
-			authorization: INTERNAL_API_SECRET
-		},
-		body: JSON.stringify(body)
-	})
-	const data = await res.json().catch(() => ({}))
-	return { ok: res.ok, status: res.status, data }
+
+	try {
+		const res = await fetch(`${TWOFA_URL}${path}`, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				authorization: INTERNAL_API_SECRET
+			},
+			body: JSON.stringify(body),
+			signal: AbortSignal.timeout(5000)
+		})
+		const data = await res.json().catch(() => ({}))
+		return { ok: res.ok, status: res.status, data }
+	} catch (e: any) {
+		if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+			throw createHttpError.GatewayTimeout('2FA service timeout')
+		}
+		throw createHttpError.ServiceUnavailable('2FA service unavailable')
+	}
 }
 
 export async function enable2faController(

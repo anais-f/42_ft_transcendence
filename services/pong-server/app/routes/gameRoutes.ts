@@ -4,10 +4,7 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import {
-	createTokenSchema,
-	IWsJwtTokenQuery
-} from '@ft_transcendence/common'
+import { createTokenSchema, IWsJwtTokenQuery } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
@@ -19,7 +16,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: createTokenSchema,
+				200: createTokenSchema
 			}
 		},
 		handler: createTokenController
