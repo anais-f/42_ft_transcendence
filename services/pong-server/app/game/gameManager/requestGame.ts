@@ -38,6 +38,7 @@ export function requestGame(request: {
 	if (null == code) {
 		const newCode = generateCode()
 
+		playerToGame.set(pID, newCode)
 		games.set(newCode, {
 			p1: { id: pID, connState: false },
 			p2: undefined,
@@ -70,12 +71,15 @@ export function requestSpecifiqueGame(request: {
 }): string {
 	const { pID1, pID2 } = request
 
+	// i assume player can be assign to a game even if hes already playing
+	/*
 	if (playerToGame.has(pID1)) {
 		throw new Error('player already in a game')
 	}
 	if (playerToGame.has(pID2)) {
 		throw new Error('player already in a game')
 	}
+	*/
 
 	// TODO: verify that players exist in database
 

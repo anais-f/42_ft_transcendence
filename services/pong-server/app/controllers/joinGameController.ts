@@ -8,7 +8,8 @@ export async function joinGameController(
 	reply: FastifyReply
 ): Promise<void> {
 	const user = request.user as { user_id: number; login: string }
-	const param = request.params
+	const param = request.params as { gameID: string }
+
 
 	console.log('pause')
 	console.log(JSON.stringify(param))
@@ -19,8 +20,10 @@ export async function joinGameController(
 	}
 
 	try {
-		addPlayerToGame(param as string, user.user_id)
+		console.log('test', param, user.user_id)
+		addPlayerToGame(param.gameID, user.user_id)
 	} catch (e) {
+		console.log('error:', e)
 		reply.code(401).send({ sucess: false, error: 'Unautorized' })
 		return
 	}
