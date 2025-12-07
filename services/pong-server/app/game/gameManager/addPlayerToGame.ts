@@ -1,8 +1,8 @@
-import { games, playerToGame } from './gamesData.js'
+import { games, playerToActiveGame } from './gamesData.js'
 
 /*
  * Function to add a second player to a game instance
- * does nothing if someone tries to join a game that is already assigned to them
+ * Does nothing if someone tries to join a game that is already assigned to them
  * return:
  *  nothing
  * error:
@@ -21,13 +21,13 @@ export function addPlayerToGame(gameCode: string, playerId: number) {
 		return
 	}
 
-	if (playerToGame.has(playerId)) {
+	if (playerToActiveGame.has(playerId)) {
 		throw new Error('player already in a game')
 	}
 
 	if (!gameData.p2) {
 		gameData.p2 = { id: playerId, connState: false }
-		playerToGame.set(playerId, gameCode)
+		playerToActiveGame.set(playerId, gameCode)
 		return
 	}
 
