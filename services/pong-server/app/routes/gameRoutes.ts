@@ -6,7 +6,6 @@ import { createTokenController } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	createTokenSchema,
-	ErrorResponseSchema,
 	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers'
@@ -21,7 +20,6 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			response: {
 				200: createTokenSchema,
-				401: ErrorResponseSchema
 			}
 		},
 		handler: createTokenController
