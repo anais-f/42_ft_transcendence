@@ -9,13 +9,13 @@ games (both active and pending), identified by a unique code in `XXXX-XXXX`
 format. Each game contains information about both players (`p1` and `p2`), the
 game instance, and a status indicating whether the game is pending, active, or
 finished. Each player is represented by the `Iplayer` interface which combines
-their identifier and their WebSocket connection state (`connState`).  The two
+their identifier and their WebSocket connection state (`connState`). The two
 player maps provide reverse relationships: `playerToActiveGame` tracks ongoing
 matches while `playerToPendingGame` handles reserved games (e.g., tournament
 matches). This separation allows a player to be in an active game while having
-a future game reserved.  The typical flow starts with game creation via
+a future game reserved. The typical flow starts with game creation via
 `requestGame()` for friendly matches or `requestPendingGame()` for tournaments,
-then transitions to active when both players connect. 
+then transitions to active when both players connect.
 
 ---
 
@@ -23,11 +23,11 @@ then transitions to active when both players connect.
 
 ### `GameStatus`
 
-| Value      | Description                              |
-| ---------- | ---------------------------------------- |
-| `pending`  | Game reserved, waiting for players       |
-| `active`   | Game in progress                         |
-| `finished` | Game completed                           |
+| Value      | Description                        |
+| ---------- | ---------------------------------- |
+| `pending`  | Game reserved, waiting for players |
+| `active`   | Game in progress                   |
+| `finished` | Game completed                     |
 
 ### `Iplayer`
 
@@ -38,12 +38,12 @@ then transitions to active when both players connect.
 
 ### `GameData`
 
-| Property       | Type                    | Description                    |
-| -------------- | ----------------------- | ------------------------------ |
-| `p1`           | `Iplayer \| undefined`  | Player 1 data                  |
-| `p2`           | `Iplayer \| undefined`  | Player 2 data                  |
-| `gameInstance` | `IGameData \| undefined`| Game instance                  |
-| `status`       | `GameStatus`            | Current state of the game      |
+| Property       | Type                     | Description               |
+| -------------- | ------------------------ | ------------------------- |
+| `p1`           | `Iplayer \| undefined`   | Player 1 data             |
+| `p2`           | `Iplayer \| undefined`   | Player 2 data             |
+| `gameInstance` | `IGameData \| undefined` | Game instance             |
+| `status`       | `GameStatus`             | Current state of the game |
 
 ### `games: Map<string, GameData>`
 
@@ -53,15 +53,15 @@ then transitions to active when both players connect.
 
 ### `playerToActiveGame: Map<number, string>`
 
-| Key       | Value     | Description                     |
-| --------- | --------- | ------------------------------- |
-| Player ID | Game code | Currently active game           |
+| Key       | Value     | Description           |
+| --------- | --------- | --------------------- |
+| Player ID | Game code | Currently active game |
 
 ### `playerToPendingGame: Map<number, string>`
 
-| Key       | Value     | Description                     |
-| --------- | --------- | ------------------------------- |
-| Player ID | Game code | Reserved game (e.g., tournament)|
+| Key       | Value     | Description                      |
+| --------- | --------- | -------------------------------- |
+| Player ID | Game code | Reserved game (e.g., tournament) |
 
 > [!NOTE]
 > A player can have at most ONE active game and ONE pending game simultaneously.
@@ -105,7 +105,7 @@ then transitions to active when both players connect.
 - Throws `'game full'` if `p2` slot is already taken
 
 > [!TIP]
-> This function is used for friendly games where players join via game code. 
+> This function is used for friendly games where players join via game code.
 
 ### `leaveGame(playerId)`
 
@@ -148,19 +148,19 @@ then transitions to active when both players connect.
 
 ## Error Summary
 
-| Function            | Error                                 | Cause                                     |
-| ------------------- | ------------------------------------- | ----------------------------------------- |
-| `requestGame`       | `'unknown game code'`                 | Provided code doesn't exist               |
-| `requestGame`       | `'player already in a game'`          | Player already has an active game         |
-| `requestPendingGame`| `'player already has a pending game'` | Player already has a pending game         |
-| `requestPendingGame`| `'unknown player'`                    | Player verification failed (TODO)         |
-| `activateGame`      | `'unknown game code'`                 | Game code doesn't exist                   |
-| `activateGame`      | `'game not pending'`                  | Game is not in pending status             |
-| `addPlayerToGame`   | `'unknown game code'`                 | Game code doesn't exist                   |
-| `addPlayerToGame`   | `'player already in a game'`          | Player already has an active game         |
-| `addPlayerToGame`   | `'game full'`                         | `p2` slot is already occupied             |
-| `cancelPendingGame` | `'unknown game code'`                 | Game code doesn't exist                   |
-| `cancelPendingGame` | `'game not pending'`                  | Game is not in pending status             |
+| Function             | Error                                 | Cause                             |
+| -------------------- | ------------------------------------- | --------------------------------- |
+| `requestGame`        | `'unknown game code'`                 | Provided code doesn't exist       |
+| `requestGame`        | `'player already in a game'`          | Player already has an active game |
+| `requestPendingGame` | `'player already has a pending game'` | Player already has a pending game |
+| `requestPendingGame` | `'unknown player'`                    | Player verification failed (TODO) |
+| `activateGame`       | `'unknown game code'`                 | Game code doesn't exist           |
+| `activateGame`       | `'game not pending'`                  | Game is not in pending status     |
+| `addPlayerToGame`    | `'unknown game code'`                 | Game code doesn't exist           |
+| `addPlayerToGame`    | `'player already in a game'`          | Player already has an active game |
+| `addPlayerToGame`    | `'game full'`                         | `p2` slot is already occupied     |
+| `cancelPendingGame`  | `'unknown game code'`                 | Game code doesn't exist           |
+| `cancelPendingGame`  | `'game not pending'`                  | Game is not in pending status     |
 
 ---
 
