@@ -71,6 +71,7 @@ export function addPlayerToGame(gameCode: string, playerId: number) {
 		throw new Error('unknown game code')
 	}
 
+	// Know bug here: !gameData.p2 but gameData can be null
 	const gameData = games.get(gameCode)
 	if (gameData?.p2) {
 		gameData.p2 = playerId
