@@ -12,8 +12,10 @@ const TWOFA_URL = process.env.TWOFA_SERVICE_URL
 const INTERNAL_API_SECRET = process.env.INTERNAL_API_SECRET
 
 async function call2fa(path: string, body: any) {
-	if (!TWOFA_URL) throw new Error('TWOFA_SERVICE_URL not set')
-	if (!INTERNAL_API_SECRET) throw new Error('INTERNAL_API_SECRET not set')
+	if (!TWOFA_URL)
+		throw createHttpError.InternalServerError('TWOFA_SERVICE_URL not set')
+	if (!INTERNAL_API_SECRET)
+		throw createHttpError.InternalServerError('INTERNAL_API_SECRET not set')
 	const res = await fetch(`${TWOFA_URL}${path}`, {
 		method: 'POST',
 		headers: {
@@ -66,8 +68,7 @@ export async function verify2faSetupController(
 		throw createHttpError.Unauthorized('Invalid cookieToken')
 
 	const parsed = twofaCodeSchema.safeParse(req.body)
-	if (!parsed.success)
-		throw createHttpError.BadRequest('Invalid request body')
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid request body')
 
 	const { twofa_code } = parsed.data
 	const { ok, status, data } = await call2fa('/api/2fa/verify', {
@@ -92,8 +93,7 @@ export async function verify2faLoginController(
 		throw createHttpError.Unauthorized('Invalid cookieToken')
 
 	const parsed = twofaCodeSchema.safeParse(req.body)
-	if (!parsed.success)
-		throw createHttpError.BadRequest('Invalid request body')
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid request body')
 
 	const { twofa_code } = parsed.data
 	const { ok, status, data } = await call2fa('/api/2fa/verify', {
@@ -146,7 +146,10 @@ export async function disable2faController(
 		twofa_code
 	})
 	if (!verify.ok)
-		throw createHttpError(verify.status, verify.data.error || '2FA service error')
+		throw createHttpError(
+			verify.status,
+			verify.data.error || '2FA service error'
+		)
 
 	const { ok, status, data } = await call2fa('/api/2fa/disable', {
 		user_id: payload.user_id
