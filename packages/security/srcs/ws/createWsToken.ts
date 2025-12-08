@@ -30,7 +30,7 @@ export function createWsToken(
 		login: user.login
 	}
 
-	const wsToken = (fastify as any).jwt.sign(payload, {
+	const wsToken = (fastify as any).jwt.ws.sign(payload, {
 		expiresIn: `${WS_TOKEN_EXPIRES_SECONDS}s`
 	})
 
