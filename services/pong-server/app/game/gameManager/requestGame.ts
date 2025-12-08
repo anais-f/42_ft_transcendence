@@ -11,6 +11,7 @@ function generateCode(): string {
 	} while (games.has(code))
 	return code
 }
+
 /*
  * Request for a game / new game
  * request:

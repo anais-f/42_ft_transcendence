@@ -73,12 +73,15 @@ then transitions to active when both players connect.
 ### `generateCode()`
 
 - Generates unique game codes in `XXXX-XXXX` format (uppercase)
-- Uses a `do-while` loop to ensure the generated code doesn't already exist in the map
+- Uses a `do-while` loop to ensure the generated code doesn't already exist in
+  the map
 
 ### `requestGame({ code, pID })`
 
-- **If `code` is null**: Creates a new active game, assigns the player as `p1`, and returns the new game code
-- **If `code` is provided**: Validates that the game exists, throws `'unknown game code'` error if not found, otherwise returns the code
+- **If `code` is null**: Creates a new active game, assigns the player as `p1`,
+  and returns the new game code
+- **If `code` is provided**: Validates that the game exists, throws `'unknown
+  game code'` error if not found, otherwise returns the code
 - Throws `'player already in a game'` if the player already has an active game
 
 ### `requestPendingGame({ pID1, pID2 })`
@@ -87,7 +90,8 @@ then transitions to active when both players connect.
 - Useful for tournament matches where both players are known in advance
 - Assigns `pID1` as `p1` and `pID2` as `p2`
 - Both players start with `connState: false` and `status: 'pending'`
-- Throws `'player already has a pending game'` if either player already has a pending game
+- Throws `'player already has a pending game'` if either player already has a
+  pending game
 - Throws `'unknown player'` if player verification fails (TODO)
 
 ### `activateGame(gameCode)`
