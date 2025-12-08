@@ -25,7 +25,10 @@ export async function start(): Promise<void> {
 			},
 			transform: jsonSchemaTransform
 		},
-		process.env.JWT_SECRET_SOCIAL as string
+		{
+			main: process.env.JWT_SECRET as string,
+			service: process.env.JWT_SECRET_SOCIAL as string
+		}
 	)
 
 	try {
