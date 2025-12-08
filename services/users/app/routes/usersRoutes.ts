@@ -13,8 +13,6 @@ import {
 	updateUserStatus
 } from '../controllers/updateUsersControllers.js'
 import {
-	SuccessResponseSchema,
-	ErrorResponseSchema,
 	PublicUserAuthSchema,
 	UserPrivateProfileSchema,
 	UserPublicProfileSchema,
@@ -34,14 +32,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/internal/users/new-user',
 		preHandler: [apiKeyMiddleware],
 		schema: {
-			body: PublicUserAuthSchema,
-			response: {
-				200: SuccessResponseSchema,
-				201: SuccessResponseSchema,
-				401: ErrorResponseSchema,
-				400: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: PublicUserAuthSchema
 		},
 		handler: handleUserCreated
 	})
@@ -54,11 +45,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			params: UserIdCoerceSchema,
 			response: {
-				200: UserPublicProfileSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: UserPublicProfileSchema
 			}
 		},
 		handler: getPublicUser
@@ -72,11 +59,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			params: UserIdCoerceSchema,
 			response: {
-				200: UserPublicProfileSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: UserPublicProfileSchema
 			}
 		},
 		handler: getPublicUser
@@ -89,10 +72,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: [jwtAuthMiddleware],
 		schema: {
 			response: {
-				200: UserPrivateProfileSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: UserPrivateProfileSchema
 			}
 		},
 		handler: getPrivateUser
@@ -104,15 +84,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/users/me',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
-			body: UserProfileUpdateUsernameSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				409: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UserProfileUpdateUsernameSchema
 		},
 		handler: updateUsername
 	})
@@ -123,14 +95,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/users/me/avatar',
 		preHandler: [jwtAuthMiddleware],
 		schema: {
-			consumes: ['multipart/form-data', 'image/jpeg', 'image/png'],
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			consumes: ['multipart/form-data', 'image/jpeg', 'image/png']
 		},
 		handler: updateAvatar
 	})
@@ -142,14 +107,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: [apiKeyMiddleware],
 		schema: {
 			params: UserIdCoerceSchema,
-			body: UpdateUserStatusSchema,
-			response: {
-				200: SuccessResponseSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
-			}
+			body: UpdateUserStatusSchema
 		},
 		handler: updateUserStatus
 	})
@@ -164,11 +122,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 				username: z.string().min(4).max(32)
 			}),
 			response: {
-				200: UserSearchResultSchema,
-				400: ErrorResponseSchema,
-				401: ErrorResponseSchema,
-				404: ErrorResponseSchema,
-				500: ErrorResponseSchema
+				200: UserSearchResultSchema
 			}
 		},
 		handler: searchUserByUsernameController

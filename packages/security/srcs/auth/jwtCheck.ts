@@ -1,8 +1,6 @@
 import '@fastify/jwt'
 import '../fastify.js'
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
-import { ERROR_MESSAGES } from '@ft_transcendence/common'
-
 /**
  * @description Check valid JWT token from httpOnly cookie or Authorization header
  * @use Routes accessible to authenticated users
@@ -21,7 +19,7 @@ export function jwtAuthMiddleware(
 			console.error('JWT verification failed:', err.message)
 			void reply.code(401).send({
 				success: false,
-				error: ERROR_MESSAGES.UNAUTHORIZED
+				error: 'Unauthorized'
 			})
 			done()
 		})
@@ -40,7 +38,7 @@ export function jwtAuthOwnerMiddleware(
 		if (err) {
 			void reply.code(401).send({
 				success: false,
-				error: ERROR_MESSAGES.UNAUTHORIZED
+				error: 'Unauthorized'
 			})
 			return done()
 		}
@@ -51,7 +49,7 @@ export function jwtAuthOwnerMiddleware(
 		if (Number.isNaN(userId) || userId !== paramId) {
 			void reply.code(403).send({
 				success: false,
-				error: ERROR_MESSAGES.FORBIDDEN
+				error: 'Forbidden'
 			})
 			return done()
 		}

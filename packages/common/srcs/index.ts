@@ -8,7 +8,7 @@ export * from './DTO/socialSchema.js'
 export * from './DTO/paramsSchema.js'
 export * from './DTO/websocketSchema.js'
 
-export * from './error/errorsMap.js'
+export * from './error/errorHandler.js'
 
 export * from './interfaces/jwtModels.js'
 export * from './interfaces/websocketModels.js'
