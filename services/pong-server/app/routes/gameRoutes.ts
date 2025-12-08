@@ -23,7 +23,6 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			params: gameCodeSchema,
 			response: {
 				201: createTokenSchema
-				//401: ErrorResponseSchema // TODO: throw
 			}
 		},
 		handler: joinGameController
@@ -36,7 +35,6 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			response: {
 				201: gameCodeSchema
-				//401: ErrorResponseSchema // TODO: throw
 			}
 		},
 		handler: createNewGameController

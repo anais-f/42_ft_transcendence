@@ -1,5 +1,6 @@
 import createError from 'http-errors'
 import { gameErrorMap } from './errorMap.js'
+import createHttpError from 'http-errors'
 
 export function withGameError<T>(fn: () => T): T {
 	try {
@@ -8,6 +9,6 @@ export function withGameError<T>(fn: () => T): T {
 		if (e instanceof Error && e.message in gameErrorMap) {
 			throw createError(gameErrorMap[e.message], e.message)
 		}
-		throw createError(500, 'Internal server error')
+		throw createHttpError.InternalServerError()
 	}
 }

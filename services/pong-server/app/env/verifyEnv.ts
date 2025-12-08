@@ -3,7 +3,7 @@ import { loadOpenAPISchema } from '@ft_transcendence/common'
 export interface IPongServerEnv {
 	HOST: string
 	PORT: number
-	JWT_SECRET: string,
+	JWT_SECRET: string
 	JWT_SECRET_GAME: string
 	openAPISchema?: any
 }

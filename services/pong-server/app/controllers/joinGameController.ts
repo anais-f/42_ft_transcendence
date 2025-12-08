@@ -17,6 +17,5 @@ export async function joinGameController(
 
 	withGameError(() => addPlayerToGame(param.gameID, user.user_id))
 
-	reply.code(201). send(createWsToken(request.server, user))
+	reply.code(201).send(createWsToken(request.server, user))
 }
-
