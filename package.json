@@ -19,6 +19,8 @@
 		"build:auth": "npm run build --workspace=services/auth/app",
 		"build:users": "npm run build --workspace=services/users/app",
 		"build:auth_google": "npm run build --workspace=services/auth_google/app",
+		"build:2fa": "npm run build --workspace=services/2fa/app",
+		"build:game": "npm run build --workspace=services/game/app",
 		"build:social": "npm run build --workspace=services/social/app",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
