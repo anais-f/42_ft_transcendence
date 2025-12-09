@@ -1,13 +1,14 @@
 {
 	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./",
-		"moduleResolution": "nodenext"
+		"outDir": "dist",
+		"rootDir": "."
 	},
-	"references": [{ "path": "../../../packages/common" }],
-	"include": ["./**/*", "../../../packages/monitoring/srcs/types"],
-	"ts-node": {
-		"esm": true
-	}
+	"references": [
+		{ "path": "../../../packages/pong-shared" },
+		{ "path": "../../../packages/common" },
+		{ "path": "../../../packages/security" },
+    { "path": "../../../packages/monitoring" }
+	],
+	"include": ["./**/*"]
 }

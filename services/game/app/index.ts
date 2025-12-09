@@ -1,81 +1,47 @@
-import Fastify from 'fastify'
-import {
-	ZodTypeProvider,
-	validatorCompiler,
-	serializerCompiler,
-	jsonSchemaTransform
-} from 'fastify-type-provider-zod'
-import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
-import metricPlugin from 'fastify-metrics'
-import Swagger from '@fastify/swagger'
-import SwaggerUI from '@fastify/swagger-ui'
-import fs from 'fs'
-import { Tournament } from '@ft_transcendence/common'
-import fastifyJwt from '@fastify/jwt'
-import fastifyCookie from '@fastify/cookie'
-import { runMigrations } from './database/connection.js'
-import { registerRoutes } from './routes/registerRoutes.js'
+//import { GameState } from '@ft_transcendence/pong-shared'
+import { jsonSchemaTransform } from 'fastify-type-provider-zod'
+//import { createGame } from './utils/createGame.js'
+import { createWsApp } from '@ft_transcendence/security'
+import { gameRoutes } from './routes/gameRoutes.js'
+import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
 
-export const tournaments: Map<string, Tournament> = new Map()
-export const usersInTournament: Set<number> = new Set()
-
-export const matchs: Map<string, any> = new Map()
-export const usersInMatch: Map<number, string> = new Map()
-
-const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) {
-	throw new Error('JWT_SECRET environment variable is required')
-}
-console.log('Using JWT Secret:', jwtSecret)
-app.setValidatorCompiler(validatorCompiler)
-app.setSerializerCompiler(serializerCompiler)
-app.register(fastifyCookie)
-app.register(fastifyJwt, {
-	secret: jwtSecret,
-	cookie: {
-		cookieName: 'auth_token',
-		signed: false
-	}
-})
-setupFastifyMonitoringHooks(app)
-async function runServer() {
-	console.log('Starting Game service...')
-	runMigrations()
-	console.log('Database migrations completed')
-	const openapiFilePath = process.env.DTO_OPENAPI_FILE
-	if (!openapiFilePath) {
-		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
-	}
-	await app.register(metricPlugin.default, { endpoint: '/metrics' })
-	const openapiSwagger = JSON.parse(fs.readFileSync(openapiFilePath, 'utf-8'))
-	await app.register(Swagger, {
-		openapi: {
-			info: {
-				title: 'API for Game Service',
-				version: '1.0.0'
+async function start(): Promise<void> {
+	const env: IPongServerEnv = checkEnv() // throw on error
+	const app = createWsApp(
+		gameRoutes,
+		{
+			openapi: {
+				info: {
+					title: 'api for game',
+					version: '1.0.0'
+				},
+				servers: [
+					{
+						url: env.HOST,
+						description: 'idk'
+					}
+				],
+				components: env.openAPISchema.components
 			},
-			servers: [
-				{ url: 'http:localhost:8080/game', description: 'Local server' }
-			],
-			components: openapiSwagger.components
+			transform: jsonSchemaTransform
 		},
-		transform: jsonSchemaTransform
-	})
-	await app.register(SwaggerUI, {
-		routePrefix: '/docs'
-	})
+		{
+			main: env.JWT_SECRET,
+			service: env.JWT_SECRET_GAME
+		}
+	)
 
-	await registerRoutes(app)
-
-	const port = Number(process.env.PORT)
-	const host = '0.0.0.0'
-
-	await app.listen({ port, host })
-	console.log(` Game service running on ${host}:${port}`)
+	try {
+		await app.ready()
+		await app.listen({
+			port: env.PORT,
+			host: '0.0.0.0'
+		})
+		console.log(`listening on port: ${env.PORT}`)
+	} catch (err) {
+		console.error('Error starting server:', err)
+		process.exit(1)
+	}
 }
 
-runServer().catch((error) => {
-	console.error('Failed to start Game service:', error)
-	process.exit(1)
-})
+start()
