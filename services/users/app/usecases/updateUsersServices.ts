@@ -1,9 +1,10 @@
 import { fileTypeFromBuffer } from 'file-type'
-import { AppError, ERROR_MESSAGES } from '@ft_transcendence/common'
+import { UserStatus } from '@ft_transcendence/common'
 import { UsersRepository } from '../repositories/usersRepository.js'
 import fs from 'fs/promises'
 import * as path from 'path'
 import { randomUUID } from 'crypto'
+import createHttpError from 'http-errors'
 
 export interface CheckUserAvatarParams {
 	user_id: number
@@ -31,7 +32,7 @@ export class UpdateUsersServices {
 		newUsername: string
 	): Promise<void> {
 		if (!user.user_id || user.user_id <= 0) {
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+			throw createHttpError.BadRequest('Invalid user ID')
 		}
 
 		await UsersRepository.updateUsername({
@@ -43,16 +44,14 @@ export class UpdateUsersServices {
 	/** Update user status (online/offline) */
 	static async updateUserStatus(
 		userId: number,
-		status: 0 | 1,
+		status: UserStatus,
 		lastConnection?: string
 	): Promise<void> {
-		if (!userId || userId <= 0) {
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
-		}
+		if (!userId || userId <= 0)
+			throw createHttpError.BadRequest('Invalid user ID')
 
-		if (!UsersRepository.existsById({ user_id: userId })) {
-			throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
-		}
+		if (!UsersRepository.existsById({ user_id: userId }))
+			throw createHttpError.NotFound('User not found')
 
 		const currentStatus = UsersRepository.getUserStatusById({ user_id: userId })
 
@@ -61,7 +60,7 @@ export class UpdateUsersServices {
 			return
 		}
 
-		if (status === 0 && !lastConnection) {
+		if (status === UserStatus.OFFLINE && !lastConnection) {
 			lastConnection = new Date().toISOString()
 		}
 
@@ -93,7 +92,7 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 	const { user_id, avatarBuffer, originalName, mimeType } = params
 
 	if (!user_id || user_id <= 0) {
-		throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+		throw createHttpError.BadRequest('Invalid user ID')
 	}
 
 	const fileExtension =
@@ -101,22 +100,18 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
 			: ''
 
-	if (!Buffer.isBuffer(avatarBuffer)) {
-		throw new AppError('Missing file', 400)
-	}
+	if (!Buffer.isBuffer(avatarBuffer))
+		throw createHttpError.BadRequest('Missing file')
 
-	if (avatarBuffer.length > MAX_SIZE) {
-		throw new AppError('File too large', 400)
-	}
+	if (avatarBuffer.length > MAX_SIZE)
+		throw createHttpError.BadRequest('File too large')
 
 	const detectedType = await fileTypeFromBuffer(avatarBuffer)
-	if (!detectedType) {
-		throw new AppError('File content not valid image', 400)
-	}
+	if (!detectedType)
+		throw createHttpError.BadRequest('File content not valid image')
 
-	if (!ALLOWED_TYPES.includes(detectedType.mime)) {
-		throw new AppError('Invalid image type', 400)
-	}
+	if (!ALLOWED_TYPES.includes(detectedType.mime))
+		throw createHttpError.BadRequest('Invalid image type')
 
 	if (mimeType && mimeType !== detectedType.mime) {
 		console.warn(
@@ -188,7 +183,7 @@ async function _saveAvatarAndCleanup(
 		try {
 			await fs.unlink(tempPath)
 		} catch (_) {}
-		throw new AppError('Failed to save avatars', 500)
+		throw createHttpError.InternalServerError('Failed to save avatars')
 	}
 
 	try {

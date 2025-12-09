@@ -1,56 +1,48 @@
-import {
-	GameEngine,
-	GameState,
-	Segment,
-	Vector2
-} from '@ft_transcendence/pong-shared'
-import {
-	createScore,
-	IScore
-} from '@ft_transcendence/pong-shared/engine/IScore.js'
+//import { GameState } from '@ft_transcendence/pong-shared'
+import { jsonSchemaTransform } from 'fastify-type-provider-zod'
+//import { createGame } from './utils/createGame.js'
+import { loadOpenAPISchema } from '@ft_transcendence/common'
+import { createWsApp } from '@ft_transcendence/security'
+import { gameRoutes } from './routes/gameRoutes.js'
 
-/* -------------- --- ---------------- */
-/* -------------- map ---------------- */
-const pointA = new Vector2(-20, -10)
-const pointB = new Vector2(20, -10)
-const pointC = new Vector2(20, 10)
-const pointD = new Vector2(-20, 10)
+console.log('test: ', process.env.HOST as string)
+const openapiSwager = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+async function start(): Promise<void> {
+	const app = createWsApp(
+		gameRoutes,
+		{
+			openapi: {
+				info: {
+					title: 'api for game',
+					version: '1.0.0'
+				},
+				servers: [
+					{
+						url: `${process.env.HOST as string}/pong-server`,
+						description: 'idk'
+					}
+				],
+				components: openapiSwager.components
+			},
+			transform: jsonSchemaTransform
+		},
+		{
+			main: process.env.JWT_SECRET as string,
+			service: process.env.JWT_SECRET_GAME as string
+		}
+	)
 
-const segA = new Segment(pointA, pointB)
-const segB = new Segment(pointD, pointC)
-const segC = new Segment(pointA, pointD)
-const segD = new Segment(pointB, pointC)
-/* -------------- --- ---------------- */
+	try {
+		await app.ready()
+		await app.listen({
+			port: parseInt(process.env.PORT as string),
+			host: '0.0.0.0'
+		})
+		console.log('Listening on port', process.env.PORT)
+	} catch (err) {
+		console.error('Error starting server: ', err)
+		process.exit(1)
+	}
+}
 
-/* -------------- --- ---------------- */
-/* -------------- pad ---------------- */
-// NOTE: i clone points in pad cuz move function edit reference
-const pointE = new Vector2(-18, -2)
-const pointF = new Vector2(-18, 2)
-const padSeg1 = new Segment(pointE.clone(), pointF.clone())
-// @ts-ignore - TODO: use pad
-//const pad1 = new PongPad([padSeg1])
-
-const pointG = new Vector2(18, -2)
-const pointH = new Vector2(18, 2)
-const padSeg2 = new Segment(pointG.clone(), pointH.clone())
-// @ts-ignore - TODO: use pad
-//const pad2 = new PongPad([padSeg2])
-/* -------------- --- ---------------- */
-
-/* -------------- --- ---------------- */
-/* ------------- gameE --------------- */
-// TODO: start lobby management here instead of start a random game
-const scoreData: IScore = createScore(500000)
-let GE = new GameEngine(
-	60,
-	scoreData,
-	[segA, segB, segC, segD, padSeg1, padSeg2],
-	[
-		{ seg: segC, player: 1 },
-		{ seg: segD, player: 2 }
-	]
-)
-
-GE.setState(GameState.Started)
-/* -------------- --- ---------------- */
+start()

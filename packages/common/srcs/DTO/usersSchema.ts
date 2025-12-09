@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { UserStatus } from '../interfaces/usersModels.js'
 
 const LOGIN_REGEX = /^[\w-]{4,32}$/
 const USERNAME_REGEX = /^[\w-]{4,32}$/
@@ -29,6 +30,12 @@ export const UserIdSchema = z
 		user_id: z.number().int().positive()
 	})
 	.meta({ description: 'User identifier schema' })
+
+export const UserIdCoerceSchema = z
+	.object({
+		user_id: z.coerce.number().int().positive()
+	})
+	.meta({ description: 'User identifier schema with coercion' })
 
 export const PublicUserAuthSchema = z
 	.object({
@@ -101,10 +108,21 @@ export const UpdateUserStatusSchema = z
 		lastConnection: z.string().datetime().optional()
 	})
 	.strict()
-	.refine((data) => data.status !== 0 || !!data.lastConnection, {
-		message: 'lastConnection is required when status is 0 (offline)'
-	})
+	.refine(
+		(data) => data.status !== UserStatus.OFFLINE || !!data.lastConnection,
+		{
+			message: 'lastConnection is required when status is 0 (offline)'
+		}
+	)
 	.meta({ description: 'Update user status schema' })
+
+export const UserSearchResultSchema = z
+	.object({
+		user_id: z.number().int().positive(),
+		username: UsernameSchema,
+		avatar: z.string()
+	})
+	.meta({ description: 'Simple user search result schema' })
 
 // Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
@@ -128,3 +146,4 @@ export type UserProfileUpdateAvatarDTO = z.infer<
 >
 export type UserProfileUpdateDTO = z.infer<typeof UserProfileUpdateSchema>
 export type UpdateUserStatusDTO = z.infer<typeof UpdateUserStatusSchema>
+export type UserSearchResultDTO = z.infer<typeof UserSearchResultSchema>

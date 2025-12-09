@@ -1,5 +1,5 @@
 {
-	"name": "pong-server-app",
+	"name": "pong-server",
 	"version": "1.0.0",
 	"main": "dist/index.js",
 	"scripts": {
@@ -8,6 +8,8 @@
 		"dev": "tsx watch index.ts"
 	},
 	"dependencies": {
-		"@ft_transcendence/pong-shared": "*"
+		"@ft_transcendence/pong-shared": "*",
+		"@ft_transcendence/common": "*",
+		"@ft_transcendence/security": "*"
 	}
 }

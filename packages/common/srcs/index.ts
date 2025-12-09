@@ -1,12 +1,19 @@
+export * from './DTO/loadOpenAPISchema.js'
 export * from './DTO/authSchema.js'
 export * from './DTO/ResponseSchema.js'
 export * from './DTO/usersSchema.js'
 export * from './DTO/2faSchema.js'
 export * from './DTO/matchmakingSchema.js'
-export * from './error/errorsMap.js'
-export * from './interfaces/usersModels.js'
-export * from './utils/secrets.js'
+export * from './DTO/socialSchema.js'
 export * from './DTO/paramsSchema.js'
+export * from './DTO/websocketSchema.js'
+
+export * from './error/errorHandler.js'
+
 export * from './interfaces/jwtModels.js'
-export * from './DTO/requestSchema.js'
+export * from './interfaces/websocketModels.js'
+export * from './interfaces/usersModels.js'
+export * from './interfaces/jwtModels.js'
+
+export * from './utils/secrets.js'
 export * from './interfaces/tournamentModels.js'

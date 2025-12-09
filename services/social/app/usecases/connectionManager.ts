@@ -1,4 +1,4 @@
-import { handlePong, startHeartbeat } from './heartbeatService.js'
+import { handlePong } from './heartbeatService.js'
 import { handleUserOnline, handleUserOffline } from './presenceService.js'
 import WebSocket from 'ws'
 
@@ -7,21 +7,22 @@ interface UserConnection {
 	lastHeartbeat: Date
 }
 
-export const wsConnections = new Map<string, UserConnection>()
-const pendingDisconnectTimers = new Map<string, NodeJS.Timeout>()
-const DISCONNECT_DELAY_MS = 5000
+export const wsConnections = new Map<number, UserConnection>()
+const pendingDisconnectTimers = new Map<number, NodeJS.Timeout>()
+const DISCONNECT_DELAY_MS = 2000
 
 /**
  * Setup event handlers for a WebSocket connection
  * @param userId - User ID
  * @param ws - WebSocket instance
  */
-function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
+function setupWebSocketHandlers(userId: number, ws: WebSocket): void {
 	ws.on('pong', () => {
 		handlePong(userId)
 	})
 
 	ws.on('close', () => {
+		console.log(`connection disconnected for user ${userId}`)
 		removeConnection(userId, ws)
 	})
 
@@ -35,7 +36,7 @@ function setupWebSocketHandlers(userId: string, ws: WebSocket): void {
  * Cancel pending disconnect timer for a user
  * @param userId - User ID
  */
-function cancelPendingDisconnect(userId: string): void {
+function cancelPendingDisconnect(userId: number): void {
 	const timer = pendingDisconnectTimers.get(userId)
 	if (timer) {
 		clearTimeout(timer)
@@ -51,7 +52,7 @@ function cancelPendingDisconnect(userId: string): void {
  * @returns true if this is the user's first connection (went online), false if replacing existing
  */
 export async function addConnection(
-	userId: string,
+	userId: number,
 	ws: WebSocket
 ): Promise<boolean> {
 	const existingConn = wsConnections.get(userId)
@@ -72,9 +73,9 @@ export async function addConnection(
 		}
 	}
 
-	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
-
 	setupWebSocketHandlers(userId, ws)
+
+	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
 
 	if (isFirstConnection) {
 		try {
@@ -94,7 +95,7 @@ export async function addConnection(
  * @param ws - WebSocket instance (to verify it's the current one)
  * @returns true if this was the user's only connection (went offline), false if connection was already gone
  */
-export function removeConnection(userId: string, ws: WebSocket): boolean {
+export function removeConnection(userId: number, ws: WebSocket): boolean {
 	const currentConn = wsConnections.get(userId)
 
 	if (!currentConn || currentConn.ws !== ws) {
@@ -129,7 +130,7 @@ export function removeConnection(userId: string, ws: WebSocket): boolean {
  * @param message - Message to send (string or object)
  * @returns true if message was sent, false otherwise
  */
-export function sendToUser(userId: string, message: unknown): boolean {
+export function sendToUser(userId: number, message: unknown): boolean {
 	const conn = wsConnections.get(userId)
 	if (!conn) return false
 
@@ -182,4 +183,10 @@ export function getTotalConnections(): number {
 	return wsConnections.size
 }
 
-startHeartbeat()
+export function getOnlineUsers(): number[] {
+	const onlineUsers: number[] = []
+	for (const userId of wsConnections.keys()) {
+		onlineUsers.push(Number(userId))
+	}
+	return onlineUsers
+}
