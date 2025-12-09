@@ -42,7 +42,7 @@ COPY --from=build-packages /build/packages/security/dist ./packages/security/dis
 COPY --from=build-packages /build/packages/monitoring/dist ./packages/monitoring/dist
 COPY --from=build-packages /build/packages/pong-shared/dist ./packages/pong-shared/dist
 
-RUN npm run build --workspace=game
+RUN npm run build --workspace=game-server
 
 #-------------------------------------------------------------#
 # prod
