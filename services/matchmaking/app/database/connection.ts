@@ -27,8 +27,8 @@ export function runMigrations() {
 			id_match INTEGER PRIMARY KEY AUTOINCREMENT,
 			winner_id INTEGER NOT NULL,
 			played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			round INTEGER DEFAULT NULL,
-			id_tournament INTEGER DEFAULT NULL
+			round INTEGER DEFAULT -1,
+			id_tournament INTEGER DEFAULT -1
 		);
 
 		CREATE TABLE IF NOT EXISTS match_player (
