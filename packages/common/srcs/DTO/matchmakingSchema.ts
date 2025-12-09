@@ -25,3 +25,4 @@ export const saveMatchShema = z
 
 export type CreateTournamentDTO = z.infer<typeof CreateTournamentSchema>
 export type RemoveTournamentDTO = z.infer<typeof RemoveTournamentSchema>
+export type saveMatchDTO = z.infer<typeof saveMatchShema>
