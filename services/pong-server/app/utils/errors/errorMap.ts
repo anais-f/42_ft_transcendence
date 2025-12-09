@@ -1,8 +1,8 @@
 export const gameErrorMap: Record<string, number> = {
+	'a player is already in a game': 409,
+	'player is already in a game': 409,
 	'unknown game code': 404,
-	'game full': 409,
-	'player already in a game': 409,
-	'player already has a pending game': 409,
-	'game not pending': 400,
-	'unknown player': 404
+	'player not allowed in this game': 403,
+	'player not in game': 400,
+	'game not found': 404
 }
