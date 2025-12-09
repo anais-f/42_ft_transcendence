@@ -143,12 +143,12 @@ services:
       retries: 5
       start_period: 10s
 
-  matchmaking:
+  game:
     restart: on-failure
-    container_name: matchmaking
+    container_name: game
     build:
       context: .
-      dockerfile: ./services/matchmaking/Dockerfile
+      dockerfile: ./services/game/Dockerfile
     depends_on:
       # pong-server:
       #   condition: service_healthy
@@ -159,7 +159,7 @@ services:
     env_file:
       - .env
     volumes:
-      - db_matchmaking_data:/data
+      - db_game_data:/data
     healthcheck:
       test:
         - CMD-SHELL
@@ -206,5 +206,5 @@ volumes:
   db_users_data:
   db_social_data:
   db_2fa_data:
-  db_matchmaking_data:
+  db_game_data:
   avatars_data:

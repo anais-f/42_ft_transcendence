@@ -34,7 +34,7 @@
 		"services/auth/app",
 		"services/users/app",
 		"services/2fa/app",
-		"services/matchmaking/app",
+		"services/game/app",
 		"services/social/app"
 	],
 	"devDependencies": {

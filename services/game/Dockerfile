@@ -21,7 +21,7 @@ FROM node:22-alpine AS build-app
 WORKDIR /build
 
 COPY package.json package-lock.json ./
-COPY services/matchmaking/app/package.json ./services/matchmaking/app/
+COPY services/game/app/package.json ./services/game/app/
 COPY packages/common/package.json ./packages/common/
 RUN apk add --no-cache python3 make g++
 RUN npm install
@@ -35,7 +35,7 @@ COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 COPY --from=build-packages /build/packages/security/dist ./packages/security/dist
 COPY --from=build-packages /build/packages/monitoring/dist ./packages/monitoring/dist
 
-RUN npm run build --workspace=matchmaking-server-app
+RUN npm run build --workspace=game-server-app
 
 #-------------------------------------------------------------#
 # prod
@@ -43,8 +43,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY --from=build-app /build/services/matchmaking/app/dist ./dist
-COPY --from=build-app /build/services/matchmaking/app/package.json ./
+COPY --from=build-app /build/services/game/app/dist ./dist
+COPY --from=build-app /build/services/game/app/package.json ./
 COPY --from=build-app /build/node_modules ./node_modules
 COPY --from=build-app /build/packages/common/ ./packages/common/
 COPY --from=build-app /build/packages/monitoring/ ./packages/monitoring/
