@@ -58,7 +58,7 @@ Games can be created in two modes:
 | Player ID | Game code | Currently active game |
 
 > [!NOTE]
-> A player can have at most ONE active game at a time.
+> A player can have at most ONE game at a time.
 
 ---
 
