@@ -3,7 +3,8 @@ import {
 	CreateTournamentSchema,
 	CodeParamSchema
 } from '@ft_transcendence/common'
-import { tournaments, usersInTournament, usersInMatch } from '../index.js'
+import { tournaments, usersInTournaments } from '../tournament/tournamentData.js'
+import { playerToGame } from '../game/gameManager/gamesData.js'
 import {
 	createTournamentTree,
 	createInviteCode
@@ -39,12 +40,12 @@ export function createTournamentController(
 	if (userId === undefined) {
 		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	if (usersInTournament.has(userId)) {
+	if (usersInTournaments.has(userId)) {
 		return reply
 			.status(409)
 			.send({ error: 'User is already in another tournament' })
 	}
-	if (usersInMatch.has(userId)) {
+	if (playerToGame.has(userId)) {
 		return reply.status(409).send({ error: 'User is already in a match' })
 	}
 	if (!parsed.success) {
@@ -70,12 +71,12 @@ export function joinTournamentController(
 	if (userId === undefined) {
 		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	if (usersInTournament.has(userId)) {
+	if (usersInTournaments.has(userId)) {
 		return reply
 			.status(409)
 			.send({ error: 'User is already in another tournament' })
 	}
-	if (usersInMatch.has(userId)) {
+	if (playerToGame.has(userId)) {
 		return reply.status(409).send({ error: 'User is already in a match' })
 	}
 	const tournament = tournaments.get(tournamentCode.code)
