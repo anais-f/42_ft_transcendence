@@ -5,7 +5,10 @@ import {
 	RemoveTournamentSchema
 } from '@ft_transcendence/common'
 import { tournaments } from '../index.js'
-import { createTournamentTree, createInviteCode } from '../usecases/tournamentUsecases.js'
+import {
+	createTournamentTree,
+	createInviteCode
+} from '../usecases/tournamentUsecases.js'
 
 let nextTournamentId = 1
 
@@ -30,7 +33,10 @@ export function deleteTournamentController(
 	return reply.send({ success: true })
 }
 
-export function getTournamentController(request: FastifyRequest, reply: FastifyReply) {
+export function getTournamentController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
 		return reply.status(401).send({ error: 'Unauthorized' })
@@ -168,4 +174,3 @@ export function joinTournamentController(
 	tournament.participants.push(userId)
 	return reply.send({ success: true, tournament })
 }
-
