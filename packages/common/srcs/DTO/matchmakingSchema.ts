@@ -2,10 +2,7 @@ import { number, z } from 'zod'
 
 export const CreateTournamentSchema = z
 	.object({
-		numberOfPlayers: number().refine((val) => [2, 4, 8, 16].includes(val), {
-			message:
-				'numberOfPlayers must be one of the following values: 2, 4, 8, 16'
-		})
+		numberOfPlayers: z.literal(4)
 	})
 	.strict()
 
