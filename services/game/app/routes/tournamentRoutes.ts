@@ -29,7 +29,8 @@ export function tournamentRoutes(app: FastifyInstance) {
 		joinTournamentController
 	)
 	app.get(
-		'/api/tournament/:code' , { preHandler: jwtAuthMiddleware },
+		'/api/tournament/:code',
+		{ preHandler: jwtAuthMiddleware },
 		getTournamentController
 	)
 }

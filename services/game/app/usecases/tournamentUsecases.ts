@@ -8,11 +8,12 @@ function randomAlphaNumeric(length: number): string {
 }
 
 export function createInviteCode(type: string): string {
-	if (type !== 'T' && type !== 'G')
-		throw new Error('Invalid tournament type')
+	if (type !== 'T' && type !== 'G') throw new Error('Invalid tournament type')
 	const str: string = randomAlphaNumeric(5)
-	if (type === 'T' && tournaments.get(type + '-' + str)) return createInviteCode(type)
-	else if (type === 'G' && matchs.get(type + '-' + str)) return createInviteCode(type)
+	if (type === 'T' && tournaments.get(type + '-' + str))
+		return createInviteCode(type)
+	else if (type === 'G' && matchs.get(type + '-' + str))
+		return createInviteCode(type)
 	return type + '-' + str
 }
 

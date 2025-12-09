@@ -22,7 +22,6 @@ export const usersInTournament: Set<number> = new Set()
 export const matchs: Map<string, any> = new Map()
 export const usersInMatch: Map<number, string> = new Map()
 
-
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 const jwtSecret = process.env.JWT_SECRET
 if (!jwtSecret) {
