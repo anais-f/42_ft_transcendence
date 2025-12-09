@@ -64,12 +64,18 @@ export const LoginPage = (): string => {
 
 // Store form handlers to be able to remove them later
 let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
+let loginFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 
 export function bindRegisterForm() {
 	const formReg = document.getElementById('register_form')
 	if (!formReg) {
 		console.log('Error: register form not found')
 		return
+	}
+
+	// Remove old listener if exists
+	if (registerFormListener) {
+		formReg.removeEventListener('submit', registerFormListener)
 	}
 
 	// Create listener function
@@ -133,4 +139,74 @@ export function unbindRegisterForm() {
 	formReg.removeEventListener('submit', registerFormListener)
 	registerFormListener = null
 	console.log('Register form unbound')
+}
+
+export function bindLoginForm() {
+  // recupereration du formulaire de login
+  const formLogin = document.getElementById('login_form')
+  if (!formLogin) {
+    console.log('Error: login form not found')
+    return
+  }
+
+  // Remove old listener if exists
+  if (loginFormListener) {
+    formLogin.removeEventListener('submit', loginFormListener)
+  }
+
+  // creation du listener de login
+  loginFormListener = async (e: SubmitEvent) => {
+    e.preventDefault()
+
+    const formData = new FormData(formLogin as HTMLFormElement)
+    console.log(formData)
+    const passwd = formData.get('login_password')
+    const user = formData.get('login_username')
+
+    if (!passwd || !user) return
+
+    if (passwd.toString().length < 8) {
+      console.log('Password too short')
+      return
+    }
+
+    const credentials = {
+      login: user,
+      password: passwd
+    }
+
+    try {
+      const res = await fetch('/auth/api/login', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        console.error('Login failed:', res.status, error)
+        return
+      }
+
+      window.navigate('/')
+    } catch (e) {
+      console.error('Login error:', e)
+    }
+  }
+
+  // ajout du listener au formulaire de login
+  formLogin.addEventListener('submit', loginFormListener)
+  console.log('Login form bound')
+}
+
+export function unbindLoginForm() {
+	const formLogin = document.getElementById('login_form')
+	if (!formLogin || !loginFormListener) return
+
+	// Remove listener
+	formLogin.removeEventListener('submit', loginFormListener)
+	loginFormListener = null
+	console.log('Login form unbound')
 }
