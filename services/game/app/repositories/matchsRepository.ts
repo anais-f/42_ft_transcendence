@@ -7,7 +7,6 @@ export function saveMatchToHistory(
 	scorePlayer2: number,
 	idTournament: number = -1,
 	round: number = -1
-
 ): number {
 	const db = getDb()
 	const winnerId = scorePlayer1 > scorePlayer2 ? player1Id : player2Id
@@ -40,8 +39,7 @@ export function saveMatchToHistory(
 	return matchId
 }
 
-export function getMatchHistoryByPlayerId(targetUserId: number)
-{
+export function getMatchHistoryByPlayerId(targetUserId: number) {
 	const db = getDb()
 	const matches = db
 		.prepare(
@@ -57,4 +55,3 @@ export function getMatchHistoryByPlayerId(targetUserId: number)
 		.all(targetUserId)
 	return matches
 }
-

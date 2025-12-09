@@ -1,8 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
-import {
-	getUserMatchHistoryController
-} from '../controllers/historyControllers.js'
+import { getUserMatchHistoryController } from '../controllers/historyControllers.js'
 
 export function historyRoutes(app: FastifyInstance) {
 	app.get(
