@@ -30,7 +30,6 @@
 		{ "path": "./services/2fa/app" },
 		{ "path": "./services/frontend/app" },
 		{ "path": "./services/social/app" },
-		{ "path": "./services/matchmaking/app" },
 		{ "path": "./services/game/app" }
 	],
 	"ts-node": {
