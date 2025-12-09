@@ -22,7 +22,6 @@
 	"references": [
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
-		{ "path": "./packages/game" },
 		{ "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users/app" },
