@@ -1,26 +1,51 @@
-import { games, playerToActiveGame } from './gamesData.js'
+import { GameData, games, playerToGame } from './gamesData'
 
-/*
- * Function to remove a player from their current active game
- * If both players have left, the game is deleted
- * Sets the game status to 'finished' when a player leaves
- * @param playerId - The ID of the player leaving
- * @return nothing
- */
-export function leaveGame(playerId: number) {
-	const gameCode = playerToActiveGame.get(playerId)
-	if (!gameCode) return
+export function leaveGame(pID: number) {
+	const gameCode = playerToGame.get(pID)
+	if (!gameCode) {
+		throw new Error('player not in game')
+	}
 
 	const gameData = games.get(gameCode)
-	if (gameData) {
-		if (gameData.p1?.id === playerId) gameData.p1 = undefined
-		if (gameData.p2?.id === playerId) gameData.p2 = undefined
+	if (!gameData) {
+		throw new Error('game not found')
+	}
 
-		gameData.status = 'finished'
+	forfeit(gameData) // set game in DB
 
-		if (!gameData.p1 && !gameData.p2) {
-			games.delete(gameCode)
+	if (gameData.p1) {
+		playerToGame.delete(gameData.p1.id)
+	}
+
+	if (gameData.p2) {
+		playerToGame.delete(gameData.p2.id)
+	}
+	games.delete(gameCode)
+}
+
+function forfeit(gameData: GameData) {
+	if (!gameData.p2) {
+		// open game nobody join
+		return // no op
+	}
+
+	if (gameData.status == 'active') {
+		// game already started
+		if (gameData.p1?.connState) {
+			// p2 disconect
+			// TODO: P1 win
+		} else {
+			// p1 disconect
+			// TODO: P2 win
+		}
+	} else {
+		// waiting
+		if (!gameData.p1.connState) {
+			// p1 disconect
+			// TODO: P2 win
+		} else if (!gameData.p2.connState) {
+			// p2 disconect
+			// TODO: P1 win
 		}
 	}
-	playerToActiveGame.delete(playerId)
 }

@@ -1,4 +1,7 @@
-import { games, playerToActiveGame, playerToPendingGame } from './gamesData.js'
+import {
+	games,
+	playerToGame,
+} from './gamesData.js'
 
 /*
  * Function to generate a random game code in the format XXXX-XXXX
@@ -13,80 +16,40 @@ function generateCode(): string {
 }
 
 /*
- * Request for a game / new game
- * request:
- *  code (code of a specific game)
- *  pID (player id)
+ * Creates a new game and returns the game code.
+ * param:
+ *  pID1 (player id of player 1)
+ *  pID2? (player id of player 2)
  * return:
  *  game code
  * error:
- *  - throw: Error('unknown game code')
- *  - throw: Error('player already in a game')
+ * 	- throw 'player is already in a game'
+ * 	- throw 'a player is already in a game'
  */
-export function requestGame(request: {
-	code: string | null
-	pID: number
-}): string {
-	const { code, pID } = request
-
-	if (playerToActiveGame.has(pID)) {
-		throw new Error('player already in a game')
+export function requestGame(
+	pID1: number,
+	pID2: number | undefined = undefined
+): string {
+	if (playerToGame.has(pID1) && !pID2) {
+		throw new Error('player is already in a game')
 	}
-
-	if (null == code) {
-		const newCode = generateCode()
-
-		playerToActiveGame.set(pID, newCode)
-		games.set(newCode, {
-			p1: { id: pID, connState: false },
-			p2: undefined,
-			gameInstance: undefined,
-			status: 'active'
-		})
-		return newCode
+	if (pID2 && (playerToGame.has(pID2) || playerToGame.has(pID1))) {
+		throw new Error('a player is already in a game')
 	}
-
-	if (!games.has(code)) {
-		throw new Error('unknown game code')
-	}
-
-	return code
-}
-
-/*
- * Request for a pending game with 2 player ids (e.g., tournament match)
- * request:
- *  pID1: player id of player 1
- *  pID2: player id of player 2
- * return:
- *  game code
- * error:
- *  - throw: Error('player already has a pending game')
- *  - throw: Error('unknown player') (TODO)
- */
-export function requestPendingGame(request: {
-	pID1: number
-	pID2: number
-}): string {
-	const { pID1, pID2 } = request
-
-	if (playerToPendingGame.has(pID1) || playerToPendingGame.has(pID2)) {
-		throw new Error('player already has a pending game')
-	}
-
-	// TODO: verify that players exist in database
 
 	const newCode = generateCode()
-
 	games.set(newCode, {
 		p1: { id: pID1, connState: false },
-		p2: { id: pID2, connState: false },
+		p2: pID2 ? { id: pID2, connState: false } : undefined,
 		gameInstance: undefined,
-		status: 'pending'
+		status: 'waiting',
+		createdAt: Date.now()
 	})
 
-	playerToPendingGame.set(pID1, newCode)
-	playerToPendingGame.set(pID2, newCode)
+	playerToGame.set(pID1, newCode)
+	if (pID2) {
+		playerToGame.set(pID2, newCode)
+	}
 
 	return newCode
 }

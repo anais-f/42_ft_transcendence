@@ -97,7 +97,7 @@ Games can be created in two modes:
 │        │                             │           │   loser                 ││
 │        ├─── Player disconnects ──┐   │           └────────────┬────────────┘│
 │        │                         │   │                        │             │
-│        ▼                         ▼   ▼                        ▼             │
+│        ▼                         ▼   ▼                        │             │
 │   ┌──────────────────────────────────────────┐                │             │
 │   │ Game saved to DB then deleted            │                │             │
 │   │ (disconnected player loses)              ├────────────────              │
@@ -118,7 +118,7 @@ Games can be created in two modes:
 - Generates unique game codes in `XXXX-XXXX` format (uppercase)
 - Uses a `do-while` loop to ensure the generated code doesn't already exist in the map
 
-### `requestGame({ pID, pID2?  })`
+### `requestGame(pID, pID2?)`
 
 Creates a new game and returns the game code.
 
@@ -140,10 +140,10 @@ Creates a new game and returns the game code.
 
 **Errors:**
 
-| Error                         | Cause                             |
-| ----------------------------- | --------------------------------- |
-| `'player already in a game'`  | `pID` already has an active game  |
-| `'player2 already in a game'` | `pID2` already has an active game |
+| Error                             | Cause                               |
+| --------------------------------- | ----------------------------------- |
+| `'a player is already in a game'` | a player already has an active game |
+| `'player is already in a game'`   | `pID1` already has an active game   |
 
 ### `joinGame(gameCode, playerId)`
 
@@ -157,26 +157,33 @@ route will handle JWT token generation for WebSocket connection.
   - If `playerId === p1.id` or `playerId === p2.id`: allowed to join
   - Otherwise: throws error
 
+> [!NOTE]
+> No validation is performed on `pID` (e.g., checking if they exist in
+> the database). This is the caller's responsibility.
+
 **Errors:**
 
 | Error                               | Cause                                                       |
 | ----------------------------------- | ----------------------------------------------------------- |
 | `'unknown game code'`               | Game code doesn't exist in `games` map                      |
-| `'player already in a game'`        | Player already has an active game (different from this one) |
+| `'player is already in a game'`     | Player already has an active game (different from this one) |
 | `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id`   |
-| `'game not in waiting status'`      | Game is already `active`                                    |
 
 ### `leaveGame(playerId)`
 
 Removes a player from their active game. The game is deleted and the opponent
 wins by forfeit (if applicable).
 
+> [!NOTE]
+> No validation is performed on `pID` (e.g., checking if they exist in
+> the database). This is the caller's responsibility.
+
 **Errors:**
 
-| Error                      | Cause                                           |
-| -------------------------- | ----------------------------------------------- |
-| `'player not in any game'` | Player has no active game in `playerToGame`     |
-| `'game not found'`         | Game code from mapping doesn't exist in `games` |
+| Error                  | Cause                                           |
+| ---------------------- | ----------------------------------------------- |
+| `'player not in game'` | Player has no active game in `playerToGame`     |
+| `'game not found'`     | Game code from mapping doesn't exist in `games` |
 
 ---
 
@@ -184,13 +191,12 @@ wins by forfeit (if applicable).
 
 | Function      | Error                               | Cause                                                       |
 | ------------- | ----------------------------------- | ----------------------------------------------------------- |
-| `requestGame` | `'player already in a game'`        | `pID` already has an active game                            |
-| `requestGame` | `'player2 already in a game'`       | `pID2` already has an active game                           |
+| `requestGame` | `'a player is already in a game'`   | already has an active game                                  |
 | `joinGame`    | `'unknown game code'`               | Game code doesn't exist in `games` map                      |
-| `joinGame`    | `'player already in a game'`        | Player already has an active game (different from this one) |
+| `joinGame`    | `'a player is already in a game'`   | Player already has an active game (different from this one) |
 | `joinGame`    | `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id`   |
 | `joinGame`    | `'game not in waiting status'`      | Game is already `active`                                    |
-| `leaveGame`   | `'player not in any game'`          | Player has no active game in `playerToGame`                 |
+| `leaveGame`   | `'player not in game'`              | Player has no active game in `playerToGame`                 |
 | `leaveGame`   | `'game not found'`                  | Game code from mapping doesn't exist in `games`             |
 
 ---

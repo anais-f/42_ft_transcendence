@@ -8,7 +8,7 @@ export interface Iplayer {
 }
 
 export interface GameData {
-	p1: Iplayer | undefined
+	p1: Iplayer
 	p2: Iplayer | undefined
 	gameInstance: IGameData | undefined
 	status: GameStatus
