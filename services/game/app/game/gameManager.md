@@ -191,8 +191,8 @@ wins by forfeit (if applicable).
 
 | Function      | Error                               | Cause                                                       |
 | ------------- | ----------------------------------- | ----------------------------------------------------------- |
-| `requestGame` | `'a player is already in a game'`   | a already has an active game                                  |
-| `requestGame` | `'player is already in a game'`     | `pID1` already has an active game                                  |
+| `requestGame` | `'a player is already in a game'`   | a already has an active game                                |
+| `requestGame` | `'player is already in a game'`     | `pID1` already has an active game                           |
 | `joinGame`    | `'unknown game code'`               | Game code doesn't exist in `games` map                      |
 | `joinGame`    | `'a player is already in a game'`   | Player already has an active game (different from this one) |
 | `joinGame`    | `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id`   |

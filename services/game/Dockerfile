@@ -25,7 +25,7 @@ FROM node:22-alpine AS build-app
 WORKDIR /build
 
 COPY package.json package-lock.json ./
-COPY services/pong-server/app/package.json ./services/pong-server/app/
+COPY services/game/app/package.json ./services/game/app/
 COPY packages/pong-shared/package.json ./packages/pong-shared/
 COPY packages/common/package.json ./packages/common/
 COPY packages/security/package.json ./packages/security/
@@ -41,7 +41,7 @@ COPY --from=build-packages /build/packages/pong-shared/dist ./packages/pong-shar
 COPY --from=build-packages /build/packages/common/dist ./packages/common/dist
 COPY --from=build-packages /build/packages/security/dist ./packages/security/dist
 
-RUN npm run build --workspace=pong-server
+RUN npm run build --workspace=game
 
 #-------------------------------------------------------------#
 # prod
@@ -49,8 +49,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY --from=build-app /build/services/pong-server/app/dist/ ./dist
-COPY --from=build-app /build/services/pong-server/app/package.json ./
+COPY --from=build-app /build/services/game/app/dist/ ./dist
+COPY --from=build-app /build/services/game/app/package.json ./
 COPY --from=build-app /build/node_modules/ ./node_modules
 
 COPY --from=build-app /build/packages/pong-shared/ ./packages/pong-shared/

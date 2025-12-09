@@ -8,4 +8,4 @@ COPY services/*/app/package*.json ./services/*/app/
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--workspace=services/pong-server/app"]
+CMD ["npm", "run", "dev", "--workspace=services/game/app"]

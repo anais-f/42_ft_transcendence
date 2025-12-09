@@ -8,12 +8,12 @@ connections.
 
 ### 1. Join Game
 
-- **URL**: `/api/pong-server/join-game/:gameID`
+- **URL**: `/api/game/join-game/:gameID`
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Parameters**:
   - `gameID`: The unique game code returned from the `new-game` endpoint
-   (format: XXXX-XXXX).
+    (format: XXXX-XXXX).
 - **Response**:
   - **201**: returns a jwt token for the session.
   - **404**: unknow game code
@@ -29,7 +29,7 @@ within the game.
 
 ### 2. Create New Game
 
-- **URL**: `/api/pong-server/new-game`
+- **URL**: `/api/game/new-game`
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Response**:
@@ -46,7 +46,7 @@ that the requester still needs to join the game using the code returned.
 
 ### 3. WebSocket Connection
 
-- **URL**: `/api/pong-server/ws`
+- **URL**: `/api/game/ws`
 - **Method**: `GET`
 - **WebSocket**: Enabled.
 - **Authentication**: Requires JWT token obtained from the `join-game` endpoint.

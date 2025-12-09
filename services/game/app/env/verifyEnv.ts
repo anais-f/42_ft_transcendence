@@ -24,7 +24,7 @@ export function checkEnv(): IPongServerEnv {
 	}
 
 	const openapiSwagger = loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string)
-	const HOST = `${variables.HOST}/pong-server`
+	const HOST = `${variables.HOST}/game`
 	const PORT = parseInt(variables.PORT as string)
 	const JWT_SECRET_GAME = variables.JWT_SECRET_GAME as string
 	const JWT_SECRET = variables.JWT_SECRET as string

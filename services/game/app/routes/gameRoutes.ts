@@ -17,7 +17,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 
 	server.route({
 		method: 'POST',
-		url: '/api/pong-server/join-game/:gameID',
+		url: '/api/game/join-game/:gameID',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			params: gameCodeSchema,
@@ -30,7 +30,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 
 	server.route({
 		method: 'POST',
-		url: '/api/pong-server/new-game',
+		url: '/api/game/new-game',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
@@ -42,7 +42,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 
 	server.register(async (fastify) => {
 		fastify.get<IWsJwtTokenQuery>(
-			'/api/pong-server/ws',
+			'/api/game/ws',
 			{ websocket: true },
 			(socket: WebSocket, request: FastifyRequest<IWsJwtTokenQuery>) =>
 				handleGameWsConnection(socket, request, fastify)

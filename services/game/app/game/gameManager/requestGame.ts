@@ -1,7 +1,4 @@
-import {
-	games,
-	playerToGame,
-} from './gamesData.js'
+import { games, playerToGame } from './gamesData.js'
 
 /*
  * Function to generate a random game code in the format XXXX-XXXX
