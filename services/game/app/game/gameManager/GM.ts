@@ -1,6 +1,3 @@
-export * from './addPlayerToGame.js'
 export * from './requestGame.js'
 export * from './gamesData.js'
 export * from './leaveGame.js'
-export * from './activateGame.js'
-export * from './cancelPendingGame.js'

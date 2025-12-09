@@ -1,7 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { ERROR_MESSAGES } from '@ft_transcendence/common'
-import { requestGame } from '../game/gameManager/GM.js'
-import { withGameError } from '../utils/errors/withGameError.js'
 import createHttpError from 'http-errors'
 
 export async function createNewGameController(
@@ -14,12 +12,14 @@ export async function createNewGameController(
 		throw createHttpError.Unauthorized(ERROR_MESSAGES.UNAUTHORIZED)
 	}
 
+	/*
 	const gameId = withGameError(() => {
 		return requestGame({
 			code: null,
 			pID: user.user_id
 		})
 	})
+	*/
 
-	reply.code(201).send({ gameID: gameId })
+	reply.code(201).send({ gameID: /*gameId*/ 0 }) // TODO
 }
