@@ -96,11 +96,11 @@ Games can be created in two modes:
 │        ├─── Game ends normally ──────┐           │ - 0 connected: random   ││
 │        │                             │           │   loser                 ││
 │        ├─── Player disconnects ──┐   │           └────────────┬────────────┘│
-│        │                         │   │                        │             │
+│        │                         │   │                        ▼             │
 │        ▼                         ▼   ▼                        │             │
 │   ┌──────────────────────────────────────────┐                │             │
 │   │ Game saved to DB then deleted            │                │             │
-│   │ (disconnected player loses)              ├────────────────              │
+│   │ (disconnected player loses)              ├────────────────┘             │
 │   └──────────────────────────────────────────┘                              │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -191,11 +191,11 @@ wins by forfeit (if applicable).
 
 | Function      | Error                               | Cause                                                       |
 | ------------- | ----------------------------------- | ----------------------------------------------------------- |
-| `requestGame` | `'a player is already in a game'`   | already has an active game                                  |
+| `requestGame` | `'a player is already in a game'`   | a already has an active game                                  |
+| `requestGame` | `'player is already in a game'`     | `pID1` already has an active game                                  |
 | `joinGame`    | `'unknown game code'`               | Game code doesn't exist in `games` map                      |
 | `joinGame`    | `'a player is already in a game'`   | Player already has an active game (different from this one) |
 | `joinGame`    | `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id`   |
-| `joinGame`    | `'game not in waiting status'`      | Game is already `active`                                    |
 | `leaveGame`   | `'player not in game'`              | Player has no active game in `playerToGame`                 |
 | `leaveGame`   | `'game not found'`                  | Game code from mapping doesn't exist in `games`             |
 
