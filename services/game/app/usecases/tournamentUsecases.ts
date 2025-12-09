@@ -1,20 +1,19 @@
-import { tournaments } from '../index.js'
+import { tournaments, matchs } from '../index.js'
 
 function randomAlphaNumeric(length: number): string {
-	const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-	let s = ''
-	for (let i = 0; i < length; i++) {
-		s += chars.charAt(Math.floor(Math.random() * chars.length))
-	}
-	return s
+	let code: string
+	const uuid = crypto.randomUUID().replace(/-/g, '')
+	code = uuid.slice(0, length)
+	return code
 }
 
-export function createInviteCode(): string {
-	const str1: string = randomAlphaNumeric(4)
-	const str2: string = randomAlphaNumeric(4)
-	for (const tournament of tournaments.values())
-		if (tournament.name === str1 + '-' + str2) return createInviteCode()
-	return str1 + '-' + str2
+export function createInviteCode(type: string): string {
+	if (type !== 'T' && type !== 'G')
+		throw new Error('Invalid tournament type')
+	const str: string = randomAlphaNumeric(5)
+	if (type === 'T' && tournaments.get(type + '-' + str)) return createInviteCode(type)
+	else if (type === 'G' && matchs.get(type + '-' + str)) return createInviteCode(type)
+	return type + '-' + str
 }
 
 function shuffle(array: any[]) {
@@ -30,22 +29,25 @@ function shuffle(array: any[]) {
 	}
 }
 
-export function createTournamentTree(id: number) {
-	const tournament = tournaments.get(id)
+export function startTournament(tournamentName: string) {
+	const tournament = tournaments.get(tournamentName)
+	if (!tournament) {
+		throw new Error('Tournament not found')
+	}
+	tournament.status = 'ongoing'
+	createTournamentTree(tournamentName)
+}
+
+export function createTournamentTree(tournamentName: string) {
+	const tournament = tournaments.get(tournamentName)
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
 	console.log('Before shuffle:', tournament.participants)
 	shuffle(tournament.participants)
 	console.log('Shuffled participants:', tournament.participants)
-	if (!tournament) {
-		throw new Error('Tournament not found')
-	}
 	if (tournament.participants.length !== tournament.maxParticipants) {
 		throw new Error('Not enough participants to create the tournament tree')
-	}
-	if (tournament.status !== 'ongoing') {
-		throw new Error('Tournament is not ongoing')
 	}
 	let maxRound = Math.log2(tournament.maxParticipants)
 	for (let match = 0; match < tournament.maxParticipants / 2; match++) {
@@ -56,9 +58,9 @@ export function createTournamentTree(id: number) {
 		tournament.matchs.push({
 			round: maxRound,
 			matchNumber: match,
-			player1Id: tournament.participants[player1Index],
-			player2Id: tournament.participants[player2Index],
-			status: 'pending'
+			player1Id: player1,
+			player2Id: player2,
+			status: 'ongoing'
 		})
 	}
 	for (let round = maxRound - 1; round > 0; --round) {
@@ -83,4 +85,13 @@ export function createTournamentTree(id: number) {
 	}
 	console.log('Tournament Matches:', tournament.matchs)
 	console.log('Tournament tree created successfully')
+}
+
+export function deleteTournament(tournamentCode: string) {
+	const tournament = tournaments.get(tournamentCode)
+	if (!tournament) {
+		throw new Error('Tournament not found')
+	}
+
+	tournaments.delete(tournamentCode)
 }

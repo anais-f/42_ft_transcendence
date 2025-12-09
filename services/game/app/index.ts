@@ -11,13 +11,17 @@ import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
 import fs from 'fs'
 import { Tournament } from '@ft_transcendence/common'
-
 import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
 import { runMigrations } from './database/connection.js'
 import { registerRoutes } from './routes/registerRoutes.js'
 
-export const tournaments: Map<number, Tournament> = new Map()
+export const tournaments: Map<string, Tournament> = new Map()
+export const usersInTournament: Set<number> = new Set()
+
+export const matchs: Map<string, any> = new Map()
+export const usersInMatch: Map<number, string> = new Map()
+
 
 const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 const jwtSecret = process.env.JWT_SECRET
@@ -37,7 +41,7 @@ app.register(fastifyJwt, {
 })
 setupFastifyMonitoringHooks(app)
 async function runServer() {
-	console.log('Starting Matchmaking service...')
+	console.log('Starting Game service...')
 	runMigrations()
 	console.log('Database migrations completed')
 	const openapiFilePath = process.env.DTO_OPENAPI_FILE
@@ -49,11 +53,11 @@ async function runServer() {
 	await app.register(Swagger, {
 		openapi: {
 			info: {
-				title: 'API for Matchmaking Service',
+				title: 'API for Game Service',
 				version: '1.0.0'
 			},
 			servers: [
-				{ url: 'http:localhost:8080/matchmaking', description: 'Local server' }
+				{ url: 'http:localhost:8080/game', description: 'Local server' }
 			],
 			components: openapiSwagger.components
 		},
@@ -69,10 +73,10 @@ async function runServer() {
 	const host = '0.0.0.0'
 
 	await app.listen({ port, host })
-	console.log(` Matchmaking service running on ${host}:${port}`)
+	console.log(` Game service running on ${host}:${port}`)
 }
 
 runServer().catch((error) => {
-	console.error('Failed to start Matchmaking service:', error)
+	console.error('Failed to start Game service:', error)
 	process.exit(1)
 })

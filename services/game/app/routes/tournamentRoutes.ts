@@ -2,10 +2,7 @@ import { FastifyInstance } from 'fastify'
 import {
 	createTournamentController,
 	joinTournamentController,
-	removeFromTournamentController,
-	startTournamentController,
-	getTournamentController,
-	deleteTournamentController
+	getTournamentController
 } from '../controllers/tournamentControllers.js'
 import {
 	CreateTournamentSchema,
@@ -25,32 +22,14 @@ export function tournamentRoutes(app: FastifyInstance) {
 		createTournamentController
 	)
 	app.post(
-		'/api/joinTournament/:id',
+		'/api/joinTournament/:code',
 		{
 			preHandler: jwtAuthMiddleware
 		},
 		joinTournamentController
 	)
-	app.post(
-		'/api/removeFromTournament/:id',
-		{
-			schema: {
-				body: RemoveTournamentSchema
-			},
-			preHandler: jwtAuthMiddleware
-		},
-		removeFromTournamentController
-	)
 	app.get(
-		'/api/startTournament/:id' /*, { preHandler: jwtAuthMiddleware }*/,
-		startTournamentController
-	)
-	app.get(
-		'/api/tournament/:id' /*, { preHandler: jwtAuthMiddleware }*/,
+		'/api/tournament/:code' , { preHandler: jwtAuthMiddleware },
 		getTournamentController
-	)
-	app.delete(
-		'/api/tournament/:id' /*, { preHandler: jwtAuthOwnerMiddleware }*/,
-		deleteTournamentController
 	)
 }
