@@ -4,10 +4,8 @@ import {
 	CodeParamSchema
 } from '@ft_transcendence/common'
 import { tournaments, usersInTournament, usersInMatch } from '../index.js'
-import {
-	createTournamentTree,
-	createInviteCode
-} from '../usecases/tournamentUsecases.js'
+import {createInviteCode} from '../usecases/tournamentUsecases.js'
+import createHttpError from 'http-errors'
 
 let nextTournamentId = 1
 
@@ -17,15 +15,15 @@ export function getTournamentController(
 ) {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' })
+		throw createHttpError.Unauthorized()
 	}
 	const tournamentCode = CodeParamSchema.parse(request.params)
 	const tournament = tournaments.get(tournamentCode.code)
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' })
+		throw createHttpError.NotFound()
 	}
 	if (!tournament.participants.includes(userId)) {
-		return reply.status(403).send({ error: 'Access denied to this tournament' })
+		throw createHttpError.Forbidden()
 	}
 	return reply.send({ success: true, tournament })
 }
@@ -40,15 +38,13 @@ export function createTournamentController(
 		return reply.status(401).send({ error: 'Unauthorized' })
 	}
 	if (usersInTournament.has(userId)) {
-		return reply
-			.status(409)
-			.send({ error: 'User is already in another tournament' })
+		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (usersInMatch.has(userId)) {
-		return reply.status(409).send({ error: 'User is already in a match' })
+		throw createHttpError.Conflict('User is already in a match')
 	}
 	if (!parsed.success) {
-		return reply.status(400).send({ error: parsed.error })
+		throw createHttpError.BadRequest(parsed.error.message)
 	}
 	const invitCode = createInviteCode('T')
 	tournaments.set(invitCode, {
@@ -68,27 +64,23 @@ export function joinTournamentController(
 	const tournamentCode = CodeParamSchema.parse(request.params)
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		return reply.status(401).send({ error: 'Unauthorized' })
+		throw createHttpError.Unauthorized()
 	}
 	if (usersInTournament.has(userId)) {
-		return reply
-			.status(409)
-			.send({ error: 'User is already in another tournament' })
+			throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (usersInMatch.has(userId)) {
-		return reply.status(409).send({ error: 'User is already in a match' })
+		throw createHttpError.Conflict('User is already in a match')
 	}
 	const tournament = tournaments.get(tournamentCode.code)
 	if (!tournament) {
-		return reply.status(404).send({ error: 'Tournament not found' })
+		throw createHttpError.NotFound()
 	}
 	if (tournament.participants.length >= tournament.maxParticipants) {
-		return reply.status(409).send({ error: 'Tournament is full' })
+		throw createHttpError.Conflict('Tournament is full')
 	}
 	if (tournament.participants.includes(userId)) {
-		return reply
-			.status(409)
-			.send({ error: 'User already joined the tournament' })
+		throw createHttpError.Conflict('User already joined the tournament')
 	}
 	tournament.participants.push(userId)
 	return reply.send({ success: true, tournament })
