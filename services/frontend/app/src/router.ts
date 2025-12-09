@@ -1,15 +1,15 @@
-import { HomePage, bindLogOutButton } from "./pages/home.js"
+import { HomePage, bindLogOutButton, unbindLogOutButton } from "./pages/home.js"
 import { GamePage } from "./pages/game.js"
 import { LobbyPage } from "./pages/lobby.js"
-import { bindRegisterForm, LoginPage } from "./pages/login.js"
+import { bindRegisterForm, unbindRegisterForm, LoginPage } from "./pages/login.js"
 import { ProfilePage } from "./pages/profile.js"
 import { SettingsPage } from "./pages/settings.js"
 import { checkAuth } from "./auth/authService.js"
-import { currentUser, setCurrentUser } from "./store/userStore.js"
+import { setCurrentUser } from "./store/userStore.js"
 
 declare global {
 	interface Window {
-		navigate: (url: string) => void
+		navigate: (url: string, skipAuth?: boolean) => void
 	}
 }
 
@@ -19,16 +19,18 @@ type Route = {
 	id: string,
 	url: string,
 	page: () => string
-	binds?: Array<() => void>
+	binds?: Array<() => void> // attache les listeners et call les fonctions necessaires
+  unbinds?: Array<() => void> //cleanup les listeners si besoin
 	protected?: boolean
 }
 
-const router: Record<Pages,Route> = {
+const router: Record<Pages, Route> = {
 	home: {
 		id: 'home',
 		url: '/',
 		page: HomePage,
 		binds: [bindLogOutButton],
+    unbinds: [unbindLogOutButton],
 		protected: true
 	},
 
@@ -50,7 +52,8 @@ const router: Record<Pages,Route> = {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [bindRegisterForm]
+		binds: [bindRegisterForm],
+		unbinds: [unbindRegisterForm]
 	},
 
 	profile: {
@@ -66,7 +69,7 @@ const router: Record<Pages,Route> = {
 		page: SettingsPage,
 		protected: true
 	}
-};
+}
 
 // Date of the day display
 const dateDiv = document.getElementById('date')
@@ -79,90 +82,117 @@ if (dateDiv) {
 	})
 }
 
-function overloadPushState() {
-  const pushState = history.pushState;
-  history.pushState = function(state, title, url) {
-    const result = pushState.apply(this, arguments);
-    window.dispatchEvent(new Event("popstate"));
-    return result;
-  };
-};
-
-console.log(history.pushState)
-overloadPushState();
-console.log(history.pushState)
+// ============================================
+// STATE
+// ============================================
+let isNavigating = false
+let currentRoute: Route | null = null
 
 function getRoute(url: string): Route {
 	const routes = Object.values(router)
-	const route = routes.find((route) => {
-		return route.url === url
-	})
+	const route = routes.find((route) => route.url === url)
 	return route || router.home
 }
 
 function render(route: Route) {
 	const contentDiv = document.getElementById('content')
-	if (!contentDiv)
-		return
+	if (!contentDiv) return
 
+	// Cleanup previous page bindings
+	if (currentRoute?.unbinds) {
+		currentRoute.unbinds.forEach(unbind => unbind())
+	}
+
+	// Render new page
 	contentDiv.innerHTML = route.page()
-	console.log('render')
+	currentRoute = route
+
+	// Setup new page bindings
+	if (route.binds) {
+		route.binds.forEach(bind => bind())
+	}
+
+	console.log('Rendered:', route.id)
 }
 
-async function handleNav() {
+// ============================================
+// NAVIGATION
+// ============================================
+async function handleNav(skipAuth = false) {
+	// Guard: prevent concurrent navigations
+	if (isNavigating) {
+		console.log('Navigation already in progress, skipping')
+		return
+	}
+
+	isNavigating = true
 	const url = window.location.pathname
 	const route = getRoute(url)
 
-	// ALWAYS check authentication status first (not just for protected routes)
-	const user = await checkAuth()
-	setCurrentUser(user)
+	try {
+		// Check authentication (skip after logout to avoid 401)
+		let user = null
+		if (!skipAuth) {
+			user = await checkAuth()
+			setCurrentUser(user)
+		} else {
+			console.log('Skipping auth check (logout flow)')
+		}
 
-	// If authenticated and trying to access login page → redirect home
-	if (url === '/login' && user) {
-		console.log('Already authenticated, redirecting to /')
-		navigate('/')
-		return
-	}
+		// Redirect authenticated users away from login page
+		if (url === '/login' && user) {
+			console.log('Already authenticated, redirecting to /')
+			isNavigating = false
+			navigate('/')
+			return
+		}
 
-	// If route is protected and user is NOT authenticated → redirect login
-	if (route.protected && !user) {
-		console.log('Not authenticated, redirecting to /login')
-		navigate('/login')
-		return
-	}
+		// Redirect unauthenticated users to login for protected routes
+		if (route.protected && !user) {
+			console.log('Not authenticated, redirecting to /login')
+			isNavigating = false
+			navigate('/login', true)
+			return
+		}
 
-	if (user) {
-		console.log('Authenticated as:', user.username)
-	}
+		if (user) {
+			console.log('Authenticated as:', user.username)
+		}
 
-	render(route)
-	if (route.binds) {
-		route.binds.forEach(bind => {
-			bind()
-		})
+		render(route)
+
+	} catch (error) {
+		console.error('Navigation error:', error)
+	} finally {
+		isNavigating = false
 	}
 }
 
-function navigate(url: string) {
+function navigate(url: string, skipAuth = false) {
+	// Guard: avoid navigating to the same URL
+	if (window.location.pathname === url) {
+		console.log('Already at', url)
+		return
+	}
+
 	history.pushState(null, '', url)
+	handleNav(skipAuth)
 }
-
 
 window.navigate = navigate
 
-window.addEventListener('popstate', async (e) => {
-	console.log('popstate')
-	console.log(e)
-	await handleNav()
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+// Browser back/forward buttons
+window.addEventListener('popstate', () => {
+	console.log('Browser back/forward')
+	handleNav()
 })
 
-window.addEventListener('DOMContentLoaded', async () => {
-	console.log('DOM OK !')
-	await handleNav()
+// Initial page load
+window.addEventListener('DOMContentLoaded', () => {
+	console.log('DOM loaded')
+	handleNav()
 })
-
-// const formLobbyDiv = document.getElementById('join_lobby_form')
-// if (!formLobbyDiv)
-// 	return
-// const formLob = formLobbyDiv as HTMLFormElement
-// formLob.get

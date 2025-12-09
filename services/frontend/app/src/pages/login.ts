@@ -62,45 +62,44 @@ export const LoginPage = (): string => {
 `
 }
 
+// Store form handlers to be able to remove them later
 let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 
 export function bindRegisterForm() {
-	console.log('Bind called')
 	const formReg = document.getElementById('register_form')
-	if (!formReg)
-		return console.log('Error no form found')
-	console.log('founded')
-
-	// Remove old listener if it exists
-	if (registerFormListener) {
-		formReg.removeEventListener('submit', registerFormListener)
+	if (!formReg) {
+		console.log('Error: register form not found')
+		return
 	}
 
-	// Create new listener function
+	// Create listener function
 	registerFormListener = async (e: SubmitEvent) => {
 		e.preventDefault()
-		console.log(e)
-		console.log(e.target)
-		if (!e.target)
-			return
+
 		const formData = new FormData(formReg as HTMLFormElement)
 		console.log(formData)
 		console.log(formData.get('register_password'))
 		const pw = formData.get('register_password')
 		const us = formData.get('register_username')
-		if (!pw)
+
+		if (!pw) return
+
+		if (pw !== formData.get('register_conf_password')) {
+			console.log("Passwords don't match")
 			return
-		if (pw != formData.get('register_conf_password'))
-			return console.log("passwords don't match")
-		const pwS = pw.toString()
-		if (pwS.length < 8)
-			return (console.log('pw too short'))
+		}
+
+		if (pw.toString().length < 8) {
+			console.log('Password too short')
+			return
+		}
+
 		const user = {
 			login: us,
 			password: pw
 		}
-		try {
 
+		try {
 			const res = await fetch('/auth/api/register', {
 				method: 'POST',
 				headers: {
@@ -108,19 +107,30 @@ export function bindRegisterForm() {
 				},
 				body: JSON.stringify(user)
 			})
+
 			if (!res.ok) {
 				const error = await res.json()
 				console.error('Register failed:', res.status, error)
 				return
 			}
-			window.navigate('/')
-		}
-		catch (e) {
-			console.log(e)
-		}
 
+			window.navigate('/')
+		} catch (e) {
+			console.error('Register error:', e)
+		}
 	}
 
 	// Add the new listener
 	formReg.addEventListener('submit', registerFormListener)
+	console.log('Register form bound')
+}
+
+export function unbindRegisterForm() {
+	const formReg = document.getElementById('register_form')
+	if (!formReg || !registerFormListener) return
+
+	// Remove listener
+	formReg.removeEventListener('submit', registerFormListener)
+	registerFormListener = null
+	console.log('Register form unbound')
 }

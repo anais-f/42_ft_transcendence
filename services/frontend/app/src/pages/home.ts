@@ -108,17 +108,33 @@ export const HomePage = (): string => {
 `
 }
 
-export function bindLogOutButton() {
-  const logoutBtn = document.getElementById('logout_btn')
-  if (!logoutBtn)
-    return
+// Store logout handler to be able to remove it later
+let logoutHandler: (() => Promise<void>) | null = null
 
-  logoutBtn.addEventListener('click', async () => {
-    await logout()
-    // Ne pas appeler setCurrentUser(null) ici
-    // handleNav() va appeler checkAuth() et setCurrentUser correctement
-    window.navigate('/login')
-  })
+export function bindLogOutButton() {
+	const logoutBtn = document.getElementById('logout_btn')
+	if (!logoutBtn) return
+
+	// Create handler
+	logoutHandler = async () => {
+		await logout()
+		setCurrentUser(null)
+		window.navigate('/login', true)  // skipAuth = true to avoid 401
+	}
+
+	// Attach listener
+	logoutBtn.addEventListener('click', logoutHandler)
+	console.log('Logout button bound')
+}
+
+export function unbindLogOutButton() {
+	const logoutBtn = document.getElementById('logout_btn')
+	if (!logoutBtn || !logoutHandler) return
+
+	// Remove listener
+	logoutBtn.removeEventListener('click', logoutHandler)
+	logoutHandler = null
+	console.log('Logout button unbound')
 }
 
 const fr1 = {
