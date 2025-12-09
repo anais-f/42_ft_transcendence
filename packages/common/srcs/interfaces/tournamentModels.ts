@@ -1,11 +1,8 @@
 export type Tournament = {
 	id: number
-	creatorId: number
-	name: string
-	status: 'pending' | 'ongoing' | 'finished'
+	status: 'pending' | 'ongoing'
 	maxParticipants: number
 	participants: number[]
-	participantsBan: number[]
 	matchs: MatchTournament[]
 }
 
@@ -16,7 +13,7 @@ type MatchTournament = {
 	matchNumber: number
 	player1Id?: number
 	player2Id?: number
-	status: 'pending' | 'ongoing' | 'completed' | 'waiting_for_players'
+	status: 'ongoing' | 'completed' | 'waiting_for_players'
 	scorePlayer1?: number
 	scorePlayer2?: number
 }

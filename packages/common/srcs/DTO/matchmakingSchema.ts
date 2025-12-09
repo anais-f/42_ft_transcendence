@@ -5,8 +5,7 @@ export const CreateTournamentSchema = z
 		numberOfPlayers: number().refine((val) => [2, 4, 8, 16].includes(val), {
 			message:
 				'numberOfPlayers must be one of the following values: 2, 4, 8, 16'
-		}),
-		creatorId: number().positive()
+		})
 	})
 	.strict()
 
