@@ -75,7 +75,7 @@ jobs:
           # JWT
           JWT_SECRET=change-me
           JWT_SECRET_SOCIAL=change-me
-          JWT_SECRET_GAMES=change-me
+          JWT_SECRET_GAME=change-me
           WS_TOKEN_EXPIRES_SECONDS=30
 
           DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
