@@ -64,7 +64,7 @@ export const ProfilePage = (): string => /*html*/ `
 `
 
 const user = {
-	avatar: '/assets/images/avatar.png',
+	avatar: '/assets/images/img_default.png',
 	username: 'Mammoth',
 	status: 'Online',
 	last_seen: '05/12/2025 12:32am'

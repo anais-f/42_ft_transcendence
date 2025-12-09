@@ -1,9 +1,17 @@
-import { HomePage } from "./pages/home.js"
+import { HomePage, bindLogOutButton } from "./pages/home.js"
 import { GamePage } from "./pages/game.js"
 import { LobbyPage } from "./pages/lobby.js"
 import { bindRegisterForm, LoginPage } from "./pages/login.js"
 import { ProfilePage } from "./pages/profile.js"
 import { SettingsPage } from "./pages/settings.js"
+import { checkAuth } from "./auth/authService.js"
+import { currentUser, setCurrentUser } from "./store/userStore.js"
+
+declare global {
+	interface Window {
+		navigate: (url: string) => void
+	}
+}
 
 type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
 
@@ -12,25 +20,30 @@ type Route = {
 	url: string,
 	page: () => string
 	binds?: Array<() => void>
+	protected?: boolean
 }
 
 const router: Record<Pages,Route> = {
 	home: {
 		id: 'home',
 		url: '/',
-		page: HomePage
+		page: HomePage,
+		binds: [bindLogOutButton],
+		protected: true
 	},
-	
+
 	game: {
 		id: 'game',
 		url: '/game',
-		page: GamePage
+		page: GamePage,
+		protected: true
 	},
 
 	lobby: {
 		id: 'lobby',
 		url: '/lobby',
-		page: LobbyPage
+		page: LobbyPage,
+		protected: true
 	},
 
 	login: {
@@ -38,19 +51,20 @@ const router: Record<Pages,Route> = {
 		url: '/login',
 		page: LoginPage,
 		binds: [bindRegisterForm]
-
 	},
 
 	profile: {
 		id: 'profile',
 		url: '/profile',
-		page: ProfilePage
+		page: ProfilePage,
+		protected: true
 	},
 
 	settings: {
 		id: 'settings',
 		url: '/settings',
-		page: SettingsPage
+		page: SettingsPage,
+		protected: true
 	}
 };
 
@@ -95,15 +109,38 @@ function render(route: Route) {
 	console.log('render')
 }
 
-function handleNav() {
+async function handleNav() {
 	const url = window.location.pathname
 	const route = getRoute(url)
+
+	// ALWAYS check authentication status first (not just for protected routes)
+	const user = await checkAuth()
+	setCurrentUser(user)
+
+	// If authenticated and trying to access login page → redirect home
+	if (url === '/login' && user) {
+		console.log('Already authenticated, redirecting to /')
+		navigate('/')
+		return
+	}
+
+	// If route is protected and user is NOT authenticated → redirect login
+	if (route.protected && !user) {
+		console.log('Not authenticated, redirecting to /login')
+		navigate('/login')
+		return
+	}
+
+	if (user) {
+		console.log('Authenticated as:', user.username)
+	}
+
 	render(route)
-	if (route.binds)
+	if (route.binds) {
 		route.binds.forEach(bind => {
 			bind()
-		});
-
+		})
+	}
 }
 
 function navigate(url: string) {
@@ -111,19 +148,17 @@ function navigate(url: string) {
 }
 
 
-
 window.navigate = navigate
 
-window.addEventListener('popstate', (e) => {
+window.addEventListener('popstate', async (e) => {
 	console.log('popstate')
 	console.log(e)
-	handleNav()
+	await handleNav()
 })
 
-window.addEventListener('DOMContentLoaded', () => {
-
+window.addEventListener('DOMContentLoaded', async () => {
 	console.log('DOM OK !')
-	handleNav()
+	await handleNav()
 })
 
 // const formLobbyDiv = document.getElementById('join_lobby_form')
@@ -131,4 +166,3 @@ window.addEventListener('DOMContentLoaded', () => {
 // 	return
 // const formLob = formLobbyDiv as HTMLFormElement
 // formLob.get
-

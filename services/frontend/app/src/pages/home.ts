@@ -1,15 +1,24 @@
-export const HomePage = (): string => /*html*/ `
+import { currentUser, setCurrentUser } from "../store/userStore.js"
+import { logout } from "../auth/authService.js"
+
+export const HomePage = (): string => {
+	const user = currentUser || {
+		username: 'Guest',
+		avatar: '/avatars/img_default.png'
+	}
+
+	return /*html*/ `
 <div class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<h1 class="text-2xl py-4">PROFILE</h1>
-		<img src=${user.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black saturate-[75%] contrast-[100%]">
+		<img src="${user.avatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="w-full object-cover border-2 border-black saturate-[75%] contrast-[100%]">
 		<h1 class="text-2xl py-6">${user.username}</h1>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<button id="settings_btn" type="button" class="generic_btn my-2" onclick="navigate('/settings')">Settings</button>
-		<button id="logout_btn" type="button" class="generic_btn" onclick="navigate('/login')">Logout</button>
+		<button id="logout_btn" type="button" class="generic_btn">Logout</button>
 	</div>
 	<div class="col-span-1">
 		<div class="news_paragraph pt-4">
@@ -97,10 +106,19 @@ export const HomePage = (): string => /*html*/ `
 	</div>
 </div>
 `
+}
 
-const user = {
-	username: 'Acancel',
-	avatar: '/assets/images/acancel.jpg'
+export function bindLogOutButton() {
+  const logoutBtn = document.getElementById('logout_btn')
+  if (!logoutBtn)
+    return
+
+  logoutBtn.addEventListener('click', async () => {
+    await logout()
+    // Ne pas appeler setCurrentUser(null) ici
+    // handleNav() va appeler checkAuth() et setCurrentUser correctement
+    window.navigate('/login')
+  })
 }
 
 const fr1 = {
@@ -126,7 +144,7 @@ const fr3 = {
 
 const fr4 = {
 	username: 'Jdoe',
-	avatar: '/assets/images/avatar.png',
+	avatar: '/assets/images/img_default.png',
 	alt: 'John_avatar',
 	status: 'Offline'
 }

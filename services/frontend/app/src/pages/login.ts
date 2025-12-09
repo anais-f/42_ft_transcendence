@@ -62,13 +62,22 @@ export const LoginPage = (): string => {
 `
 }
 
+let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
+
 export function bindRegisterForm() {
 	console.log('Bind called')
 	const formReg = document.getElementById('register_form')
 	if (!formReg)
 		return console.log('Error no form found')
 	console.log('founded')
-	formReg.addEventListener('submit', async (e) => {
+
+	// Remove old listener if it exists
+	if (registerFormListener) {
+		formReg.removeEventListener('submit', registerFormListener)
+	}
+
+	// Create new listener function
+	registerFormListener = async (e: SubmitEvent) => {
 		e.preventDefault()
 		console.log(e)
 		console.log(e.target)
@@ -99,13 +108,19 @@ export function bindRegisterForm() {
 				},
 				body: JSON.stringify(user)
 			})
-			if (!res.ok)
-				console.error(res.status)
+			if (!res.ok) {
+				const error = await res.json()
+				console.error('Register failed:', res.status, error)
+				return
+			}
 			window.navigate('/')
 		}
 		catch (e) {
 			console.log(e)
 		}
 
-	})
-} 
+	}
+
+	// Add the new listener
+	formReg.addEventListener('submit', registerFormListener)
+}
