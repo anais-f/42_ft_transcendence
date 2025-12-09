@@ -15,11 +15,11 @@
 		"@ft_transcendence/common": "*",
 		"@ft_transcendence/monitoring": "*",
 		"@ft_transcendence/security": "*",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"file-type": "^21.0.0"
 	},
 	"devDependencies": {
 		"@types/node": "^24.9.1",
-		"file-type": "^21.0.0",
 		"better-sqlite3": "^12.4.6"
 	}
 }
