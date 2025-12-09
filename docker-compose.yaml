@@ -44,14 +44,14 @@ services:
       retries: 12
       start_period: 15s
 
-  pong-server:
+  game:
     restart: on-failure
-    container_name: pong-server
+    container_name: game
     env_file:
       - .env
     build:
       context: .
-      dockerfile: services/pong-server/Dockerfile
+      dockerfile: services/game/Dockerfile
     depends_on:
       frontend:
         condition: service_healthy
@@ -150,7 +150,7 @@ services:
       context: .
       dockerfile: ./services/matchmaking/Dockerfile
     depends_on:
-      # pong-server:
+      # game:
       #   condition: service_healthy
       users:
         condition: service_healthy

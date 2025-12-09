@@ -1,5 +1,5 @@
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
-import fastifyWebsocket from '@fastify/websocket' // this import isnt useless
+import '@fastify/websocket'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
@@ -36,7 +36,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				200: createTokenSchema,
+				201: createTokenSchema,
 				401: ErrorResponseSchema
 			}
 		},

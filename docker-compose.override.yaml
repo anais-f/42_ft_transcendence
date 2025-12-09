@@ -66,10 +66,10 @@ services:
       install-dependencies:
         condition: service_completed_successfully
 
-  pong-server:
+  game:
     build:
       context: .
-      dockerfile: services/pong-server/Dockerfile.dev
+      dockerfile: services/game/Dockerfile.dev
     volumes:
       - ./:/app
     environment:
