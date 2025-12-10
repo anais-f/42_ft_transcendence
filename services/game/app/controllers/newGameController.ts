@@ -1,5 +1,4 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { ERROR_MESSAGES } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 
 export async function createNewGameController(
@@ -9,7 +8,7 @@ export async function createNewGameController(
 	const user = request.user as { user_id: number; login: string }
 
 	if (!user) {
-		throw createHttpError.Unauthorized(ERROR_MESSAGES.UNAUTHORIZED)
+		throw createHttpError.Unauthorized()
 	}
 
 	/*
