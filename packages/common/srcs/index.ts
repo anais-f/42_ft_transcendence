@@ -13,8 +13,9 @@ export * from './error/errorHandler.js'
 export * from './error/createWsError.js'
 
 export * from './interfaces/jwtModels.js'
+export * from './interfaces/tournamentModels.js'
 export * from './interfaces/websocketModels.js'
 export * from './interfaces/usersModels.js'
 export * from './interfaces/jwtModels.js'
-
 export * from './utils/secrets.js'
+export * from './interfaces/tournamentModels.js'

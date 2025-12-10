@@ -1,4 +1,4 @@
-import { GameData, games, playerToGame } from './gamesData'
+import { GameData, games, playerToGame } from './gamesData.js'
 
 export function leaveGame(pID: number) {
 	const gameCode = playerToGame.get(pID)

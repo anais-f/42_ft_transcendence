@@ -1,4 +1,4 @@
-import { IGameData } from '../../utils/createGame'
+import { IGameData } from '../../utils/createGame.js'
 
 export type GameStatus = 'waiting' | 'active'
 export type TPlayerSlot = 'p1' | 'p2'

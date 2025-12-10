@@ -10,7 +10,9 @@ export async function createNewGameController(
 	const user = request.user as { user_id: number; login: string }
 
 	// NOTE: idk if it's needed
-	if (!user) throw createHttpError.Unauthorized()
+	if (!user) {
+		throw createHttpError.Unauthorized()
+	}
 
 	const gameCode = withGameError(() => requestGame(user.user_id, undefined))
 	reply.code(201).send({ gameCode: gameCode })

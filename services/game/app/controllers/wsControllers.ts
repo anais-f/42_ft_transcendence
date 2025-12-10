@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import { FastifyRequest, FastifyInstance } from 'fastify'
 import { createWsError, IWsJwtTokenQuery } from '@ft_transcendence/common'
-import { games, playerToGame, TPlayerSlot } from '../game/gameManager/gamesData'
+import { games, playerToGame, TPlayerSlot } from '../game/gameManager/gamesData.js'
 import { handleWsConnection } from '@ft_transcendence/security'
 
 export async function handleGameWsConnection(
