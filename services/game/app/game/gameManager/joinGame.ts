@@ -1,4 +1,4 @@
-import { games, playerToGame } from './gamesData.js'
+import { games } from './gamesData.js'
 
 export function joinGame(gameCode: string, pID: number) {
 	const gameData = games.get(gameCode)
@@ -6,9 +6,10 @@ export function joinGame(gameCode: string, pID: number) {
 		throw new Error('unknow game code')
 	}
 
-	if (playerToGame.has(pID)) {
-		throw new Error('player is already in a game')
-	}
+	// TODO: test connstate instead of playerToGame
+	//	if (playerToGame.has(pID)) {
+	//		throw new Error('player is already in a game')
+	//	}
 
 	if (gameData.p1 && gameData.p1.id == pID) {
 		return

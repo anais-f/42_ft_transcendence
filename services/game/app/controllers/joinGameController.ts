@@ -1,19 +1,21 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
+import { joinGame } from '../game/gameManager/joinGame.js'
+import { withGameError } from '../utils/errors/withGameError.js'
 import { createWsToken } from '@ft_transcendence/security'
-import createError from 'http-errors'
+import createHttpError from 'http-errors'
 
-// TODO: error handling
-// TODO: auto loose game if no conn the ws after token expire
 export async function joinGameController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
 	const user = request.user as { user_id: number; login: string }
-	//const param = request.params as { gameID: string }
+	const param = request.params as { gameCode: string }
 
-	if (!user) throw createError(401, 'Unauthorized')
+	// NOTE: idk if it's needed
+	if (!user) throw createHttpError.BadRequest()
 
-	//withGameError(() => addPlayerToGame(param.gameID, user.user_id))
+	withGameError(() => joinGame(param.gameCode, user.user_id))
+	const tokenObj = createWsToken(request.server, user)
 
-	reply.code(201).send(createWsToken(request.server, user))
+	reply.code(201).send(tokenObj)
 }
