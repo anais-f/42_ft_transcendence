@@ -4,6 +4,7 @@ import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import { createWsApp } from '@ft_transcendence/security'
 import { gameRoutes } from './routes/gameRoutes.js'
 import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 async function start(): Promise<void> {
 	const env: IPongServerEnv = checkEnv() // throw on error
@@ -30,6 +31,7 @@ async function start(): Promise<void> {
 			service: env.JWT_SECRET_GAME
 		}
 	)
+	setupFastifyMonitoringHooks(app)
 
 	try {
 		await app.ready()
