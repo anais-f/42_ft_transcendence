@@ -1,8 +1,6 @@
 import { SocialRepository } from '../repositories/socialRepository.js'
 import {
 	IUserId,
-	AppError,
-	ERROR_MESSAGES,
 	IPrivateUser,
 	PendingFriendsListDTO,
 	RelationStatus
@@ -14,6 +12,7 @@ import {
 	friendRejectedNotification,
 	friendRemovedNotification
 } from './notificationService.js'
+import createHttpError from 'http-errors'
 
 /**
  * Send a notification using the provided notify function
@@ -83,25 +82,24 @@ export class FriendService {
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_ADD_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot add yourself as a friend')
 
 		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted)
-			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const existingRelation = SocialRepository.getRelationStatus(
 			userId,
 			friendId
 		)
 		if (existingRelation === RelationStatus.FRIENDS)
-			throw new AppError(ERROR_MESSAGES.RELATION_ALREADY_EXISTS, 400)
+			throw createHttpError.BadRequest('Relation already exists')
 
 		if (existingRelation === RelationStatus.PENDING) {
 			const originId = SocialRepository.getOriginId(userId, friendId)
 			if (originId === userId.user_id)
-				throw new AppError(ERROR_MESSAGES.REQUEST_ALREADY_SENT, 400)
+				throw createHttpError.BadRequest('Friend request already sent')
 			else {
-				await SocialRepository.updateRelationStatus(
+				SocialRepository.updateRelationStatus(
 					userId,
 					friendId,
 					RelationStatus.FRIENDS
@@ -131,21 +129,20 @@ export class FriendService {
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot accept yourself as a friend')
 
 		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted)
-			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status === -1)
-			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
+			throw createHttpError.NotFound('No pending friend request')
 		if (status === RelationStatus.FRIENDS)
-			throw new AppError(ERROR_MESSAGES.RELATION_ALREADY_EXISTS, 400)
+			throw createHttpError.BadRequest('Relation already exists')
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId === userId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_ACCEPT_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot accept yourself as a friend')
 
 		SocialRepository.updateRelationStatus(userId, friendId, 1)
 		await sendNotification(userId, friendId, friendAcceptedNotification)
@@ -162,19 +159,18 @@ export class FriendService {
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot reject yourself as a friend')
 
 		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted)
-			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== RelationStatus.PENDING)
-			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
+			throw createHttpError.NotFound('No pending friend request')
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId === userId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_REJECT_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot reject yourself as a friend')
 
 		SocialRepository.deleteRelation(userId, friendId)
 		await sendNotification(userId, friendId, friendRejectedNotification)
@@ -191,19 +187,18 @@ export class FriendService {
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_CANCEL_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot cancel yourself as a friend')
 
 		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted)
-			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== RelationStatus.PENDING)
-			throw new AppError(ERROR_MESSAGES.NO_PENDING_REQUEST, 404)
+			throw createHttpError.NotFound('No pending friend request')
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId !== userId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_CANCEL_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot cancel yourself as a friend')
 
 		SocialRepository.deleteRelation(userId, friendId)
 	}
@@ -216,15 +211,14 @@ export class FriendService {
 	 */
 	static async removeFriend(userId: IUserId, friendId: IUserId): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw new AppError(ERROR_MESSAGES.CANNOT_DELETE_YOURSELF, 400)
+			throw createHttpError.BadRequest('Cannot remove yourself as a friend')
 
 		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted)
-			throw new AppError(ERROR_MESSAGES.INVALID_FRIEND_ID, 404)
+		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== RelationStatus.FRIENDS)
-			throw new AppError(ERROR_MESSAGES.NOT_FRIENDS, 400)
+			throw createHttpError.BadRequest('You are not friends')
 
 		SocialRepository.deleteRelation(userId, friendId)
 		await sendNotification(userId, friendId, friendRemovedNotification)
@@ -237,7 +231,7 @@ export class FriendService {
 	 */
 	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
 		const userExisted = await UsersApi.userExists(userId)
-		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
 
 		const friendIds = SocialRepository.getFriendsList(userId)
 		return await Promise.all(
@@ -254,7 +248,7 @@ export class FriendService {
 		userId: IUserId
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {
 		const userExisted = await UsersApi.userExists(userId)
-		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
 
 		const pendingIds = SocialRepository.getPendingListToApprove(userId)
 		const pendingFriends = await Promise.all(
@@ -284,7 +278,7 @@ export class FriendService {
 		userId: IUserId
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {
 		const userExisted = await UsersApi.userExists(userId)
-		if (!userExisted) throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 404)
+		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
 
 		const pendingIds = SocialRepository.getPendingSentRequests(userId)
 		const pendingSentRequests = await Promise.all(

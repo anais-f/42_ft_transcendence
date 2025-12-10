@@ -9,6 +9,7 @@ import {
 	serializerCompiler
 } from 'fastify-type-provider-zod'
 import fastifyJwt from '@fastify/jwt'
+import { setupErrorHandler } from '@ft_transcendence/common'
 
 interface JwtSecrets {
 	main: string
@@ -29,6 +30,9 @@ export function createWsApp(
 		.setValidatorCompiler(validatorCompiler)
 		.setSerializerCompiler(serializerCompiler)
 
+	setupErrorHandler(app)
+
+	app
 		.register(fastifyCookie)
 
 		.register(fastifyJwt, {
