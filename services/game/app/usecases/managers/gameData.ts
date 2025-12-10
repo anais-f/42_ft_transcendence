@@ -23,5 +23,5 @@ export const playerToGame = new Map<number, string>()
 
 // tournament
 // TODO: usersToTournaments
-export const tournaments: Map<string, Tournament> = new Map()
-export const usersInTournaments: Set<number> = new Set()
+export const tournaments = new Map<string, Tournament>()
+export const usersInTournaments = new Set<number>()

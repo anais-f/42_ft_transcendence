@@ -9,7 +9,7 @@ import {
 	games,
 	playerToGame,
 	tournaments,
-	usersInTournaments
+	usersToTournaments
 } from './managers/gameData.js'
 
 function randomAlphaNumeric(length: number): string {
@@ -119,7 +119,7 @@ export function joinTournament(request: FastifyRequest): Tournament {
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
 	}
-	if (usersInTournaments.has(userId)) {
+	if (usersToTournaments.has(userId)) {
 		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (playerToGame.has(userId)) {
@@ -149,7 +149,7 @@ export function createTournament(
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
 	}
-	if (usersInTournaments.has(userId)) {
+	if (usersToTournaments.has(userId)) {
 		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (playerToGame.has(userId)) {
