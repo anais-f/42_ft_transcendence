@@ -12,7 +12,10 @@ import { FastifyRequest } from 'fastify'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
-	const uuid = crypto.randomUUID().replace(/[\-0o]/g, '').toUpperCase()
+	const uuid = crypto
+		.randomUUID()
+		.replace(/[\-0o]/g, '')
+		.toUpperCase()
 	code = uuid.slice(0, length)
 	return code
 }
