@@ -55,6 +55,8 @@ services:
     depends_on:
       frontend:
         condition: service_healthy
+    volumes:
+      - db_game_data:/data
     healthcheck:
       test:
         - CMD-SHELL
