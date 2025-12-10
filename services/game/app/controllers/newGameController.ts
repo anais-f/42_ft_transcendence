@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import createHttpError from 'http-errors'
-import { requestGame } from '../game/gameManager/requestGame.js'
-import { withGameError } from '../utils/errors/withGameError.js'
+import { requestGame } from '../usecases/managers/gameManager/requestGame.js';
+import { withGameError } from '../usecases/managers/gameManager/errors/withGameError.js';
 
 export async function createNewGameController(
 	request: FastifyRequest,
@@ -15,5 +15,6 @@ export async function createNewGameController(
 	}
 
 	const gameCode = withGameError(() => requestGame(user.user_id, undefined))
-	reply.code(201).send({ gameCode: gameCode })
+	console.log(gameCode)
+	reply.code(201).send({ code: gameCode })
 }

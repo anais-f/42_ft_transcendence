@@ -1,17 +1,6 @@
-import { games, playerToGame } from './gamesData.js'
-import { startTimeOut } from './startTimeOut.js'
-
-/*
- * Function to generate a random game code in the format XXXX-XXXX
- */
-function generateCode(): string {
-	let code: string
-	do {
-		const uuid = crypto.randomUUID().replace(/-/g, '').toUpperCase()
-		code = `${uuid.slice(0, 4)}-${uuid.slice(4, 8)}`
-	} while (games.has(code))
-	return code
-}
+import { createInviteCode } from "../../tournamentUsecases.js"
+import { games, playerToGame } from "../gameData.js"
+import { startTimeOut } from "./startTimeOut.js"
 
 /*
  * Creates a new game and returns the game code.
@@ -31,7 +20,7 @@ export function requestGame(
 		throw new Error('a player is already in a game')
 	}
 
-	const newCode = generateCode()
+	const newCode = createInviteCode('G')
 	games.set(newCode, {
 		p1: { id: pID1, connState: false },
 		p2: pID2 ? { id: pID2, connState: false } : undefined,

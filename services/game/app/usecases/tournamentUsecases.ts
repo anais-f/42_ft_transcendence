@@ -1,14 +1,11 @@
-import { tournaments } from '../tournament/tournamentData.js'
-import { games } from '../game/gameManager/gamesData.js'
 import {
 	CodeParamSchema,
 	Tournament,
 	CreateTournamentSchema
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
-import { usersInTournaments } from '../tournament/tournamentData.js'
-import { playerToGame } from '../game/gameManager/gamesData.js'
 import { FastifyRequest } from 'fastify'
+import { games, playerToGame, tournaments, usersInTournaments } from './managers/gameData.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -22,12 +19,13 @@ function randomAlphaNumeric(length: number): string {
 
 export function createInviteCode(type: string): string {
 	if (type !== 'T' && type !== 'G') throw new Error('Invalid tournament type')
-	const str: string = randomAlphaNumeric(5)
-	if (type === 'T' && tournaments.get(type + '-' + str))
-		return createInviteCode(type)
-	else if (type === 'G' && games.get(type + '-' + str))
-		return createInviteCode(type)
-	return type + '-' + str
+	let code: string = ''
+
+	do {
+		code = `${type}-${randomAlphaNumeric(5)}`
+	} while (games.has(code) || tournaments.has(code))
+
+	return code
 }
 
 function shuffle(array: any[]) {
