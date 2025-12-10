@@ -3,7 +3,7 @@ import { games } from '../game/gameManager/gamesData.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
-	const uuid = crypto.randomUUID().replace(/-/g, '')
+	const uuid = crypto.randomUUID().replace(/[\-0o]/g, '')
 	code = uuid.slice(0, length)
 	return code
 }
@@ -97,3 +97,5 @@ export function deleteTournament(tournamentCode: string) {
 
 	tournaments.delete(tournamentCode)
 }
+
+export function 

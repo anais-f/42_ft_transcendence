@@ -41,7 +41,7 @@ export function createTournamentController(
 	if (usersInTournaments.has(userId)) {
 		throw createHttpError.Conflict('User is already in another tournament')
 	}
-	if (usersInMatch.has(userId)) {
+	if (playerToGame.has(userId)) {
 		throw createHttpError.Conflict('User is already in a match')
 	}
 	if (!parsed.success) {
@@ -67,10 +67,10 @@ export function joinTournamentController(
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
 	}
-	if (usersInTournament.has(userId)) {
+	if (usersInTournaments.has(userId)) {
 			throw createHttpError.Conflict('User is already in another tournament')
 	}
-	if (usersInMatch.has(userId)) {
+	if (playerToGame.has(userId)) {
 		throw createHttpError.Conflict('User is already in a match')
 	}
 	const tournament = tournaments.get(tournamentCode.code)
