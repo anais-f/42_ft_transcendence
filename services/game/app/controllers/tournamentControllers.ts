@@ -3,11 +3,18 @@ import {
 	CreateTournamentSchema,
 	CodeParamSchema
 } from '@ft_transcendence/common'
-import { tournaments, usersInTournaments } from '../tournament/tournamentData.js'
+import {
+	tournaments,
+	usersInTournaments
+} from '../tournament/tournamentData.js'
 import { playerToGame } from '../game/gameManager/gamesData.js'
-import {createInviteCode} from '../usecases/tournamentUsecases.js'
+import { createInviteCode } from '../usecases/tournamentUsecases.js'
 import createHttpError from 'http-errors'
-import { joinTournament, createTournament, getTournament } from '../usecases/tournamentUsecases.js'
+import {
+	joinTournament,
+	createTournament,
+	getTournament
+} from '../usecases/tournamentUsecases.js'
 
 export function getTournamentController(
 	request: FastifyRequest,

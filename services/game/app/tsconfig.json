@@ -8,7 +8,7 @@
 		{ "path": "../../../packages/pong-shared" },
 		{ "path": "../../../packages/common" },
 		{ "path": "../../../packages/security" },
-    { "path": "../../../packages/monitoring" }
+		{ "path": "../../../packages/monitoring" }
 	],
 	"include": ["./**/*"]
 }

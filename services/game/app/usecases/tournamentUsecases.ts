@@ -1,6 +1,10 @@
 import { tournaments } from '../tournament/tournamentData.js'
 import { games } from '../game/gameManager/gamesData.js'
-import { CodeParamSchema, Tournament, CreateTournamentSchema } from '@ft_transcendence/common'
+import {
+	CodeParamSchema,
+	Tournament,
+	CreateTournamentSchema
+} from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 import { usersInTournaments } from '../tournament/tournamentData.js'
 import { playerToGame } from '../game/gameManager/gamesData.js'
@@ -103,15 +107,14 @@ export function deleteTournament(tournamentCode: string) {
 	tournaments.delete(tournamentCode)
 }
 
-export function joinTournament(request: FastifyRequest): Tournament
-{
+export function joinTournament(request: FastifyRequest): Tournament {
 	const tournamentCode = CodeParamSchema.parse(request.params)
 	const userId = request.user.user_id
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
 	}
 	if (usersInTournaments.has(userId)) {
-			throw createHttpError.Conflict('User is already in another tournament')
+		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (playerToGame.has(userId)) {
 		throw createHttpError.Conflict('User is already in a match')
@@ -132,8 +135,9 @@ export function joinTournament(request: FastifyRequest): Tournament
 
 let nextTournamentId = 1
 
-export function createTournament(request: FastifyRequest): Tournament | undefined
-{
+export function createTournament(
+	request: FastifyRequest
+): Tournament | undefined {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -159,8 +163,7 @@ export function createTournament(request: FastifyRequest): Tournament | undefine
 	return tournaments.get(invitCode)
 }
 
-export function getTournament(request: FastifyRequest): Tournament
-{
+export function getTournament(request: FastifyRequest): Tournament {
 	const userId = request.user.user_id
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
