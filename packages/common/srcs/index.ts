@@ -7,6 +7,7 @@ export * from './DTO/matchmakingSchema.js'
 export * from './DTO/socialSchema.js'
 export * from './DTO/paramsSchema.js'
 export * from './DTO/websocketSchema.js'
+export * from './DTO/gameSchema.js'
 
 export * from './error/errorHandler.js'
 

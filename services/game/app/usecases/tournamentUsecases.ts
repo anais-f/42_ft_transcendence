@@ -1,4 +1,5 @@
-import { tournaments, matchs } from '../index.js'
+import { tournaments } from '../tournament/tournamentData.js'
+import { games } from '../game/gameManager/gamesData.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -12,7 +13,7 @@ export function createInviteCode(type: string): string {
 	const str: string = randomAlphaNumeric(5)
 	if (type === 'T' && tournaments.get(type + '-' + str))
 		return createInviteCode(type)
-	else if (type === 'G' && matchs.get(type + '-' + str))
+	else if (type === 'G' && games.get(type + '-' + str))
 		return createInviteCode(type)
 	return type + '-' + str
 }

@@ -44,14 +44,14 @@ services:
       retries: 12
       start_period: 15s
 
-  pong-server:
+  game:
     restart: on-failure
-    container_name: pong-server
+    container_name: game
     env_file:
       - .env
     build:
       context: .
-      dockerfile: services/pong-server/Dockerfile
+      dockerfile: services/game/Dockerfile
     depends_on:
       frontend:
         condition: service_healthy
@@ -134,32 +134,6 @@ services:
       - backend
     env_file:
       - .env
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
-      interval: 30s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-
-  game:
-    restart: on-failure
-    container_name: game
-    build:
-      context: .
-      dockerfile: ./services/game/Dockerfile
-    depends_on:
-      # pong-server:
-      #   condition: service_healthy
-      users:
-        condition: service_healthy
-    networks:
-      - backend
-    env_file:
-      - .env
-    volumes:
-      - db_game_data:/data
     healthcheck:
       test:
         - CMD-SHELL

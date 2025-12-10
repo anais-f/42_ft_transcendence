@@ -3,7 +3,8 @@ import {
 	CreateTournamentSchema,
 	CodeParamSchema
 } from '@ft_transcendence/common'
-import { tournaments, usersInTournament, usersInMatch } from '../index.js'
+import { tournaments, usersInTournaments } from '../tournament/tournamentData.js'
+import { playerToGame } from '../game/gameManager/gamesData.js'
 import {createInviteCode} from '../usecases/tournamentUsecases.js'
 import createHttpError from 'http-errors'
 
@@ -37,7 +38,7 @@ export function createTournamentController(
 	if (userId === undefined) {
 		return reply.status(401).send({ error: 'Unauthorized' })
 	}
-	if (usersInTournament.has(userId)) {
+	if (usersInTournaments.has(userId)) {
 		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (usersInMatch.has(userId)) {

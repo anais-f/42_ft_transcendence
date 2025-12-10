@@ -22,16 +22,14 @@
 	"references": [
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/pong-client" },
-		{ "path": "./packages/pong-server" },
 		{ "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users/app" },
 		{ "path": "./services/auth/app" },
-		{ "path": "./services/pong-server/app" },
+		{ "path": "./services/game/app" },
 		{ "path": "./services/2fa/app" },
 		{ "path": "./services/frontend/app" },
 		{ "path": "./services/social/app" },
-		{ "path": "./services/matchmaking/app" },
 		{ "path": "./services/game/app" }
 	],
 	"ts-node": {
