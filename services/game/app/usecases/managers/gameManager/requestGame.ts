@@ -1,16 +1,6 @@
-import { games, playerToGame } from './gamesData.js'
-
-/*
- * Function to generate a random game code in the format XXXX-XXXX
- */
-function generateCode(): string {
-	let code: string
-	do {
-		const uuid = crypto.randomUUID().replace(/-/g, '').toUpperCase()
-		code = `${uuid.slice(0, 4)}-${uuid.slice(4, 8)}`
-	} while (games.has(code))
-	return code
-}
+import { createInviteCode } from '../../tournamentUsecases.js'
+import { games, playerToGame } from '../gameData.js'
+import { startTimeOut } from './startTimeOut.js'
 
 /*
  * Creates a new game and returns the game code.
@@ -20,21 +10,17 @@ function generateCode(): string {
  * return:
  *  game code
  * error:
- * 	- throw 'player is already in a game'
  * 	- throw 'a player is already in a game'
  */
 export function requestGame(
 	pID1: number,
 	pID2: number | undefined = undefined
 ): string {
-	if (playerToGame.has(pID1) && !pID2) {
-		throw new Error('player is already in a game')
-	}
-	if (pID2 && (playerToGame.has(pID2) || playerToGame.has(pID1))) {
+	if (playerToGame.has(pID1) || (pID2 && playerToGame.has(pID2))) {
 		throw new Error('a player is already in a game')
 	}
 
-	const newCode = generateCode()
+	const newCode = createInviteCode('G')
 	games.set(newCode, {
 		p1: { id: pID1, connState: false },
 		p2: pID2 ? { id: pID2, connState: false } : undefined,
@@ -45,7 +31,9 @@ export function requestGame(
 
 	playerToGame.set(pID1, newCode)
 	if (pID2) {
+		// locked game
 		playerToGame.set(pID2, newCode)
+		startTimeOut(pID2, 5000)
 	}
 
 	return newCode

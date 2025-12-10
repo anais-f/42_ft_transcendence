@@ -4,9 +4,9 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
+	CodeParamSchema,
 	createTokenSchema,
-	IWsJwtTokenQuery,
-	gameCodeSchema
+	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers.js'
 import { createNewGameController } from '../controllers/newGameController.js'
@@ -17,10 +17,10 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 
 	server.route({
 		method: 'POST',
-		url: '/api/game/join-game/:gameID',
+		url: '/api/game/join-game/:code',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			params: gameCodeSchema,
+			params: CodeParamSchema,
 			response: {
 				201: createTokenSchema
 			}
@@ -34,7 +34,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				201: gameCodeSchema
+				201: CodeParamSchema
 			}
 		},
 		handler: createNewGameController

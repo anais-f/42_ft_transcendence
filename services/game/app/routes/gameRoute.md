@@ -8,11 +8,11 @@ connections.
 
 ### 1. Join Game
 
-- **URL**: `/api/game/join-game/:gameID`
+- **URL**: `/api/game/join-game/:gameCode`
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Parameters**:
-  - `gameID`: The unique game code returned from the `new-game` endpoint
+  - `gameCode`: The unique game code returned from the `new-game` endpoint
     (format: XXXX-XXXX).
 - **Response**:
   - **201**: returns a jwt token for the session.
@@ -33,7 +33,7 @@ within the game.
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Response**:
-  - **201**: returns a game code (gameID)
+  - **201**: returns a game code (gameCode)
   - **404**: unknow game code.
   - **409**: player already in a game
 
