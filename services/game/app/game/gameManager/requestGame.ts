@@ -1,4 +1,5 @@
 import { games, playerToGame } from './gamesData.js'
+import { startTimeOut } from './startTimeOut.js'
 
 /*
  * Function to generate a random game code in the format XXXX-XXXX
@@ -44,8 +45,9 @@ export function requestGame(
 	})
 
 	playerToGame.set(pID1, newCode)
-	if (pID2) {
+	if (pID2) { // locked game
 		playerToGame.set(pID2, newCode)
+		startTimeOut(pID2, 5000)
 	}
 
 	return newCode

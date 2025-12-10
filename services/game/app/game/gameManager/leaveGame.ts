@@ -6,6 +6,10 @@ export function leaveGame(pID: number) {
 		throw new Error('player not in game')
 	}
 
+	deleteGame(gameCode)
+}
+
+function deleteGame(gameCode: string) {
 	const gameData = games.get(gameCode)
 	if (!gameData) {
 		throw new Error('game not found')
