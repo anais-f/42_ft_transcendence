@@ -1,6 +1,7 @@
 import { IGameData } from '../../utils/createGame'
 
 export type GameStatus = 'waiting' | 'active'
+export type TPlayerSlot = 'p1' | 'p2'
 
 export interface Iplayer {
 	id: number
