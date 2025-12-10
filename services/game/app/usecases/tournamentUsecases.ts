@@ -1,5 +1,10 @@
 import { tournaments } from '../tournament/tournamentData.js'
 import { games } from '../game/gameManager/gamesData.js'
+import { CodeParamSchema, Tournament, CreateTournamentSchema } from '@ft_transcendence/common'
+import createHttpError from 'http-errors'
+import { usersInTournaments } from '../tournament/tournamentData.js'
+import { playerToGame } from '../game/gameManager/gamesData.js'
+import { FastifyRequest } from 'fastify'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -98,4 +103,75 @@ export function deleteTournament(tournamentCode: string) {
 	tournaments.delete(tournamentCode)
 }
 
-export function 
+export function joinTournament(request: FastifyRequest): Tournament
+{
+	const tournamentCode = CodeParamSchema.parse(request.params)
+	const userId = request.user.user_id
+	if (userId === undefined) {
+		throw createHttpError.Unauthorized()
+	}
+	if (usersInTournaments.has(userId)) {
+			throw createHttpError.Conflict('User is already in another tournament')
+	}
+	if (playerToGame.has(userId)) {
+		throw createHttpError.Conflict('User is already in a match')
+	}
+	const tournament = tournaments.get(tournamentCode.code)
+	if (!tournament) {
+		throw createHttpError.NotFound()
+	}
+	if (tournament.participants.length >= tournament.maxParticipants) {
+		throw createHttpError.Conflict('Tournament is full')
+	}
+	if (tournament.participants.includes(userId)) {
+		throw createHttpError.Conflict('User already joined the tournament')
+	}
+	tournament.participants.push(userId)
+	return tournament
+}
+
+let nextTournamentId = 1
+
+export function createTournament(request: FastifyRequest): Tournament | undefined
+{
+	const parsed = CreateTournamentSchema.safeParse(request.body)
+	const userId = request.user.user_id
+	if (userId === undefined) {
+		throw createHttpError.Unauthorized()
+	}
+	if (usersInTournaments.has(userId)) {
+		throw createHttpError.Conflict('User is already in another tournament')
+	}
+	if (playerToGame.has(userId)) {
+		throw createHttpError.Conflict('User is already in a match')
+	}
+	if (!parsed.success) {
+		throw createHttpError.BadRequest(parsed.error.message)
+	}
+	const invitCode = createInviteCode('T')
+	tournaments.set(invitCode, {
+		id: nextTournamentId,
+		status: 'pending',
+		maxParticipants: parsed.data.numberOfPlayers,
+		participants: [userId],
+		matchs: []
+	})
+	return tournaments.get(invitCode)
+}
+
+export function getTournament(request: FastifyRequest): Tournament
+{
+	const userId = request.user.user_id
+	if (userId === undefined) {
+		throw createHttpError.Unauthorized()
+	}
+	const tournamentCode = CodeParamSchema.parse(request.params)
+	const tournament = tournaments.get(tournamentCode.code)
+	if (!tournament) {
+		throw createHttpError.NotFound()
+	}
+	if (!tournament.participants.includes(userId)) {
+		throw createHttpError.Forbidden()
+	}
+	return tournament
+}
