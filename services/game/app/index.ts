@@ -5,6 +5,9 @@ import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
 import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
+import { runMigrations } from './database/connection.js'
+
+runMigrations()
 
 async function start(): Promise<void> {
 	const env: IPongServerEnv = checkEnv() // throw on error
