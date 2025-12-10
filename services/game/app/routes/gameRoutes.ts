@@ -17,7 +17,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 
 	server.route({
 		method: 'POST',
-		url: '/api/game/join-game/:gameID',
+		url: '/api/game/join-game/:gameCode',
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			params: gameCodeSchema,

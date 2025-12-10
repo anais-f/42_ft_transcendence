@@ -33,7 +33,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		preHandler: jwtAuthMiddleware,
 		schema: {
 			response: {
-				201: createTokenSchema,
+				201: createTokenSchema
 			}
 		},
 		handler: createTokenController
