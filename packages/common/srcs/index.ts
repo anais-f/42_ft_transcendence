@@ -10,6 +10,7 @@ export * from './DTO/websocketSchema.js'
 export * from './DTO/gameSchema.js'
 
 export * from './error/errorHandler.js'
+export * from './error/createWsError.js'
 
 export * from './interfaces/jwtModels.js'
 export * from './interfaces/websocketModels.js'
