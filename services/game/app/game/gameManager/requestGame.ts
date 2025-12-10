@@ -21,17 +21,13 @@ function generateCode(): string {
  * return:
  *  game code
  * error:
- * 	- throw 'player is already in a game'
  * 	- throw 'a player is already in a game'
  */
 export function requestGame(
 	pID1: number,
 	pID2: number | undefined = undefined
 ): string {
-	if (playerToGame.has(pID1) && !pID2) {
-		throw new Error('player is already in a game')
-	}
-	if (pID2 && (playerToGame.has(pID2) || playerToGame.has(pID1))) {
+	if (playerToGame.has(pID1) || (pID2 && playerToGame.has(pID2))) {
 		throw new Error('a player is already in a game')
 	}
 
