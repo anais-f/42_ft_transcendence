@@ -4,9 +4,9 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
-    CodeParamSchema,
+	CodeParamSchema,
 	createTokenSchema,
-	IWsJwtTokenQuery,
+	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/wsControllers.js'
 import { createNewGameController } from '../controllers/newGameController.js'

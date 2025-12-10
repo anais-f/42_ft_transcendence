@@ -5,7 +5,12 @@ import {
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 import { FastifyRequest } from 'fastify'
-import { games, playerToGame, tournaments, usersInTournaments } from './managers/gameData.js'
+import {
+	games,
+	playerToGame,
+	tournaments,
+	usersInTournaments
+} from './managers/gameData.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
