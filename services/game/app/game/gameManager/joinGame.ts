@@ -20,7 +20,8 @@ export function joinGame(gameCode: string, pID: number) {
 		return
 	}
 
-	if (undefined == gameData.p2) { // open game
+	if (undefined == gameData.p2) {
+		// open game
 		gameData.p2 = { id: pID, connState: false }
 		startTimeOut(pID, 5000)
 		return

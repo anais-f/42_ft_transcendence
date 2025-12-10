@@ -45,7 +45,8 @@ export function requestGame(
 	})
 
 	playerToGame.set(pID1, newCode)
-	if (pID2) { // locked game
+	if (pID2) {
+		// locked game
 		playerToGame.set(pID2, newCode)
 		startTimeOut(pID2, 5000)
 	}
