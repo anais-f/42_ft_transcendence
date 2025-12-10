@@ -17,6 +17,7 @@ COPY packages/ ./packages/
 RUN npm run build --workspace=packages/pong-shared
 RUN npm run build --workspace=packages/common
 RUN npm run build --workspace=packages/security
+RUN npm run build --workspace=packages/monitoring
 #-------------------------------------------------------------#
 # Build app
 FROM node:22-alpine AS build-app
