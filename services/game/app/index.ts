@@ -2,14 +2,14 @@
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 //import { createGame } from './utils/createGame.js'
 import { createWsApp } from '@ft_transcendence/security'
-import { gameRoutes } from './routes/gameRoutes.js'
+import { registerRoutes } from './routes/registerRoutes.js'
 import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 async function start(): Promise<void> {
 	const env: IPongServerEnv = checkEnv() // throw on error
 	const app = createWsApp(
-		gameRoutes,
+		registerRoutes,
 		{
 			openapi: {
 				info: {
