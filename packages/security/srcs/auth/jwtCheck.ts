@@ -17,9 +17,12 @@ export function jwtAuthMiddleware(
 		.then(async () => {
 			const userId = request.user.user_id
 			const sessionId = request.user.session_id
+			
+			// Backward compatibility: skip session validation if session_id not present
 			if (sessionId === undefined) {
 				done()
 			}
+
 			try {
 				const authServiceUrl = process.env.AUTH_SERVICE_URL
 				const internalSecret = process.env.INTERNAL_API_SECRET
@@ -32,6 +35,7 @@ export function jwtAuthMiddleware(
 						'Service configuration error'
 					)
 				}
+
 				const response = await fetch(
 					`${authServiceUrl}/api/internal/validate-session`,
 					{
@@ -43,18 +47,20 @@ export function jwtAuthMiddleware(
 						body: JSON.stringify({ user_id: userId, session_id: sessionId })
 					}
 				)
+
 				if (!response.ok) {
 					throw createHttpError.Unauthorized('Session expired or invalid')
 				}
+
 				done()
 			} catch (error) {
 				console.error('Session validation failed:', error)
-				throw createHttpError.ServiceUnavailable('Service unavailable')
+				done(createHttpError.ServiceUnavailable('Service unavailable'))
 			}
 		})
 		.catch((err: Error) => {
 			console.error('JWT verification failed:', err.message)
-			throw createHttpError.Unauthorized('Unauthorized')
+			done(createHttpError.Unauthorized('Unauthorized'))
 		})
 }
 
