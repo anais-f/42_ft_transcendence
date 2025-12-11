@@ -6,7 +6,7 @@ export const CreateTournamentSchema = z
 	})
 	.strict()
 
-export const RemoveTournamentSchema = z
+export const RemoveFromTournamentSchema = z
 	.object({
 		userId: number().positive()
 	})
@@ -24,5 +24,5 @@ export const saveMatchShema = z
 	.strict()
 
 export type CreateTournamentDTO = z.infer<typeof CreateTournamentSchema>
-export type RemoveTournamentDTO = z.infer<typeof RemoveTournamentSchema>
+export type RemoveFromTournamentDTO = z.infer<typeof RemoveFromTournamentSchema>
 export type saveMatchDTO = z.infer<typeof saveMatchShema>

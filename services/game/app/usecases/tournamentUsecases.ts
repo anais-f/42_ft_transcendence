@@ -11,6 +11,7 @@ import {
 	tournaments,
 	usersInTournaments
 } from './managers/gameData.js'
+import { requestGame } from './managers/gameManager/requestGame.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -46,17 +47,33 @@ function shuffle(array: any[]) {
 	}
 }
 
-export function startTournament(tournamentName: string) {
-	const tournament = tournaments.get(tournamentName)
-	if (!tournament) {
-		throw new Error('Tournament not found')
-	}
-	tournament.status = 'ongoing'
-	createTournamentTree(tournamentName)
+function startNextRound(tournament: Tournament, round: number) {
+	const roundMatches = tournament.matchs.filter(
+		(match) => match.round === round
+	)
+	roundMatches.forEach((match) => {
+		if (
+			match.player1Id === undefined ||
+			match.player2Id === undefined
+		) {
+			console.error('Invalid match data for next round:', match)
+			return // Skip ce match
+		}
+		match.status = 'ongoing'
+		requestGame(match.player1Id, match.player2Id)
+	})
 }
 
-export function createTournamentTree(tournamentName: string) {
-	const tournament = tournaments.get(tournamentName)
+
+export function startTournament(tournament: Tournament) {
+	tournament.status = 'ongoing'
+	createTournamentTree(tournament)
+	for (let round = Math.log2(tournament.maxParticipants); round > 0; --round) {
+		startNextRound(tournament, round)
+	}
+}
+
+function createTournamentTree(tournament: Tournament) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
@@ -64,7 +81,7 @@ export function createTournamentTree(tournamentName: string) {
 	shuffle(tournament.participants)
 	console.log('Shuffled participants:', tournament.participants)
 	if (tournament.participants.length !== tournament.maxParticipants) {
-		throw new Error('Not enough participants to create the tournament tree')
+		throw createHttpError.Conflict('Not enough participants to create the tournament tree')
 	}
 	let maxRound = Math.log2(tournament.maxParticipants)
 	for (let match = 0; match < tournament.maxParticipants / 2; match++) {
@@ -72,6 +89,9 @@ export function createTournamentTree(tournamentName: string) {
 		const player2Index = player1Index + 1
 		const player1 = tournament.participants[player1Index]
 		const player2 = tournament.participants[player2Index]
+		if (player1 === undefined || player2 === undefined) {
+			throw createHttpError.InternalServerError(`Invalid participant indices: ${player1Index}, ${player2Index}`)
+		}
 		tournament.matchs.push({
 			round: maxRound,
 			matchNumber: match,
@@ -109,7 +129,9 @@ export function deleteTournament(tournamentCode: string) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
-
+	tournament.participants.forEach((userId) => {
+		usersInTournaments.delete(userId)
+	})
 	tournaments.delete(tournamentCode)
 }
 
@@ -136,6 +158,9 @@ export function joinTournament(request: FastifyRequest): Tournament {
 		throw createHttpError.Conflict('User already joined the tournament')
 	}
 	tournament.participants.push(userId)
+	if (tournament.participants.length === tournament.maxParticipants) {
+			startTournament(tournament)
+	}
 	return tournament
 }
 
@@ -143,7 +168,7 @@ let nextTournamentId = 1
 
 export function createTournament(
 	request: FastifyRequest
-): Tournament | undefined {
+) {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -166,8 +191,10 @@ export function createTournament(
 		participants: [userId],
 		matchs: []
 	})
-	return tournaments.get(invitCode)
-}
+	return {"code": invitCode,
+			"tournament": tournaments.get(invitCode)
+		}
+	}
 
 export function getTournament(request: FastifyRequest): Tournament {
 	const userId = request.user.user_id
@@ -183,4 +210,27 @@ export function getTournament(request: FastifyRequest): Tournament {
 		throw createHttpError.Forbidden()
 	}
 	return tournament
+}
+
+export function quitTournament(request: FastifyRequest): void {
+	const userId = request.user.user_id
+	if (userId === undefined) {
+		throw createHttpError.Unauthorized()
+	}
+	const tournamentCode = CodeParamSchema.parse(request.params)
+	const tournament = tournaments.get(tournamentCode.code)
+	if (!tournament) {
+		throw createHttpError.NotFound()
+	}
+	const participantIndex = tournament.participants.indexOf(userId)
+	if (participantIndex === -1) {
+		throw createHttpError.Forbidden()
+	}
+	if (tournament.status !== 'pending') {
+		throw createHttpError.Conflict(
+			'Cannot quit a tournament that has already started'
+		)
+	}
+	tournament.participants.splice(participantIndex, 1)
+	usersInTournaments.delete(userId)
 }
