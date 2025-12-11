@@ -10,116 +10,105 @@ import {
 } from './pages/oldlogin.js'
 import { ProfilePage } from './pages/oldprofile.js'
 import { SettingsPage } from './pages/oldsettings.js'
-import { checkAuth } from './auth/old_authService.js'
-import { setCurrentUser } from './store/olduserStore.js'
+import { checkAuth } from './api/old_authService.js'
+import { setCurrentUser } from './usecases/olduserStore.js'
 
-declare global {
-	interface Window {
-		navigate: (url: string) => void
-	}
-}
+// declare global {
+// 	interface Window {
+// 		navigate: (url: string) => void
+// 	}
+// }
+//
+// type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
+//
+// type Route = {
+// 	id: string
+// 	url: string
+// 	page: () => string
+// 	mount?: Array<() => void>
+// 	unmount?: Array<() => void>
+// 	public?: boolean
+// }
+//
+// const oldrouter: Record<Pages, Route> = {
+// 	home: {
+// 		id: 'home',
+// 		url: '/',
+// 		page: HomePage,
+// 		binds: [bindLogOutButton],
+// 		unbinds: [unbindLogOutButton]
+// 	},
+//
+// 	game: {
+// 		id: 'game',
+// 		url: '/game',
+// 		page: GamePage
+// 	},
+//
+// 	lobby: {
+// 		id: 'lobby',
+// 		url: '/lobby',
+// 		page: LobbyPage
+// 	},
+//
+// 	login: {
+// 		id: 'login',
+// 		url: '/login',
+// 		page: LoginPage,
+// 		binds: [bindRegisterForm, bindLoginForm],
+// 		unbinds: [unbindRegisterForm, unbindLoginForm],
+// 		public: true
+// 	},
+//
+// 	profile: {
+// 		id: 'profile',
+// 		url: '/profile',
+// 		page: ProfilePage
+// 	},
+//
+// 	settings: {
+// 		id: 'settings',
+// 		url: '/settings',
+// 		page: SettingsPage
+// 	}
+// }
 
-type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
+// let isNavigating = false
+// let currentRoute: Route | null = null
 
-type Route = {
-	id: string
-	url: string
-	page: () => string
-	binds?: Array<() => void>
-	unbinds?: Array<() => void>
-	public?: boolean
-}
+// function getRoute(url: string): Route {
+// 	const routes = Object.values(oldrouter)
+// 	const route = routes.find((route) => route.url === url)
+// 	return route || oldrouter.home
+// }
 
-const oldrouter: Record<Pages, Route> = {
-	home: {
-		id: 'home',
-		url: '/',
-		page: HomePage,
-		binds: [bindLogOutButton],
-		unbinds: [unbindLogOutButton]
-	},
+// function render(route: Route) {
+// 	const contentDiv = document.getElementById('content')
+// 	if (!contentDiv) return
+//
+// 	if (currentRoute?.unbinds) {
+// 		currentRoute.unbinds.forEach((unbind) => unbind())
+// 	}
+//
+// 	contentDiv.innerHTML = route.page()
+// 	currentRoute = route
+//
+// 	if (route.binds) {
+// 		route.binds.forEach((bind) => bind())
+// 	}
+//
+// 	console.log('Rendered:', route.id)
+// }
 
-	game: {
-		id: 'game',
-		url: '/game',
-		page: GamePage
-	},
-
-	lobby: {
-		id: 'lobby',
-		url: '/lobby',
-		page: LobbyPage
-	},
-
-	login: {
-		id: 'login',
-		url: '/login',
-		page: LoginPage,
-		binds: [bindRegisterForm, bindLoginForm],
-		unbinds: [unbindRegisterForm, unbindLoginForm],
-		public: true
-	},
-
-	profile: {
-		id: 'profile',
-		url: '/profile',
-		page: ProfilePage
-	},
-
-	settings: {
-		id: 'settings',
-		url: '/settings',
-		page: SettingsPage
-	}
-}
-
-// Date display
-const dateDiv = document.getElementById('date')
-if (dateDiv) {
-	dateDiv.textContent = new Date().toLocaleDateString('en-EN', {
-		weekday: 'long',
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric'
-	})
-}
-
-let isNavigating = false
-let currentRoute: Route | null = null
-
-function getRoute(url: string): Route {
-	const routes = Object.values(oldrouter)
-	const route = routes.find((route) => route.url === url)
-	return route || oldrouter.home
-}
-
-function render(route: Route) {
-	const contentDiv = document.getElementById('content')
-	if (!contentDiv) return
-
-	if (currentRoute?.unbinds) {
-		currentRoute.unbinds.forEach((unbind) => unbind())
-	}
-
-	contentDiv.innerHTML = route.page()
-	currentRoute = route
-
-	if (route.binds) {
-		route.binds.forEach((bind) => bind())
-	}
-
-	console.log('Rendered:', route.id)
-}
-
-async function handleNav() {
-	if (isNavigating) {
-		console.log('Navigation already in progress')
-		return
-	}
-
-	isNavigating = true
-	const url = window.location.pathname
-	const route = getRoute(url)
+// async function handleNav() {
+// 	if (isNavigating) {
+// 		console.log('Navigation already in progress')
+// 		return
+// 	}
+//
+// 	isNavigating = true
+// 	const url = window.location.pathname
+// 	const route = getRoute(url)
 
 	try {
 		if (route.public) {

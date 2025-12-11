@@ -1,5 +1,5 @@
-import { currentUser, setCurrentUser } from '../store/olduserStore.js'
-import { logout } from '../auth/old_authService.js'
+import { currentUser, setCurrentUser } from '../usecases/olduserStore.js'
+import { logout } from '../api/old_authService.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
