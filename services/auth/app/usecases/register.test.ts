@@ -29,6 +29,10 @@ const verifyPasswordMock: jest.MockedFunction<
 const signTokenMock: jest.MockedFunction<(payload: any) => string> = jest.fn()
 const isUser2FAEnabledMock: jest.MockedFunction<(id: number) => boolean> =
 	jest.fn()
+const getSessionIdMock: jest.MockedFunction<(userId: number) => number | null> = 
+	jest.fn()
+const incrementSessionIdMock: jest.MockedFunction<(userId: number) => void> = 
+	jest.fn()
 
 await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 	__esModule: true,
@@ -36,13 +40,17 @@ await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 	findUserByLogin: findUserByLoginMock,
 	createAdminUser: createAdminUserMock,
 	createGoogleUser: createGoogleUserMock,
-	isUser2FAEnabled: isUser2FAEnabledMock
+	isUser2FAEnabled: isUser2FAEnabledMock,
+	getSessionId: getSessionIdMock,
+	incrementSessionId: incrementSessionIdMock
 }))
+
 await jest.unstable_mockModule('../utils/password.js', () => ({
 	__esModule: true,
 	hashPassword: hashPasswordMock,
 	verifyPassword: verifyPasswordMock
 }))
+
 await jest.unstable_mockModule('../utils/jwt.js', () => ({
 	__esModule: true,
 	signToken: signTokenMock
@@ -54,6 +62,9 @@ const { loginUser, registerUser, registerAdminUser, registerGoogleUser } =
 describe('auth register/login usecases', () => {
 	beforeEach(() => {
 		jest.resetAllMocks()
+		// Valeurs par défaut pour les nouveaux mocks
+		getSessionIdMock.mockReturnValue(0)
+		incrementSessionIdMock.mockImplementation(() => {})
 	})
 
 	test('registerUser hashes and creates user', async () => {
@@ -70,7 +81,7 @@ describe('auth register/login usecases', () => {
 		expect(res).toBeNull()
 	})
 
-	test('loginUser returns token when credentials valid', async () => {
+	test('loginUser returns token when credentials valid (no 2FA)', async () => {
 		findUserByLoginMock.mockReturnValue({
 			user_id: 5,
 			login: 'alice',
@@ -78,19 +89,51 @@ describe('auth register/login usecases', () => {
 			is_admin: false
 		} as any)
 		verifyPasswordMock.mockResolvedValue(true)
+		isUser2FAEnabledMock.mockReturnValue(false)
+		getSessionIdMock.mockReturnValue(1)
 		signTokenMock.mockReturnValue('jwt.token.value')
+
 		const res = await loginUser('alice', 'pw')
+
 		expect(verifyPasswordMock).toHaveBeenCalledWith('hash', 'pw')
+		expect(incrementSessionIdMock).toHaveBeenCalledWith(5)
+		expect(getSessionIdMock).toHaveBeenCalledWith(5)
 		expect(signTokenMock).toHaveBeenCalledWith(
 			{
 				user_id: 5,
 				login: 'alice',
+				session_id: 1,
 				is_admin: false,
 				type: 'auth'
 			},
 			'1h'
 		)
 		expect(res).toEqual({ token: 'jwt.token.value' })
+	})
+
+	test('loginUser returns pre_2fa_token when 2FA enabled', async () => {
+		findUserByLoginMock.mockReturnValue({
+			user_id: 5,
+			login: 'alice',
+			password: 'hash',
+			is_admin: false
+		} as any)
+		verifyPasswordMock.mockResolvedValue(true)
+		isUser2FAEnabledMock.mockReturnValue(true)
+		signTokenMock.mockReturnValue('pre.2fa.token')
+
+		const res = await loginUser('alice', 'pw')
+
+		expect(verifyPasswordMock).toHaveBeenCalledWith('hash', 'pw')
+		expect(incrementSessionIdMock).toHaveBeenCalledWith(5)
+		expect(signTokenMock).toHaveBeenCalledWith(
+			{
+				user_id: 5,
+				type: '2fa'
+			},
+			'5m'
+		)
+		expect(res).toEqual({ pre_2fa_token: 'pre.2fa.token' })
 	})
 
 	test('loginUser returns null when verify fails', async () => {

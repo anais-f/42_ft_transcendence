@@ -16,6 +16,8 @@ const findPublicUserByLoginMock: jest.MockedFunction<(login: string) => any> =
 const findUserByGoogleIdMock: jest.MockedFunction<(google_id: string) => any> =
 	jest.fn()
 const deleteUserByIdMock: jest.MockedFunction<(id: number) => void> = jest.fn()
+const getSessionIdMock: jest.MockedFunction<(userId: number) => number | null> = jest.fn()
+const incrementSessionIdMock: jest.MockedFunction<(userId: number) => void> = jest.fn()
 
 await jest.unstable_mockModule('../usecases/register.js', () => ({
 	__esModule: true,
@@ -34,7 +36,9 @@ await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
 	__esModule: true,
 	findPublicUserByLogin: findPublicUserByLoginMock,
 	deleteUserById: deleteUserByIdMock,
-	findUserByGoogleId: findUserByGoogleIdMock
+	findUserByGoogleId: findUserByGoogleIdMock,
+	getSessionId: getSessionIdMock,
+	incrementSessionId: incrementSessionIdMock
 }))
 
 // mock fetch side-effect for register controller flows
@@ -125,6 +129,7 @@ describe('authController registerController', () => {
 		process.env.INTERNAL_API_SECRET = 'secret'
 		process.env.USERS_SERVICE_URL = 'http://users'
 		signTokenMock.mockReturnValue('test-token')
+		getSessionIdMock.mockReturnValue(0) // Mock par défaut
 	})
 
 	test('returns 500 if INTERNAL_API_SECRET missing', async () => {
@@ -150,6 +155,7 @@ describe('authController registerController', () => {
 			user_id: 10,
 			login: 'newuser'
 		})
+		getSessionIdMock.mockReturnValue(0)
 		fetchMock.mockResolvedValue({ ok: true, status: 200 } as any)
 
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
@@ -167,7 +173,7 @@ describe('authController registerController', () => {
 			expect.any(Object)
 		)
 		expect(signTokenMock).toHaveBeenCalledWith(
-			{ user_id: 10, login: 'newuser', is_admin: false, type: 'auth' },
+			{ user_id: 10, login: 'newuser', session_id: 0, is_admin: false, type: 'auth' },
 			'1h'
 		)
 		expect(reply.setCookie).toHaveBeenCalledWith(
