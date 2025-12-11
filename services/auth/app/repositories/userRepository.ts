@@ -95,3 +95,17 @@ export function isUser2FAEnabled(id: number): boolean {
 	const row = stmt.get(id) as { two_fa_enabled: number } | undefined
 	return !!row && row.two_fa_enabled === 1
 }
+
+// Session management
+export function incrementSessionId(user_id: number): void {
+	const stmt = db().prepare(
+		'UPDATE users SET session_id = session_id + 1 WHERE user_id = ?'
+	)
+	stmt.run(user_id)
+}
+
+export function getSessionId(user_id: number): number | undefined {
+	const stmt = db().prepare('SELECT session_id FROM users WHERE user_id = ?')
+	const row = stmt.get(user_id) as { session_id: number } | undefined
+	return row?.session_id
+}
