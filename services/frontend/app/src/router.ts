@@ -78,9 +78,6 @@ if (dateDiv) {
 	})
 }
 
-// ============================================
-// STATE
-// ============================================
 let isNavigating = false
 let currentRoute: Route | null = null
 
@@ -94,16 +91,13 @@ function render(route: Route) {
 	const contentDiv = document.getElementById('content')
 	if (!contentDiv) return
 
-	// 1. Cleanup previous page bindings
 	if (currentRoute?.unbinds) {
 		currentRoute.unbinds.forEach(unbind => unbind())
 	}
 
-	// 2. Render new page content
 	contentDiv.innerHTML = route.page()
 	currentRoute = route
 
-	// 3. Setup new page bindings
 	if (route.binds) {
 		route.binds.forEach(bind => bind())
 	}
@@ -111,11 +105,7 @@ function render(route: Route) {
 	console.log('Rendered:', route.id)
 }
 
-// ============================================
-// NAVIGATION
-// ============================================
 async function handleNav() {
-	// Guard: prevent concurrent navigations
 	if (isNavigating) {
 		console.log('Navigation already in progress')
 		return
@@ -126,11 +116,9 @@ async function handleNav() {
 	const route = getRoute(url)
 
 	try {
-		// Pour les pages publiques, vérifier si l'utilisateur est déjà connecté
 		if (route.public) {
 			const user = await checkAuth()
 
-			// Si connecté et sur /login, rediriger vers home
 			if (user && url === '/login') {
 				console.log('Already authenticated, redirecting to home')
 				setCurrentUser(user)
@@ -139,16 +127,13 @@ async function handleNav() {
 				return
 			}
 
-			// Sinon, render la page publique
 			render(route)
 			return
 		}
 
-		// Pour les pages protégées, vérifier l'authentification
 		const user = await checkAuth()
 		setCurrentUser(user)
 
-		// Si pas authentifié, rediriger vers login
 		if (!user) {
 			console.log('Not authenticated, redirecting to /login')
 			isNavigating = false
@@ -161,13 +146,11 @@ async function handleNav() {
 
 	} catch (error) {
 		console.error('Navigation error:', error)
-		// En cas d'erreur sur une page protégée, rediriger vers login
 		if (!route.public) {
 			isNavigating = false
 			navigate('/login')
 			return
 		}
-		// Si erreur sur page publique, essayer de la rendre quand même
 		render(route)
 	} finally {
 		isNavigating = false
@@ -175,7 +158,6 @@ async function handleNav() {
 }
 
 function navigate(url: string) {
-	// Guard: avoid navigating to the same URL
 	if (window.location.pathname === url) {
 		console.log('Already at', url)
 		return
@@ -187,17 +169,12 @@ function navigate(url: string) {
 
 window.navigate = navigate
 
-// ============================================
-// EVENT LISTENERS
-// ============================================
 
-// Browser back/forward buttons
 window.addEventListener('popstate', () => {
 	console.log('Browser back/forward')
 	handleNav()
 })
 
-// Initial page load
 window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded')
 	handleNav()
