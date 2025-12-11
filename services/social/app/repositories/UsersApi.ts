@@ -12,10 +12,10 @@ export class UsersApi {
 	 */
 	static async userExists(user: IUserId): Promise<boolean> {
 		const base = process.env.USERS_SERVICE_URL
-		const secret = process.env.USERS_API_SECRET
+		const secret = process.env.INTERNAL_API_SECRET
 		if (!base || !secret)
 			throw createHttpError.InternalServerError(
-				'Missing USERS_SERVICE_URL or USERS_API_SECRET env'
+				'Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env'
 			)
 
 		const url = `${base}/api/internal/users/profile/${user.user_id}`
@@ -60,10 +60,10 @@ export class UsersApi {
 	 */
 	static async getUserData(user: IUserId): Promise<IPrivateUser> {
 		const base = process.env.USERS_SERVICE_URL
-		const secret = process.env.USERS_API_SECRET
+		const secret = process.env.INTERNAL_API_SECRET
 		if (!base || !secret)
 			throw createHttpError.InternalServerError(
-				'Missing USERS_SERVICE_URL or USERS_API_SECRET env'
+				'Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env'
 			)
 
 		const url = `${base}/api/internal/users/profile/${user.user_id}`

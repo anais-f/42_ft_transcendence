@@ -68,21 +68,24 @@ describe('userController getPublicUserController', () => {
 
 	test('400 if missing id param', async () => {
 		const reply = buildReply()
-		await getPublicUserController({ params: {} } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			getPublicUserController({ params: {} } as any, reply)
+		).rejects.toThrow('Invalid id')
 	})
 
 	test('400 if invalid id param (non integer)', async () => {
 		const reply = buildReply()
-		await getPublicUserController({ params: { id: 'abc' } } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			getPublicUserController({ params: { id: 'abc' } } as any, reply)
+		).rejects.toThrow('Invalid id')
 	})
 
 	test('404 if user not found', async () => {
 		findPublicUserByIdMock.mockReturnValue(undefined)
 		const reply = buildReply()
-		await getPublicUserController({ params: { id: '42' } } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(404)
+		await expect(
+			getPublicUserController({ params: { id: '42' } } as any, reply)
+		).rejects.toThrow('User not found')
 	})
 
 	test('returns user when found', async () => {
@@ -98,21 +101,24 @@ describe('userController deleteUser', () => {
 
 	test('400 missing id', async () => {
 		const reply = buildReply()
-		await deleteUser({ params: {} } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(deleteUser({ params: {} } as any, reply)).rejects.toThrow(
+			'Invalid id'
+		)
 	})
 
 	test('400 invalid id', async () => {
 		const reply = buildReply()
-		await deleteUser({ params: { id: '0' } } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			deleteUser({ params: { id: '0' } } as any, reply)
+		).rejects.toThrow('Invalid id')
 	})
 
 	test('404 user not found', async () => {
 		deleteUserByIdMock.mockReturnValue(false)
 		const reply = buildReply()
-		await deleteUser({ params: { id: '99' } } as any, reply)
-		expect(reply.code).toHaveBeenCalledWith(404)
+		await expect(
+			deleteUser({ params: { id: '99' } } as any, reply)
+		).rejects.toThrow('User not found')
 	})
 
 	test('204 success delete', async () => {
@@ -129,41 +135,45 @@ describe('userController patchUserPassword', () => {
 
 	test('400 missing id', async () => {
 		const reply = buildReply()
-		await patchUserPassword(
-			{ params: {}, body: { password: 'abcdef' } } as any,
-			reply
-		)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			patchUserPassword(
+				{ params: {}, body: { password: 'abcdef' } } as any,
+				reply
+			)
+		).rejects.toThrow('Invalid id')
 	})
 
 	test('400 invalid id', async () => {
 		const reply = buildReply()
-		await patchUserPassword(
-			{ params: { id: '-1' }, body: { password: 'abcdef' } } as any,
-			reply
-		)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			patchUserPassword(
+				{ params: { id: '-1' }, body: { password: 'abcdef' } } as any,
+				reply
+			)
+		).rejects.toThrow('Invalid id')
 	})
 
 	test('400 invalid password (too short)', async () => {
 		const reply = buildReply()
-		await patchUserPassword(
-			{ params: { id: '1' }, body: { password: 'abc' } } as any,
-			reply
-		)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(
+			patchUserPassword(
+				{ params: { id: '1' }, body: { password: 'abc' } } as any,
+				reply
+			)
+		).rejects.toThrow('Invalid password')
 	})
 
 	test('404 user not found', async () => {
 		changeUserPasswordMock.mockReturnValue(false)
 		hashPasswordMock.mockResolvedValue('hashed-xxx')
 		const reply = buildReply()
-		await patchUserPassword(
-			{ params: { id: '5' }, body: { password: 'abcdef' } } as any,
-			reply
-		)
+		await expect(
+			patchUserPassword(
+				{ params: { id: '5' }, body: { password: 'abcdef' } } as any,
+				reply
+			)
+		).rejects.toThrow('User not found')
 		expect(hashPasswordMock).toHaveBeenCalledWith('abcdef')
-		expect(reply.code).toHaveBeenCalledWith(404)
 	})
 
 	test('success path - password changed', async () => {

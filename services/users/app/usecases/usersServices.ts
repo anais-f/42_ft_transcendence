@@ -11,8 +11,10 @@ import createHttpError from 'http-errors'
 
 export class UsersServices {
 	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
-		if (UsersRepository.existsById({ user_id: newUser.user_id }))
-			throw createHttpError.BadRequest('User already exists')
+		if (UsersRepository.existsById({ user_id: newUser.user_id })) {
+			console.log(`User ${newUser.user_id} already exists, skipping creation`)
+			return
+		}
 
 		await UsersRepository.insertUser({
 			user_id: newUser.user_id,

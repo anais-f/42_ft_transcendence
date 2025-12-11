@@ -10,7 +10,7 @@ export const LobbyPage = (): string => /*html*/ `
 		</button>
 		<div class="text-xl py-4 text-justify select-none">
 			Dear reader,<br>
-			We cordially invite you to share the code above with a friend so that you can invite them to play.
+			We cordially invit e you to share the code above with a friend so that you can invite them to play.
 		</div>
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
