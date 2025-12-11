@@ -1,7 +1,15 @@
+import { games } from '../gameData.js'
 import { leaveGame } from './leaveGame.js'
 
-export function startTimeOut(pID: number, ms: number = 10000) {
+export function startTimeOut(code: string, ms: number = 10000) {
+	const gameData = games.get(code)
+	if (!gameData) {
+		return
+	}
+
 	setTimeout(() => {
-		leaveGame(pID)
+		if (!gameData.p1.connState || !gameData.p2?.connState) {
+			leaveGame(gameData.p1.id)
+		}
 	}, ms)
 }

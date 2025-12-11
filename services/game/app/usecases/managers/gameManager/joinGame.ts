@@ -24,7 +24,7 @@ export function joinGame(gameCode: string, pID: number) {
 	if (!gameData.p2) {
 		gameData.p2 = { id: pID, connState: false }
 		playerToGame.set(pID, gameCode)
-		startTimeOut(pID, 50000)
+		startTimeOut(gameCode, 50000)
 		return
 	}
 
