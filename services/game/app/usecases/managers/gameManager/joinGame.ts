@@ -1,4 +1,4 @@
-import { games } from '../gameData.js'
+import { games, playerToGame } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 
 export function joinGame(gameCode: string, pID: number) {
@@ -23,7 +23,8 @@ export function joinGame(gameCode: string, pID: number) {
 
 	if (!gameData.p2) {
 		gameData.p2 = { id: pID, connState: false }
-		startTimeOut(pID, 5000)
+		playerToGame.set(pID, gameCode)
+		startTimeOut(pID, 50000)
 		return
 	}
 
