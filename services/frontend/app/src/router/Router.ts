@@ -1,7 +1,7 @@
 import { routerMap, Route, Pages } from './routerMap'
 import { checkAuth } from '../api/authService'
 import { setCurrentUser, currentUser } from '../usecases/userStore'
-import { IPrivateUser } from '@ft_transcendence/common' // Ajout de l'import pour le type manquant
+import { IPrivateUser } from '@ft_transcendence/common'
 
 declare global {
   interface Window {
@@ -78,7 +78,6 @@ export class Router {
     const route = this.getRoute(url)
 
     try {
-      // Utilisation de IPrivateUser au lieu de UserProfile
       let user: IPrivateUser | null = currentUser // Commence avec l'état du store
 
       // 1. --- AUTHENTICATION CHECK API ---

@@ -22,12 +22,10 @@ export function jwtAuthMiddleware(
       })
 }
 
-
 /**
  * @description Check valid JWT token and ownership
  * @use Routes where users can access and modify only their own resources
  */
-
 export function jwtAuthOwnerMiddleware(
     request: FastifyRequest<{ Params: { id: number } }>,
     reply: FastifyReply,

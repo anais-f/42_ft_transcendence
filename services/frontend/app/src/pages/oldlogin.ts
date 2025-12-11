@@ -6,8 +6,7 @@ export const LoginPage = (): string => {
 <section class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<h1 class="text-2xl py-4">SUBSCRIBE TO OUR NEWSPAPER</h1>
-		<form id="register_form" onsubmit="(e) => {console.log('Submit', e)
-		e.preventDefault()}" class="flex flex-col gap-2">
+		<form id="register_form" class="flex flex-col gap-2">
 			<input id="register_username" type="text" name="register_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
 			<input id="register_password" type="password" name="register_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
 			<input id="register_conf_password" type="password" name="register_conf_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="CONFIRM PASSWORD" required>
