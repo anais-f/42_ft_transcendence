@@ -5,10 +5,12 @@ import metricPlugin from 'fastify-metrics'
 import { socialRoutes } from './routes/socialRoutes.js'
 import { loadOpenAPISchema } from '@ft_transcendence/common'
 import { createWsApp } from '@ft_transcendence/security'
+import { startHeartbeat } from './usecases/heartbeatService.js'
 
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 const openapiSwagger = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+
 export async function start(): Promise<void> {
 	const app = createWsApp(
 		socialRoutes,
@@ -23,7 +25,10 @@ export async function start(): Promise<void> {
 			},
 			transform: jsonSchemaTransform
 		},
-		process.env.JWT_SECRET_SOCIAL as string
+		{
+			main: process.env.JWT_SECRET as string,
+			service: process.env.JWT_SECRET_SOCIAL as string
+		}
 	)
 
 	try {
@@ -35,6 +40,9 @@ export async function start(): Promise<void> {
 		})
 		console.log('Listening on port ', process.env.PORT)
 		console.log(`Swagger UI available at ${HOST}/social/docs`)
+
+		startHeartbeat()
+		console.log('WebSocket heartbeat monitoring started')
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

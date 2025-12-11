@@ -1,186 +1,104 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import '@fastify/multipart'
 import {
-	AppError,
-	ERROR_MESSAGES,
-	SUCCESS_MESSAGES,
 	UserProfileUpdateUsernameSchema,
 	UpdateUserStatusSchema,
 	UpdateUserStatusDTO
 } from '@ft_transcendence/common'
 import { UpdateUsersServices } from '../usecases/updateUsersServices.js'
+import createHttpError from 'http-errors'
 
 export async function updateUsername(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	try {
-		const user = req.user as { user_id?: number } | undefined
-		const userId = Number(user?.user_id)
-		const { username } = req.body as { username?: string }
+	const user = req.user as { user_id?: number } | undefined
+	const userId = Number(user?.user_id)
+	const { username } = req.body as { username?: string }
 
-		if (!userId || userId <= 0) {
-			void reply
-				.code(400)
-				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-			return
-		}
+	if (!userId || userId <= 0)
+		throw createHttpError.BadRequest('Invalid user ID')
 
-		const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
-		if (!parsed.success) {
-			console.error(
-				'UserProfileUpdateUsername validation failed:',
-				parsed.error
-			)
-			void reply.code(400).send({
-				success: false,
-				error: ERROR_MESSAGES.INVALID_USER_DATA + 'test'
-			})
-			return
-		}
-
-		await UpdateUsersServices.updateUsernameProfile(
-			{ user_id: userId },
-			parsed.data.username
-		)
-
-		void reply
-			.code(200)
-			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-	} catch (error: any) {
-		if (error instanceof AppError) {
-			void reply
-				.code(error.status)
-				.send({ success: false, error: error.message })
-			return
-		}
-		console.error('Unexpected error in updateUsernameProfile:', error)
-		void reply
-			.code(500)
-			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+	const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
+	if (!parsed.success) {
+		console.error('UserProfileUpdateUsername validation failed:', parsed.error)
+		throw createHttpError.BadRequest('Invalid user data')
 	}
+
+	await UpdateUsersServices.updateUsernameProfile(
+		{ user_id: userId },
+		parsed.data.username
+	)
+
+	reply.send({ message: 'User updated' })
 }
 
 export async function updateAvatar(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	try {
-		const user = request.user as { user_id?: number } | undefined
-		const userId = Number(user?.user_id)
+	const user = request.user as { user_id?: number } | undefined
+	const userId = Number(user?.user_id)
 
-		if (!userId || userId <= 0) {
-			void reply
-				.code(400)
-				.send({ success: false, error: ERROR_MESSAGES.INVALID_USER_ID })
-			return
+	if (!userId || userId <= 0)
+		throw createHttpError.BadRequest('Invalid user ID')
+
+	let buffer: Buffer
+	let filename: string
+	let mimeType: string
+
+	const contentType = request.headers['content-type'] || ''
+	const isMultipart =
+		contentType.startsWith('multipart/') && contentType.includes('boundary=')
+
+	if (isMultipart) {
+		const data = await request.file()
+		if (!data) throw createHttpError.BadRequest('Missing file')
+
+		const chunks: Buffer[] = []
+		for await (const chunk of data.file) {
+			chunks.push(chunk)
 		}
+		buffer = Buffer.concat(chunks)
+		filename = data.filename
+		mimeType = data.mimetype
+	} else {
+		if (!Buffer.isBuffer(request.body))
+			throw createHttpError.BadRequest('Missing file')
 
-		let buffer: Buffer
-		let filename: string
-		let mimeType: string
-
-		const contentType = request.headers['content-type'] || ''
-		const isMultipart =
-			contentType.startsWith('multipart/') && contentType.includes('boundary=')
-
-		if (isMultipart) {
-			const data = await request.file()
-			if (!data) {
-				void reply
-					.code(400)
-					.send({ success: false, error: ERROR_MESSAGES.MISSING_FILE })
-				return
-			}
-
-			const chunks: Buffer[] = []
-			for await (const chunk of data.file) {
-				chunks.push(chunk)
-			}
-			buffer = Buffer.concat(chunks)
-			filename = data.filename
-			mimeType = data.mimetype
-		} else {
-			if (!Buffer.isBuffer(request.body)) {
-				void reply
-					.code(400)
-					.send({ success: false, error: ERROR_MESSAGES.MISSING_FILE })
-				return
-			}
-
-			buffer = request.body as Buffer
-			mimeType = contentType
-			filename = `avatar.${(mimeType.split('/')[1] || 'bin').replace(/[^a-z0-9]/gi, '')}`
-		}
-
-		if (buffer.length === 0) {
-			void reply
-				.code(400)
-				.send({ success: false, error: ERROR_MESSAGES.MISSING_FILE })
-			return
-		}
-
-		await UpdateUsersServices.checkUserAvatar({
-			user_id: userId,
-			avatarBuffer: buffer,
-			originalName: filename,
-			mimeType: mimeType
-		})
-
-		void reply.code(200).send({
-			success: true,
-			message: SUCCESS_MESSAGES.USER_UPDATED
-		})
-	} catch (error: any) {
-		if (error instanceof AppError) {
-			void reply
-				.code(error.status)
-				.send({ success: false, error: error.message })
-			return
-		}
-		console.error('Unexpected error in updateAvatar:', error)
-		void reply
-			.code(500)
-			.send({ success: false, error: ERROR_MESSAGES.INTERNAL_ERROR })
+		buffer = request.body as Buffer
+		mimeType = contentType
+		filename = `avatar.${(mimeType.split('/')[1] || 'bin').replace(/[^a-z0-9]/gi, '')}`
 	}
+
+	if (buffer.length === 0) throw createHttpError.BadRequest('Missing file')
+
+	await UpdateUsersServices.checkUserAvatar({
+		user_id: userId,
+		avatarBuffer: buffer,
+		originalName: filename,
+		mimeType: mimeType
+	})
+
+	reply.code(200).send({ message: 'User updated' })
 }
 
 export async function updateUserStatus(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	try {
-		const { user_id } = req.params as { user_id: number }
-		const body = req.body as UpdateUserStatusDTO
+	const { user_id } = req.params as { user_id: number }
+	const body = req.body as UpdateUserStatusDTO
 
-		const parsed = UpdateUserStatusSchema.safeParse(body)
-		if (!parsed.success) {
-			console.error('UpdateUserStatus validation failed:', parsed.error)
-			void reply.code(400).send({
-				success: false,
-				error: ERROR_MESSAGES.INVALID_USER_DATA
-			})
-			return
-		}
-
-		const { status, lastConnection } = parsed.data
-
-		await UpdateUsersServices.updateUserStatus(user_id, status, lastConnection)
-
-		void reply
-			.code(200)
-			.send({ success: true, message: SUCCESS_MESSAGES.USER_UPDATED })
-	} catch (error: any) {
-		if (error instanceof AppError) {
-			void reply
-				.code(error.status)
-				.send({ success: false, error: error.message })
-		} else {
-			console.error('Unexpected error in updateUserStatus:', error)
-			void reply.code(500).send({
-				success: false,
-				error: ERROR_MESSAGES.INTERNAL_ERROR
-			})
-		}
+	const parsed = UpdateUserStatusSchema.safeParse(body)
+	if (!parsed.success) {
+		console.error('UpdateUserStatus validation failed:', parsed.error)
+		throw createHttpError.BadRequest('Invalid user data')
 	}
+
+	const { status, lastConnection } = parsed.data
+
+	await UpdateUsersServices.updateUserStatus(user_id, status, lastConnection)
+
+	reply.code(200).send({ message: 'User updated' })
 }
