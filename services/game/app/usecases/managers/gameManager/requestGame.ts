@@ -33,7 +33,11 @@ export function requestGame(
 	if (pID2) {
 		// locked game
 		playerToGame.set(pID2, newCode)
-		startTimeOut(newCode, 50000)
+		try {
+			startTimeOut(newCode, 50000)
+		} catch (_) {
+			// This can happen with normal use
+		}
 	}
 
 	return newCode

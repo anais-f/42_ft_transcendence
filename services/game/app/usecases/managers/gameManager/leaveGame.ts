@@ -1,6 +1,7 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame } from '../gameData.js'
 
+// todo silent throw ?
 export function leaveGame(pID: number) {
 	const gameCode = playerToGame.get(pID)
 	if (!gameCode) {

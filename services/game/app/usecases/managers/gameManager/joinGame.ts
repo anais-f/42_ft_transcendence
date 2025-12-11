@@ -24,7 +24,11 @@ export function joinGame(gameCode: string, pID: number) {
 	if (!gameData.p2) {
 		gameData.p2 = { id: pID, connState: false }
 		playerToGame.set(pID, gameCode)
-		startTimeOut(gameCode, 50000)
+		try {
+			startTimeOut(gameCode, 50000)
+		} catch (_) {
+			// This can happen with normal use
+		}
 		return
 	}
 
