@@ -26,8 +26,7 @@ WORKDIR /app
 
 RUN npm install -g serve
 
-COPY --from=build-app /build/services/frontend/app/index.html ./
-COPY --from=build-app /build/services/frontend/app/dist/*.js ./
+COPY --from=build-app /build/services/frontend/app/dist ./
 
 EXPOSE 3000
 
