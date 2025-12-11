@@ -21,7 +21,6 @@ export function validateSessionController(
 	)
 	if (currentSessionId === session_id) {
 		return reply.code(200).send({ valid: true })
-	} else {
-		throw createHttpError.Unauthorized('Session expired or invalid')
 	}
+	throw createHttpError.Unauthorized('Session expired or invalid')
 }
