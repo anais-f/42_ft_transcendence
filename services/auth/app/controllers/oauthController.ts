@@ -46,7 +46,6 @@ export async function googleLoginController(
 	if (user) {
 		console.log('Google user already exists, logging in')
 		if (!user.two_fa_enabled) {
-			// Incrémenter le session_id pour invalider les anciens tokens
 			incrementSessionId(user.user_id)
 			const newSessionId = getSessionId(user.user_id) ?? 0
 
@@ -125,8 +124,6 @@ export async function googleLoginController(
 			throw createHttpError.ServiceUnavailable('Users service unavailable')
 		}
 
-		// Auto-login on successful registration
-		// Incrémenter le session_id pour le nouvel utilisateur
 		incrementSessionId(PublicUser.user_id)
 		const newSessionId = getSessionId(PublicUser.user_id) ?? 0
 

@@ -25,7 +25,6 @@ export async function registerController(
 		throw createHttpError.InternalServerError('Server configuration error')
 	}
 
-	// Try/catch UNIQUEMENT pour registerUser (SQLITE errors)
 	try {
 		await registerUser(login, password)
 	} catch (e: any) {
@@ -56,8 +55,6 @@ export async function registerController(
 		throw createHttpError.ServiceUnavailable('Users service unavailable')
 	}
 
-	// Auto-login on successful registration
-	// Récupérer le session_id initial (devrait être 0 pour un nouvel utilisateur)
 	const sessionId = getSessionId(PublicUser.user_id) ?? 0
 
 	const token = signToken(
@@ -137,7 +134,6 @@ export async function validateAdminController(
 		if (!payload.is_admin) throw createHttpError.Forbidden('Forbidden')
 		return reply.code(200).send({ success: true })
 	} catch (e: any) {
-		// Si c'est déjà une HttpError, rethrow
 		if (e && (e.statusCode || e.status)) {
 			throw e
 		}
@@ -150,14 +146,9 @@ export async function logoutController(
 	reply: FastifyReply
 ) {
 	try {
-		// Vérifier le JWT pour obtenir le user_id
 		await request.jwtVerify()
 		const userId = request.user.user_id
-
-		// Incrémenter le session_id pour invalider tous les tokens existants
 		incrementSessionId(userId)
-
-		// Supprimer les cookies
 		reply.clearCookie('auth_token', { path: '/' })
 		reply.clearCookie('twofa_token', { path: '/' })
 

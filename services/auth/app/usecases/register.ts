@@ -32,7 +32,6 @@ export async function loginUser(login: string, password: string) {
 	if (!ok) return null
 	const isAdmin = Boolean(user.is_admin)
 
-	// Incrémenter le session_id pour invalider les anciens tokens
 	incrementSessionId(user.user_id)
 	const newSessionId = getSessionId(user.user_id) ?? 0
 

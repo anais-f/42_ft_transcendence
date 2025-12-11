@@ -115,7 +115,6 @@ export async function verify2faLoginController(
 
 	setUser2FAEnabled(payload.user_id, true)
 
-	// Incrémenter le session_id après validation 2FA
 	incrementSessionId(payload.user_id)
 	const newSessionId = getSessionId(payload.user_id) ?? 0
 

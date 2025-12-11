@@ -96,7 +96,6 @@ export function isUser2FAEnabled(id: number): boolean {
 	return !!row && row.two_fa_enabled === 1
 }
 
-// Session management
 export function incrementSessionId(user_id: number): void {
 	const stmt = db().prepare(
 		'UPDATE users SET session_id = session_id + 1 WHERE user_id = ?'
