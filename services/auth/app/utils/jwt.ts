@@ -6,6 +6,7 @@ export function signToken(
 	payload: {
 		user_id: number
 		login?: string
+		session_id?: number
 		is_admin?: boolean
 		type: string
 	},
