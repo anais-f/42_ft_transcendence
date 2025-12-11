@@ -169,7 +169,7 @@ route will handle JWT token generation for WebSocket connection.
 
 ### `startTimeOut(pID, ms?)`
 
-Starts a timeout for a player. When the timeout expires, `leaveGame(pID)` is
+Starts a timeout for a game. When the timeout expires, `leaveGame()` is
 called automatically. The timeout duration is configurable.
 
 - Called in `requestGame` for locked games (when both players are pre-assigned)
@@ -216,3 +216,4 @@ wins by forfeit (if applicable).
 - [x] #113
 - [ ] #114
 - [x] #115
+- [ ] fix 500 on TO
