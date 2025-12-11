@@ -4,7 +4,9 @@ import { authenticator } from 'otplib'
 import { verifyToken, signToken } from '../utils/jwt.js'
 import {
 	setUser2FAEnabled,
-	isUser2FAEnabled
+	isUser2FAEnabled,
+	incrementSessionId,
+	getSessionId
 } from '../repositories/userRepository.js'
 import { twofaCodeSchema } from '@ft_transcendence/common'
 
@@ -112,10 +114,16 @@ export async function verify2faLoginController(
 	if (!ok) throw createHttpError(status, data.error || '2FA service error')
 
 	setUser2FAEnabled(payload.user_id, true)
+
+	// Incrémenter le session_id après validation 2FA
+	incrementSessionId(payload.user_id)
+	const newSessionId = getSessionId(payload.user_id) ?? 0
+
 	const newToken = signToken(
 		{
 			user_id: payload.user_id,
 			login: payload.login,
+			session_id: newSessionId,
 			is_admin: payload.is_admin,
 			type: 'auth'
 		},

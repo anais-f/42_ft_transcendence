@@ -1,8 +1,12 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginActionSchema } from '@ft_transcendence/common'
-import { findPublicUserByLogin } from '../repositories/userRepository.js'
-import { deleteUserById } from '../repositories/userRepository.js'
+import {
+	findPublicUserByLogin,
+	deleteUserById,
+	incrementSessionId,
+	getSessionId
+} from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
 
@@ -53,10 +57,14 @@ export async function registerController(
 	}
 
 	// Auto-login on successful registration
+	// Récupérer le session_id initial (devrait être 0 pour un nouvel utilisateur)
+	const sessionId = getSessionId(PublicUser.user_id) ?? 0
+
 	const token = signToken(
 		{
 			user_id: PublicUser.user_id,
 			login: PublicUser.login,
+			session_id: sessionId,
 			is_admin: false,
 			type: 'auth'
 		},
@@ -141,7 +149,24 @@ export async function logoutController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	reply.clearCookie('auth_token', { path: '/' })
-	reply.clearCookie('twofa_token', { path: '/' })
-	return reply.code(200).send({ success: true })
+	try {
+		// Vérifier le JWT pour obtenir le user_id
+		await request.jwtVerify()
+		const userId = request.user.user_id
+
+		// Incrémenter le session_id pour invalider tous les tokens existants
+		incrementSessionId(userId)
+
+		// Supprimer les cookies
+		reply.clearCookie('auth_token', { path: '/' })
+		reply.clearCookie('twofa_token', { path: '/' })
+
+		return reply.code(200).send({
+			success: true,
+			message: 'Logged out successfully'
+		})
+	} catch (e) {
+		console.error('Logout error:', e)
+		throw createHttpError.InternalServerError('Logout failed')
+	}
 }

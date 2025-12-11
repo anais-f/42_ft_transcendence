@@ -3,7 +3,9 @@ import {
 	findUserByLogin,
 	createAdminUser,
 	createGoogleUser,
-	isUser2FAEnabled
+	isUser2FAEnabled,
+	incrementSessionId,
+	getSessionId
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
@@ -29,12 +31,18 @@ export async function loginUser(login: string, password: string) {
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) return null
 	const isAdmin = Boolean(user.is_admin)
+
+	// Incrémenter le session_id pour invalider les anciens tokens
+	incrementSessionId(user.user_id)
+	const newSessionId = getSessionId(user.user_id) ?? 0
+
 	if (!isUser2FAEnabled(user.user_id)) {
 		return {
 			token: signToken(
 				{
 					user_id: user.user_id,
 					login: user.login,
+					session_id: newSessionId,
 					is_admin: isAdmin,
 					type: 'auth'
 				},

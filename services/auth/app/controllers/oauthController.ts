@@ -3,10 +3,12 @@ import { OAuth2Client } from 'google-auth-library'
 import {
 	findPublicUserByGoogleId,
 	findUserByGoogleId,
-	deleteUserById
+	deleteUserById,
+	createGoogleUser,
+	incrementSessionId,
+	getSessionId
 } from '../repositories/userRepository.js'
 import { signToken } from '../utils/jwt.js'
-import { createGoogleUser } from '../repositories/userRepository.js'
 import createHttpError from 'http-errors'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
@@ -44,10 +46,15 @@ export async function googleLoginController(
 	if (user) {
 		console.log('Google user already exists, logging in')
 		if (!user.two_fa_enabled) {
+			// Incrémenter le session_id pour invalider les anciens tokens
+			incrementSessionId(user.user_id)
+			const newSessionId = getSessionId(user.user_id) ?? 0
+
 			const authToken = signToken(
 				{
 					user_id: user.user_id,
 					login: user.login,
+					session_id: newSessionId,
 					is_admin: user.is_admin,
 					type: 'auth'
 				},
@@ -119,10 +126,15 @@ export async function googleLoginController(
 		}
 
 		// Auto-login on successful registration
+		// Incrémenter le session_id pour le nouvel utilisateur
+		incrementSessionId(PublicUser.user_id)
+		const newSessionId = getSessionId(PublicUser.user_id) ?? 0
+
 		const authToken = signToken(
 			{
 				user_id: PublicUser.user_id,
 				login: PublicUser.login,
+				session_id: newSessionId,
 				is_admin: false,
 				type: 'auth'
 			},
