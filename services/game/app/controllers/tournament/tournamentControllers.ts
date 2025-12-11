@@ -3,7 +3,7 @@ import {
 	joinTournament,
 	createTournament,
 	getTournament
-} from '../usecases/tournamentUsecases.js'
+} from '../../usecases/tournamentUsecases.js'
 
 export function getTournamentController(
 	request: FastifyRequest,
