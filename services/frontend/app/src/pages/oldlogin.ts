@@ -1,3 +1,6 @@
+import { checkAuth } from '../api/authService'
+import { setCurrentUser } from '../usecases/userStore'
+
 export const LoginPage = (): string => {
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
@@ -113,13 +116,18 @@ export function bindRegisterForm() {
 				body: JSON.stringify(user)
 			})
 
-			if (!res.ok) {
-				const error = await res.json()
-				console.error('Register failed:', res.status, error)
-				return
-			}
+      if (!res.ok) {
+        const error = await res.json()
+        console.error('Register failed:', res.status, error)
+        return
+      }
 
-			window.navigate('/')
+      // Après register réussi, vérifier l'auth et mettre à jour le store
+      // puis naviguer avec skipAuth=true pour éviter un double appel
+      const authResult = await checkAuth()
+      setCurrentUser(authResult)
+      // CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
+      await window.navigate('/', true)
 		} catch (e) {
 			console.error('Register error:', e)
 		}
@@ -183,13 +191,18 @@ export function bindLoginForm() {
 				body: JSON.stringify(credentials)
 			})
 
-			if (!res.ok) {
-				const error = await res.json()
-				console.error('Login failed:', res.status, error)
-				return
-			}
+      if (!res.ok) {
+        const error = await res.json()
+        console.error('Login failed:', res.status, error)
+        return
+      }
 
-			window.navigate('/')
+      // Après login réussi, vérifier l'auth et mettre à jour le store
+      // puis naviguer avec skipAuth=true pour éviter un double appel
+      const authResult = await checkAuth()
+      setCurrentUser(authResult)
+      // CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
+      await window.navigate('/', true)
 		} catch (e) {
 			console.error('Login error:', e)
 		}
