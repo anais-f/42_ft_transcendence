@@ -139,21 +139,21 @@ export function unbindLogOutButton() {
 
 const fr1 = {
 	username: 'Anfichet',
-	avatar: '/assets/images/anfichet.jpeg',
+	avatar: '/assets/images/bear.png',
 	alt: 'Nanou_avatar',
 	status: 'Online'
 }
 
 const fr2 = {
 	username: 'Mjuffard',
-	avatar: '/assets/images/mjuffard.jpg',
+	avatar: '/assets/images/bear.png',
 	alt: 'Mich_avatar',
 	status: 'Online'
 }
 
 const fr3 = {
 	username: 'Lrio',
-	avatar: '/assets/images/lrio.jpg',
+	avatar: '/assets/images/bear.png',
 	alt: 'Lohhiiccc_avatar',
 	status: 'Offline'
 }
