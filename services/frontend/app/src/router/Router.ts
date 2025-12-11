@@ -1,12 +1,14 @@
-import { routerMap, Route, Pages } from './routerMap'
-import { checkAuth } from '../api/authService'
-import { setCurrentUser } from '../usecases/userStore'
+import { routerMap, Route } from './routerMap.js'
+import { checkAuth } from '../api/authService.js'
+import { setCurrentUser } from '../usecases/userStore.js'
 
 declare global {
 	interface Window {
 		navigate: (url: string, skipAuth?: boolean) => void
 	}
 }
+
+export let routeParams: Record<string, string> = {}
 
 export class Router {
 	private isNavigating = false
@@ -19,12 +21,53 @@ export class Router {
 		this.initEventListeners()
 	}
 
-	// Find route by URL
 	private getRoute(url: string): Route {
-		return (
-			Object.values(routerMap).find((route) => route.url === url) ||
-			this.HOME_ROUTE
+		routeParams = {}
+
+		// exact match first
+		const exactMatch = Object.values(routerMap).find(
+			(route) => route.url === url
 		)
+		if (exactMatch) return exactMatch
+
+		// dynamic match
+		for (const route of Object.values(routerMap)) {
+			const match = this.matchDynamicRoute(route.url, url)
+			if (match) {
+				routeParams = match
+				return route
+			}
+		}
+
+		return this.HOME_ROUTE
+	}
+
+	// match a route pattern against a URL and extract params
+	private matchDynamicRoute(
+		pattern: string,
+		url: string
+	): Record<string, string> | null {
+		const patternParts = pattern.split('/')
+		const urlParts = url.split('/')
+
+		if (patternParts.length !== urlParts.length) return null
+
+		const params: Record<string, string> = {}
+
+		for (let i = 0; i < patternParts.length; i++) {
+			const patternPart = patternParts[i]
+			const urlPart = urlParts[i]
+
+			if (patternPart.startsWith(':')) {
+				// dynamic segment
+				params[patternPart.slice(1)] = urlPart
+			} else if (patternPart !== urlPart) {
+				// static segment doesn't match
+				return null
+			}
+		}
+
+		return params
 	}
 
 	// Render the page content and manage binds/unbinds
@@ -115,7 +158,7 @@ export class Router {
 
 	// Public method to navigate to a URL
 	// updates browser history and triggers navigation handling
-	public navigate = async (url: string, skipAuth: boolean = false): void => {
+	public navigate = async (url: string, skipAuth: boolean = false): Promise<void> => {
 		if (window.location.pathname === url) {
 			console.log('Already at', url)
 			return
@@ -133,7 +176,7 @@ export class Router {
 	}
 
 	// Start the router
-	public async start(): void {
+	public async start(): Promise<void> {
 		// Expose navigate on window for inline onclicks
 		// @ts-ignore
 		window.navigate = (url: string, skipAuth?: boolean) =>
