@@ -1,18 +1,10 @@
-export interface UserProfile {
-	user_id: number
-	username: string
-	avatar: string
-	status: number
-	last_connection: string
-}
-
-//TODO : mettre le Iuserprofile
+import { IPrivateUser } from '@ft_transcendence/common'
 
 /**
  * Check if user is authenticated by calling backend
  * JWT is in httpOnly cookie, sent automatically with credentials: 'include'
  */
-export async function checkAuth(): Promise<UserProfile | null> {
+export async function checkAuth(): Promise<IPrivateUser | null> {
 	try {
 		const response = await fetch('/users/api/users/me', {
 			method: 'GET',
@@ -21,7 +13,7 @@ export async function checkAuth(): Promise<UserProfile | null> {
 
 		if (!response.ok) return null
 
-		const user = (await response.json()) as UserProfile
+		const user = (await response.json()) as IPrivateUser
 		return user
 	} catch (error) {
 		console.error('Auth check failed:', error)
