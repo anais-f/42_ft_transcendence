@@ -8,7 +8,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY services/frontend/app/package.json ./services/frontend/app/package.json
 
-RUN npm ci
+RUN apk add --no-cache python3 make g++ && npm ci
 
 COPY tsconfig.json ./
 COPY services/frontend/app ./services/frontend/app
