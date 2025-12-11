@@ -31,6 +31,7 @@ export function runMigrations() {
 	db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	  session_id INTEGER DEFAULT 0,
       login TEXT UNIQUE NOT NULL,
       password TEXT,
 	  google_id TEXT UNIQUE,
