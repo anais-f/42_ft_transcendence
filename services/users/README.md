@@ -25,19 +25,14 @@ The service clearly distinguishes between:
 ### Variables required for normal operation
 
 - `INTERNAL_API_SECRET`: Secret/API key to protect internal endpoints
-- `DATABASE_URL`: PostgreSQL database connection URL (or separate DB variables depending on your configuration)
+- `DATABASE_URL`: SQLite database connection URL (or separate DB variables depending on your configuration)
 - `HOST` / `PORT`: Host and port on which the service listens
 - `AVATAR_STORAGE_PATH`: Storage path for uploaded avatars
 - `JWT_SECRET`: JWT secret for authentication token validation
 
-### Variables required only for tests
-
-- `TEST_DATABASE_URL`: Test database URL (if separate configuration)
-- Avatar storage access variables for upload tests
-
 ## Database
 
-The service uses a **PostgreSQL** database to store user profiles. The main `users` table contains:
+The service uses a **SQLite** database to store user profiles. The main `users` table contains:
 
 - `user_id` (primary key): Unique user identifier
 - `username`: Username (unique, modifiable)

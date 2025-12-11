@@ -26,7 +26,10 @@ async function start(): Promise<void> {
 			},
 			transform: jsonSchemaTransform
 		},
-		process.env.JWT_SECRET_GAME as string
+		{
+			main: process.env.JWT_SECRET as string,
+			service: process.env.JWT_SECRET_GAME as string
+		}
 	)
 
 	try {

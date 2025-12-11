@@ -26,7 +26,7 @@
 // } from '@ft_transcendence/security'
 // import fastifyJwt from '@fastify/jwt'
 // import fastifyCookie from '@fastify/cookie'
-
+//
 // const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>()
 // const jwtSecret = process.env.JWT_SECRET
 // if (!jwtSecret) {
@@ -35,7 +35,7 @@
 // console.log('Using JWT Secret:', jwtSecret)
 // app.setValidatorCompiler(validatorCompiler)
 // app.setSerializerCompiler(serializerCompiler)
-
+//
 // app.register(fastifyCookie)
 // app.register(fastifyJwt, {
 // 	secret: jwtSecret,
@@ -44,9 +44,9 @@
 // 		signed: false
 // 	}
 // })
-
+//
 // setupFastifyMonitoringHooks(app)
-
+//
 // type MatchTournament = {
 // 	previousMatchId1?: number
 // 	previousMatchId2?: number
@@ -58,7 +58,7 @@
 // 	scorePlayer1?: number
 // 	scorePlayer2?: number
 // }
-
+//
 // type Tournament = {
 // 	id: number
 // 	creatorId: number
@@ -69,12 +69,12 @@
 // 	participantsBan: number[]
 // 	matchs: MatchTournament[]
 // }
-
+//
 // const tournaments: Map<number, Tournament> = new Map()
 // let nextTournamentId = 1
-
+//
 // let db: Database
-
+//
 // function historyRoutes(app: FastifyInstance) {
 // 	app.get(
 // 		'/api/matchHisotry/:id',
@@ -82,7 +82,7 @@
 // 		getMatchHistoryController
 // 	)
 // }
-
+//
 // function tournamentRoutes(app: FastifyInstance) {
 // 	app.post(
 // 		'/api/createTournament',
@@ -124,7 +124,7 @@
 // 		deleteTournamentController
 // 	)
 // }
-
+//
 // function getMatchHistoryController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -150,7 +150,7 @@
 // 	}
 // 	return reply.send({ success: true, match })
 // }
-
+//
 // function deleteTournamentController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -171,7 +171,7 @@
 // 	tournaments.delete(tournament.id)
 // 	return reply.send({ success: true })
 // }
-
+//
 // function getTournamentController(request: FastifyRequest, reply: FastifyReply) {
 // 	const userId = request.user.user_id
 // 	if (userId === undefined) {
@@ -187,7 +187,7 @@
 // 	}
 // 	return reply.send({ success: true, tournament })
 // }
-
+//
 // const randomAlphaNumeric = (length: number) => {
 // 	const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 // 	let s = ''
@@ -196,7 +196,7 @@
 // 	}
 // 	return s
 // }
-
+//
 // const createInviteCode = (): string => {
 // 	const str1: string = randomAlphaNumeric(4)
 // 	const str2: string = randomAlphaNumeric(4)
@@ -204,7 +204,7 @@
 // 		if (tournament.name === str1 + '-' + str2) return createInviteCode()
 // 	return str1 + '-' + str2
 // }
-
+//
 // function removeFromTournamentController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -234,10 +234,10 @@
 // 	tournament.participantsBan.push(parsed.data.userId)
 // 	return reply.send({ success: true, tournament })
 // }
-
+//
 // function shuffle(array: any[]) {
 // 	let currentIndex = array.length
-
+//
 // 	while (currentIndex != 0) {
 // 		let randomIndex = Math.floor(Math.random() * currentIndex)
 // 		currentIndex--
@@ -247,7 +247,7 @@
 // 		]
 // 	}
 // }
-
+//
 // function createTournamentTree(id: number) {
 // 	const tournament = tournaments.get(id)
 // 	if (!tournament) {
@@ -302,7 +302,7 @@
 // 	console.log('Tournament Matches:', tournament.matchs)
 // 	console.log('Tournament tree created successfully')
 // }
-
+//
 // function startTournamentController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -326,7 +326,7 @@
 // 	createTournamentTree(tournament.id)
 // 	return reply.send({ success: true, tournament })
 // }
-
+//
 // function createTournamentController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -357,7 +357,7 @@
 // 	})
 // 	return reply.send(tournaments.get(nextTournamentId++))
 // }
-
+//
 // function joinTournamentController(
 // 	request: FastifyRequest,
 // 	reply: FastifyReply
@@ -395,12 +395,12 @@
 // 	tournament.participants.push(userId)
 // 	return reply.send({ success: true, tournament })
 // }
-
+//
 // async function registerRoutes(app: FastifyInstance) {
 // 	await app.register(tournamentRoutes)
 // 	await app.register(historyRoutes)
 // }
-
+//
 // function getDb(): Database {
 // 	if (!db) {
 // 		const path = process.env.MATCHMAKING_DB_PATH
@@ -415,7 +415,7 @@
 // 	}
 // 	return db
 // }
-
+//
 // function saveMatchToHistory(
 // 	player1Id: number,
 // 	player2Id: number,
@@ -425,7 +425,7 @@
 // ): number {
 // 	const db = getDb()
 // 	const winnerId = scorePlayer1 > scorePlayer2 ? player1Id : player2Id
-
+//
 // 	const matchResult = db
 // 		.prepare(
 // 			`
@@ -434,26 +434,26 @@
 // 	`
 // 		)
 // 		.run(winnerId, isTournament)
-
+//
 // 	const matchId = matchResult.lastInsertRowid as number
-
+//
 // 	db.prepare(
 // 		`
 // 		INSERT INTO match_player (id_match, player_id, score)
 // 		VALUES (?, ?, ?)
 // 	`
 // 	).run(matchId, player1Id, scorePlayer1)
-
+//
 // 	db.prepare(
 // 		`
 // 		INSERT INTO match_player (id_match, player_id, score)
 // 		VALUES (?, ?, ?)
 // 	`
 // 	).run(matchId, player2Id, scorePlayer2)
-
+//
 // 	return matchId
 // }
-
+//
 // function runMigrations() {
 // 	const db = getDb()
 // 	db.exec(`
@@ -464,7 +464,7 @@
 // 			round INTEGER DEFAULT NULL,
 // 			id_tournament INTEGER DEFAULT NULL
 // 		);
-
+//
 // 		CREATE TABLE IF NOT EXISTS match_player (
 // 			id_match INTEGER NOT NULL,
 // 			player_id INTEGER NOT NULL,
@@ -474,7 +474,7 @@
 // 		);
 // 	`)
 // }
-
+//
 // async function runServer() {
 // 	console.log('Starting Matchmaking service...')
 // 	runMigrations()
@@ -501,16 +501,16 @@
 // 	await app.register(SwaggerUI, {
 // 		routePrefix: '/docs'
 // 	})
-
+//
 // 	await registerRoutes(app)
-
+//
 // 	const port = Number(process.env.PORT)
 // 	const host = '0.0.0.0'
-
+//
 // 	await app.listen({ port, host })
 // 	console.log(` Matchmaking service running on ${host}:${port}`)
 // }
-
+//
 // runServer().catch((error) => {
 // 	console.error('Failed to start Matchmaking service:', error)
 // 	process.exit(1)

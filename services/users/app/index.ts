@@ -5,7 +5,6 @@ import SwaggerUI from '@fastify/swagger-ui'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
-import fs from 'fs'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -16,8 +15,8 @@ import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
+import { setupErrorHandler, loadOpenAPISchema } from '@ft_transcendence/common'
 
-const OPENAPI_FILE = process.env.DTO_OPENAPI_FILE as string
 const HOST = process.env.HOST || 'http://localhost:8080'
 
 function createApp(): FastifyInstance {
@@ -27,6 +26,8 @@ function createApp(): FastifyInstance {
 	}).withTypeProvider<ZodTypeProvider>()
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
+
+	setupErrorHandler(app)
 
 	setupFastifyMonitoringHooks(app)
 
@@ -58,7 +59,10 @@ function createApp(): FastifyInstance {
 		}
 	)
 
-	const openapiSwagger = loadOpenAPISchema()
+	const openapiSwagger = loadOpenAPISchema(
+		process.env.DTO_OPENAPI_FILE as string
+	)
+
 	app.register(Swagger as any, {
 		openapi: {
 			info: {
@@ -105,23 +109,6 @@ export async function start(): Promise<void> {
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)
-	}
-}
-
-function loadOpenAPISchema() {
-	try {
-		if (!fs.existsSync(OPENAPI_FILE)) {
-			console.warn(
-				`OpenAPI DTO file not found at ${OPENAPI_FILE} - continuing without OpenAPI components`
-			)
-			return { components: {} }
-		}
-
-		const schemaData = fs.readFileSync(OPENAPI_FILE, 'utf-8')
-		return JSON.parse(schemaData)
-	} catch (error) {
-		console.error('Error loading OpenAPI schema:', error)
-		return { components: {} }
 	}
 }
 

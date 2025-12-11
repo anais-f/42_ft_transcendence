@@ -2,18 +2,17 @@ import { UsersRepository } from '../repositories/usersRepository.js'
 import { AuthApi } from '../repositories/AuthApi.js'
 import {
 	IUserId,
-	AppError,
 	PublicUserAuthDTO,
 	UserPublicProfileDTO,
 	UserPrivateProfileDTO,
-	UserSearchResultDTO,
-	ERROR_MESSAGES
+	UserSearchResultDTO
 } from '@ft_transcendence/common'
+import createHttpError from 'http-errors'
 
 export class UsersServices {
 	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
 		if (UsersRepository.existsById({ user_id: newUser.user_id }))
-			throw new AppError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400)
+			throw createHttpError.BadRequest('User already exists')
 
 		await UsersRepository.insertUser({
 			user_id: newUser.user_id,
@@ -38,12 +37,12 @@ export class UsersServices {
 		user: IUserId
 	): Promise<UserPublicProfileDTO> {
 		if (!user?.user_id || user.user_id <= 0)
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+			throw createHttpError.BadRequest('Invalid user ID')
 
 		const localUser = await UsersRepository.getUserById({
 			user_id: user.user_id
 		})
-		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		if (!localUser) throw createHttpError.NotFound('User not found')
 
 		return {
 			user_id: localUser.user_id,
@@ -58,12 +57,12 @@ export class UsersServices {
 		user_id: number
 	}): Promise<UserPrivateProfileDTO> {
 		if (!user.user_id || user.user_id <= 0)
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+			throw createHttpError.BadRequest('Invalid user ID')
 
 		const localUser = await UsersRepository.getUserById({
 			user_id: user.user_id
 		})
-		if (!localUser) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		if (!localUser) throw createHttpError.NotFound('User not found')
 
 		return {
 			user_id: localUser.user_id,
@@ -78,10 +77,10 @@ export class UsersServices {
 		username: string
 	): Promise<UserSearchResultDTO> {
 		if (!username || username.trim().length === 0)
-			throw new AppError(ERROR_MESSAGES.INVALID_USER_ID, 400)
+			throw createHttpError.BadRequest('Username is required')
 
 		const result = UsersRepository.searchByExactUsername({ username })
-		if (!result) throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, 404)
+		if (!result) throw createHttpError.NotFound('User not found')
 
 		return result
 	}

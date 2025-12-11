@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
-import { ERROR_MESSAGES } from '@ft_transcendence/common'
 
 /**
  * @description Check valid API key in headers for inter-service communication
@@ -18,7 +17,7 @@ export function apiKeyMiddleware(
 	if (!apiKey || apiKey !== process.env.INTERNAL_API_SECRET) {
 		void reply.code(401).send({
 			success: false,
-			error: ERROR_MESSAGES.UNAUTHORIZED
+			error: 'Unauthorized'
 		})
 		return done()
 	}

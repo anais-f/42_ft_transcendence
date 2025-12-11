@@ -1,8 +1,7 @@
-import { FastifyRequest, FastifyReply } from 'fastify'
 import { FastifyInstance } from 'fastify'
 
 export const WS_TOKEN_EXPIRES_SECONDS = Number(
-	process.env.WS_TOKEN_EXPIRES_SECONDS ?? 30
+	process.env.WS_TOKEN_EXPIRES_SECONDS
 )
 
 export interface WsTokenPayload {
@@ -30,7 +29,7 @@ export function createWsToken(
 		login: user.login
 	}
 
-	const wsToken = (fastify as any).jwt.sign(payload, {
+	const wsToken = (fastify as any).jwt.ws.sign(payload, {
 		expiresIn: `${WS_TOKEN_EXPIRES_SECONDS}s`
 	})
 

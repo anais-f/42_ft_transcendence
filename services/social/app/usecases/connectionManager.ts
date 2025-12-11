@@ -1,4 +1,4 @@
-import { handlePong, startHeartbeat } from './heartbeatService.js'
+import { handlePong } from './heartbeatService.js'
 import { handleUserOnline, handleUserOffline } from './presenceService.js'
 import WebSocket from 'ws'
 
@@ -7,7 +7,7 @@ interface UserConnection {
 	lastHeartbeat: Date
 }
 
-export const wsConnections = new Map<string, UserConnection>()
+export const wsConnections = new Map<number, UserConnection>()
 const pendingDisconnectTimers = new Map<number, NodeJS.Timeout>()
 const DISCONNECT_DELAY_MS = 2000
 
@@ -22,6 +22,7 @@ function setupWebSocketHandlers(userId: number, ws: WebSocket): void {
 	})
 
 	ws.on('close', () => {
+		console.log(`connection disconnected for user ${userId}`)
 		removeConnection(userId, ws)
 	})
 
@@ -54,7 +55,7 @@ export async function addConnection(
 	userId: number,
 	ws: WebSocket
 ): Promise<boolean> {
-	const existingConn = wsConnections.get(String(userId))
+	const existingConn = wsConnections.get(userId)
 	const isFirstConnection = !existingConn
 
 	if (!isFirstConnection) {
@@ -72,9 +73,9 @@ export async function addConnection(
 		}
 	}
 
-	wsConnections.set(String(userId), { ws, lastHeartbeat: new Date() })
-
 	setupWebSocketHandlers(userId, ws)
+
+	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
 
 	if (isFirstConnection) {
 		try {
@@ -95,13 +96,13 @@ export async function addConnection(
  * @returns true if this was the user's only connection (went offline), false if connection was already gone
  */
 export function removeConnection(userId: number, ws: WebSocket): boolean {
-	const currentConn = wsConnections.get(String(userId))
+	const currentConn = wsConnections.get(userId)
 
 	if (!currentConn || currentConn.ws !== ws) {
 		return false
 	}
 
-	wsConnections.delete(String(userId))
+	wsConnections.delete(userId)
 
 	cancelPendingDisconnect(userId)
 	const timer = setTimeout(async () => {
@@ -130,7 +131,7 @@ export function removeConnection(userId: number, ws: WebSocket): boolean {
  * @returns true if message was sent, false otherwise
  */
 export function sendToUser(userId: number, message: unknown): boolean {
-	const conn = wsConnections.get(String(userId))
+	const conn = wsConnections.get(userId)
 	if (!conn) return false
 
 	const payload =
@@ -189,5 +190,3 @@ export function getOnlineUsers(): number[] {
 	}
 	return onlineUsers
 }
-
-startHeartbeat()
