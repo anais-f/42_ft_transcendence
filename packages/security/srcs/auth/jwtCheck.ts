@@ -44,7 +44,7 @@ export function jwtAuthMiddleware(
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-Internal-Secret': internalSecret
+							'x-api-key': internalSecret
 						},
 						body: JSON.stringify({ user_id: userId, session_id: sessionId })
 					}
