@@ -9,7 +9,11 @@ export function startTimeOut(code: string, ms: number = 10000) {
 
 	setTimeout(() => {
 		if (!gameData.p1.connState || !gameData.p2?.connState) {
-			leaveGame(gameData.p1.id)
+			try {
+				leaveGame(gameData.p1.id)
+			} catch (e) {
+				// Someone already left
+			}
 		}
 	}, ms)
 }
