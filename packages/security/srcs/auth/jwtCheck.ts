@@ -27,7 +27,9 @@ export function jwtAuthMiddleware(
 				const internalSecret = process.env.INTERNAL_API_SECRET
 
 				if (!authServiceUrl || !internalSecret) {
-					console.error('AUTH_SERVICE_URL or INTERNAL_API_SECRET not configured')
+					console.error(
+						'AUTH_SERVICE_URL or INTERNAL_API_SECRET not configured'
+					)
 					void reply.code(503).send({
 						success: false,
 						error: 'Service configuration error'

@@ -4,8 +4,8 @@ import { getSessionId } from '../repositories/userRepository.js'
 import createHttpError from 'http-errors'
 
 export function validateSessionController(
-request: FastifyRequest,
-reply: FastifyReply
+	request: FastifyRequest,
+	reply: FastifyReply
 ) {
 	const parsed = ValidateSessionSchema.safeParse(request.body)
 	if (!parsed.success)

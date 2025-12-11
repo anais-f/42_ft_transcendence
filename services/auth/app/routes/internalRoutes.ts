@@ -5,13 +5,13 @@ import { validateSessionController } from '../controllers/internalController.js'
 
 export async function internalRoutes(app: FastifyInstance) {
 	app.post(
-'/api/internal/validate-session',
-{
-schema: {
-body: ValidateSessionSchema
-},
-preHandler: apiKeyMiddleware
-},
-validateSessionController
-)
+		'/api/internal/validate-session',
+		{
+			schema: {
+				body: ValidateSessionSchema
+			},
+			preHandler: apiKeyMiddleware
+		},
+		validateSessionController
+	)
 }
