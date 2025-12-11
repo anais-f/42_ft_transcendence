@@ -8,7 +8,6 @@ COPY package.json package-lock.json ./
 COPY packages ./packages
 
 RUN apk add --no-cache python3 make g++ && npm ci
-run npm ci
 
 COPY tsconfig.json ./
 
