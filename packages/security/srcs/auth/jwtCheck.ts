@@ -17,7 +17,7 @@ export function jwtAuthMiddleware(
 		.then(async () => {
 			const userId = request.user.user_id
 			const sessionId = request.user.session_id
-			
+
 			// Backward compatibility: skip session validation if session_id not present
 			if (sessionId === undefined) {
 				done()
