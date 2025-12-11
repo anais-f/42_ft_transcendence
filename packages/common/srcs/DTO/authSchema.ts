@@ -33,8 +33,16 @@ export const PasswordBodySchema = z
 	})
 	.strict()
 
+export const ValidateSessionSchema = z
+	.object({
+		user_id: z.number().int().positive(),
+		session_id: z.number().int().nonnegative()
+	})
+	.strict()
+
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>
 export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>
 export type LogoutParamsDTO = z.infer<typeof LogoutParamsSchema>
+export type ValidateSessionDTO = z.infer<typeof ValidateSessionSchema>

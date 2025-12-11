@@ -5,6 +5,7 @@
  */
 export interface IUserAuth {
 	user_id: number
+	session_id: number
 	login: string
 	password?: string
 	google_id?: string
@@ -14,7 +15,7 @@ export interface IUserAuth {
 
 export type IPublicUserAuth = Omit<
 	IUserAuth,
-	'is_admin' | 'password' | 'google_id' | 'two_fa_enabled'
+	'is_admin' | 'password' | 'google_id' | 'two_fa_enabled' | 'session_id'
 >
 
 /**
