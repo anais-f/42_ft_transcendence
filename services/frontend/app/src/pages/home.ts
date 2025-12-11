@@ -1,5 +1,5 @@
-import { currentUser, setCurrentUser } from "../store/userStore.js"
-import { logout } from "../auth/authService.js"
+import { currentUser, setCurrentUser } from '../store/userStore.js'
+import { logout } from '../auth/authService.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -119,7 +119,7 @@ export function bindLogOutButton() {
 	logoutHandler = async () => {
 		await logout()
 		setCurrentUser(null)
-		window.navigate('/login', true)  // skipAuth = true to avoid 401
+		window.navigate('/login', true) // skipAuth = true to avoid 401
 	}
 
 	// Attach listener

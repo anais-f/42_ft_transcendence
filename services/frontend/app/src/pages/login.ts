@@ -1,5 +1,4 @@
 export const LoginPage = (): string => {
-
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
@@ -142,63 +141,63 @@ export function unbindRegisterForm() {
 }
 
 export function bindLoginForm() {
-  // recupereration du formulaire de login
-  const formLogin = document.getElementById('login_form')
-  if (!formLogin) {
-    console.log('Error: login form not found')
-    return
-  }
+	// recupereration du formulaire de login
+	const formLogin = document.getElementById('login_form')
+	if (!formLogin) {
+		console.log('Error: login form not found')
+		return
+	}
 
-  // Remove old listener if exists
-  if (loginFormListener) {
-    formLogin.removeEventListener('submit', loginFormListener)
-  }
+	// Remove old listener if exists
+	if (loginFormListener) {
+		formLogin.removeEventListener('submit', loginFormListener)
+	}
 
-  // creation du listener de login
-  loginFormListener = async (e: SubmitEvent) => {
-    e.preventDefault()
+	// creation du listener de login
+	loginFormListener = async (e: SubmitEvent) => {
+		e.preventDefault()
 
-    const formData = new FormData(formLogin as HTMLFormElement)
-    console.log(formData)
-    const passwd = formData.get('login_password')
-    const user = formData.get('login_username')
+		const formData = new FormData(formLogin as HTMLFormElement)
+		console.log(formData)
+		const passwd = formData.get('login_password')
+		const user = formData.get('login_username')
 
-    if (!passwd || !user) return
+		if (!passwd || !user) return
 
-    if (passwd.toString().length < 8) {
-      console.log('Password too short')
-      return
-    }
+		if (passwd.toString().length < 8) {
+			console.log('Password too short')
+			return
+		}
 
-    const credentials = {
-      login: user,
-      password: passwd
-    }
+		const credentials = {
+			login: user,
+			password: passwd
+		}
 
-    try {
-      const res = await fetch('/auth/api/login', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
-      })
+		try {
+			const res = await fetch('/auth/api/login', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(credentials)
+			})
 
-      if (!res.ok) {
-        const error = await res.json()
-        console.error('Login failed:', res.status, error)
-        return
-      }
+			if (!res.ok) {
+				const error = await res.json()
+				console.error('Login failed:', res.status, error)
+				return
+			}
 
-      window.navigate('/')
-    } catch (e) {
-      console.error('Login error:', e)
-    }
-  }
+			window.navigate('/')
+		} catch (e) {
+			console.error('Login error:', e)
+		}
+	}
 
-  // ajout du listener au formulaire de login
-  formLogin.addEventListener('submit', loginFormListener)
-  console.log('Login form bound')
+	// ajout du listener au formulaire de login
+	formLogin.addEventListener('submit', loginFormListener)
+	console.log('Login form bound')
 }
 
 export function unbindLoginForm() {

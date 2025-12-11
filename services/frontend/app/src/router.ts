@@ -1,11 +1,17 @@
-import { HomePage, bindLogOutButton, unbindLogOutButton } from "./pages/home.js"
-import { GamePage } from "./pages/game.js"
-import { LobbyPage } from "./pages/lobby.js"
-import { bindRegisterForm, unbindRegisterForm, bindLoginForm, unbindLoginForm, LoginPage } from "./pages/login.js"
-import { ProfilePage } from "./pages/profile.js"
-import { SettingsPage } from "./pages/settings.js"
-import { checkAuth } from "./auth/authService.js"
-import { setCurrentUser } from "./store/userStore.js"
+import { HomePage, bindLogOutButton, unbindLogOutButton } from './pages/home.js'
+import { GamePage } from './pages/game.js'
+import { LobbyPage } from './pages/lobby.js'
+import {
+	bindRegisterForm,
+	unbindRegisterForm,
+	bindLoginForm,
+	unbindLoginForm,
+	LoginPage
+} from './pages/login.js'
+import { ProfilePage } from './pages/profile.js'
+import { SettingsPage } from './pages/settings.js'
+import { checkAuth } from './auth/authService.js'
+import { setCurrentUser } from './store/userStore.js'
 
 declare global {
 	interface Window {
@@ -92,14 +98,14 @@ function render(route: Route) {
 	if (!contentDiv) return
 
 	if (currentRoute?.unbinds) {
-		currentRoute.unbinds.forEach(unbind => unbind())
+		currentRoute.unbinds.forEach((unbind) => unbind())
 	}
 
 	contentDiv.innerHTML = route.page()
 	currentRoute = route
 
 	if (route.binds) {
-		route.binds.forEach(bind => bind())
+		route.binds.forEach((bind) => bind())
 	}
 
 	console.log('Rendered:', route.id)
@@ -143,7 +149,6 @@ async function handleNav() {
 
 		console.log('Authenticated as:', user.username)
 		render(route)
-
 	} catch (error) {
 		console.error('Navigation error:', error)
 		if (!route.public) {
@@ -168,7 +173,6 @@ function navigate(url: string) {
 }
 
 window.navigate = navigate
-
 
 window.addEventListener('popstate', () => {
 	console.log('Browser back/forward')

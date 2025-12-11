@@ -19,10 +19,9 @@ export async function checkAuth(): Promise<UserProfile | null> {
 			credentials: 'include'
 		})
 
-		if (!response.ok)
-			return null
+		if (!response.ok) return null
 
-		const user = await response.json() as UserProfile
+		const user = (await response.json()) as UserProfile
 		return user
 	} catch (error) {
 		console.error('Auth check failed:', error)
