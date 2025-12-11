@@ -149,15 +149,25 @@ export async function logoutController(
 		await request.jwtVerify()
 		const userId = request.user.user_id
 		incrementSessionId(userId)
-		reply.clearCookie('auth_token', { path: '/' })
-		reply.clearCookie('twofa_token', { path: '/' })
-
-		return reply.code(200).send({
-			success: true,
-			message: 'Logged out successfully'
-		})
-	} catch (e) {
+	} catch (e: any) {
+		// If no token, still clear cookies and return success
+		if (e.statusCode === 401) {
+			reply.clearCookie('auth_token', { path: '/' })
+			reply.clearCookie('twofa_token', { path: '/' })
+			return reply.code(200).send({
+				success: true,
+				message: 'Already logged out'
+			})
+		}
 		console.error('Logout error:', e)
 		throw createHttpError.InternalServerError('Logout failed')
 	}
+
+	reply.clearCookie('auth_token', { path: '/' })
+	reply.clearCookie('twofa_token', { path: '/' })
+
+	return reply.code(200).send({
+		success: true,
+		message: 'Logged out successfully'
+	})
 }
