@@ -1,5 +1,4 @@
-import { saveMatchToHistory } from '@services/game/app/repositories/matchsRepository.js'
-import { saveMatch } from '../../matchUsecases.js'
+import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame } from '../gameData.js'
 
 export function leaveGame(pID: number) {
