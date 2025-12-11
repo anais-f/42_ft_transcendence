@@ -6,7 +6,7 @@ import {
 	TPlayerSlot,
 	games,
 	playerToGame
-} from '../usecases/managers/gameData.js'
+} from '../../usecases/managers/gameData.js'
 
 export async function handleGameWsConnection(
 	socket: WebSocket,

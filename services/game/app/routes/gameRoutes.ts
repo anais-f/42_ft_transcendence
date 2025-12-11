@@ -8,9 +8,9 @@ import {
 	createTokenSchema,
 	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
-import { handleGameWsConnection } from '../controllers/wsControllers.js'
-import { createNewGameController } from '../controllers/newGameController.js'
-import { joinGameController } from '../controllers/joinGameController.js'
+import { handleGameWsConnection } from '../controllers/game/wsControllers.js'
+import { createNewGameController } from '../controllers/game/newGameController.js'
+import { joinGameController } from '../controllers/game/joinGameController.js'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()

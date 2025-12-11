@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { createWsToken } from '@ft_transcendence/security'
 import createHttpError from 'http-errors'
-import { joinGame } from '../usecases/managers/gameManager/joinGame.js'
-import { withGameError } from '../usecases/managers/gameManager/errors/withGameError.js'
+import { joinGame } from '../../usecases/managers/gameManager/joinGame.js'
+import { withGameError } from '../../usecases/managers/gameManager/errors/withGameError.js'
 import { CodeParamSchema } from '@ft_transcendence/common'
 
 export async function joinGameController(

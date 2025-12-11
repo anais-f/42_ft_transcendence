@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import createHttpError from 'http-errors'
-import { requestGame } from '../usecases/managers/gameManager/requestGame.js'
-import { withGameError } from '../usecases/managers/gameManager/errors/withGameError.js'
+import { requestGame } from '../../usecases/managers/gameManager/requestGame.js'
+import { withGameError } from '../../usecases/managers/gameManager/errors/withGameError.js'
 
 export async function createNewGameController(
 	request: FastifyRequest,
