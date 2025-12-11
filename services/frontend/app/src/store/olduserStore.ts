@@ -1,4 +1,4 @@
-import type { UserProfile } from '../auth/authService.js'
+import type { UserProfile } from '../auth/old_authService.js'
 
 // Global variable to store current authenticated user
 export let currentUser: UserProfile | null = null

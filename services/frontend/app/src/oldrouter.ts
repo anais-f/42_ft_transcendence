@@ -1,17 +1,17 @@
-import { HomePage, bindLogOutButton, unbindLogOutButton } from './pages/home.js'
-import { GamePage } from './pages/game.js'
-import { LobbyPage } from './pages/lobby.js'
+import { HomePage, bindLogOutButton, unbindLogOutButton } from './pages/oldhome.js'
+import { GamePage } from './pages/oldgame.js'
+import { LobbyPage } from './pages/oldlobby.js'
 import {
 	bindRegisterForm,
 	unbindRegisterForm,
 	bindLoginForm,
 	unbindLoginForm,
 	LoginPage
-} from './pages/login.js'
-import { ProfilePage } from './pages/profile.js'
-import { SettingsPage } from './pages/settings.js'
-import { checkAuth } from './auth/authService.js'
-import { setCurrentUser } from './store/userStore.js'
+} from './pages/oldlogin.js'
+import { ProfilePage } from './pages/oldprofile.js'
+import { SettingsPage } from './pages/oldsettings.js'
+import { checkAuth } from './auth/old_authService.js'
+import { setCurrentUser } from './store/olduserStore.js'
 
 declare global {
 	interface Window {
@@ -30,7 +30,7 @@ type Route = {
 	public?: boolean
 }
 
-const router: Record<Pages, Route> = {
+const oldrouter: Record<Pages, Route> = {
 	home: {
 		id: 'home',
 		url: '/',
@@ -88,9 +88,9 @@ let isNavigating = false
 let currentRoute: Route | null = null
 
 function getRoute(url: string): Route {
-	const routes = Object.values(router)
+	const routes = Object.values(oldrouter)
 	const route = routes.find((route) => route.url === url)
-	return route || router.home
+	return route || oldrouter.home
 }
 
 function render(route: Route) {
