@@ -8,16 +8,17 @@ connections.
 
 ### 1. Join Game
 
-- **URL**: `/api/game/join-game/:gameCode`
+- **URL**: `/api/game/join-game/:code`
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Parameters**:
-  - `gameCode`: The unique game code returned from the `new-game` endpoint
+  - `code`: The unique game code returned from the `new-game` endpoint
     (format: XXXX-XXXX).
 - **Response**:
   - **201**: returns a jwt token for the session.
   - **404**: unknow game code
-  - **409**: player already in a game **OR** game full
+  - **409**: player already in a game 
+  - **409**: player not allowed in this game
 
 #### Description
 
@@ -33,7 +34,7 @@ within the game.
 - **Method**: `POST`
 - **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
 - **Response**:
-  - **201**: returns a game code (gameCode)
+  - **201**: returns a game code
   - **404**: unknow game code.
   - **409**: player already in a game
 
@@ -61,18 +62,6 @@ allowing for real-time communication within the game.
 
 ## Development Notes
 
-- The **gameRoutes** function registers the endpoints and requires proper error
-  handling for responses.
 - All JWT-related authentication is handled by the `jwtAuthMiddleware`.
-- TODOs for implementing the 401 error responses have been noted in place for
-  future development.
-- Ensure to consider implementing a redirection to a waiting page upon receiving
-  the JWT from joining a game.
-
-## Usage
-
-To utilize these API endpoints, ensure your requests include the necessary JWT
-tokens where indicated. Testing can be done with tools such as Postman or
-through your application client.
 
 ---
