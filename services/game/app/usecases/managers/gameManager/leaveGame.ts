@@ -1,3 +1,5 @@
+import { saveMatchToHistory } from '@services/game/app/repositories/matchsRepository.js'
+import { saveMatch } from '../../matchUsecases.js'
 import { games, GameData, playerToGame } from '../gameData.js'
 
 export function leaveGame(pID: number) {
@@ -36,20 +38,16 @@ function forfeit(gameData: GameData) {
 	if (gameData.status == 'active') {
 		// game already started
 		if (gameData.p1?.connState) {
-			// p2 disconect
-			// TODO: P1 win
+			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 		} else {
-			// p1 disconect
-			// TODO: P2 win
+			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 		}
 	} else {
 		// waiting
 		if (!gameData.p1.connState) {
-			// p1 disconect
-			// TODO: P2 win
+			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 		} else if (!gameData.p2.connState) {
-			// p2 disconect
-			// TODO: P1 win
+			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 		}
 	}
 }
