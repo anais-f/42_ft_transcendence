@@ -7,6 +7,7 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY packages ./packages
 
+RUN apk add --no-cache python3 make g++
 RUN npm install
 
 COPY tsconfig.json ./
