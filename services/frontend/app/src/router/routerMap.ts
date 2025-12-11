@@ -26,7 +26,7 @@ export type Route = {
 	public?: boolean
 }
 
-export const routerMap = (Record<Pages, Route> = {
+export const routerMap: Record<Pages, Route> = {
 	home: {
 		id: 'home',
 		url: '/',
@@ -67,4 +67,4 @@ export const routerMap = (Record<Pages, Route> = {
 		url: '/settings',
 		page: SettingsPage
 	}
-})
+}

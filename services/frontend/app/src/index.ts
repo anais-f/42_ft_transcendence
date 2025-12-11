@@ -1,4 +1,4 @@
-import { Router } from './Router.js'
+import { Router } from './router/Router.js'
 
 // Date display
 const dateDiv = document.getElementById('date')
@@ -10,7 +10,6 @@ if (dateDiv) {
 		year: 'numeric'
 	})
 }
-
 
 // Démarrer l'application après le chargement complet du DOM
 window.addEventListener('DOMContentLoaded', () => {
