@@ -22,6 +22,5 @@ export const games = new Map<string, GameData>()
 export const playerToGame = new Map<number, string>()
 
 // tournament
-// TODO: usersToTournaments
 export const tournaments = new Map<string, Tournament>()
 export const usersInTournaments = new Set<number>()

@@ -17,7 +17,7 @@ connections.
 - **Response**:
   - **201**: returns a jwt token for the session.
   - **404**: unknow game code
-  - **409**: player already in a game 
+  - **409**: player already in a game
   - **409**: player not allowed in this game
 
 #### Description
