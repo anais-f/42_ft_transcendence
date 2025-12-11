@@ -28,7 +28,9 @@ export function jwtAuthMiddleware(
 					console.error(
 						'AUTH_SERVICE_URL or INTERNAL_API_SECRET not configured'
 					)
-					throw createHttpError.ServiceUnavailable('Service configuration error')
+					throw createHttpError.ServiceUnavailable(
+						'Service configuration error'
+					)
 				}
 				const response = await fetch(
 					`${authServiceUrl}/api/internal/validate-session`,

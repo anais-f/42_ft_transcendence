@@ -16,7 +16,9 @@ export function validateSessionController(
 
 	if (currentSessionId === undefined)
 		throw createHttpError.NotFound('User not found')
-	console.log(`Validating session for user ${user_id}: current ${currentSessionId}, provided ${session_id}`)
+	console.log(
+		`Validating session for user ${user_id}: current ${currentSessionId}, provided ${session_id}`
+	)
 	if (currentSessionId === session_id) {
 		return reply.code(200).send({ valid: true })
 	} else {
