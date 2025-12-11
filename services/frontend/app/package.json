@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "node --experimental-vm-modules ./node_modules/.bin/jest --config ./jest.config.ts ./**/*.test.ts",
 		"dev": "vite --host --port 3000",
-		"build": "tsc -p .",
+		"build": "vite build",
 		"preview": "vite preview"
 	},
 	"description": "",

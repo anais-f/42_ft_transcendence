@@ -1,6 +1,5 @@
 export * from './DTO/loadOpenAPISchema.js'
 export * from './DTO/authSchema.js'
-export * from './DTO/ResponseSchema.js'
 export * from './DTO/usersSchema.js'
 export * from './DTO/2faSchema.js'
 export * from './DTO/matchmakingSchema.js'

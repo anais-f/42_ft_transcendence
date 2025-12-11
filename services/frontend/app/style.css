@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	@font-face {
+		font-family: 'HoldMoney';
+		src: url('/assets/fonts/HoldMoney/HoldMoney-Regular.ttf') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+}
+
+@layer components {
+	.submission_btn {
+		@apply bg-green-500 border border-green-600 p-3 hover:bg-green-600;
+	}
+	.generic_btn {
+		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
+	}
+}
+
+@layer utilities {
+	.title_font {
+		@apply font-[HoldMoney] text-5xl;
+	}
+	.news_paragraph {
+		@apply text-black opacity-15 select-none text-justify;
+	}
+}
+
+body {
+	background-color: #ecdabb;
+	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	/* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+}
