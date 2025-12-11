@@ -1,4 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import createHttpError from 'http-errors'
 import {
 	listPublicUsers,
 	findPublicUserById,
@@ -26,19 +27,19 @@ export async function getPublicUserController(
 	reply: FastifyReply
 ) {
 	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) return reply.code(400).send({ error: 'Invalid id' })
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
 	const idNum = Number(parsed.data.id)
 	const user = findPublicUserById(idNum)
-	if (!user) return reply.code(404).send({ error: 'User not found' })
+	if (!user) throw createHttpError.NotFound('User not found')
 	return reply.send(PublicUserAuthSchema.parse(user))
 }
 
 export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {
 	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) return reply.code(400).send({ error: 'Invalid id' })
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
 	const idNum = Number(parsed.data.id)
 	const ok = deleteUserById(idNum)
-	if (!ok) return reply.code(404).send({ error: 'User not found' })
+	if (!ok) throw createHttpError.NotFound('User not found')
 	return reply.code(204).send({ success: true })
 }
 
@@ -47,12 +48,12 @@ export async function patchUserPassword(
 	reply: FastifyReply
 ) {
 	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) return reply.code(400).send({ error: 'Invalid id' })
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
 	const idNum = Number(parsed.data.id)
 	const body = PasswordBodySchema.safeParse(request.body)
-	if (!body.success) return reply.code(400).send({ error: 'Invalid password' })
+	if (!body.success) throw createHttpError.BadRequest('Invalid password')
 	const hashed = await hashPassword(body.data.password)
 	const ok = changeUserPassword(idNum, hashed)
-	if (!ok) return reply.code(404).send({ error: 'User not found' })
+	if (!ok) throw createHttpError.NotFound('User not found')
 	return reply.send({ success: true })
 }

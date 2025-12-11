@@ -57,14 +57,14 @@ describe('Auth Service - Integration Tests', () => {
 				method: 'POST',
 				url: '/api/register',
 				payload: {
-					login: 'testuser',
+					login: `testuser-${Date.now()}`,
 					password: 'password123'
 				}
 			})
 
-			expect(response.statusCode).toBe(200)
+			expect(response.statusCode).toBe(201)
 			const body = JSON.parse(response.body)
-			expect(body.success).toBe(true)
+			expect(body.message).toBe('User registered successfully')
 			expect(body.token).toBeDefined()
 			expect(response.cookies).toBeDefined()
 		})
@@ -83,12 +83,13 @@ describe('Auth Service - Integration Tests', () => {
 		})
 
 		it('should reject duplicate username', async () => {
+			const duplicateLogin = `duplicate-${Date.now()}`
 			// First registration
 			await app.inject({
 				method: 'POST',
 				url: '/api/register',
 				payload: {
-					login: 'duplicate',
+					login: duplicateLogin,
 					password: 'password123'
 				}
 			})
@@ -98,14 +99,14 @@ describe('Auth Service - Integration Tests', () => {
 				method: 'POST',
 				url: '/api/register',
 				payload: {
-					login: 'duplicate',
+					login: duplicateLogin,
 					password: 'password456'
 				}
 			})
 
 			expect(response.statusCode).toBe(409)
 			const body = JSON.parse(response.body)
-			expect(body.error).toContain('already exists')
+			expect(body.message).toContain('Login already exists')
 		})
 
 		it('should reject invalid payload', async () => {
@@ -123,13 +124,14 @@ describe('Auth Service - Integration Tests', () => {
 	})
 
 	describe('POST /api/login', () => {
+		const login = `logintest-${Date.now()}`
 		beforeAll(async () => {
 			// Create a test user
 			await app.inject({
 				method: 'POST',
 				url: '/api/register',
 				payload: {
-					login: 'logintest',
+					login: login,
 					password: 'password123'
 				}
 			})
@@ -140,7 +142,7 @@ describe('Auth Service - Integration Tests', () => {
 				method: 'POST',
 				url: '/api/login',
 				payload: {
-					login: 'logintest',
+					login: login,
 					password: 'password123'
 				}
 			})
@@ -157,14 +159,14 @@ describe('Auth Service - Integration Tests', () => {
 				method: 'POST',
 				url: '/api/login',
 				payload: {
-					login: 'logintest',
+					login: login,
 					password: 'wrongpassword'
 				}
 			})
 
 			expect(response.statusCode).toBe(401)
 			const body = JSON.parse(response.body)
-			expect(body.error).toContain('Invalid credentials')
+			expect(body.message).toContain('Invalid credentials')
 		})
 
 		it('should reject non-existent user', async () => {

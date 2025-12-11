@@ -24,14 +24,20 @@ export class AuthApi {
 			'content-type': 'application/json',
 			authorization: secret
 		}
-		const options = { method: 'GET', headers: headers }
 
 		let response
 		try {
-			response = await fetch(url, options)
-		} catch (err) {
+			response = await fetch(url, {
+				method: 'GET',
+				headers,
+				signal: AbortSignal.timeout(10000)
+			})
+		} catch (err: any) {
+			if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+				throw createHttpError.GatewayTimeout('Auth service timeout')
+			}
 			throw createHttpError.BadGateway(
-				'Failed to fetch users from auth: ' + (err as Error).message
+				'Failed to fetch users from auth: ' + err.message
 			)
 		}
 

@@ -1,5 +1,16 @@
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 
+// TODO: PROPOSITION: Fail-fast au startup (as auth service)
+// const keyB64 = process.env.TOTP_ENC_KEY
+// if (!keyB64) {
+// 	throw new Error('TOTP_ENC_KEY environment variable is required')
+// }
+// const KEY = Buffer.from(keyB64, 'base64')
+// if (KEY.length !== 32) {
+// 	throw new Error('TOTP_ENC_KEY must decode to 32 bytes (AES-256)')
+// }
+
+// ACTUAL: Warn only at runtime
 const keyB64 = process.env.TOTP_ENC_KEY
 if (!keyB64) {
 	console.warn('TOTP_ENC_KEY not set - secret encryption will fail.')
@@ -16,6 +27,7 @@ export function encryptSecret(secret: string): string {
 		cipher.final()
 	])
 	const tag = cipher.getAuthTag()
+
 	return Buffer.concat([iv, tag, ciphertext]).toString('base64')
 }
 
@@ -27,5 +39,6 @@ export function decryptSecret(payloadB64: string): string {
 	const decipher = createDecipheriv('aes-256-gcm', KEY, iv)
 	decipher.setAuthTag(tag)
 	const out = Buffer.concat([decipher.update(ct), decipher.final()])
+
 	return out.toString('utf8')
 }

@@ -21,7 +21,6 @@
 	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
 	"references": [
 		{ "path": "./packages/pong-shared" },
-		{ "path": "./packages/pong-client" },
 		{ "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users/app" },

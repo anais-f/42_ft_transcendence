@@ -16,6 +16,7 @@ import { findPublicUserByLogin } from './repositories/userRepository.js'
 import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
+import { setupErrorHandler } from '@ft_transcendence/common'
 
 const app = Fastify({
 	logger: true
@@ -37,6 +38,7 @@ app.register(fastifyJwt, {
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
+setupErrorHandler(app)
 setupFastifyMonitoringHooks(app)
 
 // readSecret now provided by @ft_transcendence/common
