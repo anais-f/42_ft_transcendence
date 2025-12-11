@@ -22,8 +22,6 @@
 	"references": [
 		{ "path": "./services/frontend/app" },
 		{ "path": "./packages/pong-shared" },
-		{ "path": "./packages/pong-client" },
-		{ "path": "./packages/pong-server" },
 		{ "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users/app" },
