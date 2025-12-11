@@ -1,5 +1,8 @@
-import { currentUser, setCurrentUser } from '../usecases/userStore'
-import { logout } from '../api/authService'
+import { currentUser, setCurrentUser } from '../usecases/userStore.js'
+import { logout } from '../api/authService.js'
+import { gameStore } from '../usecases/gameStore.js'
+import { joinGame } from '../api/game/joinGame.js'
+import { createGame } from '../api/game/createGame.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -26,7 +29,7 @@ export const HomePage = (): string => {
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
-		<button id="remote_btn" type="button" class="generic_btn my-2" onclick="navigate('/lobby')">Remote</button>
+		<button id="create_game_btn" type="button" class="generic_btn my-2">Create</button>
 		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/game')">Tournament</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
@@ -135,6 +138,83 @@ export function unbindLogOutButton() {
 	logoutBtn.removeEventListener('click', logoutHandler)
 	logoutHandler = null
 	console.log('Logout button unbound')
+}
+
+let createGameHandler: (() => Promise<void>) | null = null
+
+export function bindCreateButton() {
+	const createBtn = document.getElementById('create_game_btn')
+	if (!createBtn) return
+
+	createGameHandler = async () => {
+		const code = await createGame()
+		if (!code) {
+			console.error('Failed to create game')
+			return
+		}
+		gameStore.setGameCode(code)
+
+		const token = await joinGame(code)
+		if (!token) {
+			console.error('Failed to join game')
+			gameStore.clear()
+			return
+		}
+		gameStore.setSessionToken(token)
+
+		window.navigate(`/lobby/${code}`)
+	}
+
+	createBtn.addEventListener('click', createGameHandler)
+	console.log('Game button bound')
+}
+
+export function unbindCreateButton() {
+	const createBtn = document.getElementById('create_game_btn')
+	if (!createBtn || !createGameHandler) return
+
+	createBtn.removeEventListener('click', createGameHandler)
+	createGameHandler = null
+	console.log('Create button unbound')
+}
+
+let joinFormHandler: ((e: Event) => Promise<void>) | null = null
+
+export function bindJoinLobbyForm() {
+	const joinForm = document.getElementById('join_lobby_form')
+	if (!joinForm) return
+
+	joinFormHandler = async (e: Event) => {
+		e.preventDefault()
+		const input = document.getElementById('join_lobby') as HTMLInputElement
+		const code = input?.value?.trim()
+
+		if (!code) return
+
+		gameStore.setGameCode(code)
+
+		const token = await joinGame(code)
+		if (!token) {
+			console.error('Failed to join game')
+			gameStore.clear()
+			return
+		}
+		gameStore.setSessionToken(token)
+
+		window.navigate(`/lobby/${code}`)
+	}
+
+	joinForm.addEventListener('submit', joinFormHandler)
+	console.log('Join lobby form bound')
+}
+
+export function unbindJoinLobbyForm() {
+	const joinForm = document.getElementById('join_lobby_form')
+	if (!joinForm || !joinFormHandler) return
+
+	joinForm.removeEventListener('submit', joinFormHandler)
+	joinFormHandler = null
+	console.log('Join lobby form unbound')
 }
 
 const fr1 = {

@@ -1,9 +1,16 @@
-export const LobbyPage = (): string => /*html*/ `
+import { createGameWebSocket } from '../api/game/createGame.js'
+import { routeParams } from '../router/Router.js'
+import { gameStore } from '../usecases/gameStore.js'
+
+export const LobbyPage = (): string => {
+	const code = routeParams.code || gameStore.getGameCode() || 'G-XXXXX'
+
+	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="flex flex-row justify-between pt-10 pb-5 w-full">
-			<h1 class="text-2xl select-none ">LOBBY NUMBER :</h1> 
-			<span class="text-2xl ">${lobby_number}</span>
+			<h1 class="text-2xl select-none ">LOBBY NUMBER :</h1>
+			<span id="lobby-code" class="text-2xl ">${code}</span>
 		</div>
 		<button id="btn-copy" class="generic_btn mb-4">
 			Copy Lobby Code
@@ -36,7 +43,7 @@ export const LobbyPage = (): string => /*html*/ `
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia.</p>
 		</div>
 		<img src="/assets/images/swords.png" alt="Player_1" class="w-[100%] object-cover aspect-square object-center select-none opacity-30 py-8">
-		<button id="btn-copy" class="generic_btn mt-4">
+		<button id="btn-ready" class="generic_btn mt-4">
 			Ready
 		</button>
 		<div class="news_paragraph">
@@ -60,8 +67,7 @@ export const LobbyPage = (): string => /*html*/ `
 	</div>
 </section>
 `
-
-let lobby_number = 'XXXX-XXXX'
+}
 
 let p1 = {
 	username: 'Anfichet',
@@ -71,4 +77,62 @@ let p1 = {
 let p2 = {
 	username: 'Lrio',
 	avatar: 'assets/images/lrio.jpg'
+}
+
+let copyHandler: (() => void) | null = null
+
+export function bindLobbyPage() {
+	const copyBtn = document.getElementById('btn-copy')
+	const codeSpan = document.getElementById('lobby-code')
+
+	if (copyBtn && codeSpan) {
+		copyHandler = () => {
+			navigator.clipboard.writeText(codeSpan.textContent || '')
+			copyBtn.textContent = 'Copied!'
+			setTimeout(() => {
+				copyBtn.textContent = 'Copy Lobby Code'
+			}, 2000)
+		}
+		copyBtn.addEventListener('click', copyHandler)
+	}
+
+	// Connect WebSocket
+	const token = gameStore.getSessionToken()
+	if (token) {
+		const ws = createGameWebSocket(token)
+		gameStore.setGameSocket(ws)
+
+		ws.onopen = () => {
+			console.log('WS connected')
+		}
+
+		ws.onmessage = (event) => {
+			console.log('WS message:', event.data)
+			// TODO: handle game messages
+		}
+
+		ws.onerror = (error) => {
+			console.error('WS error:', error)
+		}
+
+		ws.onclose = () => {
+			console.log('WS closed')
+		}
+	} else {
+		console.error('ws JWT token not found')
+	}
+}
+
+export function unbindLobbyPage() {
+	const copyBtn = document.getElementById('btn-copy')
+	if (copyBtn && copyHandler) {
+		copyBtn.removeEventListener('click', copyHandler)
+		copyHandler = null
+	}
+
+	const ws = gameStore.getGameSocket()
+	if (ws) {
+		ws.close()
+		gameStore.setGameSocket(null)
+	}
 }

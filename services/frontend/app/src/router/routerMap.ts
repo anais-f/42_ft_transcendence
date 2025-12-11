@@ -1,19 +1,23 @@
 import {
 	bindLogOutButton,
+	bindCreateButton,
+	bindJoinLobbyForm,
 	HomePage,
-	unbindLogOutButton
-} from '../pages/oldhome'
-import { GamePage } from '../pages/oldgame'
-import { LobbyPage } from '../pages/oldlobby'
+	unbindLogOutButton,
+	unbindCreateButton,
+	unbindJoinLobbyForm
+} from '../pages/oldhome.js'
+import { GamePage } from '../pages/oldgame.js'
+import { LobbyPage, bindLobbyPage, unbindLobbyPage } from '../pages/oldlobby.js'
 import {
 	bindLoginForm,
 	bindRegisterForm,
 	LoginPage,
 	unbindLoginForm,
 	unbindRegisterForm
-} from '../pages/oldlogin'
-import { ProfilePage } from '../pages/oldprofile'
-import { SettingsPage } from '../pages/oldsettings'
+} from '../pages/oldlogin.js'
+import { ProfilePage } from '../pages/oldprofile.js'
+import { SettingsPage } from '../pages/oldsettings.js'
 
 export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
 
@@ -31,8 +35,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'home',
 		url: '/',
 		page: HomePage,
-		binds: [bindLogOutButton],
-		unbinds: [unbindLogOutButton]
+		binds: [bindLogOutButton, bindCreateButton, bindJoinLobbyForm],
+		unbinds: [unbindLogOutButton, unbindCreateButton, unbindJoinLobbyForm]
 	},
 
 	game: {
@@ -43,8 +47,10 @@ export const routerMap: Record<Pages, Route> = {
 
 	lobby: {
 		id: 'lobby',
-		url: '/lobby',
-		page: LobbyPage
+		url: '/lobby/:code',
+		page: LobbyPage,
+		binds: [bindLobbyPage],
+		unbinds: [unbindLobbyPage]
 	},
 
 	login: {
