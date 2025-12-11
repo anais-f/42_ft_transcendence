@@ -53,4 +53,49 @@ export class AuthApi {
 
 		return parsed.data.users
 	}
+
+	/**
+	 * @description Get 2FA status for a user from auth service
+	 * @param userId - The user ID
+	 * @returns Boolean indicating if 2FA is enabled
+	 * @throws Error if the request fails
+	 */
+	static async get2FAStatus(userId: number): Promise<boolean> {
+		const base = process.env.AUTH_SERVICE_URL
+		const secret = process.env.INTERNAL_API_SECRET
+
+		if (!base || !secret)
+			throw createHttpError.InternalServerError(
+				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
+			)
+
+		const url = `${base}/api/internal/auth/${userId}/2fa-status`
+		const headers = {
+			'content-type': 'application/json',
+			authorization: secret
+		}
+
+		let response
+		try {
+			response = await fetch(url, {
+				method: 'GET',
+				headers,
+				signal: AbortSignal.timeout(5000)
+			})
+		} catch (err: unknown) {
+			const error = err as Error
+			if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+				throw createHttpError.GatewayTimeout('Auth service timeout')
+			}
+			throw createHttpError.BadGateway(
+				'Failed to fetch 2FA status from auth: ' + error.message
+			)
+		}
+
+		if (!response.ok)
+			throw createHttpError.BadGateway(`Auth service HTTP ${response.status}`)
+
+		const raw = (await response.json()) as { two_fa_enabled: boolean }
+		return raw.two_fa_enabled
+	}
 }

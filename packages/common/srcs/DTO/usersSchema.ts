@@ -68,9 +68,9 @@ export const UserPrivateProfileSchema = z
 		username: UsernameSchema,
 		avatar: z.string(),
 		status: z.number().int().nonnegative(),
-		last_connection: z.string()
+		last_connection: z.string(),
+		two_fa_enabled: z.boolean().optional()
 	})
-	.strict()
 	.meta({ description: 'Private user profile schema' })
 
 export const UserPrivateProfileListSchema = z
