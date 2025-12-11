@@ -19,7 +19,6 @@ export async function googleLoginController(
 
 	if (!credential) throw createHttpError.BadRequest('Missing Google credential')
 
-	// Try/catch pour Google API (peut throw des erreurs non-HTTP)
 	let ticket
 	try {
 		ticket = await client.verifyIdToken({

@@ -1,6 +1,6 @@
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 
-// TODO: PROPOSITION: Fail-fast au startup (comme auth service)
+// TODO: PROPOSITION: Fail-fast au startup (as auth service)
 // const keyB64 = process.env.TOTP_ENC_KEY
 // if (!keyB64) {
 // 	throw new Error('TOTP_ENC_KEY environment variable is required')
@@ -10,7 +10,7 @@ import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
 // 	throw new Error('TOTP_ENC_KEY must decode to 32 bytes (AES-256)')
 // }
 
-// VERSION ACTUELLE: Console warn (permet démarrage même si mal configuré)
+// ACTUAL: Warn only at runtime
 const keyB64 = process.env.TOTP_ENC_KEY
 if (!keyB64) {
 	console.warn('TOTP_ENC_KEY not set - secret encryption will fail.')
