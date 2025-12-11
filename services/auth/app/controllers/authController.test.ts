@@ -59,8 +59,7 @@ describe('authController login', () => {
 	test('loginController: invalid payload returns 400', async () => {
 		const req: any = { body: { login: 1, password: 'pw' } } // login should be string per schema
 		const reply = buildReply()
-		await loginController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(loginController(req, reply)).rejects.toThrow('Invalid payload')
 	})
 
 	test('loginController: bad credentials 401', async () => {
@@ -68,8 +67,9 @@ describe('authController login', () => {
 		// password length >=8 to pass schema, still wrong credentials
 		const req: any = { body: { login: 'alice', password: 'wrongpass' } }
 		const reply = buildReply()
-		await loginController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(401)
+		await expect(loginController(req, reply)).rejects.toThrow(
+			'Invalid credentials'
+		)
 	})
 
 	test('loginController: sets auth_token cookie and returns token', async () => {
@@ -92,16 +92,18 @@ describe('validateAdminController', () => {
 	test('missing token returns 401', async () => {
 		const req: any = { headers: {}, cookies: {} }
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
-		await validateAdminController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(401)
+		await expect(validateAdminController(req, reply)).rejects.toThrow(
+			'Missing token'
+		)
 	})
 
 	test('non admin returns 403', async () => {
 		verifyTokenMock.mockReturnValue({ user_id: 1, login: 'a' } as any)
 		const req: any = { headers: { authorization: 'Bearer t' }, cookies: {} }
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
-		await validateAdminController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(403)
+		await expect(validateAdminController(req, reply)).rejects.toThrow(
+			'Forbidden'
+		)
 	})
 
 	test('admin token returns 200', async () => {
@@ -129,15 +131,17 @@ describe('authController registerController', () => {
 		delete process.env.INTERNAL_API_SECRET
 		const req: any = { body: { login: 'newuser', password: 'password1' } }
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
-		await registerController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(500)
+		await expect(registerController(req, reply)).rejects.toThrow(
+			'Server configuration error'
+		)
 	})
 
 	test('returns 400 for invalid payload', async () => {
 		const req: any = { body: { login: 'usr', password: 'short' } } // too short
 		const reply: any = { code: jest.fn().mockReturnThis(), send: jest.fn() }
-		await registerController(req, reply)
-		expect(reply.code).toHaveBeenCalledWith(400)
+		await expect(registerController(req, reply)).rejects.toThrow(
+			'Invalid payload'
+		)
 	})
 
 	test('creates user and syncs with users service (happy path)', async () => {
@@ -172,7 +176,7 @@ describe('authController registerController', () => {
 			expect.objectContaining({ httpOnly: true })
 		)
 		expect(reply.send).toHaveBeenCalledWith({
-			success: true,
+			message: 'User registered successfully',
 			token: 'test-token'
 		})
 	})
@@ -192,10 +196,10 @@ describe('authController registerController', () => {
 			setCookie: jest.fn().mockReturnThis()
 		}
 
-		await registerController(req, reply)
-
+		await expect(registerController(req, reply)).rejects.toThrow(
+			'Failed to sync user with users service'
+		)
 		expect(deleteUserByIdMock).toHaveBeenCalledWith(11)
-		expect(reply.code).toHaveBeenCalledWith(500)
 	})
 
 	test('on users service failure, deletes created user and returns 400', async () => {
@@ -213,9 +217,9 @@ describe('authController registerController', () => {
 			setCookie: jest.fn().mockReturnThis()
 		}
 
-		await registerController(req, reply)
-
+		await expect(registerController(req, reply)).rejects.toThrow(
+			'Users service unavailable'
+		)
 		expect(deleteUserByIdMock).toHaveBeenCalledWith(12)
-		expect(reply.code).toHaveBeenCalledWith(400)
 	})
 })

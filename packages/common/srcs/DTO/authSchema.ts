@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { RegisterLoginSchema } from './usersSchema.js'
 
+//TODO : a changer les regles du password
+
 export const RegisterSchema = z
 	.object({
 		login: RegisterLoginSchema,
