@@ -105,8 +105,8 @@ export class Router {
 			// --- REDIRECTION GUARDS ---
 
 			// GUARD 1: Authenticated on the Login page
-            // If the user has passed verification (user exists) and is on /login, we redirect them to /
-            // skipAuth=true because we have just verified them, no need to re-verify
+			// If the user has passed verification (user exists) and is on /login, we redirect them to /
+			// skipAuth=true because we have just verified them, no need to re-verify
 			if (url === '/login' && user !== null) {
 				console.log('Authenticated, redirecting from /login to /')
 				this.isNavigating = false
@@ -115,8 +115,8 @@ export class Router {
 			}
 
 			// GUARD 2: Unauthenticated on a Protected Page
-            // If the route is protected and the user is not in the state (after API check or store)
-            // skipAuth=true because we just checked, the user is not authenticated
+			// If the route is protected and the user is not in the state (after API check or store)
+			// skipAuth=true because we just checked, the user is not authenticated
 			if (!route.public && !user) {
 				console.log('Not authenticated, redirecting to /login')
 				this.isNavigating = false

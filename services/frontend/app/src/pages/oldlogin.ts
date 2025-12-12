@@ -215,7 +215,6 @@ export async function bindGoogleBtn() {
 	try {
 		await loadGoogleScript()
 		if (window.google) {
-
 			window.google.accounts.id.initialize({
 				client_id: 'Push you ID here', // todoo make Env work
 				callback: async (response: CredentialResponse) => {
@@ -238,7 +237,7 @@ export async function bindGoogleBtn() {
 				theme: 'outline',
 				size: 'large',
 				text: 'continue_with',
-				width: '300' // 
+				width: '300' //
 			})
 			console.log('Google button rendered')
 		}
