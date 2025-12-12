@@ -3,6 +3,7 @@ import { setCurrentUser } from '../usecases/userStore'
 import { GoogleCodeClient, GoogleCodeResponse } from '../types/google-type.js'
 import { loadGoogleScript, loginWithGoogleBackend } from '../api/authService.js'
 
+
 export const LoginPage = (): string => {
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
@@ -25,7 +26,7 @@ export const LoginPage = (): string => {
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
 		</div>
 		<img src="/assets/images/mammoth.png" alt="mamouth" class="w-full object-cover opacity-50 select-none">
-		
+
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
@@ -41,14 +42,14 @@ export const LoginPage = (): string => {
 		<input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
 		<input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
 		<button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
-		
+
 		<!-- <button id="google_btn" type="button" class="generic_btn">Continue with Google</button> -->
-		
+
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. </p>
 		</div>
-		
+
 	</div>
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph">
@@ -65,7 +66,9 @@ export const LoginPage = (): string => {
 `
 }
 
-// Store form handlers to be able to remove them later
+
+
+// Store form events to be able to remove them later
 let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 let loginFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 // Cést l'état du bouton Google
@@ -74,52 +77,52 @@ let googleClient: GoogleCodeClient | null = null
 
 
 export function bindRegisterForm() {
-	const formReg = document.getElementById('register_form')
-	if (!formReg) {
-		console.log('Error: register form not found')
-		return
-	}
+  const formReg = document.getElementById('register_form')
+  if (!formReg) {
+    console.log('Error: register form not found')
+    return
+  }
 
-	// Remove old listener if exists
-	if (registerFormListener) {
-		formReg.removeEventListener('submit', registerFormListener)
-	}
+  // Remove old listener if exists
+  if (registerFormListener) {
+    formReg.removeEventListener('submit', registerFormListener)
+  }
 
-	// Create listener function
-	registerFormListener = async (e: SubmitEvent) => {
-		e.preventDefault()
+  // Create listener function
+  registerFormListener = async (e: SubmitEvent) => {
+    e.preventDefault()
 
-		const formData = new FormData(formReg as HTMLFormElement)
-		console.log(formData)
-		console.log(formData.get('register_password'))
-		const pw = formData.get('register_password')
-		const us = formData.get('register_username')
+    const formData = new FormData(formReg as HTMLFormElement)
+    console.log(formData)
+    console.log(formData.get('register_password'))
+    const pw = formData.get('register_password')
+    const us = formData.get('register_username')
 
-		if (!pw) return
+    if (!pw) return
 
-		if (pw !== formData.get('register_conf_password')) {
-			console.log("Passwords don't match")
-			return
-		}
+    if (pw !== formData.get('register_conf_password')) {
+      console.log("Passwords don't match")
+      return
+    }
 
-		if (pw.toString().length < 8) {
-			console.log('Password too short')
-			return
-		}
+    if (pw.toString().length < 8) {
+      console.log('Password too short')
+      return
+    }
 
-		const user = {
-			login: us,
-			password: pw
-		}
+    const user = {
+      login: us,
+      password: pw
+    }
 
-		try {
-			const res = await fetch('/auth/api/register', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(user)
-			})
+    try {
+      const res = await fetch('/auth/api/register', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      })
 
       if (!res.ok) {
         const error = await res.json()
@@ -133,68 +136,68 @@ export function bindRegisterForm() {
       setCurrentUser(authResult)
       // CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
       await window.navigate('/', true)
-		} catch (e) {
-			console.error('Register error:', e)
-		}
-	}
+    } catch (e) {
+      console.error('Register error:', e)
+    }
+  }
 
-	// Add the new listener
-	formReg.addEventListener('submit', registerFormListener)
-	console.log('Register form bound')
+  // Add the new listener
+  formReg.addEventListener('submit', registerFormListener)
+  console.log('Register form bound')
 }
 
 export function unbindRegisterForm() {
-	const formReg = document.getElementById('register_form')
-	if (!formReg || !registerFormListener) return
+  const formReg = document.getElementById('register_form')
+  if (!formReg || !registerFormListener) return
 
-	// Remove listener
-	formReg.removeEventListener('submit', registerFormListener)
-	registerFormListener = null
-	console.log('Register form unbound')
+  // Remove listener
+  formReg.removeEventListener('submit', registerFormListener)
+  registerFormListener = null
+  console.log('Register form unbound')
 }
 
 export function bindLoginForm() {
-	// recupereration du formulaire de login
-	const formLogin = document.getElementById('login_form')
-	if (!formLogin) {
-		console.log('Error: login form not found')
-		return
-	}
+  // recupereration du formulaire de login
+  const formLogin = document.getElementById('login_form')
+  if (!formLogin) {
+    console.log('Error: login form not found')
+    return
+  }
 
-	// Remove old listener if exists
-	if (loginFormListener) {
-		formLogin.removeEventListener('submit', loginFormListener)
-	}
+  // Remove old listener if exists
+  if (loginFormListener) {
+    formLogin.removeEventListener('submit', loginFormListener)
+  }
 
-	// creation du listener de login
-	loginFormListener = async (e: SubmitEvent) => {
-		e.preventDefault()
+  // creation du listener de login
+  loginFormListener = async (e: SubmitEvent) => {
+    e.preventDefault()
 
-		const formData = new FormData(formLogin as HTMLFormElement)
-		console.log(formData)
-		const passwd = formData.get('login_password')
-		const user = formData.get('login_username')
+    const formData = new FormData(formLogin as HTMLFormElement)
+    console.log(formData)
+    const passwd = formData.get('login_password')
+    const user = formData.get('login_username')
 
-		if (!passwd || !user) return
+    if (!passwd || !user) return
 
-		if (passwd.toString().length < 8) {
-			console.log('Password too short')
-			return
-		}
+    if (passwd.toString().length < 8) {
+      console.log('Password too short')
+      return
+    }
 
-		const credentials = {
-			login: user,
-			password: passwd
-		}
+    const credentials = {
+      login: user,
+      password: passwd
+    }
 
-		try {
-			const res = await fetch('/auth/api/login', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify(credentials)
-			})
+    try {
+      const res = await fetch('/auth/api/login', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+      })
 
       if (!res.ok) {
         const error = await res.json()
@@ -208,24 +211,24 @@ export function bindLoginForm() {
       setCurrentUser(authResult)
       // CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
       await window.navigate('/', true)
-		} catch (e) {
-			console.error('Login error:', e)
-		}
-	}
+    } catch (e) {
+      console.error('Login error:', e)
+    }
+  }
 
-	// ajout du listener au formulaire de login
-	formLogin.addEventListener('submit', loginFormListener)
-	console.log('Login form bound')
+  // ajout du listener au formulaire de login
+  formLogin.addEventListener('submit', loginFormListener)
+  console.log('Login form bound')
 }
 
 export function unbindLoginForm() {
-	const formLogin = document.getElementById('login_form')
-	if (!formLogin || !loginFormListener) return
+  const formLogin = document.getElementById('login_form')
+  if (!formLogin || !loginFormListener) return
 
-	// Remove listener
-	formLogin.removeEventListener('submit', loginFormListener)
-	loginFormListener = null
-	console.log('Login form unbound')
+  // Remove listener
+  formLogin.removeEventListener('submit', loginFormListener)
+  loginFormListener = null
+  console.log('Login form unbound')
 }
 
 export async function bindGoogleBtn() {
