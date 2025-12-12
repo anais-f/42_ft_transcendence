@@ -21,6 +21,7 @@ export class PongPad {
 			if (this.border?.some((b) => b.intersect(s))) {
 				s.getP1().add(new Vector2(0, -dist))
 				s.getP2().add(new Vector2(0, -dist))
+				break
 			}
 		}
 	}
