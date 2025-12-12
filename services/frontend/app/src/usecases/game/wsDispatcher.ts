@@ -1,5 +1,12 @@
+import { packetBuilder } from '@ft_transcendence/pong-shared/network/Packet/packetBuilder.js'
+import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/Server/S02.js'
+import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
 import { eogHandler } from './handlers/eogHandler.js'
 import { opponentHandler } from './handlers/opponentHandler.js'
+import { startingInHandler } from './handlers/startingInHandler.js'
+import { startHandler } from './handlers/startHandler.js'
+import { slotHandler } from './handlers/slotHandler.js'
+import { gameRenderer } from './gameRenderer.js'
 
 type JsonMessage = {
 	type: string
@@ -8,7 +15,10 @@ type JsonMessage = {
 
 const jsonHandlers: Record<string, (data: unknown) => void | Promise<void>> = {
 	EOG: eogHandler,
-	opponent: opponentHandler
+	opponent: opponentHandler,
+	startingIn: startingInHandler,
+	start: startHandler,
+	slot: slotHandler
 }
 
 export function wsDispatcher(event: MessageEvent) {
@@ -31,6 +41,17 @@ function handleJsonMessage(data: string) {
 	}
 }
 
-function handleBinaryMessage(_data: ArrayBuffer) {
-	// TODO: handle game packets
+function handleBinaryMessage(data: ArrayBuffer) {
+	const packet = packetBuilder.deserializeS(data)
+	if (!packet) return
+
+	if (packet instanceof S02SegmentUpdate) {
+		gameRenderer.setSegments(packet.segs)
+	} else if (packet instanceof S06BallSync) {
+		gameRenderer.setBallState(
+			packet.getPos(),
+			packet.getVelo(),
+			packet.getFactor()
+		)
+	}
 }
