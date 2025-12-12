@@ -96,5 +96,3 @@ export async function handleLogin(form: HTMLFormElement) {
 		console.error('Login error:', e)
 	}
 }
-
-

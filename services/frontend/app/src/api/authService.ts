@@ -54,28 +54,25 @@ export const loadGoogleScript = (nonce?: string): Promise<void> => {
 			return
 		}
 
-    // script creation
+		// script creation
 		const script = document.createElement('script')
-    // utilise le nonce passé ou celui exposé par le serveur : window.__cspNonce
-    const effectiveNonce = nonce || (window as any).__cspNonce
-    if (effectiveNonce) {
-      // `nonce` est supporté comme attribut DOM
-      script.setAttribute('nonce', effectiveNonce)
-      // aussi utile pour certains navigateurs :
-      ;(script as any).nonce = effectiveNonce
-    }
+		// const effectiveNonce = nonce || (window as any).__cspNonce
+		// if (effectiveNonce) {
+		//   script.setAttribute('nonce', effectiveNonce)
+		//   ;(script as any).nonce = effectiveNonce
+		// }
 
-    // attributes
+		// attributes
 		script.src = 'https://accounts.google.com/gsi/client'
 		script.id = 'google-client-script'
 		script.async = true
 		script.defer = true
 
-    // resolution of promise
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Google script'))
+		// resolution of promise
+		script.onload = () => resolve()
+		script.onerror = () => reject(new Error('Failed to load Google script'))
 
-    // injection into DOM, after the body
+		// injection into DOM, after the body
 		document.body.appendChild(script)
 	})
 }
@@ -88,18 +85,18 @@ export const loadGoogleScript = (nonce?: string): Promise<void> => {
  */
 
 export const loginWithGoogleCredential = async (
-    credential: string
+	credential: string
 ): Promise<void> => {
-  const res = await fetch('/auth/api/login-google', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ credential })
-  })
+	const res = await fetch('/auth/api/login-google', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ credential })
+	})
 
-  if (!res.ok) {
-    const error = await res.json()
-    throw new Error(error.message || 'Google login failed')
-  }
+	if (!res.ok) {
+		const error = await res.json()
+		throw new Error(error.message || 'Google login failed')
+	}
 }

@@ -1,16 +1,19 @@
 export interface CredentialResponse {
-  credential: string
-  select_by: string
+	credential: string
+	select_by: string
 }
 
 declare global {
 	interface Window {
-    navigate: (url: string, skipAuth?: boolean) => void
+		navigate: (url: string, skipAuth?: boolean) => void
 
 		google: {
-			accounts: { // fonctionnality related to Google Accounts
-				id: { // functionality related to One Tap and Sign In With Google
-					initialize: (config: { // initialization of the Google Sign-In client
+			accounts: {
+				// fonctionnality related to Google Accounts
+				id: {
+					// functionality related to One Tap and Sign In With Google
+					initialize: (config: {
+						// initialization of the Google Sign-In client
 						client_id: string
 						callback: (response: CredentialResponse) => void
 						auto_select?: boolean
