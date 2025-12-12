@@ -21,23 +21,18 @@ export function leaveGame(code: string) {
 
 function forfeit(gameData: GameData) {
 	if (!gameData.p2) {
-		// open game nobody join
-		return // no op
+		// open game, nobody joined
+		return
 	}
 
-	if (gameData.status == 'active') {
-		// game already started
-		if (gameData.p1?.ws) {
-			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
-		} else {
-			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
-		}
+	if (!gameData.p1.ws) {
+		// p1 left, p2 wins
+		gameData.p2.ws?.send(JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } }))
+		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 	} else {
-		// waiting
-		if (!gameData.p1.ws) {
-			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
-		} else if (!gameData.p2.ws) {
-			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
-		}
+		// p2 left, p1 wins
+		gameData.p1.ws.send(JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } }))
+		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 	}
 }
+
