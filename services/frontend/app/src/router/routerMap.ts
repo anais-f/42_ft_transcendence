@@ -5,13 +5,7 @@ import {
 } from '../pages/oldhome'
 import { GamePage } from '../pages/oldgame'
 import { LobbyPage } from '../pages/oldlobby'
-import {
-	bindLoginForm,
-	bindRegisterForm,
-	LoginPage,
-	unbindLoginForm,
-	unbindRegisterForm
-} from '../pages/oldlogin'
+import { LoginPage, attachLoginEvents } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
 import { SettingsPage } from '../pages/oldsettings'
 
@@ -51,8 +45,7 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [bindRegisterForm, bindLoginForm],
-		unbinds: [unbindRegisterForm, unbindLoginForm],
+		binds: [attachLoginEvents],
 		public: true
 	},
 
