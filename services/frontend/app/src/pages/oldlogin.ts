@@ -76,7 +76,6 @@ export function bindRegisterForm() {
 		return
 	}
 
-	// Remove old listener if exists
 	if (registerFormListener) {
 		formReg.removeEventListener('submit', registerFormListener)
 	}
@@ -123,18 +122,13 @@ export function bindRegisterForm() {
 				return
 			}
 
-			// Après register réussi, vérifier l'auth et mettre à jour le store
-			// puis naviguer avec skipAuth=true pour éviter un double appel
 			const authResult = await checkAuth()
 			setCurrentUser(authResult)
-			// CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
 			await window.navigate('/', true)
 		} catch (e) {
 			console.error('Register error:', e)
 		}
 	}
-
-	// Add the new listener
 	formReg.addEventListener('submit', registerFormListener)
 	console.log('Register form bound')
 }
@@ -150,19 +144,16 @@ export function unbindRegisterForm() {
 }
 
 export function bindLoginForm() {
-	// recupereration du formulaire de login
 	const formLogin = document.getElementById('login_form')
 	if (!formLogin) {
 		console.log('Error: login form not found')
 		return
 	}
 
-	// Remove old listener if exists
 	if (loginFormListener) {
 		formLogin.removeEventListener('submit', loginFormListener)
 	}
 
-	// creation du listener de login
 	loginFormListener = async (e: SubmitEvent) => {
 		e.preventDefault()
 
@@ -198,18 +189,13 @@ export function bindLoginForm() {
 				return
 			}
 
-			// Après login réussi, vérifier l'auth et mettre à jour le store
-			// puis naviguer avec skipAuth=true pour éviter un double appel
 			const authResult = await checkAuth()
 			setCurrentUser(authResult)
-			// CORRECTION: Ajouter 'await' pour s'assurer que la navigation est terminée.
 			await window.navigate('/', true)
 		} catch (e) {
 			console.error('Login error:', e)
 		}
 	}
-
-	// ajout du listener au formulaire de login
 	formLogin.addEventListener('submit', loginFormListener)
 	console.log('Login form bound')
 }
@@ -217,36 +203,27 @@ export function bindLoginForm() {
 export function unbindLoginForm() {
 	const formLogin = document.getElementById('login_form')
 	if (!formLogin || !loginFormListener) return
-
-	// Remove listener
 	formLogin.removeEventListener('submit', loginFormListener)
 	loginFormListener = null
 	console.log('Login form unbound')
 }
 
 export async function bindGoogleBtn() {
-	// On cible le conteneur vide
 	const btnContainer = document.getElementById('google-btn-container')
 	if (!btnContainer) return
 
 	try {
-		// 1. On charge le script
 		await loadGoogleScript()
-
-		// 2. On initialise et on rend le bouton
 		if (window.google) {
-			// Configuration avec ton Client ID
+
 			window.google.accounts.id.initialize({
 				client_id: 'Push you ID here', // todoo make Env work
 				callback: async (response: CredentialResponse) => {
-					// C'est ici qu'on reçoit le Token (Credential)
 					console.log('Google Credential received', response)
 
 					try {
-						// Envoi au back
 						await loginWithGoogleCredential(response.credential)
 
-						// Succès : mise à jour du store et redirection
 						const authResult = await checkAuth()
 						setCurrentUser(authResult)
 						await window.navigate('/', true)
@@ -257,12 +234,11 @@ export async function bindGoogleBtn() {
 				}
 			})
 
-			// Affichage du bouton Google officiel dans la div
 			window.google.accounts.id.renderButton(btnContainer, {
 				theme: 'outline',
 				size: 'large',
 				text: 'continue_with',
-				width: '300' // Tu peux ajuster la largeur
+				width: '300' // 
 			})
 			console.log('Google button rendered')
 		}
@@ -273,7 +249,6 @@ export async function bindGoogleBtn() {
 
 export function unbindGoogleBtn() {
 	const btnContainer = document.getElementById('google-btn-container')
-	// Nettoyage visuel si nécessaire (Google gère ses propres listeners internes)
 	if (btnContainer) {
 		btnContainer.innerHTML = ''
 	}
