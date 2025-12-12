@@ -1,67 +1,64 @@
 import { checkAuth } from '../api/authService'
 import { setCurrentUser } from '../usecases/userStore'
-import { GoogleCodeClient, GoogleCodeResponse } from '../types/google-type.js'
-import { loadGoogleScript, loginWithGoogleBackend } from '../api/authService.js'
+import { CredentialResponse } from '../types/google-type.js'
+import { loadGoogleScript, loginWithGoogleCredential } from '../api/authService.js'
 
 
 export const LoginPage = (): string => {
-	return /*html*/ `
+    return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
-	<div class="col-span-1 flex flex-col items-start">
-		<h1 class="text-2xl py-4">SUBSCRIBE TO OUR NEWSPAPER</h1>
-		<form id="register_form" class="flex flex-col gap-2">
-			<input id="register_username" type="text" name="register_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
-			<input id="register_password" type="password" name="register_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
-			<input id="register_conf_password" type="password" name="register_conf_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="CONFIRM PASSWORD" required>
-			<button id="register_btn" class="generic_btn mt-4" type="submit">Register</button>
-		</form>
-		<div class="news_paragraph">
-			<h1 class="text-lg pt-4">Title</h1>
-			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
-		</div>
-	</div>
+    <div class="col-span-1 flex flex-col items-start">
+        <h1 class="text-2xl py-4">SUBSCRIBE TO OUR NEWSPAPER</h1>
+        <form id="register_form" class="flex flex-col gap-2">
+            <input id="register_username" type="text" name="register_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
+            <input id="register_password" type="password" name="register_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
+            <input id="register_conf_password" type="password" name="register_conf_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="CONFIRM PASSWORD" required>
+            <button id="register_btn" class="generic_btn mt-4" type="submit">Register</button>
+        </form>
+        <div class="news_paragraph">
+            <h1 class="text-lg pt-4">Title</h1>
+            <p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
+        </div>
+    </div>
 
-	<div class="col-span-1 flex flex-col items-start">
-		<div class="news_paragraph">
-			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
-		</div>
-		<img src="/assets/images/mammoth.png" alt="mamouth" class="w-full object-cover opacity-50 select-none">
+    <div class="col-span-1 flex flex-col items-start">
+        <div class="news_paragraph">
+            <p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
+        </div>
+        <img src="/assets/images/mammoth.png" alt="mamouth" class="w-full object-cover opacity-50 select-none">
 
-		<div class="news_paragraph">
-			<h1 class="text-lg pt-4">Title</h1>
-			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
-		</div>
-	</div>
+        <div class="news_paragraph">
+            <h1 class="text-lg pt-4">Title</h1>
+            <p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
+        </div>
+    </div>
 
-	<div class="col-span-1 flex flex-col items-start">
-		<div class="news_paragraph">
-			<p class="text-sm py-6">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
-		</div>
-		<h1 class="text-2xl pt-4 pb-1">RESUME READING</h1>
-		<form id="login_form" class="flex flex-col gap-2">
-		<input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
-		<input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
-		<button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
+    <div class="col-span-1 flex flex-col items-start">
+        <div class="news_paragraph">
+            <p class="text-sm py-6">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
+        </div>
+        <h1 class="text-2xl pt-4 pb-1">RESUME READING</h1>
+        <form id="login_form" class="flex flex-col gap-2">
+        <input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
+        <input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
+        <button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
 
-		<!-- <button id="google_btn" type="button" class="generic_btn">Continue with Google</button> -->
+        <div id="google-btn-container" class="my-8 h-12 w-full flex justify-center"></div>
 
-		<div class="news_paragraph">
-			<h1 class="text-lg pt-4">Title</h1>
-			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. </p>
-		</div>
+        <div class="news_paragraph">
+            <h1 class="text-lg pt-4">Title</h1>
+            <p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. </p>
+        </div>
 
-	</div>
-	<div class="col-span-1 flex flex-col items-start">
-		<div class="news_paragraph">
-			<h1 class="text-lg pt-6 pb-4">Title</h1>
-			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Beatae qui et placeat.</p>
-		</div>
-			<button id="btn-google" class="generic_btn my-8">
-				<img src="/assets/images/l-ggl.webp" alt="Google_logo" class="size-7 inline -ml-3 -mt-1">
-				Continue with Google
-			</button>
-			<img src="/assets/images/screamer_girl.png" alt="screamer girl" class="w-full object-cover opacity-50 select-none">
-	</div>
+    </div>
+    <div class="col-span-1 flex flex-col items-start">
+        <div class="news_paragraph">
+            <h1 class="text-lg pt-6 pb-4">Title</h1>
+            <p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Beatae qui et placeat.</p>
+        </div>
+            
+            <img src="/assets/images/screamer_girl.png" alt="screamer girl" class="w-full object-cover opacity-50 select-none">
+    </div>
 </section>
 `
 }
@@ -71,10 +68,6 @@ export const LoginPage = (): string => {
 // Store form events to be able to remove them later
 let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 let loginFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
-// Cést l'état du bouton Google
-let googleBtnListener: (() => void) | null = null
-let googleClient: GoogleCodeClient | null = null
-
 
 export function bindRegisterForm() {
   const formReg = document.getElementById('register_form')
@@ -232,70 +225,60 @@ export function unbindLoginForm() {
 }
 
 export async function bindGoogleBtn() {
-    const btnGoogle = document.getElementById('btn-google')
-    if (!btnGoogle) return
+    // On cible le conteneur vide
+    const btnContainer = document.getElementById('google-btn-container')
+    if (!btnContainer) return
 
     try {
-        // 1. On charge le script Google (lazy loading pour la perf)
+        // 1. On charge le script
         await loadGoogleScript()
 
-        // 2. On configure le client Google (une seule fois)
-        if (window.google && !googleClient) {
-            googleClient = window.google.accounts.oauth2.initCodeClient({
-                client_id: 'PLACEHOLDER CLIENTID',
-                scope: 'email profile', // On demande l'email et le nom/photo
-                ux_mode: 'popup',       // Ouvre une petite fenêtre sans quitter ton site
-                
-                // C'est ICI que Google te répond après que l'user ait cliqué "OK"
-                callback: async (response: GoogleCodeResponse) => {
-                    if (response.code) {
-                        console.log('Code Google reçu, envoi au back...')
-                        try {
-                            // On envoie le "ticket" au backend
-                            await loginWithGoogleBackend(response.code)
-                            
-                            // Si le back dit OK, on met à jour le store et on redirige
-                            const authResult = await checkAuth()
-                            setCurrentUser(authResult)
-                            await window.navigate('/', true)
-                        } catch (err) {
-                            console.error('Erreur validation backend:', err)
-                            alert("Échec de la connexion Google.")
-                        }
+        // 2. On initialise et on rend le bouton
+        if (window.google) {
+            // Configuration avec ton Client ID
+            window.google.accounts.id.initialize({
+                client_id: 'Push you ID here' , // todoo make Env work
+                callback: async (response: CredentialResponse) => {
+                    // C'est ici qu'on reçoit le Token (Credential)
+                    console.log('Google Credential received', response)
+                    
+                    try {
+                        // Envoi au back
+                        await loginWithGoogleCredential(response.credential)
+                        
+                        // Succès : mise à jour du store et redirection
+                        const authResult = await checkAuth()
+                        setCurrentUser(authResult)
+                        await window.navigate('/', true)
+                    } catch (err) {
+                        console.error('Google Login Error:', err)
+                        alert("Erreur de connexion Google")
                     }
-                },
-            })
+                }
+            });
+
+            // Affichage du bouton Google officiel dans la div
+            window.google.accounts.id.renderButton(
+                btnContainer,
+                { 
+                    theme: 'outline', 
+                    size: 'large', 
+                    text: 'continue_with',
+                    width: '300' // Tu peux ajuster la largeur
+                } 
+            );
+            console.log('Google button rendered')
         }
     } catch (e) {
         console.error('Impossible de charger le script Google API', e)
-        return
     }
-
-    // 3. On attache le clic sur TON bouton custom
-    // Nettoyage préventif
-    if (googleBtnListener) {
-        btnGoogle.removeEventListener('click', googleBtnListener)
-    }
-
-    // Création de l'action du clic
-    googleBtnListener = () => {
-        if (googleClient) {
-            // C'est cette ligne qui fait apparaître la popup Google
-            googleClient.requestCode()
-        }
-    }
-
-    btnGoogle.addEventListener('click', googleBtnListener)
-    console.log('Google Auth bound')
 }
 
 export function unbindGoogleBtn() {
-    const btnGoogle = document.getElementById('btn-google')
-    if (btnGoogle && googleBtnListener) {
-        btnGoogle.removeEventListener('click', googleBtnListener)
+    const btnContainer = document.getElementById('google-btn-container')
+    // Nettoyage visuel si nécessaire (Google gère ses propres listeners internes)
+    if (btnContainer) {
+        btnContainer.innerHTML = ''
     }
-    googleBtnListener = null
-    // On garde googleClient en mémoire pour ne pas le recréer si l'user revient sur la page,
-    // mais on pourrait le mettre à null si on voulait être puriste.
     console.log('Google Auth unbound')
 }

@@ -63,23 +63,17 @@ export const loadGoogleScript = (): Promise<void> => {
     })
 }
 
-/**
- * Envoie le "code" (le ticket) reçu de Google vers ton backend
- * Ton backend l'échangera contre les vraies infos (email, photo, etc.)
- */
-export const loginWithGoogleBackend = async (code: string): Promise<void> => {
+export const loginWithGoogleCredential = async (credential: string): Promise<void> => {
     const res = await fetch('/auth/api/login-google', {
         method: 'POST',
-		credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ code }) // On envoie { "code": "4/0Ae..." }
+        body: JSON.stringify({ credential }) 
     })
 
     if (!res.ok) {
         const error = await res.json()
-        // On lance une erreur pour que le front puisse afficher une alerte
         throw new Error(error.message || 'Google login failed')
     }
 }
