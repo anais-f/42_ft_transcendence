@@ -54,7 +54,7 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [attachLoginEvents],
+		// binds: [attachLoginEvents],
 		binds: [bindRegisterForm, bindLoginForm, bindGoogleBtn],
 		unbinds: [unbindRegisterForm, unbindLoginForm, unbindGoogleBtn],
 		public: true

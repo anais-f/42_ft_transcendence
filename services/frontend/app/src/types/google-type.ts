@@ -1,6 +1,14 @@
 export {}
 
 declare global {
+  interface Window {
+    navigate: (url: string, skipAuth?: boolean) => void
+  }
+}
+// TODO ????
+
+
+declare global {
 	interface Window {
 		google: {
 			accounts: {

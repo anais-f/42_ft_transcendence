@@ -320,6 +320,50 @@ export function unbindLoginForm() {
 }
 
 
+export async function bindGoogleBtn() {
+  const btnContainer = document.getElementById('google-btn-container')
+  if (!btnContainer) return
 
+  try {
+    await loadGoogleScript()
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: 'Push you ID here', // todoo make Env work
+        callback: async (response: CredentialResponse) => {
+          console.log('Google Credential received', response)
+
+          try {
+            await loginWithGoogleCredential(response.credential)
+
+            const authResult = await checkAuth()
+            setCurrentUser(authResult)
+            await window.navigate('/', true)
+          } catch (err) {
+            console.error('Google Login Error:', err)
+            alert('Erreur de connexion Google')
+          }
+        }
+      })
+
+      window.google.accounts.id.renderButton(btnContainer, {
+        theme: 'outline',
+        size: 'large',
+        text: 'continue_with',
+        width: '300' //
+      })
+      console.log('Google button rendered')
+    }
+  } catch (e) {
+    console.error('Impossible de charger le script Google API', e)
+  }
+}
+
+export function unbindGoogleBtn() {
+  const btnContainer = document.getElementById('google-btn-container')
+  if (btnContainer) {
+    btnContainer.innerHTML = ''
+  }
+  console.log('Google Auth unbound')
+}
 
 

@@ -1,8 +1,10 @@
 import { IPrivateUser } from '@ft_transcendence/common'
+import createError from 'http-errors'
 
 /**
  * Check if user is authenticated by calling backend
  * JWT is in httpOnly cookie, sent automatically with credentials: 'include'
+ * @returns Promise that resolves to IPrivateUser if authenticated, null otherwise
  */
 export async function checkAuth(): Promise<IPrivateUser | null> {
 	try {
@@ -23,6 +25,8 @@ export async function checkAuth(): Promise<IPrivateUser | null> {
 
 /**
  * Logout user
+ * JWT cookie will be cleared by backend
+ * @returns Promise that resolves to true if logout successful, false otherwise
  */
 export async function logout(): Promise<boolean> {
 	try {
@@ -38,6 +42,11 @@ export async function logout(): Promise<boolean> {
 	}
 }
 
+/**
+ * Load Google Identity Services script dynamically
+ * Necessary for Google OAuth login
+ * @returns Promise that resolves when the script is loaded
+ */
 export const loadGoogleScript = (): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		if (document.getElementById('google-client-script')) {
@@ -45,32 +54,53 @@ export const loadGoogleScript = (): Promise<void> => {
 			return
 		}
 
+    // script creation
 		const script = document.createElement('script')
+
+    // resolution of promise
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load Google script'))
+
+    // attributes
 		script.src = 'https://accounts.google.com/gsi/client'
 		script.id = 'google-client-script'
 		script.async = true
-		script.defer = true
+		// script.defer = true
 
-		script.onload = () => resolve()
-		script.onerror = () => reject(new Error('Failed to load Google script'))
-
+    // injection into DOM, after the body
 		document.body.appendChild(script)
 	})
 }
+/* reject or resolve -> indicate success or failure of loading the script */
 
+/**
+ * Login with Google credential
+ * @param credential
+ * @returns void
+ */
 export const loginWithGoogleCredential = async (
 	credential: string
 ): Promise<void> => {
-	const res = await fetch('/auth/api/login-google', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ credential })
-	})
+	try {
+		const res = await fetch('/auth/api/login-google', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ credential })
+		})
 
-	if (!res.ok) {
-		const error = await res.json()
-		throw new Error(error.message || 'Google login failed')
+		if (!res.ok) {
+			const errorData = await res.json()
+			throw createError(res.status, errorData.message || 'Google login failed', {
+				code: errorData.code,
+				details: errorData.details
+			})
+		}
+	} catch (error) {
+		if (createError.isHttpError(error)) {
+			throw error
+		}
+		throw createError.InternalServerError('Network error during Google login')
 	}
 }

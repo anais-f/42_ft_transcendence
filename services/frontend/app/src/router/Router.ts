@@ -8,6 +8,8 @@ declare global {
 		navigate: (url: string, skipAuth?: boolean) => void
 	}
 }
+// TODO a garder ou dans le type ?
+
 
 export class Router {
 	private isNavigating = false
