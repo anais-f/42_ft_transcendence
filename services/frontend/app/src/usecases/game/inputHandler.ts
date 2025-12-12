@@ -10,7 +10,8 @@ const pressedKeys = new Set<string>()
 function sendMove(state: boolean, dir: padDirection): void {
 	const ws = gameStore.getGameSocket()
 	if (!ws) {
-		return }
+		return
+	}
 
 	const packet = new C01Move(state, dir)
 	ws.send(packet.serialize())

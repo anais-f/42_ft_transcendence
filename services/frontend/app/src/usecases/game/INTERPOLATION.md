@@ -56,5 +56,5 @@ TPS.
 ## Limitations
 
 - No collision prediction: ball may briefly clip through walls before server
-correction
+  correction
 - Relies on accurate server timestamps for smooth interpolation
