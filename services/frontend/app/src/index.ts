@@ -1,6 +1,6 @@
 import { Router } from './router/Router.js'
 
-// Date display
+// Display the current date in the specified format
 const dateDiv = document.getElementById('date')
 if (dateDiv) {
 	dateDiv.textContent = new Date().toLocaleDateString('en-EN', {
@@ -11,13 +11,13 @@ if (dateDiv) {
 	})
 }
 
-// Démarrer l'application après le chargement complet du DOM
+// Start the application when the DOM is fully loaded
 window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded')
 
-	// 1. Créer une instance du routeur
+	// Create the main application router
 	const appRouter = new Router()
 
-	// 2. Démarrer le routage. (Ceci appelle le handleNav initial et expose window.navigate)
+	// Start the router to handle navigation and rendering
 	appRouter.start()
 })

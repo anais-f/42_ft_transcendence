@@ -68,6 +68,8 @@ export const LoginPage = (): string => {
 
 // UNE SEULE FONCTION pour gérer TOUS les événements de la page login
 export function attachLoginEvents() {
+	//listenener sur le content, pas sur les formulaires, quand on refresh le content dans le router avec contentDiv.innerHTML = new page
+	// -> formulaire supprime du DOM, donc les listeners aussi puis il appelle attachLoginEvents() pour les rattacher
 	const content = document.getElementById('content')
 	if (!content) return
 
