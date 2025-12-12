@@ -47,7 +47,7 @@ export async function logout(): Promise<boolean> {
  * Necessary for Google OAuth login
  * @returns Promise that resolves when the script is loaded
  */
-export const loadGoogleScript = (): Promise<void> => {
+export const loadGoogleScript = (nonce?: string): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		if (document.getElementById('google-client-script')) {
 			resolve()
@@ -56,16 +56,24 @@ export const loadGoogleScript = (): Promise<void> => {
 
     // script creation
 		const script = document.createElement('script')
-
-    // resolution of promise
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Google script'))
+    // utilise le nonce passé ou celui exposé par le serveur : window.__cspNonce
+    const effectiveNonce = nonce || (window as any).__cspNonce
+    if (effectiveNonce) {
+      // `nonce` est supporté comme attribut DOM
+      script.setAttribute('nonce', effectiveNonce)
+      // aussi utile pour certains navigateurs :
+      ;(script as any).nonce = effectiveNonce
+    }
 
     // attributes
 		script.src = 'https://accounts.google.com/gsi/client'
 		script.id = 'google-client-script'
 		script.async = true
-		// script.defer = true
+		script.defer = true
+
+    // resolution of promise
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load Google script'))
 
     // injection into DOM, after the body
 		document.body.appendChild(script)

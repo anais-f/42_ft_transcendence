@@ -97,11 +97,4 @@ export async function handleLogin(form: HTMLFormElement) {
 	}
 }
 
-/**
- * Handler for Google login button
- * @returns void
- */
-//TODO : a revoir avec le code de l'autre branche
-export function handleGoogleLogin() {
-	window.location.href = '/auth/api/google'
-}
+
