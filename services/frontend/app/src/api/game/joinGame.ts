@@ -1,9 +1,7 @@
-
 export interface JoinGameResponse {
 	wsToken: string
 	expiresIn: number
 }
-
 
 export async function joinGame(code: string): Promise<string | null> {
 	try {
@@ -29,4 +27,3 @@ export async function joinGame(code: string): Promise<string | null> {
 		return null
 	}
 }
-

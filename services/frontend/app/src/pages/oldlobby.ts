@@ -9,7 +9,7 @@ export const LobbyPage = (): string => {
 <section class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="flex flex-row justify-between pt-10 pb-5 w-full">
-			<h1 class="text-2xl select-none ">LOBBY NUMBER :</h1>
+			<h1 class="text-2xl select-none ">GAME-TAG:</h1>
 			<span id="lobby-code" class="text-2xl ">${code}</span>
 		</div>
 		<button id="btn-copy" class="generic_btn mb-4">
@@ -116,10 +116,11 @@ export function bindLobbyPage() {
 		}
 
 		ws.onclose = () => {
+			window.navigate('/home')
 			console.log('WS closed')
 		}
 	} else {
-		console.error('ws JWT token not found')
+		window.navigate('/home')
 	}
 }
 

@@ -158,7 +158,10 @@ export class Router {
 
 	// Public method to navigate to a URL
 	// updates browser history and triggers navigation handling
-	public navigate = async (url: string, skipAuth: boolean = false): Promise<void> => {
+	public navigate = async (
+		url: string,
+		skipAuth: boolean = false
+	): Promise<void> => {
 		if (window.location.pathname === url) {
 			console.log('Already at', url)
 			return
