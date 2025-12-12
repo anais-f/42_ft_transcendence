@@ -32,6 +32,11 @@ export function initGameWsConnection(
 	// @ts-ignore - gameData.p2 can't be null (if playerSlot == p2)
 	gameData[playerSlot].ws = socket
 
+	const opponent: TPlayerSlot = playerSlot == 'p1' ? 'p2' : 'p1'
+	gameData[opponent]?.ws?.send(
+		JSON.stringify({ type: 'opponent', data: { id: user.user_id } })
+	)
+
 	console.log(
 		`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`
 	)
