@@ -31,6 +31,6 @@ declare global {
 }
 
 export interface CredentialResponse {
-	credential: string // C'est le fameux JWT (le manteau)
+	credential: string
 	select_by: string
 }
