@@ -11,7 +11,7 @@ export function registerGameSocketEvents(
 ): void {
 	socket.on('message', (data, isBinary) => {
 		if (isBinary) {
-			handleGamePacket(data as Buffer, ctx.user, ctx.gameCode, ctx.playerSlot)
+			handleGamePacket(data as Buffer, ctx.gameCode, ctx.playerSlot)
 		} else {
 			try {
 				const message = JSON.parse(data.toString())
