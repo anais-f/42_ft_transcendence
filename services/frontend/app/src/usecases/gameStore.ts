@@ -1,11 +1,21 @@
 export type PlayerSlot = 'p1' | 'p2'
 
+export interface PlayerData {
+	username: string
+	avatar: string
+}
+
+export type OnOpponentJoinCallback = (opponent: PlayerData) => void
+
 class GameStore {
 	private gameCode: string | null = null
 	private sessionToken: string | null = null
 	private gameSocket: WebSocket | null = null
 	private _navigatingToGame: boolean = false
 	private _playerSlot: PlayerSlot = 'p1'
+	private _p1: PlayerData | null = null
+	private _p2: PlayerData | null = null
+	private _onOpponentJoin: OnOpponentJoinCallback | null = null
 
 	getGameCode(): string | null {
 		return this.gameCode
@@ -47,6 +57,32 @@ class GameStore {
 		this._playerSlot = slot
 	}
 
+	get p1(): PlayerData | null {
+		return this._p1
+	}
+
+	set p1(data: PlayerData | null) {
+		this._p1 = data
+	}
+
+	get p2(): PlayerData | null {
+		return this._p2
+	}
+
+	set p2(data: PlayerData | null) {
+		this._p2 = data
+	}
+
+	setOnOpponentJoin(callback: OnOpponentJoinCallback | null): void {
+		this._onOpponentJoin = callback
+	}
+
+	notifyOpponentJoined(opponent: PlayerData): void {
+		if (this._onOpponentJoin) {
+			this._onOpponentJoin(opponent)
+		}
+	}
+
 	clear(): void {
 		if (this.gameSocket) {
 			this.gameSocket.close()
@@ -56,6 +92,9 @@ class GameStore {
 		this.gameSocket = null
 		this._navigatingToGame = false
 		this._playerSlot = 'p1'
+		this._p1 = null
+		this._p2 = null
+		this._onOpponentJoin = null
 	}
 }
 

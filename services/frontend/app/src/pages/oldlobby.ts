@@ -1,6 +1,6 @@
 import { createGameWebSocket } from '../api/game/createGame.js'
 import { routeParams } from '../router/Router.js'
-import { gameStore } from '../usecases/gameStore.js'
+import { gameStore, PlayerData } from '../usecases/gameStore.js'
 import { wsDispatcher } from '../usecases/game/wsDispatcher.js'
 import { currentUser } from '../usecases/userStore.js'
 
@@ -74,6 +74,20 @@ export const LobbyPage = (): string => {
 
 let copyHandler: (() => void) | null = null
 
+function onOpponentJoin(opponent: PlayerData) {
+	const avatarEl = document.getElementById(
+		'opponent-avatar'
+	) as HTMLImageElement | null
+	const usernameEl = document.getElementById('opponent-username')
+
+	if (avatarEl) {
+		avatarEl.src = opponent.avatar
+	}
+	if (usernameEl) {
+		usernameEl.textContent = opponent.username
+	}
+}
+
 export function bindLobbyPage() {
 	const copyBtn = document.getElementById('btn-copy')
 	const codeSpan = document.getElementById('lobby-code')
@@ -88,6 +102,9 @@ export function bindLobbyPage() {
 		}
 		copyBtn.addEventListener('click', copyHandler)
 	}
+
+	// Register callback for opponent joining
+	gameStore.setOnOpponentJoin(onOpponentJoin)
 
 	// Connect WebSocket
 	const token = gameStore.getSessionToken()
@@ -121,6 +138,9 @@ export function unbindLobbyPage() {
 		copyBtn.removeEventListener('click', copyHandler)
 		copyHandler = null
 	}
+
+	// Unregister callback
+	gameStore.setOnOpponentJoin(null)
 
 	// close WS only if not navigating to /game
 	if (!gameStore.navigatingToGame) {

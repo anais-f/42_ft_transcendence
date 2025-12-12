@@ -1,4 +1,5 @@
 import { fetchUserById } from '../../../api/usersService.js'
+import { gameStore } from '../../gameStore.js'
 
 export async function opponentHandler(data: unknown) {
 	const { id } = data as { id: number }
@@ -8,15 +9,15 @@ export async function opponentHandler(data: unknown) {
 		return
 	}
 
-	const avatarEl = document.getElementById(
-		'opponent-avatar'
-	) as HTMLImageElement | null
-	const usernameEl = document.getElementById('opponent-username')
+	const opponentData = {
+		username: opponent.username,
+		avatar: opponent.avatar
+	}
+	if (gameStore.playerSlot === 'p1') {
+		gameStore.p2 = opponentData
+	} else {
+		gameStore.p1 = opponentData
+	}
 
-	if (avatarEl) {
-		avatarEl.src = opponent.avatar
-	}
-	if (usernameEl) {
-		usernameEl.textContent = opponent.username
-	}
+	gameStore.notifyOpponentJoined(opponentData)
 }
