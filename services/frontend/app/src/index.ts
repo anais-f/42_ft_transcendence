@@ -10,14 +10,8 @@ if (dateDiv) {
 		year: 'numeric'
 	})
 }
-
-// Démarrer l'application après le chargement complet du DOM
 window.addEventListener('DOMContentLoaded', () => {
 	console.log('DOM loaded')
-
-	// 1. Créer une instance du routeur
 	const appRouter = new Router()
-
-	// 2. Démarrer le routage. (Ceci appelle le handleNav initial et expose window.navigate)
 	appRouter.start()
 })
