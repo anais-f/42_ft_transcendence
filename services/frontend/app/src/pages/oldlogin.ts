@@ -44,7 +44,7 @@ export const LoginPage = (): string => {
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. </p>
 		</div>
-		
+		</form>
 	</div>
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph">

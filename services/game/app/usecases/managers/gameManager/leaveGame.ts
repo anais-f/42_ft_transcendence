@@ -27,12 +27,15 @@ function forfeit(gameData: GameData) {
 
 	if (!gameData.p1.ws) {
 		// p1 left, p2 wins
-		gameData.p2.ws?.send(JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } }))
+		gameData.p2.ws?.send(
+			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
+		)
 		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 	} else {
 		// p2 left, p1 wins
-		gameData.p1.ws.send(JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } }))
+		gameData.p1.ws.send(
+			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
+		)
 		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 	}
 }
-
