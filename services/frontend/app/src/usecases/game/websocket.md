@@ -9,7 +9,10 @@ communication with the game server.
 game/
 ├── wsDispatcher.ts     # Routes incoming WebSocket messages
 └── handlers/           # JSON message handlers
-    └── eogHandler.ts
+    ├── eogHandler.ts
+    ├── opponentHandler.ts
+    ├── startingInHandler.ts
+    └── startHandler.ts
 ```
 
 ## Message Types
@@ -31,10 +34,11 @@ checks if the message is binary (`ArrayBuffer`) or JSON and routes accordingly.
 Triggered when the game ends (opponent left, forfeit, etc.).
 
 **Message format:**
+
 ```json
 {
-    "type": "EOG",
-    "data": { "reason": "opponent left" }
+	"type": "EOG",
+	"data": { "reason": "opponent left" }
 }
 ```
 
@@ -45,12 +49,42 @@ Triggered when the game ends (opponent left, forfeit, etc.).
 Triggered when an opponent joins the lobby.
 
 **Message format:**
+
 ```json
 {
-    "type": "opponent",
-    "data": { "id": 123 }
+	"type": "opponent",
+	"data": { "id": 123 }
 }
 ```
 
 **Behavior:** Fetches the opponent's profile (username, avatar) from the users
 API and updates the lobby page.
+
+### startingIn
+
+Triggered during the countdown before game starts (when both players are connected).
+
+**Message format:**
+
+```json
+{
+	"type": "startingIn",
+	"data": { "seconds": 3 }
+}
+```
+
+**Behavior:** Updates the Ready button to show the countdown ("Starting in 3...").
+
+### start
+
+Triggered when the countdown ends and the game should begin.
+
+**Message format:**
+
+```json
+{
+	"type": "start"
+}
+```
+
+**Behavior:** Redirects the user to `/game`.
