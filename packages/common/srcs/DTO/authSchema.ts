@@ -33,7 +33,7 @@ export const PasswordBodySchema = z
 	})
 	.strict()
 
-export const  LoginGoogleSchema = z
+export const LoginGoogleSchema = z
 	.object({
 		credential: z.string().min(1)
 	})

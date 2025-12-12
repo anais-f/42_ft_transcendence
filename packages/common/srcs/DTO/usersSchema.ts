@@ -40,7 +40,7 @@ export const UserIdCoerceSchema = z
 export const PublicUserAuthSchema = z
 	.object({
 		user_id: z.number().int().positive(),
-		login: LoginSchema,
+		login: LoginSchema
 	})
 	.strict()
 	.meta({ description: 'Public user authentication schema' })

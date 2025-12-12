@@ -12,7 +12,7 @@ import {
 	unbindLoginForm,
 	unbindRegisterForm,
 	bindGoogleBtn,
-    unbindGoogleBtn
+	unbindGoogleBtn
 } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
 import { SettingsPage } from '../pages/oldsettings'

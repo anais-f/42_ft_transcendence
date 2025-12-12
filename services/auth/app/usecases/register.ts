@@ -60,16 +60,16 @@ export async function registerGoogleUser(google_id: string) {
 }
 
 export function generateUsername(name: string): string {
-	let username = name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\w-]/g, '-')
-    .replace(/-+/g, '-') 
-    .replace(/^-|-$/g, '')
-    .substring(0, 32)
-    || 'user';
+	let username =
+		name
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/[^\w-]/g, '-')
+			.replace(/-+/g, '-')
+			.replace(/^-|-$/g, '')
+			.substring(0, 32) || 'user'
 	if (username.length < 4) {
-		username = username.padEnd(4, '-');
+		username = username.padEnd(4, '-')
 	}
-	return username;
+	return username
 }
