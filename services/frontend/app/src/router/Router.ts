@@ -78,10 +78,9 @@ export class Router {
 		const route = this.getRoute(url)
 
 		try {
-			let user: IPrivateUser | null = currentUser // Commence avec l'état du store
+			let user: IPrivateUser | null = currentUser // start with store state
 
 			// 1. --- AUTHENTICATION CHECK API ---
-			// Simplification: On appelle checkAuth() si on ne skip pas l'auth, pour garantir l'état le plus à jour.
 			const shouldCallAPI = !skipAuth
 
 			console.log('🔍 Navigation:', {
@@ -98,16 +97,16 @@ export class Router {
 				setCurrentUser(authCheckResult)
 				user = authCheckResult
 			} else {
-				// Pas d'appel API, on utilise l'état actuel du store
+				// use actual store state
 				console.log('⏭️  Skipping checkAuth()')
 				user = currentUser
 			}
 
 			// --- REDIRECTION GUARDS ---
 
-			// GUARD 1: Authentifié sur la page de Login
-			// Si l'utilisateur a réussi la vérification (user existe) et est sur /login, on le renvoie à /
-			// skipAuth=true car on vient de vérifier, pas besoin de re-vérifier
+			// GUARD 1: Authenticated on the Login page
+            // If the user has passed verification (user exists) and is on /login, we redirect them to /
+            // skipAuth=true because we have just verified them, no need to re-verify
 			if (url === '/login' && user !== null) {
 				console.log('Authenticated, redirecting from /login to /')
 				this.isNavigating = false
@@ -115,9 +114,9 @@ export class Router {
 				return
 			}
 
-			// GUARD 2: Non Authentifié sur une page Protégée
-			// Si la route est protégée et que l'utilisateur n'est pas dans l'état (après API check ou store)
-			// skipAuth=true car on vient de vérifier, l'utilisateur n'est pas authentifié
+			// GUARD 2: Unauthenticated on a Protected Page
+            // If the route is protected and the user is not in the state (after API check or store)
+            // skipAuth=true because we just checked, the user is not authenticated
 			if (!route.public && !user) {
 				console.log('Not authenticated, redirecting to /login')
 				this.isNavigating = false
@@ -125,18 +124,18 @@ export class Router {
 				return
 			}
 
-			// 3. RENDU
+			// 3. RENDER
 			if (user) console.log('Authenticated as: ', user.username)
 			this.renderPage(route)
 		} catch (e: unknown) {
-			// ... (Gestion des erreurs)
+			// ... erreor handler to do
 			if (!route.public) {
-				this.isNavigating = false // permet à la nouvelle nav de s'exécuter
+				this.isNavigating = false // new nav to execute
 				await this.navigate('/login', true)
 				return
 			}
 		} finally {
-			// Si le rendu a été fait SANS redirection, on réinitialise l'état
+			// if render without redir, change the state
 			if (this.isNavigating === true) {
 				this.isNavigating = false
 			}
@@ -172,7 +171,6 @@ export class Router {
 		window.navigate = (url: string, skipAuth?: boolean) =>
 			this.navigate(url, skipAuth ?? false)
 
-		// Pas de vérification au démarrage : handleNav() s'en charge
 		await this.handleNav()
 	}
 }
