@@ -9,6 +9,7 @@ import { signToken } from '../utils/jwt.js'
 import { createGoogleUser } from '../repositories/userRepository.js'
 import createHttpError from 'http-errors'
 import { LoginGoogleSchema } from '@ft_transcendence/common'
+import { generateUsername } from '../usecases/register.js'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -37,15 +38,11 @@ export async function googleLoginController(
 
 	const google_id = payload.sub
 	console.log('Google User Info:', {
-		id: google_id,
-		email: payload.email,
-		name: payload.name,
-		picture: payload.picture
+		payload
 	})
 	const user = findUserByGoogleId(google_id)
 	if (user) {
 		console.log('Google user already exists, logging in')
-		
 		if (!user.two_fa_enabled) {
 			const authToken = signToken(
 				{
@@ -102,6 +99,8 @@ export async function googleLoginController(
 		const PublicUser = findPublicUserByGoogleId(google_id)
 		if (PublicUser == undefined)
 			throw createHttpError.InternalServerError('Database error')
+		const newLogin = generateUsername(payload.given_name || 'user')
+		PublicUser.login = newLogin
 		console.log('Created new Google user:', PublicUser)
 		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
 		const response = await fetch(url, {
