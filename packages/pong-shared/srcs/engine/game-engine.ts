@@ -23,14 +23,18 @@ export enum GameState {
 	Started
 }
 
+export const BALL_SPEED = 0.6
+
 export class GameEngine {
 	private currentState: GameState = GameState.Paused
 	private TPS_DATA: TPS_MANAGER
 	private tickTimer: ReturnType<typeof setInterval> | null = null
 	private ball: IBall = {
-		shape: new Circle(new Vector2(), 1.5),
+		shape: new Circle(new Vector2(), 0.8),
 		velo: this.getRandomVelo()
 	}
+	private pauseTicksRemaining: number = 0
+	private readonly PAUSE_TICKS_AFTER_POINT = 120
 	public startTime
 
 	public constructor(
@@ -44,8 +48,8 @@ export class GameEngine {
 	}
 
 	private getRandomVelo(): Vector2 {
-		let x = Math.random() < 0.5 ? 1 : -1
-		let y = Math.random() * 0.25
+		const x = Math.random() < 0.5 ? 1 : -1
+		const y = (Math.random() - 0.5) * 1.4
 		return new Vector2(x, y).normalize()
 	}
 
@@ -108,6 +112,13 @@ export class GameEngine {
 			return
 		}
 
+		// Handle pause between points
+		if (this.pauseTicksRemaining > 0) {
+			--this.pauseTicksRemaining
+			++this.TPS_DATA.tickCount
+			return
+		}
+
 		// TP failsafe
 		if (Vector2.squaredDist(this.ball.shape.getPos(), new Vector2()) > 4096) {
 			console.warn(`ball to far away: ${this.ball.shape.getPos()}`)
@@ -115,12 +126,13 @@ export class GameEngine {
 		}
 
 		if (!this.checkColision()) {
-			this.ball.shape.getPos().add(this.ball.velo)
+			const movement = this.ball.velo.clone().multiply(BALL_SPEED)
+			this.ball.shape.getPos().add(movement)
 		} else {
 			this.ball.shape.getPos().setXY(0, 0)
 			this.ball.velo = this.getRandomVelo()
+			this.pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
 			console.log(`[${this.score.p1} | ${this.score.p2}]`)
-			console.log(`${this.ball.velo.getX()} : ${this.ball.velo.getY()}`)
 		}
 
 		++this.TPS_DATA.tickCount
