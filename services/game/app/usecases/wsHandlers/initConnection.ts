@@ -5,8 +5,10 @@ import {
 	TPlayerSlot,
 	GameData,
 	games,
-	playerToGame
+	playerToGame,
+	Iplayer
 } from '../managers/gameData.js'
+import { startCountdown } from './startCountdown.js'
 
 export interface ConnectionContext {
 	user: WsTokenPayload
@@ -32,15 +34,17 @@ export function initGameWsConnection(
 	// @ts-ignore - gameData.p2 can't be null (if playerSlot == p2)
 	gameData[playerSlot].ws = socket
 
+	socket.send(JSON.stringify({ type: 'slot', data: { slot: playerSlot } }))
+
 	const opponent: TPlayerSlot = playerSlot == 'p1' ? 'p2' : 'p1'
 	const opponentData = gameData[opponent]
 
-	opponentData?.ws?.send(
-		JSON.stringify({ type: 'opponent', data: { id: user.user_id } })
-	)
-
 	if (opponentData) {
-		socket.send(JSON.stringify({ type: 'opponent', data: { id: opponentData.id } }))
+		notifyOpponent(opponentData, user, socket)
+	}
+
+	if (gameData.p1.ws && gameData.p2?.ws) {
+		startCountdown(gameData)
 	}
 
 	console.log(
@@ -48,4 +52,20 @@ export function initGameWsConnection(
 	)
 
 	return { user, gameCode, playerSlot, gameData }
+}
+
+function notifyOpponent(
+	opponentData: Iplayer,
+	user: WsTokenPayload,
+	socket: WebSocket
+) {
+	opponentData?.ws?.send(
+		JSON.stringify({ type: 'opponent', data: { id: user.user_id } })
+	)
+
+	if (opponentData) {
+		socket.send(
+			JSON.stringify({ type: 'opponent', data: { id: opponentData.id } })
+		)
+	}
 }

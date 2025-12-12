@@ -2,16 +2,24 @@ import {
 	GameEngine,
 	PongPad,
 	Segment,
-	Vector2
+	Vector2,
+	padDirection
 } from '@ft_transcendence/pong-shared'
 import { createScore } from '@ft_transcendence/pong-shared/engine/IScore.js'
 
-export const DEFAULT_TPS = 10
+export const DEFAULT_TPS = 60
+
+export interface PlayerMovement {
+	isMoving: boolean
+	direction: padDirection
+}
 
 export interface IGameData {
 	GE: GameEngine
 	pad1: PongPad
 	pad2: PongPad
+	p1Movement: PlayerMovement
+	p2Movement: PlayerMovement
 }
 
 export function createGame(maxScore: number): IGameData {
@@ -47,6 +55,8 @@ export function createGame(maxScore: number): IGameData {
 			]
 		),
 		pad1: pad1,
-		pad2: pad2
+		pad2: pad2,
+		p1Movement: { isMoving: false, direction: padDirection.UP },
+		p2Movement: { isMoving: false, direction: padDirection.UP }
 	}
 }
