@@ -8,7 +8,9 @@ export async function opponentHandler(data: unknown) {
 		return
 	}
 
-	const avatarEl = document.getElementById('opponent-avatar') as HTMLImageElement | null
+	const avatarEl = document.getElementById(
+		'opponent-avatar'
+	) as HTMLImageElement | null
 	const usernameEl = document.getElementById('opponent-username')
 
 	if (avatarEl) {
