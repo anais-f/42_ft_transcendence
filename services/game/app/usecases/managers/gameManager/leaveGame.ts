@@ -1,20 +1,11 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame } from '../gameData.js'
 
-// todo silent throw ?
-export function leaveGame(pID: number) {
-	const gameCode = playerToGame.get(pID)
-	if (!gameCode) {
-		throw new Error('player not in game')
-	}
-
-	deleteGame(gameCode)
-}
-
-function deleteGame(gameCode: string) {
-	const gameData = games.get(gameCode)
+export function leaveGame(code: string) {
+	const gameData = games.get(code)
 	if (!gameData) {
-		throw new Error('game not found')
+		console.log('game not found')
+		return
 	}
 
 	forfeit(gameData) // set game in DB
@@ -26,7 +17,7 @@ function deleteGame(gameCode: string) {
 	if (gameData.p2) {
 		playerToGame.delete(gameData.p2.id)
 	}
-	games.delete(gameCode)
+	games.delete(code)
 }
 
 function forfeit(gameData: GameData) {

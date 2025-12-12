@@ -24,7 +24,7 @@ export function registerGameSocketEvents(
 
 	socket.on('close', (code) => {
 		console.log(
-			`[-] ${ctx.user.login} disconnected from game: ${ctx.gameCode} (code: ${code})`
+			`[-] ${ctx.user.login}(${ctx.user.user_id}) disconnected from game: ${ctx.gameCode} (code: ${code})`
 		)
 
 		const currentGame = games.get(ctx.gameCode)
@@ -34,7 +34,7 @@ export function registerGameSocketEvents(
 		}
 
 		try {
-			leaveGame(ctx.user.user_id)
+			leaveGame(ctx.gameCode)
 		} catch (e) {
 			console.error('Error on leaveGame:', e)
 		}

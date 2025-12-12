@@ -32,7 +32,7 @@ export function initGameWsConnection(
 	// @ts-ignore - gameData.p2 can't be null (if playerSlot == p2)
 	gameData[playerSlot].connState = true
 
-	console.log(`[+] ${user.login} join game: ${gameCode} as ${playerSlot}`)
+	console.log(`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`)
 
 	return { user, gameCode, playerSlot, gameData }
 }
