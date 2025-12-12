@@ -22,8 +22,8 @@ export function requestGame(
 
 	const newCode = createInviteCode('G')
 	games.set(newCode, {
-		p1: { id: pID1, connState: false },
-		p2: pID2 ? { id: pID2, connState: false } : undefined,
+		p1: { id: pID1, ws: null },
+		p2: pID2 ? { id: pID2, ws: null } : undefined,
 		gameInstance: undefined,
 		status: 'waiting',
 		createdAt: Date.now()
@@ -34,7 +34,7 @@ export function requestGame(
 		// locked game
 		playerToGame.set(pID2, newCode)
 		try {
-			startTimeOut(newCode, 50000)
+			startTimeOut(newCode, 20000)
 		} catch (_) {
 			// This can happen with normal use
 		}

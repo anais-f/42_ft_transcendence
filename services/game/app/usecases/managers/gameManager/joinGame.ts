@@ -8,24 +8,24 @@ export function joinGame(gameCode: string, pID: number) {
 	}
 
 	if (gameData.p1.id === pID) {
-		if (gameData.p1.connState) {
+		if (gameData.p1.ws) {
 			throw new Error('player is already in a game')
 		}
 		return
 	}
 
 	if (gameData.p2?.id === pID) {
-		if (gameData.p2.connState) {
+		if (gameData.p2.ws) {
 			throw new Error('player is already in a game')
 		}
 		return
 	}
 
 	if (!gameData.p2) {
-		gameData.p2 = { id: pID, connState: false }
+		gameData.p2 = { id: pID, ws: null }
 		playerToGame.set(pID, gameCode)
 		try {
-			startTimeOut(gameCode, 50000)
+			startTimeOut(gameCode, 20000)
 		} catch (_) {
 			// This can happen with normal use
 		}

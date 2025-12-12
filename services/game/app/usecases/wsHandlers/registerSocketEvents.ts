@@ -30,7 +30,7 @@ export function registerGameSocketEvents(
 		const currentGame = games.get(ctx.gameCode)
 		const player = currentGame?.[ctx.playerSlot]
 		if (player) {
-			player.connState = false
+			player.ws = null
 		}
 
 		try {

@@ -8,7 +8,8 @@ export function startTimeOut(code: string, ms: number = 10000) {
 	}
 
 	setTimeout(() => {
-		if (!gameData.p1.connState || !gameData.p2?.connState) {
+		if (!gameData.p1.ws || !gameData.p2?.ws) {
+			console.log(`time out reached for game ${code}`)
 			leaveGame(code)
 		}
 	}, ms)

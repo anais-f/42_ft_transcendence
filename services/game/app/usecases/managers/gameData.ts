@@ -4,9 +4,11 @@ import { Tournament } from '@ft_transcendence/common'
 export type GameStatus = 'waiting' | 'active'
 export type TPlayerSlot = 'p1' | 'p2'
 
+import WebSocket from 'ws'
+
 export interface Iplayer {
 	id: number
-	connState: boolean
+	ws: WebSocket | null
 }
 
 export interface GameData {

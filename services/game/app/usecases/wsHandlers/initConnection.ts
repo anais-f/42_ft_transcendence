@@ -30,9 +30,11 @@ export function initGameWsConnection(
 	const playerSlot: TPlayerSlot = gameData.p1.id === user.user_id ? 'p1' : 'p2'
 
 	// @ts-ignore - gameData.p2 can't be null (if playerSlot == p2)
-	gameData[playerSlot].connState = true
+	gameData[playerSlot].ws = socket
 
-	console.log(`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`)
+	console.log(
+		`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`
+	)
 
 	return { user, gameCode, playerSlot, gameData }
 }

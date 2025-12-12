@@ -4,7 +4,6 @@ import { games, GameData, playerToGame } from '../gameData.js'
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
 	if (!gameData) {
-		console.log('game not found')
 		return
 	}
 
@@ -28,16 +27,16 @@ function forfeit(gameData: GameData) {
 
 	if (gameData.status == 'active') {
 		// game already started
-		if (gameData.p1?.connState) {
+		if (gameData.p1?.ws) {
 			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 		} else {
 			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 		}
 	} else {
 		// waiting
-		if (!gameData.p1.connState) {
+		if (!gameData.p1.ws) {
 			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
-		} else if (!gameData.p2.connState) {
+		} else if (!gameData.p2.ws) {
 			saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 		}
 	}
