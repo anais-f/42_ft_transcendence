@@ -86,29 +86,20 @@ export const loadGoogleScript = (nonce?: string): Promise<void> => {
  * @param credential
  * @returns void
  */
-export const loginWithGoogleCredential = async (
-	credential: string
-): Promise<void> => {
-	try {
-		const res = await fetch('/auth/api/login-google', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ credential })
-		})
 
-		if (!res.ok) {
-			const errorData = await res.json()
-			throw createError(res.status, errorData.message || 'Google login failed', {
-				code: errorData.code,
-				details: errorData.details
-			})
-		}
-	} catch (error) {
-		if (createError.isHttpError(error)) {
-			throw error
-		}
-		throw createError.InternalServerError('Network error during Google login')
-	}
+export const loginWithGoogleCredential = async (
+    credential: string
+): Promise<void> => {
+  const res = await fetch('/auth/api/login-google', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ credential })
+  })
+
+  if (!res.ok) {
+    const error = await res.json()
+    throw new Error(error.message || 'Google login failed')
+  }
 }

@@ -15,7 +15,7 @@ export const LoginPage = (): string => {
 <section class="grid grid-cols-4 gap-11">
     <div class="col-span-1 flex flex-col items-start">
         <h1 class="text-2xl py-4">SUBSCRIBE TO OUR NEWSPAPER</h1>
-        <form id="register_form" class="flex flex-col gap-2">
+        <form id="register_form" data-form="register" class="flex flex-col gap-2">
             <input id="register_username" type="text" name="register_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
             <input id="register_password" type="password" name="register_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
             <input id="register_conf_password" type="password" name="register_conf_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="CONFIRM PASSWORD" required>
@@ -42,7 +42,7 @@ export const LoginPage = (): string => {
             <p class="text-sm py-6">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
         </div>
         <h1 class="text-2xl pt-4 pb-1">RESUME READING</h1>
-        <form id="login_form" class="flex flex-col gap-2">
+        <form id="login_form" data-form="login" class="flex flex-col gap-2">
         <input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
         <input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
         <button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
@@ -113,11 +113,15 @@ export async function initGoogleAuth() {
   const btnContainer = document.getElementById('google-btn-container')
   if (!btnContainer) return
 
+  // Clear container before rendering to avoid duplicates
+  btnContainer.innerHTML = ''
+
   try {
     await loadGoogleScript()
     if (window.google) {
+      // Always reinitialize (Google SDK handles this gracefully)
       window.google.accounts.id.initialize({
-        client_id: '310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com', // todoo make Env work
+        client_id: '310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
         callback: async (response: CredentialResponse) => {
           console.log('Google Credential received', response)
 
@@ -138,7 +142,7 @@ export async function initGoogleAuth() {
         theme: 'outline',
         size: 'large',
         text: 'continue_with',
-        width: '300' //
+        width: '300'
       })
       console.log('Google button rendered')
     }
@@ -154,5 +158,11 @@ export function cleanupGoogleAuth() {
   if (btnContainer) {
     btnContainer.innerHTML = ''
   }
+
+  // Cancel Google One Tap prompt if active
+  if (window.google?.accounts?.id) {
+    window.google.accounts.id.cancel()
+  }
+
   console.log('Google Auth cleaned up')
 }
