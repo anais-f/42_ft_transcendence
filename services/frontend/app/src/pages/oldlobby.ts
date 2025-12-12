@@ -93,6 +93,7 @@ export function bindLobbyPage() {
 	const token = gameStore.getSessionToken()
 	if (token) {
 		const ws = createGameWebSocket(token)
+		ws.binaryType = 'arraybuffer'
 		gameStore.setGameSocket(ws)
 
 		ws.onopen = () => {
@@ -121,9 +122,12 @@ export function unbindLobbyPage() {
 		copyHandler = null
 	}
 
-	const ws = gameStore.getGameSocket()
-	if (ws) {
-		ws.close()
-		gameStore.setGameSocket(null)
+	// close WS only if not navigating to /game
+	if (!gameStore.navigatingToGame) {
+		const ws = gameStore.getGameSocket()
+		if (ws) {
+			ws.close()
+			gameStore.setGameSocket(null)
+		}
 	}
 }

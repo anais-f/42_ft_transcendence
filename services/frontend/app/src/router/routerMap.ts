@@ -7,7 +7,7 @@ import {
 	unbindCreateButton,
 	unbindJoinLobbyForm
 } from '../pages/oldhome.js'
-import { GamePage } from '../pages/oldgame.js'
+import { GamePage, bindGamePage, unbindGamePage } from '../pages/oldgame.js'
 import { LobbyPage, bindLobbyPage, unbindLobbyPage } from '../pages/oldlobby.js'
 import {
 	bindLoginForm,
@@ -42,7 +42,9 @@ export const routerMap: Record<Pages, Route> = {
 	game: {
 		id: 'game',
 		url: '/game',
-		page: GamePage
+		page: GamePage,
+		binds: [bindGamePage],
+		unbinds: [unbindGamePage]
 	},
 
 	lobby: {

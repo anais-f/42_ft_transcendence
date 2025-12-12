@@ -1,3 +1,10 @@
+import { gameStore } from '../usecases/gameStore.js'
+import { gameRenderer } from '../usecases/game/gameRenderer.js'
+import {
+	bindInputHandler,
+	unbindInputHandler
+} from '../usecases/game/inputHandler.js'
+
 export const GamePage = (): string => /*html*/ `
 <div class="min-h-[80vh] w-full flex items-center justify-center">
 
@@ -36,4 +43,26 @@ let p2 = {
 	username: 'PlayerTwo',
 	avatar: '/assets/images/bear.png',
 	score: 1
+}
+
+export function bindGamePage() {
+	gameStore.navigatingToGame = false
+
+	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
+	if (canvas) {
+		gameRenderer.setCanvas(canvas)
+	}
+
+	bindInputHandler()
+}
+
+export function unbindGamePage() {
+	unbindInputHandler()
+	gameRenderer.clear()
+
+	const ws = gameStore.getGameSocket()
+	if (ws) {
+		ws.close()
+		gameStore.setGameSocket(null)
+	}
 }
