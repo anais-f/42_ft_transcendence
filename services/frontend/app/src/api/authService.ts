@@ -38,13 +38,8 @@ export async function logout(): Promise<boolean> {
 	}
 }
 
-/**
- * Charge le script Google Identity Services dynamiquement
- * Cela évite de le mettre dans le index.html et de ralentir tout le site
- */
 export const loadGoogleScript = (): Promise<void> => {
 	return new Promise((resolve, reject) => {
-		// Si le script est déjà là, on ne fait rien
 		if (document.getElementById('google-client-script')) {
 			resolve()
 			return
