@@ -1,9 +1,12 @@
 import { createGameWebSocket } from '../api/game/createGame.js'
 import { routeParams } from '../router/Router.js'
 import { gameStore } from '../usecases/gameStore.js'
+import { wsDispatcher } from '../usecases/game/wsDispatcher.js'
+import { currentUser } from '../usecases/userStore.js'
 
 export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.getGameCode() || 'G-XXXXX'
+	const player = currentUser
 
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
@@ -30,8 +33,8 @@ export const LobbyPage = (): string => {
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
 		</div>
 		<h1 class="text-2xl pt-4 pb-1">PLAYER 1</h1>
-		<img src="${p1.avatar}" alt="Player_1" class="w-[90%] object-cover aspect-square object-center select-none">
-		<span class="text-xl pt-2 pb-4">${p1.username}</span>
+		<img src="${player?.avatar ?? ''}" alt="Player_1" class="w-[90%] object-cover aspect-square object-center select-none">
+		<span class="text-xl pt-2 pb-4">${player?.username ?? ''}</span>
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. </p>
@@ -58,8 +61,8 @@ export const LobbyPage = (): string => {
 				<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
 			</div>
 			<h1 class="text-2xl pt-4 pb-1">PLAYER 2</h1>
-			<img src="${p2.avatar}" alt="Player_2" class="w-[90%] object-cover aspect-square object-center select-none">
-			<span class="text-xl pt-2 pb-6">${p2.username}</span>
+			<img id="opponent-avatar" src="" alt="Player_2" class="w-[90%] object-cover aspect-square object-center select-none">
+			<span id="opponent-username" class="text-xl pt-2 pb-6">Waiting...</span>
 			<div class="news_paragraph">
 				<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus.</p>
 			</div>
@@ -67,16 +70,6 @@ export const LobbyPage = (): string => {
 	</div>
 </section>
 `
-}
-
-let p1 = {
-	username: 'Anfichet',
-	avatar: 'assets/images/anfichet.jpeg'
-}
-
-let p2 = {
-	username: 'Lrio',
-	avatar: 'assets/images/lrio.jpg'
 }
 
 let copyHandler: (() => void) | null = null
@@ -106,10 +99,7 @@ export function bindLobbyPage() {
 			console.log('WS connected')
 		}
 
-		ws.onmessage = (event) => {
-			console.log('WS message:', event.data)
-			// TODO: handle game messages
-		}
+		ws.onmessage = wsDispatcher
 
 		ws.onerror = (error) => {
 			console.error('WS error:', error)
