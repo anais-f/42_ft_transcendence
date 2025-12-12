@@ -73,7 +73,7 @@ class GameRenderer {
 		const toCanvasY = (y: number) => offsetY - y * scaleY
 
 		ctx.strokeStyle = 'black'
-		ctx.lineWidth = 4
+		ctx.lineWidth = 5
 		for (const seg of this.segments) {
 			const p1 = seg.getP1()
 			const p2 = seg.getP2()
@@ -89,7 +89,7 @@ class GameRenderer {
 		ctx.arc(
 			toCanvasX(predictedPos.getX()),
 			toCanvasY(predictedPos.getY()),
-			0.8 * scaleX,
+			0.5 * scaleX,
 			0,
 			Math.PI * 2
 		)
