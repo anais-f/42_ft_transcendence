@@ -8,6 +8,7 @@ import {
 import { signToken } from '../utils/jwt.js'
 import { createGoogleUser } from '../repositories/userRepository.js'
 import createHttpError from 'http-errors'
+import { LoginGoogleSchema } from '@ft_transcendence/common'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -15,14 +16,14 @@ export async function googleLoginController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const { credential } = request.body as { credential: string }
-
-	if (!credential) throw createHttpError.BadRequest('Missing Google credential')
+	const parsed = LoginGoogleSchema.parse(request.body)
+	if (!parsed)
+		throw createHttpError.BadRequest('Invalid request body structure')
 
 	let ticket
 	try {
 		ticket = await client.verifyIdToken({
-			idToken: credential,
+			idToken: parsed.credential,
 			audience: process.env.GOOGLE_CLIENT_ID
 		})
 	} catch (error) {
@@ -38,11 +39,13 @@ export async function googleLoginController(
 	console.log('Google User Info:', {
 		id: google_id,
 		email: payload.email,
-		name: payload.name
+		name: payload.name,
+		picture: payload.picture
 	})
 	const user = findUserByGoogleId(google_id)
 	if (user) {
 		console.log('Google user already exists, logging in')
+		
 		if (!user.two_fa_enabled) {
 			const authToken = signToken(
 				{
@@ -99,7 +102,7 @@ export async function googleLoginController(
 		const PublicUser = findPublicUserByGoogleId(google_id)
 		if (PublicUser == undefined)
 			throw createHttpError.InternalServerError('Database error')
-
+		console.log('Created new Google user:', PublicUser)
 		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
 		const response = await fetch(url, {
 			method: 'POST',

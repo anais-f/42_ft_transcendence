@@ -6,7 +6,7 @@ import {
 	logoutController
 } from '../controllers/authController.js'
 import { googleLoginController } from '../controllers/oauthController.js'
-import { RegisterSchema, LoginActionSchema } from '@ft_transcendence/common'
+import { RegisterSchema, LoginActionSchema, LoginGoogleSchema } from '@ft_transcendence/common'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(
@@ -27,12 +27,18 @@ export async function authRoutes(app: FastifyInstance) {
 		},
 		loginController
 	)
-	app.post('/api/login-google', googleLoginController)
+	app.post('/api/login-google',
+		{
+			schema: {
+				body: LoginGoogleSchema
+			}
+		},
+		googleLoginController)
 	app.get('/api/admin/validate', validateAdminController)
 	app.post('/api/logout', logoutController)
 
 	// Public config endpoint
-	app.get('/api/config', async (_request, reply) => {
+	app.get('/api/config', async (_request, reply ) => {
 		console.log('GET /api/config called')
 		return reply.send({
 			googleClientId: process.env.GOOGLE_CLIENT_ID || null
