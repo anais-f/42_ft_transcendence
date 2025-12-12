@@ -10,7 +10,9 @@ import {
 	bindRegisterForm,
 	LoginPage,
 	unbindLoginForm,
-	unbindRegisterForm
+	unbindRegisterForm,
+	bindGoogleBtn,
+    unbindGoogleBtn
 } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
 import { SettingsPage } from '../pages/oldsettings'
@@ -51,8 +53,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [bindRegisterForm, bindLoginForm],
-		unbinds: [unbindRegisterForm, unbindLoginForm],
+		binds: [bindRegisterForm, bindLoginForm, bindGoogleBtn],
+		unbinds: [unbindRegisterForm, unbindLoginForm, unbindGoogleBtn],
 		public: true
 	},
 

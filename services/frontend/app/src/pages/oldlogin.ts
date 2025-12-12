@@ -1,5 +1,7 @@
 import { checkAuth } from '../api/authService'
 import { setCurrentUser } from '../usecases/userStore'
+import { GoogleCodeClient, GoogleCodeResponse } from '../types/google-type.js'
+import { loadGoogleScript, loginWithGoogleBackend } from '../api/authService.js'
 
 export const LoginPage = (): string => {
 	return /*html*/ `
@@ -66,6 +68,10 @@ export const LoginPage = (): string => {
 // Store form handlers to be able to remove them later
 let registerFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
 let loginFormListener: ((e: SubmitEvent) => Promise<void>) | null = null
+// Cést l'état du bouton Google
+let googleBtnListener: (() => void) | null = null
+let googleClient: GoogleCodeClient | null = null
+
 
 export function bindRegisterForm() {
 	const formReg = document.getElementById('register_form')
@@ -220,4 +226,73 @@ export function unbindLoginForm() {
 	formLogin.removeEventListener('submit', loginFormListener)
 	loginFormListener = null
 	console.log('Login form unbound')
+}
+
+export async function bindGoogleBtn() {
+    const btnGoogle = document.getElementById('btn-google')
+    if (!btnGoogle) return
+
+    try {
+        // 1. On charge le script Google (lazy loading pour la perf)
+        await loadGoogleScript()
+
+        // 2. On configure le client Google (une seule fois)
+        if (window.google && !googleClient) {
+            googleClient = window.google.accounts.oauth2.initCodeClient({
+                client_id: 'PLACEHOLDER CLIENTID',
+                scope: 'email profile', // On demande l'email et le nom/photo
+                ux_mode: 'popup',       // Ouvre une petite fenêtre sans quitter ton site
+                
+                // C'est ICI que Google te répond après que l'user ait cliqué "OK"
+                callback: async (response: GoogleCodeResponse) => {
+                    if (response.code) {
+                        console.log('Code Google reçu, envoi au back...')
+                        try {
+                            // On envoie le "ticket" au backend
+                            await loginWithGoogleBackend(response.code)
+                            
+                            // Si le back dit OK, on met à jour le store et on redirige
+                            const authResult = await checkAuth()
+                            setCurrentUser(authResult)
+                            await window.navigate('/', true)
+                        } catch (err) {
+                            console.error('Erreur validation backend:', err)
+                            alert("Échec de la connexion Google.")
+                        }
+                    }
+                },
+            })
+        }
+    } catch (e) {
+        console.error('Impossible de charger le script Google API', e)
+        return
+    }
+
+    // 3. On attache le clic sur TON bouton custom
+    // Nettoyage préventif
+    if (googleBtnListener) {
+        btnGoogle.removeEventListener('click', googleBtnListener)
+    }
+
+    // Création de l'action du clic
+    googleBtnListener = () => {
+        if (googleClient) {
+            // C'est cette ligne qui fait apparaître la popup Google
+            googleClient.requestCode()
+        }
+    }
+
+    btnGoogle.addEventListener('click', googleBtnListener)
+    console.log('Google Auth bound')
+}
+
+export function unbindGoogleBtn() {
+    const btnGoogle = document.getElementById('btn-google')
+    if (btnGoogle && googleBtnListener) {
+        btnGoogle.removeEventListener('click', googleBtnListener)
+    }
+    googleBtnListener = null
+    // On garde googleClient en mémoire pour ne pas le recréer si l'user revient sur la page,
+    // mais on pourrait le mettre à null si on voulait être puriste.
+    console.log('Google Auth unbound')
 }

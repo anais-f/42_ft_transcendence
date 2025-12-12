@@ -37,3 +37,49 @@ export async function logout(): Promise<boolean> {
 		return false
 	}
 }
+
+/**
+ * Charge le script Google Identity Services dynamiquement
+ * Cela évite de le mettre dans le index.html et de ralentir tout le site
+ */
+export const loadGoogleScript = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        // Si le script est déjà là, on ne fait rien
+        if (document.getElementById('google-client-script')) {
+            resolve()
+            return
+        }
+
+        const script = document.createElement('script')
+        script.src = 'https://accounts.google.com/gsi/client'
+        script.id = 'google-client-script'
+        script.async = true
+        script.defer = true
+        
+        script.onload = () => resolve()
+        script.onerror = () => reject(new Error('Failed to load Google script'))
+        
+        document.body.appendChild(script)
+    })
+}
+
+/**
+ * Envoie le "code" (le ticket) reçu de Google vers ton backend
+ * Ton backend l'échangera contre les vraies infos (email, photo, etc.)
+ */
+export const loginWithGoogleBackend = async (code: string): Promise<void> => {
+    const res = await fetch('/auth/api/login-google', {
+        method: 'POST',
+		credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code }) // On envoie { "code": "4/0Ae..." }
+    })
+
+    if (!res.ok) {
+        const error = await res.json()
+        // On lance une erreur pour que le front puisse afficher une alerte
+        throw new Error(error.message || 'Google login failed')
+    }
+}
