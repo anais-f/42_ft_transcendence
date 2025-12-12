@@ -4,10 +4,12 @@ import {
 	verify2faSetupController,
 	verify2faLoginController,
 	disable2faController,
-	status2faController
+	status2faController,
+	get2FAStatusInternalController
 } from '../controllers/2faController.js'
 import { twofaCodeSchema } from '@ft_transcendence/common'
-import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
+import { z } from 'zod'
 
 export async function twoFARoutes(app: FastifyInstance) {
 	// Setup 2FA - requires auth_token (user already authenticated)
@@ -47,5 +49,24 @@ export async function twoFARoutes(app: FastifyInstance) {
 		'/api/2fa/status',
 		{ preHandler: jwtAuthMiddleware },
 		status2faController
+	)
+
+	// INTERNAL: Get 2FA status by user_id (service-to-service)
+	app.get(
+		'/api/internal/auth/:user_id/2fa-status',
+		{
+			preHandler: apiKeyMiddleware,
+			schema: {
+				params: z.object({
+					user_id: z.coerce.number().int().positive()
+				}),
+				response: {
+					200: z.object({
+						two_fa_enabled: z.boolean()
+					})
+				}
+			}
+		},
+		get2FAStatusInternalController
 	)
 }

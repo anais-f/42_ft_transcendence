@@ -1,4 +1,5 @@
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
+import createHttpError from 'http-errors'
 
 /**
  * @description Check valid API key in headers for inter-service communication
@@ -15,12 +16,9 @@ export function apiKeyMiddleware(
 	const apiKey = Array.isArray(rawAuth) ? rawAuth[0] : rawAuth
 
 	if (!apiKey || apiKey !== process.env.INTERNAL_API_SECRET) {
-		void reply.code(401).send({
-			success: false,
-			error: 'Unauthorized'
-		})
-		return done()
+		done(createHttpError.Unauthorized('Unauthorized'))
+		return
 	}
 
-	return done()
+	done()
 }
