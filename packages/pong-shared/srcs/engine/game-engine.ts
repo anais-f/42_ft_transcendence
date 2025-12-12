@@ -123,6 +123,7 @@ export class GameEngine {
 		if (Vector2.squaredDist(this.ball.shape.getPos(), new Vector2()) > 4096) {
 			console.warn(`ball to far away: ${this.ball.shape.getPos()}`)
 			this.ball.shape.setOrigin(new Vector2())
+			this.ball.velo = this.getRandomVelo()
 		}
 
 		if (!this.checkColision()) {
