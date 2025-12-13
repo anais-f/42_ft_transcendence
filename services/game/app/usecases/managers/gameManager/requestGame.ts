@@ -26,7 +26,8 @@ export function requestGame(
 		p2: pID2 ? { id: pID2, ws: null } : undefined,
 		gameInstance: undefined,
 		status: 'waiting',
-		createdAt: Date.now()
+		createdAt: Date.now(),
+		timeoutId: null
 	})
 
 	playerToGame.set(pID1, newCode)

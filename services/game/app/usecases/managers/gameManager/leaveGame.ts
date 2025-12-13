@@ -1,5 +1,7 @@
+import { GameState } from '@ft_transcendence/pong-shared'
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame } from '../gameData.js'
+import { clearGameTimeout } from './startTimeOut.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -7,7 +9,13 @@ export function leaveGame(code: string) {
 		return
 	}
 
-	forfeit(gameData) // set game in DB
+	clearGameTimeout(code)
+
+	if (gameData.status !== 'ended') {
+		gameData.gameInstance?.GE.setState(GameState.Paused)
+		forfeit(gameData)
+		gameData.status = 'ended'
+	}
 
 	if (gameData.p1) {
 		playerToGame.delete(gameData.p1.id)

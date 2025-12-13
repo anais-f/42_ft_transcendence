@@ -7,14 +7,15 @@ import { GameData } from '../../managers/gameData.js'
 import { createGame, DEFAULT_TPS, IGameData } from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
+import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_SCORE = 101
+export const MAX_SCORE = 3
 export const PAD_SPEED = 0.3
 export const PAUSE_TICKS = 120
 export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / COUNTDOWN_STEPS
 
-export function startGame(gameData: GameData): void {
+export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_SCORE)
 	gameData.gameInstance = gameInstance
 
@@ -31,7 +32,7 @@ export function startGame(gameData: GameData): void {
 
 	gameInstance.GE.setState(GameState.Started)
 
-	startGameLoop(gameData, packetSender)
+	startGameLoop(gameData, gameCode, packetSender)
 }
 
 // TODO: move this somewhere else
@@ -46,6 +47,7 @@ function updatePadMovements(gameInstance: IGameData): void {
 
 async function startGameLoop(
 	gameData: GameData,
+	gameCode: string,
 	packetSender: PacketSender
 ): Promise<void> {
 	const limiter = new Bottleneck({
@@ -57,8 +59,13 @@ async function startGameLoop(
 	let lastP2Score = 0
 	let lastCountdown = -1
 
-	while (gameData.gameInstance?.GE.getState() === GameState.Started) {
+	while (
+		gameData.gameInstance?.GE.getState() === GameState.Started &&
+		gameData.status === 'active'
+	) {
 		await limiter.schedule(async () => {
+			if (gameData.status !== 'active') return
+
 			updatePadMovements(gameData.gameInstance!)
 
 			const segPacket = new S02SegmentUpdate(
@@ -78,9 +85,11 @@ async function startGameLoop(
 			updateHUDs(gameData, packetSender, {
 				lastP1Score,
 				lastP2Score,
-				lastCountdown})
+				lastCountdown
+			})
 		})
 	}
 
 	packetSender.stop()
+	endGame(gameCode)
 }

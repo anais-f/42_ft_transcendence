@@ -1,9 +1,12 @@
 import { GameData } from '../managers/gameData.js'
 import { startGame } from './loop/startGame.js'
+import { clearGameTimeout } from '../managers/gameManager/startTimeOut.js'
 
 // lobby count down
-export function startCountdown(gameData: GameData) {
+export function startCountdown(gameData: GameData, gameCode: string) {
 	const COUNTDOWN_SECONDS = 5
+
+	clearGameTimeout(gameCode)
 
 	let remaining = COUNTDOWN_SECONDS
 
@@ -29,7 +32,7 @@ export function startCountdown(gameData: GameData) {
 			gameData.p1.ws.send(startMessage)
 			gameData.p2.ws.send(startMessage)
 			gameData.status = 'active'
-			startGame(gameData)
+			startGame(gameData, gameCode)
 		}
 	}, 1000)
 }

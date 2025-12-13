@@ -44,7 +44,7 @@ export function initGameWsConnection(
 	}
 
 	if (gameData.p1.ws && gameData.p2?.ws) {
-		startCountdown(gameData)
+		startCountdown(gameData, gameCode)
 	}
 
 	console.log(

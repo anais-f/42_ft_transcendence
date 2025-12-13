@@ -1,7 +1,7 @@
 import { IGameData } from '../createGame.js'
 import { Tournament } from '@ft_transcendence/common'
 
-export type GameStatus = 'waiting' | 'active'
+export type GameStatus = 'waiting' | 'active' | 'ended'
 export type TPlayerSlot = 'p1' | 'p2'
 
 import WebSocket from 'ws'
@@ -17,6 +17,7 @@ export interface GameData {
 	gameInstance: IGameData | undefined
 	status: GameStatus
 	createdAt: number
+	timeoutId: ReturnType<typeof setTimeout> | null
 }
 
 // individial game

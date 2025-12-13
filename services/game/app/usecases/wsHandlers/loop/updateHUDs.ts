@@ -5,12 +5,20 @@ import { S08Countdown } from '@ft_transcendence/pong-shared/network/Packet/Serve
 import { TICKS_PER_STEP } from './startGame.js'
 import { PacketSender } from '../PacketSender.js'
 
-export function updateHUDs(gameData: GameData, packetSender: PacketSender, obj: {lastP1Score: number, lastP2Score: number, lastCountdown: number}) {
+export function updateHUDs(
+	gameData: GameData,
+	packetSender: PacketSender,
+	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+) {
 	updateScoreHUD(gameData, packetSender, obj)
 	updateCountDownHUD(gameData, packetSender, obj)
 }
 
-async function updateScoreHUD(gameData: GameData, packetSender: PacketSender, obj: {lastP1Score: number, lastP2Score: number, lastCountdown: number}) {
+async function updateScoreHUD(
+	gameData: GameData,
+	packetSender: PacketSender,
+	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+) {
 	const score = gameData.gameInstance!.GE.getScore()
 	if (score.p1 !== obj.lastP1Score || score.p2 !== obj.lastP2Score) {
 		obj.lastP1Score = score.p1
@@ -21,7 +29,11 @@ async function updateScoreHUD(gameData: GameData, packetSender: PacketSender, ob
 	}
 }
 
-async function updateCountDownHUD(gameData: GameData, packetSender: PacketSender, obj: {lastP1Score: number, lastP2Score: number, lastCountdown: number}) {
+async function updateCountDownHUD(
+	gameData: GameData,
+	packetSender: PacketSender,
+	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+) {
 	const pauseTicks = gameData.gameInstance!.GE.getPauseTicksRemaining()
 	if (pauseTicks > 0) {
 		const countdown = Math.ceil(pauseTicks / TICKS_PER_STEP)

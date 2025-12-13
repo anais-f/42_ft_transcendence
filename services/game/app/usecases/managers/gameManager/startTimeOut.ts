@@ -7,10 +7,26 @@ export function startTimeOut(code: string, ms: number = 10000) {
 		return
 	}
 
-	setTimeout(() => {
-		if (!gameData.p1.ws || !gameData.p2?.ws) {
+	if (gameData.timeoutId) {
+		clearTimeout(gameData.timeoutId)
+	}
+
+	gameData.timeoutId = setTimeout(() => {
+		gameData.timeoutId = null
+		if (
+			gameData.status === 'waiting' &&
+			(!gameData.p1.ws || !gameData.p2?.ws)
+		) {
 			console.log(`time out reached for game ${code}`)
 			leaveGame(code)
 		}
 	}, ms)
+}
+
+export function clearGameTimeout(code: string) {
+	const gameData = games.get(code)
+	if (gameData?.timeoutId) {
+		clearTimeout(gameData.timeoutId)
+		gameData.timeoutId = null
+	}
 }
