@@ -183,3 +183,12 @@ export async function status2faController(
 	const enabled = isUser2FAEnabled(payload.user_id)
 	return reply.code(200).send({ enabled })
 }
+
+export async function get2FAStatusInternalController(
+	req: FastifyRequest,
+	reply: FastifyReply
+) {
+	const { user_id } = req.params as { user_id: number }
+	const enabled = isUser2FAEnabled(user_id)
+	return reply.code(200).send({ two_fa_enabled: enabled })
+}
