@@ -46,6 +46,7 @@ export async function authRoutes(app: FastifyInstance) {
 	app.post('/api/logout', logoutController)
 
 	// Verify password endpoint (for sensitive operations like enabling 2FA)
+  // TODO peut etre a virer plus tard si on l'utilise pas
 	app.post(
 		'/api/auth/verify-password',
 		{

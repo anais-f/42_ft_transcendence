@@ -24,6 +24,11 @@ export function findUserByLogin(login: string): IUserAuth | undefined {
 	return stmt.get(login) as IUserAuth | undefined
 }
 
+export function findUserById(id: number): IUserAuth | undefined {
+	const stmt = db().prepare('SELECT * FROM users WHERE user_id = ?')
+	return stmt.get(id) as IUserAuth | undefined
+}
+
 export function findPublicUserByLogin(
 	login: string
 ): PublicUserAuthDTO | undefined {

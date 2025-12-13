@@ -238,15 +238,14 @@ export async function handlerAvatar(form: HTMLFormElement) {
 }
 
 // ============================================
-// 2FA HANDLERS - TOUT REVOIR
+// 2FA HANDLERS - Using Auth Service Routes
 // ============================================
 
 /**
  * Génère le QR code pour l'activation de la 2FA
+ * Utilise: POST /auth/api/2fa/setup (JWT auth via cookie)
  */
 async function handleGenerateQRCode() {
-  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
-
   try {
     console.log('Generating 2FA QR code...')
 
@@ -256,18 +255,10 @@ async function handleGenerateQRCode() {
       return
     }
 
-    const res = await fetch('/2fa/api/2fa/setup', {
+    // Auth service route - uses JWT from cookie, no body needed
+    const res = await fetch('/auth/api/2fa/setup', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        authorization: secret
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        user_id: currentUser.user_id,
-        issuer: 'ft_transcendence',
-        label: currentUser.username
-      })
+      credentials: 'include' // Sends auth_token cookie
     })
 
     if (!res.ok) {
@@ -317,10 +308,10 @@ async function handleGenerateQRCode() {
 
 /**
  * Vérifie le code 2FA et active la 2FA
- * // ajouter le password pour valider l'activation + changer dans le /me pour mettre two_fa_enabled à true
+ * 2-step verification: 1) Verify password 2) Verify 2FA code
+ * Utilise: POST /auth/api/auth/verify-password + POST /auth/api/2fa/verify-setup
  */
 async function handleEnable2FA(form: HTMLFormElement) {
-  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
   const formData = new FormData(form)
   const code = formData.get('code') as string
   const password = formData.get('password') as string
@@ -331,24 +322,40 @@ async function handleEnable2FA(form: HTMLFormElement) {
     return
   }
 
-  // TODO: Vérifier le password avant d'activer la 2FA (via service auth)
-  // + 2fa doit notifier auth de sa MAJ et ensuite users/me sera mis a jour auto
-  console.log('Password not verified yet:', password)
-
-
-
   try {
-    console.log('Verifying and enabling 2FA...')
+    console.log('Step 1: Verifying password...')
 
-    const res = await fetch('/2fa/api/2fa/verify', {
+    // STEP 1: Verify password
+    const passwordRes = await fetch('/auth/api/auth/verify-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization: secret
+        'authorization': import.meta.env.VITE_INTERNAL_API_SECRET
       },
       credentials: 'include',
       body: JSON.stringify({
         user_id: currentUser.user_id,
+        password
+      })
+    })
+
+    const passwordResult = await passwordRes.json()
+    if (!passwordRes.ok || !passwordResult.valid) {
+      console.error('Password verification failed:', passwordResult)
+      alert('Invalid password. Please try again.')
+      return
+    }
+
+    console.log('Step 2: Verifying 2FA code and enabling 2FA...')
+
+    // STEP 2: Verify 2FA code (this also enables 2FA and updates two_fa_enabled flag)
+    const res = await fetch('/auth/api/2fa/verify-setup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // Sends auth_token cookie
+      body: JSON.stringify({
         twofa_code: code
       })
     })
@@ -356,7 +363,7 @@ async function handleEnable2FA(form: HTMLFormElement) {
     const result = await res.json()
     if (!res.ok) {
       console.error('Failed to enable 2FA:', result)
-      alert(result.message || 'Invalid code or password. Please try again.')
+      alert(result.message || 'Invalid 2FA code. Please try again.')
       return
     }
 
@@ -383,31 +390,62 @@ async function handleEnable2FA(form: HTMLFormElement) {
 
 /**
  * Désactive la 2FA
+ * 2-step verification: 1) Verify password 2) Disable 2FA with code
+ * Utilise: POST /auth/api/auth/verify-password + DELETE /auth/api/2fa/disable
  */
 async function handleDisable2FA(form: HTMLFormElement) {
-  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
   const formData = new FormData(form)
   const code = formData.get('code') as string
   const password = formData.get('password') as string
 
-  try {
-    console.log('Disabling 2FA...')
+  // Vérifier que l'utilisateur est connecté
+  if (!currentUser) {
+    alert('User not authenticated')
+    return
+  }
 
-    // TODO: Remplacer par le vrai endpoint
-    const res = await fetch('/2fa/api/2fa/disable', {
+  try {
+    console.log('Step 1: Verifying password...')
+
+    // STEP 1: Verify password
+    const passwordRes = await fetch('/auth/api/auth/verify-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization: secret
+        'authorization': import.meta.env.VITE_INTERNAL_API_SECRET
       },
       credentials: 'include',
-      body: JSON.stringify({ code, password })
+      body: JSON.stringify({
+        user_id: currentUser.user_id,
+        password
+      })
+    })
+
+    const passwordResult = await passwordRes.json()
+    if (!passwordRes.ok || !passwordResult.valid) {
+      console.error('Password verification failed:', passwordResult)
+      alert('Invalid password. Please try again.')
+      return
+    }
+
+    console.log('Step 2: Disabling 2FA...')
+
+    // STEP 2: Disable 2FA (also updates two_fa_enabled flag)
+    const res = await fetch('/auth/api/2fa/disable', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include', // Sends auth_token cookie
+      body: JSON.stringify({
+        twofa_code: code
+      })
     })
 
     const result = await res.json()
     if (!res.ok) {
       console.error('Failed to disable 2FA:', result)
-      alert(result.message || 'Invalid code or password. Please try again.')
+      alert(result.message || 'Invalid 2FA code. Please try again.')
       return
     }
 
