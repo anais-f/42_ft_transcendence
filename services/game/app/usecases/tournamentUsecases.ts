@@ -13,6 +13,7 @@ import {
 } from './managers/gameData.js'
 import { requestGame } from './managers/gameManager/requestGame.js'
 import { MatchTournament } from '@ft_transcendence/common'
+import { saveMatch } from './matchUsecases.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -48,6 +49,40 @@ function shuffle(array: any[]) {
 	}
 }
 
+export async function simulateMatch(
+	player1Id: number,
+	player2Id: number,
+	tournamentId: number,
+	round: number,
+	matchNumber: number
+) {
+	// Random match duration between 5 and 60 seconds
+	const duration = Math.floor(Math.random() * 55000) + 5000
+
+	console.log(
+		`[MOCK] Starting match: Player ${player1Id} vs Player ${player2Id} (duration: ${duration}ms)`
+	)
+
+	// Wait for the match duration
+	await new Promise((resolve) => setTimeout(resolve, duration))
+
+	// Random winner (50/50 chance)
+	const player1Wins = Math.random() < 0.5
+	const winnerId = player1Wins ? player1Id : player2Id
+	const loserId = player1Wins ? player2Id : player1Id
+
+	const scoreWinner = 10
+	const scoreLoser = Math.floor(Math.random() * 9) // 0-4
+
+	const scorePlayer1 = player1Wins ? scoreWinner : scoreLoser
+	const scorePlayer2 = player1Wins ? scoreLoser : scoreWinner
+
+	console.log(
+		`[MOCK] Match ended: Player ${winnerId} wins! Score: ${scorePlayer1}-${scorePlayer2}`
+	)
+	saveMatch(player1Id, player2Id, scorePlayer1, scorePlayer2, tournamentId, round, matchNumber)
+}
+
 function startNextRound(tournament: Tournament, round: number) {
 	const roundMatches = tournament.matchs.filter(
 		(match) => match.round === round
@@ -61,10 +96,16 @@ function startNextRound(tournament: Tournament, round: number) {
 			return // Skip ce match
 		}
 		match.status = 'ongoing'
-		requestGame(match.player1Id, match.player2Id)
+		simulateMatch(
+			match.player1Id,
+			match.player2Id,
+			tournament.id,
+			match.round,
+			match.matchNumber
+		)
+		// requestGame(match.player1Id, match.player2Id)
 	})
 }
-
 
 export function startTournament(tournament: Tournament) {
 	tournament.status = 'ongoing'
@@ -309,7 +350,14 @@ export function onTournamentMatchEnd(
 		console.log(
 			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
-		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id)
+		simulateMatch(
+			nextRoundMatch.player1Id,
+			nextRoundMatch.player2Id,
+			tournament.id,
+			nextRoundMatch.round,
+			nextRoundMatch.matchNumber
+		)
+		// requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id)
 	}
 }
 
