@@ -18,7 +18,7 @@ export function jwtAuthMiddleware(
 		})
 		.catch((err: Error) => {
 			console.error('JWT verification failed:', err.message)
-			throw createHttpError.Unauthorized()
+			done(createHttpError.Unauthorized('Unauthorized from jwtCheck'))
 		})
 }
 
@@ -31,18 +31,21 @@ export function jwtAuthOwnerMiddleware(
 	reply: FastifyReply,
 	done: HookHandlerDoneFunction
 ): void {
-	request.jwtVerify((err: Error | null) => {
-		if (err) {
-			throw createHttpError.Unauthorized()
-		}
+	request
+		.jwtVerify()
+		.then(() => {
+			const userId = Number(request.user?.user_id)
+			const paramId = Number(request.params.id)
 
-		const userId = Number(request.user?.user_id)
-		const paramId = Number(request.params.id)
+			if (Number.isNaN(userId) || userId !== paramId) {
+				done(createHttpError.Forbidden('Forbidden'))
+				return
+			}
 
-		if (Number.isNaN(userId) || userId !== paramId) {
-			throw createHttpError.Forbidden()
-		}
-
-		return done()
-	})
+			done()
+		})
+		.catch((err: Error) => {
+			console.error('JWT verification failed:', err.message)
+			done(createHttpError.Unauthorized('Unauthorized from jwtCheck'))
+		})
 }

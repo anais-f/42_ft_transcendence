@@ -1,5 +1,5 @@
-import { currentUser, setCurrentUser } from '../store/userStore.js'
-import { logout } from '../auth/authService.js'
+import { currentUser, setCurrentUser } from '../usecases/userStore.js'
+import { logout } from '../api/authService.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -15,27 +15,27 @@ export const HomePage = (): string => {
 		<h1 class="text-2xl py-6">${user.username}</h1>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
-			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
+			<p class="text-sm pb-2">Ipsum d debeeserun sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
-		<button id="settings_btn" type="button" class="generic_btn my-2" onclick="navigate('/settings')">Settings</button>
-		<button id="logout_btn" type="button" class="generic_btn">Logout</button>
+		<button id="settings_btn" data-action="navigate-settings" type="button" class="generic_btn my-2">Settings</button>
+		<button id="logout_btn" data-action="logout" type="button" class="generic_btn">Logout</button>
 	</div>
 	<div class="col-span-1">
 		<div class="news_paragraph pt-4">
 			<h1 class="text-lg py-2">Title</h1>
-			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est. Voluptatem dolore vero in. A aut iste et unde autem ut deserunt quam. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
+			<p class="text-sm pb-2">Ipst quam. Euidem nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
 		<button id="remote_btn" type="button" class="generic_btn my-2" onclick="navigate('/lobby')">Remote</button>
 		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/game')">Tournament</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
-			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
+			<p class="text-sm pb-2">Ipeat. Ipsum dolore vericorrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
 		</div>
 	</div>
 	<div class="col-span-1">
 		 <div class="news_paragraph pt-8">
-			<p class="text-sm pb-2">Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui.</p>
+			<p class="text-sm pb-2">Assumenda repreemque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui.</p>
 		</div>
 		<h1 class="text-2xl py-2">FEELING LONELY ?</h1>
 		<p class="text-lg">You can join a game by enter the lobby code below</p>
@@ -108,33 +108,32 @@ export const HomePage = (): string => {
 `
 }
 
-// Store logout handler to be able to remove it later
-let logoutHandler: (() => Promise<void>) | null = null
+export function attachHomeEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
 
-export function bindLogOutButton() {
-	const logoutBtn = document.getElementById('logout_btn')
-	if (!logoutBtn) return
+	content.addEventListener('click', async (e) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
 
-	// Create handler
-	logoutHandler = async () => {
-		await logout()
-		setCurrentUser(null)
-		window.navigate('/login', true) // skipAuth = true to avoid 401
-	}
+		if (actionButton) {
+			const action = actionButton.getAttribute('data-action')
 
-	// Attach listener
-	logoutBtn.addEventListener('click', logoutHandler)
-	console.log('Logout button bound')
-}
+			// Logout
+			if (action === 'logout') {
+				await logout()
+				setCurrentUser(null)
+				window.navigate('/login', true) // skipAuth = true to avoid 401
+			}
 
-export function unbindLogOutButton() {
-	const logoutBtn = document.getElementById('logout_btn')
-	if (!logoutBtn || !logoutHandler) return
+			// Navigate to settings
+			if (action === 'navigate-settings') {
+				window.navigate('/settings')
+			}
+		}
+	})
 
-	// Remove listener
-	logoutBtn.removeEventListener('click', logoutHandler)
-	logoutHandler = null
-	console.log('Logout button unbound')
+	console.log('Home page events attached')
 }
 
 const fr1 = {

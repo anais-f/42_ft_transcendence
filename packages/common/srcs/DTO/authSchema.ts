@@ -33,6 +33,12 @@ export const PasswordBodySchema = z
 	})
 	.strict()
 
+export const LoginGoogleSchema = z
+	.object({
+		credential: z.string().min(1)
+	})
+	.strict()
+
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>

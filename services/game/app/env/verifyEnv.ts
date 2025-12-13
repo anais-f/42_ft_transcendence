@@ -11,7 +11,7 @@ export interface IPongServerEnv {
 export function checkEnv(): IPongServerEnv {
 	const variables = {
 		DTO_OPENAPI_FILE: process.env.DTO_OPENAPI_FILE,
-		HOST: process.env.HOST,
+		HOST: process.env.HOSTNAME,
 		PORT: process.env.PORT,
 		JWT_SECRET_GAME: process.env.JWT_SECRET_GAME,
 		JWT_SECRET: process.env.JWT_SECRET

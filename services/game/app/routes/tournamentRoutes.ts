@@ -2,12 +2,10 @@ import { FastifyInstance } from 'fastify'
 import {
 	createTournamentController,
 	joinTournamentController,
-	getTournamentController
+	getTournamentController,
+	quitTournamentController
 } from '../controllers/tournamentControllers.js'
-import {
-	CreateTournamentSchema,
-	RemoveTournamentSchema
-} from '@ft_transcendence/common'
+import { CreateTournamentSchema } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 
 export function tournamentRoutes(app: FastifyInstance) {
@@ -32,5 +30,10 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/tournament/:code',
 		{ preHandler: jwtAuthMiddleware },
 		getTournamentController
+	)
+	app.delete(
+		'/api/quitTournament/:code',
+		{ preHandler: jwtAuthMiddleware },
+		quitTournamentController
 	)
 }

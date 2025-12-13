@@ -16,8 +16,9 @@ export function apiKeyMiddleware(
 	const apiKey = Array.isArray(rawAuth) ? rawAuth[0] : rawAuth
 
 	if (!apiKey || apiKey !== process.env.INTERNAL_API_SECRET) {
-		throw createHttpError.Unauthorized()
+		done(createHttpError.Unauthorized('Unauthorized'))
+		return
 	}
 
-	return done()
+	done()
 }

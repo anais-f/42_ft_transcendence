@@ -66,12 +66,22 @@ export class UsersServices {
 		})
 		if (!localUser) throw createHttpError.NotFound('User not found')
 
+		let two_fa_status = false
+		try {
+			two_fa_status = await AuthApi.get2FAStatus(user.user_id)
+		} catch (err) {
+			throw createHttpError.BadGateway(
+				'Failed to get 2FA status from auth service'
+			)
+		}
+
 		return {
 			user_id: localUser.user_id,
 			username: localUser.username,
 			avatar: localUser.avatar,
 			status: localUser.status,
-			last_connection: localUser.last_connection
+			last_connection: localUser.last_connection,
+			two_fa_enabled: two_fa_status
 		}
 	}
 
