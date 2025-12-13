@@ -19,7 +19,8 @@ export const saveMatchShema = z
 		scorePlayer1: number().nonnegative(),
 		scorePlayer2: number().nonnegative(),
 		idTournament: number(), //-1 if no tournament
-		round: number() //-1 no tournament
+		round: number(), //-1 no tournament
+		matchNumber: number()// -1 no tournament
 	})
 	.strict()
 
