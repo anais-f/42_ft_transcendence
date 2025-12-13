@@ -172,4 +172,12 @@ export class GameEngine {
 	public getBorders(): Segment[] {
 		return this.borders
 	}
+
+	public getScore(): IScore {
+		return this.score
+	}
+
+	public getPauseTicksRemaining(): number {
+		return this.pauseTicksRemaining
+	}
 }
