@@ -7,7 +7,7 @@ import {
 	cleanupGoogleAuth
 } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
-import { SettingsPage } from '../pages/oldsettings'
+import { SettingsPage, attachSettingsEvents } from '../pages/oldsettings'
 import { TestPage } from '../pages/LoginPage'
 
 export type Pages =
@@ -66,7 +66,8 @@ export const routerMap: Record<Pages, Route> = {
 	settings: {
 		id: 'settings',
 		url: '/settings',
-		page: SettingsPage
+		page: SettingsPage,
+    binds: [attachSettingsEvents]
 	},
 
 	test: {

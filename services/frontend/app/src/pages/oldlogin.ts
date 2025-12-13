@@ -103,8 +103,7 @@ export async function initGoogleAuth() {
 		await loadGoogleScript()
 		if (window.google) {
 			window.google.accounts.id.initialize({
-				client_id:
-					'310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
+				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
 				callback: async (response: CredentialResponse) => {
 					console.log('Google Credential received', response)
 

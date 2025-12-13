@@ -100,6 +100,15 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
 			: ''
 
+  if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
+    console.warn(
+        '[avatars] original file extension not allowed:',
+        fileExtension,
+        ' - continuing based on detectedType'
+    )
+    throw createHttpError.BadRequest('Invalid file extension')
+  }
+
 	if (!Buffer.isBuffer(avatarBuffer))
 		throw createHttpError.BadRequest('Missing file')
 
@@ -121,15 +130,7 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			detectedType.mime
 		)
 	}
-
-	if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
-		console.warn(
-			'[avatars] original file extension not allowed:',
-			fileExtension,
-			' - continuing based on detectedType'
-		)
-	}
-
+  
 	return detectedType
 }
 
