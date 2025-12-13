@@ -1,25 +1,31 @@
+import { HomePage, attachHomeEvents } from '../pages/oldhome.js'
 import {
-	bindLogOutButton,
-	bindCreateButton,
-	bindJoinLobbyForm,
-	HomePage,
-	unbindLogOutButton,
-	unbindCreateButton,
-	unbindJoinLobbyForm
-} from '../pages/oldhome.js'
-import { GamePage, bindGamePage, unbindGamePage } from '../pages/oldgame.js'
-import { LobbyPage, bindLobbyPage, unbindLobbyPage } from '../pages/oldlobby.js'
+	GamePage,
+	attachGameEvents,
+	cleanupGameEvents
+} from '../pages/oldgame.js'
 import {
-	bindLoginForm,
-	bindRegisterForm,
+	LobbyPage,
+	attachLobbyEvents,
+	cleanupLobbyEvents
+} from '../pages/oldlobby.js'
+import {
 	LoginPage,
-	unbindLoginForm,
-	unbindRegisterForm
+	attachLoginEvents,
+	cleanupGoogleAuth
 } from '../pages/oldlogin.js'
 import { ProfilePage } from '../pages/oldprofile.js'
 import { SettingsPage } from '../pages/oldsettings.js'
+import { TestPage } from '../pages/LoginPage.js'
 
-export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
+export type Pages =
+	| 'home'
+	| 'game'
+	| 'lobby'
+	| 'login'
+	| 'profile'
+	| 'settings'
+	| 'test'
 
 export type Route = {
 	id: string
@@ -35,32 +41,31 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'home',
 		url: '/',
 		page: HomePage,
-		binds: [bindLogOutButton, bindCreateButton, bindJoinLobbyForm],
-		unbinds: [unbindLogOutButton, unbindCreateButton, unbindJoinLobbyForm]
+		binds: [attachHomeEvents]
 	},
 
 	game: {
 		id: 'game',
 		url: '/game',
 		page: GamePage,
-		binds: [bindGamePage],
-		unbinds: [unbindGamePage]
+		binds: [attachGameEvents],
+		unbinds: [cleanupGameEvents]
 	},
 
 	lobby: {
 		id: 'lobby',
 		url: '/lobby/:code',
 		page: LobbyPage,
-		binds: [bindLobbyPage],
-		unbinds: [unbindLobbyPage]
+		binds: [attachLobbyEvents],
+		unbinds: [cleanupLobbyEvents]
 	},
 
 	login: {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [bindRegisterForm, bindLoginForm],
-		unbinds: [unbindRegisterForm, unbindLoginForm],
+		binds: [attachLoginEvents],
+		unbinds: [cleanupGoogleAuth],
 		public: true
 	},
 
@@ -74,5 +79,11 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'settings',
 		url: '/settings',
 		page: SettingsPage
+	},
+
+	test: {
+		id: 'test',
+		url: '/test',
+		page: TestPage
 	}
 }

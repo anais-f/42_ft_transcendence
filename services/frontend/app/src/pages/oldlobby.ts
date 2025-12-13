@@ -15,7 +15,7 @@ export const LobbyPage = (): string => {
 			<h1 class="text-2xl select-none ">GAME-TAG:</h1>
 			<span id="lobby-code" class="text-2xl ">${code}</span>
 		</div>
-		<button id="btn-copy" class="generic_btn mb-4">
+		<button id="btn-copy" data-action="copy-code" class="generic_btn mb-4">
 			Copy Lobby Code
 		</button>
 		<div class="text-xl py-4 text-justify select-none">
@@ -72,8 +72,6 @@ export const LobbyPage = (): string => {
 `
 }
 
-let copyHandler: (() => void) | null = null
-
 function onOpponentJoin(opponent: PlayerData) {
 	const avatarEl = document.getElementById(
 		'opponent-avatar'
@@ -88,20 +86,30 @@ function onOpponentJoin(opponent: PlayerData) {
 	}
 }
 
-export function bindLobbyPage() {
-	const copyBtn = document.getElementById('btn-copy')
-	const codeSpan = document.getElementById('lobby-code')
+export function attachLobbyEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
 
-	if (copyBtn && codeSpan) {
-		copyHandler = () => {
-			navigator.clipboard.writeText(codeSpan.textContent || '')
-			copyBtn.textContent = 'Copied!'
-			setTimeout(() => {
-				copyBtn.textContent = 'Copy Lobby Code'
-			}, 2000)
+	content.addEventListener('click', (e) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
+
+		if (actionButton) {
+			const action = actionButton.getAttribute('data-action')
+
+			// Copy lobby code
+			if (action === 'copy-code') {
+				const codeSpan = document.getElementById('lobby-code')
+				if (codeSpan) {
+					navigator.clipboard.writeText(codeSpan.textContent || '')
+					actionButton.textContent = 'Copied!'
+					setTimeout(() => {
+						actionButton.textContent = 'Copy Lobby Code'
+					}, 2000)
+				}
+			}
 		}
-		copyBtn.addEventListener('click', copyHandler)
-	}
+	})
 
 	// Register callback for opponent joining
 	gameStore.setOnOpponentJoin(onOpponentJoin)
@@ -130,15 +138,11 @@ export function bindLobbyPage() {
 	} else {
 		window.navigate('/home')
 	}
+
+	console.log('Lobby page events attached')
 }
 
-export function unbindLobbyPage() {
-	const copyBtn = document.getElementById('btn-copy')
-	if (copyBtn && copyHandler) {
-		copyBtn.removeEventListener('click', copyHandler)
-		copyHandler = null
-	}
-
+export function cleanupLobbyEvents() {
 	// Unregister callback
 	gameStore.setOnOpponentJoin(null)
 
@@ -150,4 +154,6 @@ export function unbindLobbyPage() {
 			gameStore.setGameSocket(null)
 		}
 	}
+
+	console.log('Lobby page events cleaned up')
 }

@@ -44,7 +44,7 @@ export const GamePage = (): string => {
 `
 }
 
-export function bindGamePage() {
+export function attachGameEvents() {
 	gameStore.navigatingToGame = false
 
 	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
@@ -53,8 +53,11 @@ export function bindGamePage() {
 	if (canvas && ws) {
 		gameEngine.bindAll(canvas, ws)
 	}
+
+	console.log('Game page events attached')
 }
 
-export function unbindGamePage() {
+export function cleanupGameEvents() {
 	gameEngine.unbindAll()
+	console.log('Game page events cleaned up')
 }

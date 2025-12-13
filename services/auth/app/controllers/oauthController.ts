@@ -8,6 +8,8 @@ import {
 import { signToken } from '../utils/jwt.js'
 import { createGoogleUser } from '../repositories/userRepository.js'
 import createHttpError from 'http-errors'
+import { LoginGoogleSchema } from '@ft_transcendence/common'
+import { generateUsername } from '../usecases/register.js'
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
@@ -15,14 +17,14 @@ export async function googleLoginController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const { credential } = request.body as { credential: string }
-
-	if (!credential) throw createHttpError.BadRequest('Missing Google credential')
+	const parsed = LoginGoogleSchema.parse(request.body)
+	if (!parsed)
+		throw createHttpError.BadRequest('Invalid request body structure')
 
 	let ticket
 	try {
 		ticket = await client.verifyIdToken({
-			idToken: credential,
+			idToken: parsed.credential,
 			audience: process.env.GOOGLE_CLIENT_ID
 		})
 	} catch (error) {
@@ -36,9 +38,7 @@ export async function googleLoginController(
 
 	const google_id = payload.sub
 	console.log('Google User Info:', {
-		id: google_id,
-		email: payload.email,
-		name: payload.name
+		payload
 	})
 	const user = findUserByGoogleId(google_id)
 	if (user) {
@@ -99,7 +99,9 @@ export async function googleLoginController(
 		const PublicUser = findPublicUserByGoogleId(google_id)
 		if (PublicUser == undefined)
 			throw createHttpError.InternalServerError('Database error')
-
+		const newLogin = generateUsername(payload.given_name || 'user')
+		PublicUser.login = newLogin
+		console.log('Created new Google user:', PublicUser)
 		const url = `${process.env.USERS_SERVICE_URL}/api/internal/users/new-user`
 		const response = await fetch(url, {
 			method: 'POST',

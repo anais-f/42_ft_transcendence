@@ -1,12 +1,7 @@
-import { routerMap, Route } from './routerMap.js'
+import { routerMap, Route, Pages } from './routerMap.js'
 import { checkAuth } from '../api/authService.js'
-import { setCurrentUser } from '../usecases/userStore.js'
-
-declare global {
-	interface Window {
-		navigate: (url: string, skipAuth?: boolean) => void
-	}
-}
+import { setCurrentUser, currentUser } from '../usecases/userStore.js'
+import { IPrivateUser } from '@ft_transcendence/common'
 
 export let routeParams: Record<string, string> = {}
 
@@ -87,6 +82,7 @@ export class Router {
 		}
 
 		// render new page
+
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
 
@@ -120,39 +116,61 @@ export class Router {
 		const route = this.getRoute(url)
 
 		try {
-			let user: any = null
+			let user: IPrivateUser | null = currentUser // Start with current user from store
+
+			// 1. --- AUTHENTICATION CHECK API ---
+			console.log('🔍 Navigation:', {
+				url,
+				skipAuth,
+				'route.public': route.public,
+				currentUser: currentUser?.username || null
+			})
 
 			if (!skipAuth) {
+				console.log('Calling checkAuth()...')
 				const authCheckResult = await checkAuth()
 				setCurrentUser(authCheckResult)
 				user = authCheckResult
+			} else {
+				console.log('Skipping checkAuth()')
+				user = currentUser
 			}
 
-			if (url === '/login' && user) {
-				console.log('Already authenticated, redirecting to home')
-				this.navigate('/')
+			// --- REDIRECTION GUARDS ---
+
+			// GUARD 1: Authenticated on /login
+			// skipAuth=true because we just checked and user is authenticated
+			if (url === '/login' && user !== null) {
+				console.log('Authenticated, redirecting from /login to /')
+				this.isNavigating = false
+				await this.navigate('/', true)
 				return
 			}
 
+			// GUARD 2: Non-authenticated on protected route
+			// skipAuth=true because we just checked and user is not authenticated
 			if (!route.public && !user) {
 				console.log('Not authenticated, redirecting to /login')
-				this.navigate('/login')
+				this.isNavigating = false
+				await this.navigate('/login', true)
 				return
 			}
 
+			// 3. RENDER PAGE
 			if (user) console.log('Authenticated as: ', user.username)
-
 			this.renderPage(route)
 		} catch (e: unknown) {
-			console.error('Navigation error: ', e)
+			// ... (Error handlering)
 			if (!route.public) {
-				this.navigate('/login')
+				this.isNavigating = false // to new navigation
+				await this.navigate('/login', true)
 				return
-			} else {
-				this.renderPage(route)
 			}
 		} finally {
-			this.isNavigating = false
+			// if rendering happened WITHOUT redirection, reset state
+			if (this.isNavigating === true) {
+				this.isNavigating = false
+			}
 		}
 	}
 
@@ -181,9 +199,9 @@ export class Router {
 	// Start the router
 	public async start(): Promise<void> {
 		// Expose navigate on window for inline onclicks
-		// @ts-ignore
 		window.navigate = (url: string, skipAuth?: boolean) =>
 			this.navigate(url, skipAuth ?? false)
+
 		await this.handleNav()
 	}
 }
