@@ -5,27 +5,20 @@ import { CPacketsType } from '../packetTypes.js'
 export class C01Move implements IC00PongBase {
 	public constructor(
 		public state: boolean,
-		public dir: padDirection,
-		public time = Date.now()
+		public dir: padDirection
 	) {}
 
-	public getTime(): number {
-		return this.time
-	}
-
 	/*
-	 * timestamp start at 0
-	 * type start at 8
+	 * type start at 0
 	 * [{start/stop}{up/down}{}{}{}{}{}{}]
 	 */
 	public serialize(): ArrayBuffer {
-		const buff = new ArrayBuffer(10) // 8 + 1 + 8 + 8
+		const buff = new ArrayBuffer(2) // 1 + 1
 		const view = new DataView(buff)
 
-		view.setFloat64(0, this.time, true) // timestamp [0 - 7]
-		view.setUint8(8, CPacketsType.C01) // type [8]
+		view.setUint8(0, CPacketsType.C01) // type [0]
 		view.setUint8(
-			9,
+			1,
 			0 |
 				(this.state ? 0b10 : 0b00) |
 				(this.dir === padDirection.UP ? 0b01 : 0b00)

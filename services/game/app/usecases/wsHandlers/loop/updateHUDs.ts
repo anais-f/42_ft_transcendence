@@ -24,7 +24,7 @@ async function updateScoreHUD(
 		obj.lastP1Score = score.p1
 		obj.lastP2Score = score.p2
 		obj.lastCountdown = -1
-		const scorePacket = new S07Score(Date.now(), score.p1, score.p2)
+		const scorePacket = new S07Score(score.p1, score.p2)
 		packetSender.push(SPacketsType.S07, scorePacket)
 	}
 }
@@ -39,12 +39,12 @@ async function updateCountDownHUD(
 		const countdown = Math.ceil(pauseTicks / TICKS_PER_STEP)
 		if (countdown !== obj.lastCountdown) {
 			obj.lastCountdown = countdown
-			const countdownPacket = new S08Countdown(Date.now(), countdown)
+			const countdownPacket = new S08Countdown(countdown)
 			packetSender.push(SPacketsType.S08, countdownPacket)
 		}
 	} else if (obj.lastCountdown > 0) {
 		obj.lastCountdown = 0
-		const countdownPacket = new S08Countdown(Date.now(), 0)
+		const countdownPacket = new S08Countdown(0)
 		packetSender.push(SPacketsType.S08, countdownPacket)
 	}
 }

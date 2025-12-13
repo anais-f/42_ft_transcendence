@@ -7,7 +7,7 @@ export class S05BallPos extends AS03BaseBall implements IS00PongBase {
 	private pos: Vector2
 
 	constructor(S03: AS03BaseBall, pos: Vector2) {
-		super(S03.getTime())
+		super()
 		this.pos = pos
 	}
 
@@ -17,17 +17,17 @@ export class S05BallPos extends AS03BaseBall implements IS00PongBase {
 
 	serialize(): ArrayBuffer {
 		const fake = this.fserialize()
-		const buff = new ArrayBuffer(25)
+		const buff = new ArrayBuffer(17)
 		const fakeUint8 = new Uint8Array(fake)
 		const buffUint8 = new Uint8Array(buff)
 
 		buffUint8.set(fakeUint8)
 
-		buffUint8[8] |= SPacketsType.S05
+		buffUint8[0] |= SPacketsType.S05
 
 		const view = new DataView(buff)
-		view.setFloat64(9, this.pos.getX(), true)
-		view.setFloat64(17, this.pos.getY(), true)
+		view.setFloat64(1, this.pos.getX(), true)
+		view.setFloat64(9, this.pos.getY(), true)
 
 		return buff
 	}

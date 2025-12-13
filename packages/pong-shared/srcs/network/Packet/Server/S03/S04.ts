@@ -9,7 +9,7 @@ export class S04BallVeloChange extends AS03BaseBall implements IS00PongBase {
 		private velo: Vector2,
 		private factor: number
 	) {
-		super(S03.getTime())
+		super()
 	}
 
 	getVelo(): Vector2 {
@@ -22,18 +22,18 @@ export class S04BallVeloChange extends AS03BaseBall implements IS00PongBase {
 
 	serialize(): ArrayBuffer {
 		const fake = this.fserialize()
-		const buff = new ArrayBuffer(33)
+		const buff = new ArrayBuffer(25)
 		const fakeUint8 = new Uint8Array(fake)
 		const buffUint8 = new Uint8Array(buff)
 
 		buffUint8.set(fakeUint8)
 
-		buffUint8[8] |= SPacketsType.S04
+		buffUint8[0] |= SPacketsType.S04
 
 		const view = new DataView(buff)
-		view.setFloat64(9, this.velo.getX(), true)
-		view.setFloat64(17, this.velo.getY(), true)
-		view.setFloat64(25, this.factor, true)
+		view.setFloat64(1, this.velo.getX(), true)
+		view.setFloat64(9, this.velo.getY(), true)
+		view.setFloat64(17, this.factor, true)
 
 		return buff
 	}

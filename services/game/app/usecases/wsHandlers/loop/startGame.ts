@@ -19,10 +19,7 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_SCORE)
 	gameData.gameInstance = gameInstance
 
-	const mapPacket = new S02SegmentUpdate(
-		Date.now(),
-		gameInstance.GE.getBorders()
-	)
+	const mapPacket = new S02SegmentUpdate(gameInstance.GE.getBorders())
 	const mapBuffer = mapPacket.serialize()
 	gameData.p1.ws?.send(mapBuffer)
 	gameData.p2?.ws?.send(mapBuffer)
@@ -69,7 +66,6 @@ async function startGameLoop(
 			updatePadMovements(gameData.gameInstance!)
 
 			const segPacket = new S02SegmentUpdate(
-				Date.now(),
 				gameData.gameInstance!.GE.getBorders()
 			)
 			packetSender.push(SPacketsType.S02, segPacket)
