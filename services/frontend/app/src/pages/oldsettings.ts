@@ -1,7 +1,7 @@
 import { checkAuth } from '../api/authService'
 import { setCurrentUser, currentUser } from '../usecases/userStore'
 import { UsernameSchema } from '@common/DTO/usersSchema.js'
-import { IPrivateUser } from '@common/interfaces/usersModels.js'
+import { setup2FASchema } from '@common/DTO/2faSchema.js'
 
 
 export const SettingsPage = (): string => {
@@ -43,7 +43,6 @@ export const SettingsPage = (): string => {
 			${is2FAEnabled ? '<input id="password_2fa_code" type="text" name="password_2fa_code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required maxlength="6" pattern="[0-9]{6}">' : ''}
 			<button id="change_password_btn" class="generic_btn mt-4" type="submit">Save it</button>
 		</form>
-		
 	</div>
 
 	<div class="col-span-1 flex flex-col items-start">
@@ -64,11 +63,33 @@ export const SettingsPage = (): string => {
 	<div class="col-span-1 flex flex-col items-start">
 		<div id="manage_2fa" class="w-full">
 			<h1 class="text-2xl pt-8 pb-1">${twoFATitle}</h1>
-			<form id="manage_2fa_form" class="flex flex-col gap-2 w-full">
-				<input id="manage_2fa_code" type="text" name="manage_2fa_code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required>
-				<input id="manage_2fa_password" type="password" name="manage_2fa_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
-				<button id="manage_2fa_btn" class="generic_btn mt-4" type="submit">${twoFAButtonText}</button>
-			</form>
+
+			${is2FAEnabled ?
+				// DISABLE 2FA - Formulaire simple
+				`<form id="disable_2fa_form" data-form="disable_2fa_form" class="flex flex-col gap-2 w-full">
+					<input id="disable_2fa_code" type="text" name="code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required maxlength="6" pattern="[0-9]{6}">
+					<input id="disable_2fa_password" type="password" name="password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
+					<button id="disable_2fa_btn" class="generic_btn mt-4" type="submit">Disable 2FA</button>
+				</form>`
+				:
+				// ENABLE 2FA - Flow en deux étapes
+				`<!-- Étape 1 : Générer le QR code -->
+				<div id="generate_qr_step">
+					<button id="generate_qr_btn" class="generic_btn mt-4" type="button">Generate QR Code</button>
+				</div>
+
+				<!-- Étape 2 : Vérifier et activer (caché par défaut, affiché après génération) -->
+				<div id="verify_2fa_step" style="display: none;">
+					<div id="qr_code_container" class="my-4 flex flex-col gap-2">
+						<!-- Le QR code sera inséré ici par JavaScript -->
+					</div>
+					<form id="enable_2fa_form" data-form="enable_2fa_form" class="flex flex-col gap-2 w-full">
+						<input id="enable_2fa_code" type="text" name="code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required maxlength="6" pattern="[0-9]{6}">
+						<input id="enable_2fa_password" type="password" name="password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
+						<button id="enable_2fa_btn" class="generic_btn mt-4" type="submit">Verify & Enable</button>
+					</form>
+				</div>`
+			}
 		</div>
 		<img src="/assets/images/tiger.png" alt="tiger" class="w-full object-cover opacity-50 select-none">
 		<div class="news_paragraph">
@@ -76,6 +97,7 @@ export const SettingsPage = (): string => {
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est.</p>
 		</div>
 	</div>
+	
 </section>
 `
 }
@@ -84,6 +106,7 @@ export function attachSettingsEvents() {
   const content = document.getElementById('content')
   if (!content) return
 
+  // Event listener pour les formulaires
   content.addEventListener('submit', async (e) => {
     const form = (e.target as HTMLElement).closest('form[data-form]')
     if (!form) return
@@ -100,8 +123,21 @@ export function attachSettingsEvents() {
     if (formName === 'avatar_form') {
       await handlerAvatar(form as HTMLFormElement)
     }
-
+    if (formName === 'enable_2fa_form') {
+      await handleEnable2FA(form as HTMLFormElement)
+    }
+    if (formName === 'disable_2fa_form') {
+      await handleDisable2FA(form as HTMLFormElement)
+    }
   })
+
+  // Event listener pour le bouton "Generate QR Code"
+  const generateQRBtn = document.getElementById('generate_qr_btn')
+  if (generateQRBtn) {
+    generateQRBtn.addEventListener('click', async () => {
+      await handleGenerateQRCode()
+    })
+  }
 
   console.log('Settings page events attached')
 }
@@ -201,3 +237,196 @@ export async function handlerAvatar(form: HTMLFormElement) {
   }
 }
 
+// ============================================
+// 2FA HANDLERS - TOUT REVOIR
+// ============================================
+
+/**
+ * Génère le QR code pour l'activation de la 2FA
+ */
+async function handleGenerateQRCode() {
+  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
+
+  try {
+    console.log('Generating 2FA QR code...')
+
+    // Vérifier que l'utilisateur est connecté
+    if (!currentUser) {
+      alert('User not authenticated')
+      return
+    }
+
+    const res = await fetch('/2fa/api/2fa/setup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: secret
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        user_id: currentUser.user_id,
+        issuer: 'ft_transcendence',
+        label: currentUser.username
+      })
+    })
+
+    if (!res.ok) {
+      const error = await res.json()
+      console.error('Failed to generate QR code:', error)
+      alert('Failed to generate QR code. Please try again.')
+      return
+    }
+
+    const data = await res.json()
+    // Format reçu: { otpauth_url: string, qr_base64: string, expires_at: string }
+    console.log('QR code generated successfully:', data)
+
+    // Afficher le QR code dans le container
+    const qrContainer = document.getElementById('qr_code_container')
+    const generateStep = document.getElementById('generate_qr_step')
+    const verifyStep = document.getElementById('verify_2fa_step')
+
+    if (qrContainer && generateStep && verifyStep) {
+      // Insérer le QR code (qr_base64 est déjà une data URL complète)
+      qrContainer.innerHTML = `
+        <div class="flex flex-col gap-2 items-center w-full">
+          <p class="text-sm">Scan this QR code with Google Authenticator:</p>
+          <img src="${data.qr_base64}" alt="QR Code" class="w-64 h-64 border-2 border-black">
+          <p class="text-xs mt-2">Or copy this URL:</p>
+          <input
+            type="text"
+            value="${data.otpauth_url}"
+            readonly
+            class="text-xs px-2 py-1 border border-black w-full font-mono"
+            onclick="this.select()"
+          >
+          <p class="text-xs opacity-50 mt-2">Expires in 5 minutes</p>
+        </div>
+      `
+
+      // Cacher le bouton Generate, afficher le formulaire de vérification
+      generateStep.style.display = 'none'
+      verifyStep.style.display = 'block'
+    }
+
+  } catch (error) {
+    console.error('Error generating QR code:', error)
+    alert('An error occurred. Please try again.')
+  }
+}
+
+/**
+ * Vérifie le code 2FA et active la 2FA
+ * // ajouter le password pour valider l'activation + changer dans le /me pour mettre two_fa_enabled à true
+ */
+async function handleEnable2FA(form: HTMLFormElement) {
+  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
+  const formData = new FormData(form)
+  const code = formData.get('code') as string
+  const password = formData.get('password') as string
+
+  // Vérifier que l'utilisateur est connecté
+  if (!currentUser) {
+    alert('User not authenticated')
+    return
+  }
+
+  // TODO: Vérifier le password avant d'activer la 2FA (via service auth)
+  // + 2fa doit notifier auth de sa MAJ et ensuite users/me sera mis a jour auto
+  console.log('Password not verified yet:', password)
+
+
+
+  try {
+    console.log('Verifying and enabling 2FA...')
+
+    const res = await fetch('/2fa/api/2fa/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: secret
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        user_id: currentUser.user_id,
+        twofa_code: code
+      })
+    })
+
+    const result = await res.json()
+    if (!res.ok) {
+      console.error('Failed to enable 2FA:', result)
+      alert(result.message || 'Invalid code or password. Please try again.')
+      return
+    }
+
+    console.log('2FA enabled successfully:', result)
+
+    // Synchroniser l'état utilisateur
+    const updatedUser = await checkAuth()
+    if (!updatedUser) {
+      console.error('Failed to fetch updated user data.')
+      return
+    }
+    setCurrentUser(updatedUser)
+    console.log('Updated user after enabling 2FA:', updatedUser)
+
+    // Feedback et reload de la page pour afficher le nouveau formulaire
+    alert('Two-Factor Authentication enabled successfully!')
+    window.location.reload() // Recharger pour afficher "DISABLE 2FA"
+
+  } catch (error) {
+    console.error('Error enabling 2FA:', error)
+    alert('An error occurred. Please try again.')
+  }
+}
+
+/**
+ * Désactive la 2FA
+ */
+async function handleDisable2FA(form: HTMLFormElement) {
+  const secret = import.meta.env.VITE_INTERNAL_API_SECRET
+  const formData = new FormData(form)
+  const code = formData.get('code') as string
+  const password = formData.get('password') as string
+
+  try {
+    console.log('Disabling 2FA...')
+
+    // TODO: Remplacer par le vrai endpoint
+    const res = await fetch('/2fa/api/2fa/disable', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: secret
+      },
+      credentials: 'include',
+      body: JSON.stringify({ code, password })
+    })
+
+    const result = await res.json()
+    if (!res.ok) {
+      console.error('Failed to disable 2FA:', result)
+      alert(result.message || 'Invalid code or password. Please try again.')
+      return
+    }
+
+    console.log('2FA disabled successfully:', result)
+
+    // Synchroniser l'état utilisateur
+    const updatedUser = await checkAuth()
+    if (!updatedUser) {
+      console.error('Failed to fetch updated user data.')
+      return
+    }
+    setCurrentUser(updatedUser)
+
+    // Feedback et reload de la page
+    alert('Two-Factor Authentication disabled successfully!')
+    window.location.reload() // Recharger pour afficher "ENABLE 2FA"
+
+  } catch (error) {
+    console.error('Error disabling 2FA:', error)
+    alert('An error occurred. Please try again.')
+  }
+}

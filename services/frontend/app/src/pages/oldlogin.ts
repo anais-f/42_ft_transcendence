@@ -96,14 +96,18 @@ export async function initGoogleAuth() {
 	const btnContainer = document.getElementById('google-btn-container')
 	if (!btnContainer) return
 
+  console.log('test')
 	// Clear container before rendering to avoid duplicates
 	btnContainer.innerHTML = ''
 
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  console.log(clientId)
 	try {
 		await loadGoogleScript()
 		if (window.google) {
 			window.google.accounts.id.initialize({
-				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+				client_id: clientId,
+					// '310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
 				callback: async (response: CredentialResponse) => {
 					console.log('Google Credential received', response)
 

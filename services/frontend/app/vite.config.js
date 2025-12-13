@@ -4,6 +4,7 @@ import path from 'path'
 
 export default defineConfig({
 	base: './',
+	envDir: '../../../',
 	build: { outDir: 'dist', emptyOutDir: true },
 	server: {
 		host: true,

@@ -3,7 +3,8 @@ import {
 	registerController,
 	loginController,
 	validateAdminController,
-	logoutController
+	logoutController,
+	verifyPasswordController
 } from '../controllers/authController.js'
 import { googleLoginController } from '../controllers/oauthController.js'
 import {
@@ -11,6 +12,7 @@ import {
 	LoginActionSchema,
 	LoginGoogleSchema
 } from '@ft_transcendence/common'
+import { apiKeyMiddleware } from '@ft_transcendence/security'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(
@@ -42,6 +44,15 @@ export async function authRoutes(app: FastifyInstance) {
 	)
 	app.get('/api/admin/validate', validateAdminController)
 	app.post('/api/logout', logoutController)
+
+	// Verify password endpoint (for sensitive operations like enabling 2FA)
+	app.post(
+		'/api/auth/verify-password',
+		{
+			preHandler: apiKeyMiddleware
+		},
+		verifyPasswordController
+	)
 
 	// Public config endpoint
 	app.get('/api/config', async (_request, reply) => {

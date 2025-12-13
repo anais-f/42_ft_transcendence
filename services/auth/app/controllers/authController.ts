@@ -1,10 +1,18 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
 import { RegisterSchema, LoginActionSchema } from '@ft_transcendence/common'
-import { findPublicUserByLogin } from '../repositories/userRepository.js'
+import { findPublicUserByLogin, findUserById } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
+import { verifyPassword } from '../utils/password.js'
 import createHttpError from 'http-errors'
+import { z } from 'zod'
+
+// TODO : mettre dans le common package
+const VerifyPasswordSchema = z.object({
+	user_id: z.number().int().positive(),
+	password: z.string().min(1)
+}).strict()
 
 export async function registerController(
 	request: FastifyRequest,
@@ -144,4 +152,23 @@ export async function logoutController(
 	reply.clearCookie('auth_token', { path: '/' })
 	reply.clearCookie('twofa_token', { path: '/' })
 	return reply.code(200).send({ success: true })
+}
+
+export async function verifyPasswordController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	const parsed = VerifyPasswordSchema.safeParse(request.body)
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
+
+	const { user_id, password } = parsed.data
+
+	const user = findUserById(user_id)
+	if (!user || !user.password) {
+		throw createHttpError.NotFound('User not found')
+	}
+
+	const ok = await verifyPassword(user.password, password)
+
+	return reply.code(200).send({ valid: ok })
 }
