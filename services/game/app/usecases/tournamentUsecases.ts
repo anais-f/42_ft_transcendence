@@ -12,6 +12,7 @@ import {
 	usersInTournaments
 } from './managers/gameData.js'
 import { requestGame } from './managers/gameManager/requestGame.js'
+import { MatchTournament } from '@ft_transcendence/common'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -40,7 +41,7 @@ function shuffle(array: any[]) {
 	while (currentIndex != 0) {
 		let randomIndex = Math.floor(Math.random() * currentIndex)
 		currentIndex--
-		;[array[currentIndex], array[randomIndex]] = [
+		;[array[currentIndex], array[randomIndex] ] = [
 			array[randomIndex],
 			array[currentIndex]
 		]
@@ -68,9 +69,9 @@ function startNextRound(tournament: Tournament, round: number) {
 export function startTournament(tournament: Tournament) {
 	tournament.status = 'ongoing'
 	createTournamentTree(tournament)
-	for (let round = Math.log2(tournament.maxParticipants); round > 0; --round) {
-		startNextRound(tournament, round)
-	}
+	// Only start the first round (highest round number)
+	const firstRound = Math.log2(tournament.maxParticipants)
+	startNextRound(tournament, firstRound)
 }
 
 function createTournamentTree(tournament: Tournament) {
@@ -233,4 +234,105 @@ export function quitTournament(request: FastifyRequest): void {
 	}
 	tournament.participants.splice(participantIndex, 1)
 	usersInTournaments.delete(userId)
+}
+
+export function onTournamentMatchEnd(
+	tournamentCode: string,
+	round: number,
+	matchNumber: number,
+	winnerId: number,
+	scorePlayer1: number,
+	scorePlayer2: number
+): void {
+	const tournament = tournaments.get(tournamentCode)
+	if (!tournament) {
+		throw createHttpError.NotFound('Tournament not found')
+	}
+
+	// Find the match that just ended
+	const currentMatch = tournament.matchs.find(
+		(m) => m.round === round && m.matchNumber === matchNumber
+	)
+	if (!currentMatch) {
+		throw createHttpError.NotFound('Match not found')
+	}
+
+	// Update match status and scores
+	currentMatch.status = 'completed'
+	currentMatch.scorePlayer1 = scorePlayer1
+	currentMatch.scorePlayer2 = scorePlayer2
+
+	// If this was the final (round 1), tournament is over
+	if (round === 1) {
+		tournament.status = 'completed'
+		console.log(`Tournament ${tournamentCode} completed! Winner: ${winnerId}`)
+		
+		// Clean up participants from tracking
+		tournament.participants.forEach((userId) => {
+			usersInTournaments.delete(userId)
+		})
+		return
+	}
+
+	// Find the next round match that this winner should advance to
+	const nextRoundMatch = tournament.matchs.find(
+		(m) =>
+			m.round === round - 1 &&
+			(m.previousMatchId1 === matchNumber ||
+				m.previousMatchId2 === matchNumber)
+	)
+
+	if (!nextRoundMatch) {
+		console.error('No next round match found for winner')
+		return
+	}
+
+	// Place winner in the appropriate slot of next match
+	if (nextRoundMatch.previousMatchId1 === matchNumber) {
+		nextRoundMatch.player1Id = winnerId
+	} else if (nextRoundMatch.previousMatchId2 === matchNumber) {
+		nextRoundMatch.player2Id = winnerId
+	}
+
+	console.log(
+		`Winner ${winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
+	)
+
+	// Check if both players are ready for the next match
+	if (
+		nextRoundMatch.player1Id !== undefined &&
+		nextRoundMatch.player2Id !== undefined &&
+		nextRoundMatch.status === 'waiting_for_players'
+	) {
+		// Both players ready, start the match!
+		nextRoundMatch.status = 'ongoing'
+		console.log(
+			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+		)
+		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id)
+	}
+}
+
+/**
+ * Helper to get tournament code from a user or game
+ */
+export function getTournamentByUser(userId: number): string | undefined {
+	for (const [code, tournament] of tournaments.entries()) {
+		if (tournament.participants.includes(userId)) {
+			return code
+		}
+	}
+	return undefined
+}
+
+/**
+ * Get tournament code by tournament ID
+ */
+export function getTournamentCodeById(tournamentId: number): string | undefined {
+	for (const [code, tournament] of tournaments.entries()) {
+		if (tournament.id === tournamentId) {
+			return code
+		}
+	}
+	return undefined
 }
