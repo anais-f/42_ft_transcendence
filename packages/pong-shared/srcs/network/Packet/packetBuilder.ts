@@ -10,7 +10,9 @@ import {
 	AS03BaseBall as S03,
 	S04BallVeloChange as S04,
 	S05BallPos as S05,
-	S06BallSync as S06
+	S06BallSync as S06,
+	S07Score as S07,
+	S08Countdown as S08
 } from './Server/SPackets.js'
 
 export class packetBuilder {
@@ -43,7 +45,7 @@ export class packetBuilder {
 
 	public static deserializeS(
 		buff: ArrayBuffer
-	): S01 | S03 | S04 | S05 | S06 | null {
+	): S01 | S03 | S04 | S05 | S06 | S07 | S08 | null {
 		const view = new DataView(buff)
 		const time = view.getFloat64(0, true)
 		let velo: Vector2
@@ -100,6 +102,10 @@ export class packetBuilder {
 						view.getFloat64(41, true)
 					)
 					return new S06(pos, factor, velo, time)
+				case SPacketsType.S07:
+					return new S07(time, view.getUint8(9), view.getUint8(10))
+				case SPacketsType.S08:
+					return new S08(time, view.getUint8(9))
 				default:
 					break
 			}

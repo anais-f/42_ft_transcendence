@@ -65,6 +65,11 @@
             - pos (vec2)
             - velo (vec2)
             - factor (number)
+        - S07Score
+            - p1 score (uint8)
+            - p2 score (uint8)
+        - S07Countdown
+            - remaining (uint8)
 
     [ ts ][ type       ][ data ]
     [    ][  0000 0001 ][ 0o   ] 00
@@ -73,3 +78,5 @@
     [    ][  0000 1101 ][ 33o  ] 04
     [    ][  0001 0101 ][ 25o  ] 05
     [    ][  0001 1101 ][ 49o  ] 06
+	[    ][  0000 0111 ][ 11o  ] 07
+	[    ][  0000 1001 ][ 10o  ] 08
