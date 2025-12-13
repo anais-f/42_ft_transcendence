@@ -13,19 +13,17 @@
 		<title>Ft Transcendence</title>
 	</head>
 
-	<body class="h-[100vh] px-12 py-6">
+	<body class="flex flex-col h-dvh px-6 py-4 gap-4">
 		<header
-			class="border-t-2 border-b-2 border-gray-800 text-3xl p-4 m-1 flex justify-between"
+			class="border-t-2 border-b-2 border-gray-800 p-4 justify-between flex items-center text-sm"
 		>
-			<h4 class="flex mr-4 text-sm">Page 1</h4>
+			<h4 class="flex-1 mr-4">Page 1</h4>
 			<a href="/" title="Return Home" class="no-underline">
-				<h1 class="flex title_font">FT-TRANSCENDENCE</h1>
+				<h1 class="title_font">FT-TRANSCENDENCE</h1>
 			</a>
-			<h4 id="date" class="flex ml-4 text-sm"></h4>
+			<h4 id="date" class="flex flex-1 justify-end ml-4"></h4>
 		</header>
-		<div class="h-[85vh] font-[Newsreader]">
-			<div id="content" class="flex flex-col items-center"></div>
-		</div>
+		<div id="content" class="flex-1 font-[Newsreader] overflow-hidden"></div>
 		<script src="/src/index.js" type="module"></script>
 	</body>
 </html>

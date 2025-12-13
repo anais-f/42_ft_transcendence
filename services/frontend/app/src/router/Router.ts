@@ -1,13 +1,7 @@
-import { routerMap, Route, Pages } from './routerMap'
-import { checkAuth } from '../api/authService'
-import { setCurrentUser, currentUser } from '../usecases/userStore'
+import { routerMap, Route, Pages } from './routerMap.js'
+import { checkAuth } from '../api/authService.js'
+import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
-
-declare global {
-	interface Window {
-		navigate: (url: string, skipAuth?: boolean) => void
-	}
-}
 
 export class Router {
 	private isNavigating = false
@@ -45,6 +39,7 @@ export class Router {
 		}
 
 		// render new page
+
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
 
@@ -78,35 +73,30 @@ export class Router {
 		const route = this.getRoute(url)
 
 		try {
-			let user: IPrivateUser | null = currentUser // start with store state
+			let user: IPrivateUser | null = currentUser // Start with current user from store
 
 			// 1. --- AUTHENTICATION CHECK API ---
-			const shouldCallAPI = !skipAuth
-
 			console.log('🔍 Navigation:', {
 				url,
 				skipAuth,
 				'route.public': route.public,
-				currentUser: currentUser?.username || null,
-				shouldCallAPI
+				currentUser: currentUser?.username || null
 			})
 
-			if (shouldCallAPI) {
-				console.log('📞 Calling checkAuth()...')
+			if (!skipAuth) {
+				console.log('Calling checkAuth()...')
 				const authCheckResult = await checkAuth()
 				setCurrentUser(authCheckResult)
 				user = authCheckResult
 			} else {
-				// use actual store state
-				console.log('⏭️  Skipping checkAuth()')
+				console.log('Skipping checkAuth()')
 				user = currentUser
 			}
 
 			// --- REDIRECTION GUARDS ---
 
-			// GUARD 1: Authenticated on the Login page
-			// If the user has passed verification (user exists) and is on /login, we redirect them to /
-			// skipAuth=true because we have just verified them, no need to re-verify
+			// GUARD 1: Authenticated on /login
+			// skipAuth=true because we just checked and user is authenticated
 			if (url === '/login' && user !== null) {
 				console.log('Authenticated, redirecting from /login to /')
 				this.isNavigating = false
@@ -114,9 +104,8 @@ export class Router {
 				return
 			}
 
-			// GUARD 2: Unauthenticated on a Protected Page
-			// If the route is protected and the user is not in the state (after API check or store)
-			// skipAuth=true because we just checked, the user is not authenticated
+			// GUARD 2: Non-authenticated on protected route
+			// skipAuth=true because we just checked and user is not authenticated
 			if (!route.public && !user) {
 				console.log('Not authenticated, redirecting to /login')
 				this.isNavigating = false
@@ -124,18 +113,18 @@ export class Router {
 				return
 			}
 
-			// 3. RENDER
+			// 3. RENDER PAGE
 			if (user) console.log('Authenticated as: ', user.username)
 			this.renderPage(route)
 		} catch (e: unknown) {
-			// ... erreor handler to do
+			// ... (Error handlering)
 			if (!route.public) {
-				this.isNavigating = false // new nav to execute
+				this.isNavigating = false // to new navigation
 				await this.navigate('/login', true)
 				return
 			}
 		} finally {
-			// if render without redir, change the state
+			// if rendering happened WITHOUT redirection, reset state
 			if (this.isNavigating === true) {
 				this.isNavigating = false
 			}
@@ -167,7 +156,6 @@ export class Router {
 	// Start the router
 	public async start(): Promise<void> {
 		// Expose navigate on window for inline onclicks
-		// @ts-ignore
 		window.navigate = (url: string, skipAuth?: boolean) =>
 			this.navigate(url, skipAuth ?? false)
 

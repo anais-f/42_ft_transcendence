@@ -1,23 +1,23 @@
-import {
-	bindLogOutButton,
-	HomePage,
-	unbindLogOutButton
-} from '../pages/oldhome'
+import { HomePage, attachHomeEvents } from '../pages/oldhome'
 import { GamePage } from '../pages/oldgame'
 import { LobbyPage } from '../pages/oldlobby'
 import {
-	bindLoginForm,
-	bindRegisterForm,
 	LoginPage,
-	unbindLoginForm,
-	unbindRegisterForm,
-	bindGoogleBtn,
-	unbindGoogleBtn
+	attachLoginEvents,
+	cleanupGoogleAuth
 } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
 import { SettingsPage } from '../pages/oldsettings'
+import { TestPage } from '../pages/LoginPage'
 
-export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
+export type Pages =
+	| 'home'
+	| 'game'
+	| 'lobby'
+	| 'login'
+	| 'profile'
+	| 'settings'
+	| 'test'
 
 export type Route = {
 	id: string
@@ -33,8 +33,7 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'home',
 		url: '/',
 		page: HomePage,
-		binds: [bindLogOutButton],
-		unbinds: [unbindLogOutButton]
+		binds: [attachHomeEvents]
 	},
 
 	game: {
@@ -53,8 +52,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'login',
 		url: '/login',
 		page: LoginPage,
-		binds: [bindRegisterForm, bindLoginForm, bindGoogleBtn],
-		unbinds: [unbindRegisterForm, unbindLoginForm, unbindGoogleBtn],
+		binds: [attachLoginEvents],
+		unbinds: [cleanupGoogleAuth],
 		public: true
 	},
 
@@ -68,5 +67,11 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'settings',
 		url: '/settings',
 		page: SettingsPage
+	},
+
+	test: {
+		id: 'test',
+		url: '/test',
+		page: TestPage
 	}
 }
