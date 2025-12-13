@@ -46,7 +46,7 @@ export const routerMap: Record<Pages, Route> = {
 
 	game: {
 		id: 'game',
-		url: '/game',
+		url: '/play',
 		page: GamePage,
 		binds: [attachGameEvents],
 		unbinds: [cleanupGameEvents]

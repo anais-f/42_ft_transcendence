@@ -30,7 +30,7 @@ export const HomePage = (): string => {
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
 		<button id="create_game_btn" data-action="create-game" type="button" class="generic_btn my-2">Create</button>
-		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/game')">Tournament</button>
+		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/play')">Tournament</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipeat. Ipsum dolore vericorrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
