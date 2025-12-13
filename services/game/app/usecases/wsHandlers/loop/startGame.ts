@@ -3,12 +3,16 @@ import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/S
 import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
-import { GameData } from '../managers/gameData.js'
-import { createGame, DEFAULT_TPS, IGameData } from '../createGame.js'
-import { PacketSender } from './PacketSender.js'
+import { GameData } from '../../managers/gameData.js'
+import { createGame, DEFAULT_TPS, IGameData } from '../../createGame.js'
+import { PacketSender } from '../PacketSender.js'
+import { updateHUDs } from './updateHUDs.js'
 
-const MAX_SCORE = 101
-const PAD_SPEED = 0.3
+export const MAX_SCORE = 101
+export const PAD_SPEED = 0.3
+export const PAUSE_TICKS = 120
+export const COUNTDOWN_STEPS = 3
+export const TICKS_PER_STEP = PAUSE_TICKS / COUNTDOWN_STEPS
 
 export function startGame(gameData: GameData): void {
 	const gameInstance = createGame(MAX_SCORE)
@@ -49,6 +53,10 @@ async function startGameLoop(
 		maxConcurrent: 1
 	})
 
+	let lastP1Score = 0
+	let lastP2Score = 0
+	let lastCountdown = -1
+
 	while (gameData.gameInstance?.GE.getState() === GameState.Started) {
 		await limiter.schedule(async () => {
 			updatePadMovements(gameData.gameInstance!)
@@ -66,6 +74,11 @@ async function startGameLoop(
 				ball.velo
 			)
 			packetSender.push(SPacketsType.S06, ballPacket)
+
+			updateHUDs(gameData, packetSender, {
+				lastP1Score,
+				lastP2Score,
+				lastCountdown})
 		})
 	}
 
