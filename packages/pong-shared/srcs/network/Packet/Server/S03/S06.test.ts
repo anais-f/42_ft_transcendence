@@ -20,10 +20,10 @@ describe('S06', () => {
 		const py = view.getFloat64(33, true)
 
 		expect(type).toBe(0b11101)
-		expect(vx).toBeCloseTo(velo.getX())
-		expect(vy).toBeCloseTo(velo.getY())
-		expect(px).toBeCloseTo(pos.getX())
-		expect(py).toBeCloseTo(pos.getY())
+		expect(vx).toBeCloseTo(velo.x)
+		expect(vy).toBeCloseTo(velo.y)
+		expect(px).toBeCloseTo(pos.x)
+		expect(py).toBeCloseTo(pos.y)
 		expect(f).toBeCloseTo(factor)
 	})
 
@@ -36,18 +36,18 @@ describe('S06', () => {
 		const factor = 0.8
 
 		view.setUint8(0, type)
-		view.setFloat64(1, v.getX(), true)
-		view.setFloat64(9, v.getY(), true)
+		view.setFloat64(1, v.x, true)
+		view.setFloat64(9, v.y, true)
 		view.setFloat64(17, factor, true)
 
-		view.setFloat64(25, pos.getX(), true)
-		view.setFloat64(33, pos.getY(), true)
+		view.setFloat64(25, pos.x, true)
+		view.setFloat64(33, pos.y, true)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(S06BallSync)
 		if (p instanceof S06BallSync) {
-			expect(p.getVelo().equals(v)).toBe(true)
-			expect(p.getPos().equals(pos)).toBe(true)
+			expect(p.velo.equals(v)).toBe(true)
+			expect(p.pos.equals(pos)).toBe(true)
 		} else {
 			throw new Error('Packet is not S06BallSync')
 		}
@@ -63,8 +63,8 @@ describe('S06', () => {
 
 		expect(S06Back).toBeInstanceOf(S06BallSync)
 		if (S06Back instanceof S06BallSync) {
-			expect(S06Back.getPos().equals(S06.getPos())).toBe(true)
-			expect(S06Back.getVelo().equals(S06.getVelo())).toBe(true)
+			expect(S06Back.pos.equals(S06.pos)).toBe(true)
+			expect(S06Back.velo.equals(S06.velo)).toBe(true)
 		} else {
 			throw new Error('Packet is not S06BallSync')
 		}

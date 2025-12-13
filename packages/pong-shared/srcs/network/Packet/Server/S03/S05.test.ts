@@ -17,8 +17,8 @@ describe('S05', () => {
 		const y = view.getFloat64(9, true)
 
 		expect(type).toBe(0b10101)
-		expect(x).toBeCloseTo(velo.getX())
-		expect(y).toBeCloseTo(velo.getY())
+		expect(x).toBeCloseTo(velo.x)
+		expect(y).toBeCloseTo(velo.y)
 	})
 
 	test('deserialize', () => {
@@ -28,13 +28,13 @@ describe('S05', () => {
 		const pos = new Vector2(324.32, -42)
 
 		view.setUint8(0, type)
-		view.setFloat64(1, pos.getX(), true)
-		view.setFloat64(9, pos.getY(), true)
+		view.setFloat64(1, pos.x, true)
+		view.setFloat64(9, pos.y, true)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(S05BallPos)
 		if (p instanceof S05BallPos) {
-			expect(p.getPos().equals(pos)).toBe(true)
+			expect(p.pos.equals(pos)).toBe(true)
 		} else {
 			throw new Error('Packet is not S05BallPos')
 		}
@@ -49,7 +49,7 @@ describe('S05', () => {
 
 		expect(S05Back).toBeInstanceOf(S05BallPos)
 		if (S05Back instanceof S05BallPos) {
-			expect(S05Back.getPos().equals(S05.getPos())).toBe(true)
+			expect(S05Back.pos.equals(S05.pos)).toBe(true)
 		} else {
 			throw new Error('Packet is not S05BallPos')
 		}

@@ -18,8 +18,8 @@ describe('S04', () => {
 		const y = view.getFloat64(9, true)
 
 		expect(type).toBe(SPacketsType.S04)
-		expect(x).toBeCloseTo(velo.getX())
-		expect(y).toBeCloseTo(velo.getY())
+		expect(x).toBeCloseTo(velo.x)
+		expect(y).toBeCloseTo(velo.y)
 	})
 
 	test('deserialize', () => {
@@ -29,8 +29,8 @@ describe('S04', () => {
 		const factor: number = 0.8
 
 		view.setUint8(0, SPacketsType.S04)
-		view.setFloat64(1, v.getX(), true)
-		view.setFloat64(9, v.getY(), true)
+		view.setFloat64(1, v.x, true)
+		view.setFloat64(9, v.y, true)
 		view.setFloat64(17, factor, true)
 
 		const p = packetBuilder.deserializeS(buff)
@@ -38,8 +38,8 @@ describe('S04', () => {
 		if (!(p instanceof S04BallVeloChange)) {
 			throw '...'
 		}
-		expect(p.getVelo().equals(v)).toBe(true)
-		expect(p.getFactor()).toBeCloseTo(factor)
+		expect(p.velo.equals(v)).toBe(true)
+		expect(p.factor).toBeCloseTo(factor)
 	})
 
 	test('serialize + deserialize', () => {
@@ -51,7 +51,7 @@ describe('S04', () => {
 
 		expect(S04Back).toBeInstanceOf(S04BallVeloChange)
 		if (S04Back instanceof S04BallVeloChange) {
-			expect(S04Back.getVelo().equals(S04.getVelo())).toBe(true)
+			expect(S04Back.velo.equals(S04.velo)).toBe(true)
 		} else {
 			throw new Error('Packet is not S04BallVeloChange')
 		}

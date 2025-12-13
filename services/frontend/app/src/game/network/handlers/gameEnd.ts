@@ -4,9 +4,9 @@ export function eogHandler(data: unknown) {
 	const { reason } = data as { reason: string }
 	console.log('Game ended:', reason)
 
-	const ws = gameStore.getGameSocket()
+	const ws = gameStore.gameSocket
 	if (ws) {
 		ws.close()
-		gameStore.setGameSocket(null)
+		gameStore.gameSocket = null
 	}
 }

@@ -26,24 +26,24 @@ export enum GameState {
 export const BALL_SPEED = 0.6
 
 export class GameEngine {
-	private currentState: GameState = GameState.Paused
-	private TPS_DATA: TPS_MANAGER
-	private tickTimer: ReturnType<typeof setInterval> | null = null
-	private ball: IBall = {
+	private _currentState: GameState = GameState.Paused
+	private _TPS_DATA: TPS_MANAGER
+	private _tickTimer: ReturnType<typeof setInterval> | null = null
+	private _ball: IBall = {
 		shape: new Circle(new Vector2(), 0.8),
 		velo: this.getRandomVelo()
 	}
-	private pauseTicksRemaining: number = 0
+	private _pauseTicksRemaining: number = 0
 	private readonly PAUSE_TICKS_AFTER_POINT = 120
 	public startTime
 
 	public constructor(
 		TPS: number,
-		private score: IScore,
-		private borders: Segment[],
-		private winZones: IWinZone[]
+		private _score: IScore,
+		private _borders: Segment[],
+		private _winZones: IWinZone[]
 	) {
-		this.TPS_DATA = new TPS_MANAGER(TPS)
+		this._TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
 	}
 
@@ -54,16 +54,16 @@ export class GameEngine {
 	}
 
 	private _startGame(): void {
-		if (this.currentState === GameState.Started) return
-		this.currentState = GameState.Started
+		if (this._currentState === GameState.Started) return
+		this._currentState = GameState.Started
 		this.startTickLoop()
 	}
 
 	private _pauseGame(): void {
-		this.currentState = GameState.Paused
-		if (this.tickTimer !== null) {
-			clearInterval(this?.tickTimer)
-			this.tickTimer = null
+		this._currentState = GameState.Paused
+		if (this._tickTimer !== null) {
+			clearInterval(this?._tickTimer)
+			this._tickTimer = null
 		}
 	}
 
@@ -79,9 +79,9 @@ export class GameEngine {
 	}
 
 	private checkWin(seg: Segment): boolean {
-		for (const w of this.winZones) {
+		for (const w of this._winZones) {
 			if (w.seg === seg) {
-				++this.score[`p${w.player as 1 | 2}`]
+				++this._score[`p${w.player as 1 | 2}`]
 				return true
 			}
 		}
@@ -89,18 +89,18 @@ export class GameEngine {
 	}
 
 	private checkColision(): boolean {
-		for (const border of this.borders) {
-			const hitData = border.intersect(this.ball.shape)
+		for (const border of this._borders) {
+			const hitData = border.intersect(this._ball.shape)
 			if (Array.isArray(hitData) && hitData.length > 0) {
 				if (this.checkWin(border)) {
 					return true
 				}
 
 				const velo: Vector2 = Vector2.reflect(
-					this.ball.velo,
+					this._ball.velo,
 					border.getNormal()
 				)
-				this.ball.velo = velo
+				this._ball.velo = velo
 				return false
 			}
 		}
@@ -108,44 +108,44 @@ export class GameEngine {
 	}
 
 	private playTick(): void {
-		if (this.currentState != GameState.Started) {
+		if (this._currentState != GameState.Started) {
 			return
 		}
 
 		// Handle pause between points
-		if (this.pauseTicksRemaining > 0) {
-			--this.pauseTicksRemaining
-			++this.TPS_DATA.tickCount
+		if (this._pauseTicksRemaining > 0) {
+			--this._pauseTicksRemaining
+			++this._TPS_DATA.tickCount
 			return
 		}
 
 		// TP failsafe
-		if (Vector2.squaredDist(this.ball.shape.getPos(), new Vector2()) > 4096) {
-			console.warn(`ball to far away: ${this.ball.shape.getPos()}`)
-			this.ball.shape.setOrigin(new Vector2())
-			this.ball.velo = this.getRandomVelo()
+		if (Vector2.squaredDist(this._ball.shape.pos, new Vector2()) > 4096) {
+			console.warn(`ball to far away: ${this._ball.shape.pos}`)
+			this._ball.shape.origin = new Vector2()
+			this._ball.velo = this.getRandomVelo()
 		}
 
 		if (!this.checkColision()) {
-			const movement = this.ball.velo.clone().multiply(BALL_SPEED)
-			this.ball.shape.getPos().add(movement)
+			const movement = this._ball.velo.clone().multiply(BALL_SPEED)
+			this._ball.shape.pos.add(movement)
 		} else {
-			this.ball.shape.getPos().setXY(0, 0)
-			this.ball.velo = this.getRandomVelo()
-			this.pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
-			console.log(`[${this.score.p1} | ${this.score.p2}]`)
+			this._ball.shape.pos.setXY(0, 0)
+			this._ball.velo = this.getRandomVelo()
+			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
+			console.log(`[${this._score.p1} | ${this._score.p2}]`)
 		}
 
-		++this.TPS_DATA.tickCount
-		if (this.score.p1 + this.score.p2 >= this.score.max) {
+		++this._TPS_DATA.tickCount
+		if (this._score.p1 + this._score.p2 >= this._score.max) {
 			this._pauseGame()
 		}
 	}
 
 	private async startTickLoop(): Promise<void> {
-		while (this.currentState === GameState.Started) {
+		while (this._currentState === GameState.Started) {
 			try {
-				await this.TPS_DATA.tickLimiter.schedule(async () => {
+				await this._TPS_DATA.tickLimiter.schedule(async () => {
 					this.playTick()
 				})
 			} catch (err) {
@@ -154,30 +154,30 @@ export class GameEngine {
 		}
 	}
 
-	public getSyncedTimeMs(): number {
+	get syncedTimeMs(): number {
 		return Date.now()
 	}
-	public getState(): GameState {
-		return this.currentState
+	get state(): GameState {
+		return this._currentState
 	}
 
-	public getTickCount(): number {
-		return this.TPS_DATA.tickCount
+	get tickCount(): number {
+		return this._TPS_DATA.tickCount
 	}
 
-	public getBall(): IBall {
-		return this.ball
+	get ball(): IBall {
+		return this._ball
 	}
 
-	public getBorders(): Segment[] {
-		return this.borders
+	get borders(): Segment[] {
+		return this._borders
 	}
 
-	public getScore(): IScore {
-		return this.score
+	get score(): IScore {
+		return this._score
 	}
 
-	public getPauseTicksRemaining(): number {
-		return this.pauseTicksRemaining
+	get pauseTicksRemaining(): number {
+		return this._pauseTicksRemaining
 	}
 }

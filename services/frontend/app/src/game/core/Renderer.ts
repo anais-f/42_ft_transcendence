@@ -64,8 +64,8 @@ class Renderer {
 		const now = performance.now()
 		const dt = (now - this.lastBallUpdate) / 1000
 		return new Vector2(
-			this.ballPos.getX() + this.ballVelo.getX() * this.ballFactor * dt,
-			this.ballPos.getY() + this.ballVelo.getY() * this.ballFactor * dt
+			this.ballPos.x + this.ballVelo.x * this.ballFactor * dt,
+			this.ballPos.y + this.ballVelo.y * this.ballFactor * dt
 		)
 	}
 
@@ -90,11 +90,11 @@ class Renderer {
 		ctx.strokeStyle = SEGMENT_COLOR
 		ctx.lineWidth = SEGMENT_LINE_WIDTH
 		for (const seg of this.segments) {
-			const p1 = seg.getP1()
-			const p2 = seg.getP2()
+			const p1 = seg.p1
+			const p2 = seg.p2
 			ctx.beginPath()
-			ctx.moveTo(toCanvasX(p1.getX()), toCanvasY(p1.getY()))
-			ctx.lineTo(toCanvasX(p2.getX()), toCanvasY(p2.getY()))
+			ctx.moveTo(toCanvasX(p1.x), toCanvasY(p1.y))
+			ctx.lineTo(toCanvasX(p2.x), toCanvasY(p2.y))
 			ctx.stroke()
 		}
 
@@ -102,8 +102,8 @@ class Renderer {
 		ctx.fillStyle = BALL_COLOR
 		ctx.beginPath()
 		ctx.arc(
-			toCanvasX(predictedPos.getX()),
-			toCanvasY(predictedPos.getY()),
+			toCanvasX(predictedPos.x),
+			toCanvasY(predictedPos.y),
 			BALL_RADIUS_SCALE * scaleX,
 			0,
 			Math.PI * 2

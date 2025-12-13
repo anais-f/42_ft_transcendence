@@ -6,7 +6,7 @@ import { UP_KEYS, DOWN_KEYS } from '../constants.js'
 const pressedKeys = new Set<string>()
 
 function sendMove(state: boolean, dir: padDirection): void {
-	const ws = gameStore.getGameSocket()
+	const ws = gameStore.gameSocket
 	if (!ws) {
 		return
 	}

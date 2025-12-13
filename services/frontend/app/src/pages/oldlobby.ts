@@ -6,7 +6,7 @@ import { currentUser } from '../usecases/userStore.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 
 export const LobbyPage = (): string => {
-	const code = routeParams.code || gameStore.getGameCode() || 'G-XXXXX'
+	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
 	const player = currentUser
 
 	return /*html*/ `
@@ -114,11 +114,11 @@ export function attachLobbyEvents() {
 
 	gameStore.setOnOpponentJoin(onOpponentJoin)
 
-	const token = gameStore.getSessionToken()
+	const token = gameStore.sessionToken
 	if (token) {
 		const ws = createGameWebSocket(token)
 		ws.binaryType = 'arraybuffer'
-		gameStore.setGameSocket(ws)
+		gameStore.gameSocket = ws
 
 		ws.onopen = () => {
 			console.log('WS connected')
@@ -147,10 +147,10 @@ export function cleanupLobbyEvents() {
 
 	// close WS only if not navigating to /game
 	if (!gameStore.navigatingToGame) {
-		const ws = gameStore.getGameSocket()
+		const ws = gameStore.gameSocket
 		if (ws) {
 			ws.close()
-			gameStore.setGameSocket(null)
+			gameStore.gameSocket = null
 		}
 	}
 

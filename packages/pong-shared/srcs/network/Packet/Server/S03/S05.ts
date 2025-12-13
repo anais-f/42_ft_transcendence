@@ -4,15 +4,15 @@ import { IS00PongBase } from '../S00.js'
 import { AS03BaseBall } from './S03.js'
 
 export class S05BallPos extends AS03BaseBall implements IS00PongBase {
-	private pos: Vector2
+	private _pos: Vector2
 
 	constructor(S03: AS03BaseBall, pos: Vector2) {
 		super()
-		this.pos = pos
+		this._pos = pos
 	}
 
-	getPos(): Vector2 {
-		return this.pos
+	get pos(): Vector2 {
+		return this._pos
 	}
 
 	serialize(): ArrayBuffer {
@@ -26,8 +26,8 @@ export class S05BallPos extends AS03BaseBall implements IS00PongBase {
 		buffUint8[0] |= SPacketsType.S05
 
 		const view = new DataView(buff)
-		view.setFloat64(1, this.pos.getX(), true)
-		view.setFloat64(9, this.pos.getY(), true)
+		view.setFloat64(1, this._pos.x, true)
+		view.setFloat64(9, this._pos.y, true)
 
 		return buff
 	}

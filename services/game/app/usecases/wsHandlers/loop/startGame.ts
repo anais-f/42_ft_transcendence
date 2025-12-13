@@ -19,7 +19,7 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_SCORE)
 	gameData.gameInstance = gameInstance
 
-	const mapPacket = new S02SegmentUpdate(gameInstance.GE.getBorders())
+	const mapPacket = new S02SegmentUpdate(gameInstance.GE.borders)
 	const mapBuffer = mapPacket.serialize()
 	gameData.p1.ws?.send(mapBuffer)
 	gameData.p2?.ws?.send(mapBuffer)
@@ -57,7 +57,7 @@ async function startGameLoop(
 	let lastCountdown = -1
 
 	while (
-		gameData.gameInstance?.GE.getState() === GameState.Started &&
+		gameData.gameInstance?.GE.state === GameState.Started &&
 		gameData.status === 'active'
 	) {
 		await limiter.schedule(async () => {
@@ -65,17 +65,11 @@ async function startGameLoop(
 
 			updatePadMovements(gameData.gameInstance!)
 
-			const segPacket = new S02SegmentUpdate(
-				gameData.gameInstance!.GE.getBorders()
-			)
+			const segPacket = new S02SegmentUpdate(gameData.gameInstance!.GE.borders)
 			packetSender.push(SPacketsType.S02, segPacket)
 
-			const ball = gameData.gameInstance!.GE.getBall()
-			const ballPacket = new S06BallSync(
-				ball.shape.getPos(),
-				BALL_SPEED,
-				ball.velo
-			)
+			const ball = gameData.gameInstance!.GE.ball
+			const ballPacket = new S06BallSync(ball.shape.pos, BALL_SPEED, ball.velo)
 			packetSender.push(SPacketsType.S06, ballPacket)
 
 			updateHUDs(gameData, packetSender, {

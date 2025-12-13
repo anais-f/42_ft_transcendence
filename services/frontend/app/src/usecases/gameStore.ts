@@ -8,37 +8,37 @@ export interface PlayerData {
 export type OnOpponentJoinCallback = (opponent: PlayerData) => void
 
 class GameStore {
-	private gameCode: string | null = null
-	private sessionToken: string | null = null
-	private gameSocket: WebSocket | null = null
+	private _gameCode: string | null = null
+	private _sessionToken: string | null = null
+	private _gameSocket: WebSocket | null = null
 	private _navigatingToGame: boolean = false
 	private _playerSlot: PlayerSlot = 'p1'
 	private _p1: PlayerData | null = null
 	private _p2: PlayerData | null = null
 	private _onOpponentJoin: OnOpponentJoinCallback | null = null
 
-	getGameCode(): string | null {
-		return this.gameCode
+	get gameCode(): string | null {
+		return this._gameCode
 	}
 
-	setGameCode(code: string | null): void {
-		this.gameCode = code
+	set gameCode(code: string | null) {
+		this._gameCode = code
 	}
 
-	getSessionToken(): string | null {
-		return this.sessionToken
+	get sessionToken(): string | null {
+		return this._sessionToken
 	}
 
-	setSessionToken(token: string | null): void {
-		this.sessionToken = token
+	set sessionToken(token: string | null) {
+		this._sessionToken = token
 	}
 
-	getGameSocket(): WebSocket | null {
-		return this.gameSocket
+	get gameSocket(): WebSocket | null {
+		return this._gameSocket
 	}
 
-	setGameSocket(socket: WebSocket | null): void {
-		this.gameSocket = socket
+	set gameSocket(socket: WebSocket | null) {
+		this._gameSocket = socket
 	}
 
 	get navigatingToGame(): boolean {
@@ -84,12 +84,12 @@ class GameStore {
 	}
 
 	clear(): void {
-		if (this.gameSocket) {
-			this.gameSocket.close()
+		if (this._gameSocket) {
+			this._gameSocket.close()
 		}
-		this.gameCode = null
-		this.sessionToken = null
-		this.gameSocket = null
+		this._gameCode = null
+		this._sessionToken = null
+		this._gameSocket = null
 		this._navigatingToGame = false
 		this._playerSlot = 'p1'
 		this._p1 = null

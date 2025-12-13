@@ -16,11 +16,11 @@ export class PongPad {
 	public move(dir: padDirection, incr: number) {
 		for (const s of this.seg) {
 			const dist = incr * dir
-			s.getP1().add(new Vector2(0, dist))
-			s.getP2().add(new Vector2(0, dist))
+			s.p1.add(new Vector2(0, dist))
+			s.p2.add(new Vector2(0, dist))
 			if (this.border?.some((b) => b.intersect(s))) {
-				s.getP1().add(new Vector2(0, -dist))
-				s.getP2().add(new Vector2(0, -dist))
+				s.p1.add(new Vector2(0, -dist))
+				s.p2.add(new Vector2(0, -dist))
 				break
 			}
 		}

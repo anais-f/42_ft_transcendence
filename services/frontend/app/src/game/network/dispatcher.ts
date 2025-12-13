@@ -52,7 +52,7 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	if (packet instanceof S02SegmentUpdate) {
 		renderer.setSegments(packet.segs)
 	} else if (packet instanceof S06BallSync) {
-		renderer.setBallState(packet.getPos(), packet.getVelo(), packet.getFactor())
+		renderer.setBallState(packet.pos, packet.velo, packet.factor)
 	} else if (packet instanceof S07Score) {
 		scoreHandler(packet)
 	} else if (packet instanceof S08Countdown) {

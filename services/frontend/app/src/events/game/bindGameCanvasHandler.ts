@@ -5,7 +5,7 @@ export function handleBindGameCanvas() {
 	gameStore.navigatingToGame = false
 
 	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
-	const ws = gameStore.getGameSocket()
+	const ws = gameStore.gameSocket
 
 	if (canvas && ws) {
 		gameEngine.bindAll(canvas, ws)

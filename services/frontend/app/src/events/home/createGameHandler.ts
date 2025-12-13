@@ -8,7 +8,7 @@ export async function handleCreateGame() {
 		console.error('Failed to create game')
 		return
 	}
-	gameStore.setGameCode(code)
+	gameStore.gameCode = code
 
 	const token = await joinGame(code)
 	if (!token) {
@@ -16,6 +16,6 @@ export async function handleCreateGame() {
 		gameStore.clear()
 		return
 	}
-	gameStore.setSessionToken(token)
+	gameStore.sessionToken = token
 	window.navigate(`/lobby/${code}`)
 }

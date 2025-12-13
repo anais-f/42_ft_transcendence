@@ -11,7 +11,7 @@ export function endGame(code: string) {
 	clearGameTimeout(code)
 	gameData.status = 'ended'
 
-	const score = gameData.gameInstance?.GE.getScore()
+	const score = gameData.gameInstance?.GE.score
 	if (!score || !gameData.p2) {
 		return
 	}

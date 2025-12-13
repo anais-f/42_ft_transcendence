@@ -7,7 +7,7 @@ describe('Segment', () => {
 		const a = new Vector2(1, 2)
 		const b = new Vector2(3, 4)
 		const s = new Segment(a, b)
-		expect(s.getPoints()).toEqual([a, b])
+		expect(s.points).toEqual([a, b])
 	})
 	describe('intersect', () => {
 		// TODO: add more test later
@@ -210,16 +210,16 @@ describe('Segment', () => {
 			const seg = new Segment(new Vector2(0, 0), new Vector2(10, 0))
 			const normal = seg.getNormal()
 
-			expect(Math.abs(normal.getX())).toBe(0)
-			expect(Math.abs(normal.getY())).toBe(1)
+			expect(Math.abs(normal.x)).toBe(0)
+			expect(Math.abs(normal.y)).toBe(1)
 		})
 
 		test('vertical one', () => {
 			const seg = new Segment(new Vector2(0, 0), new Vector2(0, 10))
 			const normal = seg.getNormal()
 
-			expect(Math.abs(normal.getX())).toBe(1)
-			expect(Math.abs(normal.getY())).toBe(0)
+			expect(Math.abs(normal.x)).toBe(1)
+			expect(Math.abs(normal.y)).toBe(0)
 		})
 
 		test('45 deg test', () => {
@@ -228,8 +228,8 @@ describe('Segment', () => {
 
 			const expectedX = Math.abs(1 / Math.sqrt(2))
 			const expectedY = Math.abs(-1 / Math.sqrt(2))
-			expect(Math.abs(normal.getX())).toBeCloseTo(expectedX)
-			expect(Math.abs(normal.getY())).toBeCloseTo(expectedY)
+			expect(Math.abs(normal.x)).toBeCloseTo(expectedX)
+			expect(Math.abs(normal.y)).toBeCloseTo(expectedY)
 		})
 	})
 })

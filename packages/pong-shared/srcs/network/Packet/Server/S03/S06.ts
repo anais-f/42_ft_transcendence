@@ -6,27 +6,27 @@ import { S05BallPos } from './S05.js'
 import { S04BallVeloChange } from './S04.js'
 
 export class S06BallSync extends AS03BaseBall implements IS00PongBase {
-	private S05: S05BallPos
-	private S04: S04BallVeloChange
+	private _S05: S05BallPos
+	private _S04: S04BallVeloChange
 
 	constructor(pos: Vector2, factor: number, velo: Vector2) {
 		const S03 = AS03BaseBall.createS03()
 
 		super()
-		this.S04 = new S04BallVeloChange(S03, velo, factor)
-		this.S05 = new S05BallPos(S03, pos)
+		this._S04 = new S04BallVeloChange(S03, velo, factor)
+		this._S05 = new S05BallPos(S03, pos)
 	}
 
-	getPos(): Vector2 {
-		return this.S05.getPos()
+	get pos(): Vector2 {
+		return this._S05.pos
 	}
 
-	getVelo(): Vector2 {
-		return this.S04.getVelo()
+	get velo(): Vector2 {
+		return this._S04.velo
 	}
 
-	getFactor(): number {
-		return this.S04.getFactor()
+	get factor(): number {
+		return this._S04.factor
 	}
 
 	serialize(): ArrayBuffer {
@@ -41,11 +41,11 @@ export class S06BallSync extends AS03BaseBall implements IS00PongBase {
 		buffUint8[0] |= SPacketsType.S06
 
 		const view = new DataView(buff)
-		view.setFloat64(1, this.getVelo().getX(), true)
-		view.setFloat64(9, this.getVelo().getY(), true)
-		view.setFloat64(17, this.getFactor(), true)
-		view.setFloat64(25, this.getPos().getX(), true)
-		view.setFloat64(33, this.getPos().getY(), true)
+		view.setFloat64(1, this.velo.x, true)
+		view.setFloat64(9, this.velo.y, true)
+		view.setFloat64(17, this.factor, true)
+		view.setFloat64(25, this.pos.x, true)
+		view.setFloat64(33, this.pos.y, true)
 
 		return buff
 	}

@@ -45,10 +45,10 @@ describe('S02', () => {
 			const x2 = view.getFloat64(offset + 16, true)
 			const y2 = view.getFloat64(offset + 24, true)
 
-			expect(x1).toBeCloseTo(pa.getX(), 6)
-			expect(y1).toBeCloseTo(pa.getY(), 6)
-			expect(x2).toBeCloseTo(pb.getX(), 6)
-			expect(y2).toBeCloseTo(pb.getY(), 6)
+			expect(x1).toBeCloseTo(pa.x, 6)
+			expect(y1).toBeCloseTo(pa.y, 6)
+			expect(x2).toBeCloseTo(pb.x, 6)
+			expect(y2).toBeCloseTo(pb.y, 6)
 		}
 	})
 
@@ -64,9 +64,7 @@ describe('S02', () => {
 		}
 		tab.forEach((seg) =>
 			expect(
-				NO2.segs.some(
-					(e) => e.getP1().equals(seg.getP1()) && e.getP2().equals(seg.getP2())
-				)
+				NO2.segs.some((e) => e.p1.equals(seg.p1) && e.p2.equals(seg.p2))
 			).toBe(true)
 		)
 	})

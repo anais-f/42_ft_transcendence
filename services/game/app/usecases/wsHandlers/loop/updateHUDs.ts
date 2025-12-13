@@ -19,7 +19,7 @@ async function updateScoreHUD(
 	packetSender: PacketSender,
 	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
 ) {
-	const score = gameData.gameInstance!.GE.getScore()
+	const score = gameData.gameInstance!.GE.score
 	if (score.p1 !== obj.lastP1Score || score.p2 !== obj.lastP2Score) {
 		obj.lastP1Score = score.p1
 		obj.lastP2Score = score.p2
@@ -34,7 +34,7 @@ async function updateCountDownHUD(
 	packetSender: PacketSender,
 	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
 ) {
-	const pauseTicks = gameData.gameInstance!.GE.getPauseTicksRemaining()
+	const pauseTicks = gameData.gameInstance!.GE.pauseTicksRemaining
 	if (pauseTicks > 0) {
 		const countdown = Math.ceil(pauseTicks / TICKS_PER_STEP)
 		if (countdown !== obj.lastCountdown) {
