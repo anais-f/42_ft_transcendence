@@ -10,6 +10,7 @@ class GameRenderer {
 	private canvas: HTMLCanvasElement | null = null
 	private ctx: CanvasRenderingContext2D | null = null
 	private animationId: number | null = null
+	private countdown: number | null = null
 
 	setCanvas(canvas: HTMLCanvasElement): void {
 		this.canvas = canvas
@@ -26,6 +27,10 @@ class GameRenderer {
 		this.ballVelo = velo
 		this.ballFactor = factor
 		this.lastBallUpdate = performance.now()
+	}
+
+	setCountdown(value: number | null): void {
+		this.countdown = value
 	}
 
 	private startAnimation(): void {
@@ -94,6 +99,14 @@ class GameRenderer {
 			Math.PI * 2
 		)
 		ctx.fill()
+
+		if (this.countdown !== null && this.countdown > 0) {
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+			ctx.font = 'bold 120px sans-serif'
+			ctx.textAlign = 'center'
+			ctx.textBaseline = 'middle'
+			ctx.fillText(this.countdown.toString(), width / 2, height / 3)
+		}
 	}
 
 	clear(): void {
@@ -105,6 +118,7 @@ class GameRenderer {
 		this.lastBallUpdate = 0
 		this.canvas = null
 		this.ctx = null
+		this.countdown = null
 	}
 }
 

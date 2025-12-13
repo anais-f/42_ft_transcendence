@@ -1,5 +1,5 @@
 import { GameData } from '../managers/gameData.js'
-import { startGame } from './startGame.js'
+import { startGame } from './loop/startGame.js'
 
 // lobby count down
 export function startCountdown(gameData: GameData) {
