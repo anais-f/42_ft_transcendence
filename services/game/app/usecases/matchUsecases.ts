@@ -1,5 +1,8 @@
 import { saveMatchToHistory } from '../repositories/matchsRepository.js'
-import { onTournamentMatchEnd, getTournamentCodeById } from './tournamentUsecases.js'
+import {
+	onTournamentMatchEnd,
+	getTournamentCodeById
+} from './tournamentUsecases.js'
 
 export function saveMatch(
 	player1Id: number,

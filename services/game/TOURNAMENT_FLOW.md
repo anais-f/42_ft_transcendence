@@ -46,7 +46,7 @@ Round 1 (Final) - 1 match
 ### 1. Tournament Creation
 
 ```typescript
-createTournament(request) 
+createTournament(request)
   → generates unique code (e.g., "T-ABC12")
   → creates tournament with status='pending'
   → adds creator to participants
@@ -90,19 +90,19 @@ saveMatch(request)
 onTournamentMatchEnd(tournamentCode, round, matchNumber, winnerId, scores)
   1. Finds and marks match as 'completed'
   2. Saves scores
-  
+
   3. If round === 1 (final):
      → tournament.status = 'completed'
      → cleans up participants
      → TOURNAMENT END ✨
-  
+
   4. Otherwise, finds next match:
      → searches in round-1 where previousMatchId1 or previousMatchId2 === matchNumber
-  
+
   5. Places winner in appropriate slot:
      → if previousMatchId1 === matchNumber → nextMatch.player1Id = winnerId
      → if previousMatchId2 === matchNumber → nextMatch.player2Id = winnerId
-  
+
   6. Checks if both players are ready:
      → if player1Id AND player2Id are defined:
        → nextMatch.status = 'ongoing'
@@ -114,6 +114,7 @@ onTournamentMatchEnd(tournamentCode, round, matchNumber, winnerId, scores)
 ### 4-player Tournament (A, B, C, D)
 
 #### Initialization
+
 ```
 Round 2 (Semi-finals):
 ├─ Match 0: A vs B [ongoing] ← starts immediately
@@ -125,6 +126,7 @@ Round 1 (Final):
 ```
 
 #### Scenario 1: A beats B (5-3)
+
 ```
 onTournamentMatchEnd("T-ABC12", 2, 0, A, 5, 3)
   → Match R2-M0 marked completed
@@ -135,6 +137,7 @@ onTournamentMatchEnd("T-ABC12", 2, 0, A, 5, 3)
 ```
 
 State after:
+
 ```
 Round 2:
 ├─ Match 0: A vs B [completed] ✅ Winner: A
@@ -145,6 +148,7 @@ Round 1:
 ```
 
 #### Scenario 2: C beats D (4-2)
+
 ```
 onTournamentMatchEnd("T-ABC12", 2, 1, C, 4, 2)
   → Match R2-M1 marked completed
@@ -155,6 +159,7 @@ onTournamentMatchEnd("T-ABC12", 2, 1, C, 4, 2)
 ```
 
 Final state:
+
 ```
 Round 2:
 ├─ Match 0: A vs B [completed] Winner: A
@@ -191,6 +196,7 @@ Round 1:
 ## Debugging
 
 To track the flow:
+
 ```typescript
 console.log('Tournament Matches:', tournament.matchs)
 console.log('Match completed:', { round, matchNumber, winnerId })

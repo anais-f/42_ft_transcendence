@@ -42,7 +42,7 @@ function shuffle(array: any[]) {
 	while (currentIndex != 0) {
 		let randomIndex = Math.floor(Math.random() * currentIndex)
 		currentIndex--
-		;[array[currentIndex], array[randomIndex] ] = [
+		;[array[currentIndex], array[randomIndex]] = [
 			array[randomIndex],
 			array[currentIndex]
 		]
@@ -80,7 +80,15 @@ export async function simulateMatch(
 	console.log(
 		`[MOCK] Match ended: Player ${winnerId} wins! Score: ${scorePlayer1}-${scorePlayer2}`
 	)
-	saveMatch(player1Id, player2Id, scorePlayer1, scorePlayer2, tournamentId, round, matchNumber)
+	saveMatch(
+		player1Id,
+		player2Id,
+		scorePlayer1,
+		scorePlayer2,
+		tournamentId,
+		round,
+		matchNumber
+	)
 }
 
 function startNextRound(tournament: Tournament, round: number) {
@@ -88,10 +96,7 @@ function startNextRound(tournament: Tournament, round: number) {
 		(match) => match.round === round
 	)
 	roundMatches.forEach((match) => {
-		if (
-			match.player1Id === undefined ||
-			match.player2Id === undefined
-		) {
+		if (match.player1Id === undefined || match.player2Id === undefined) {
 			console.error('Invalid match data for next round:', match)
 			return // Skip ce match
 		}
@@ -123,7 +128,9 @@ function createTournamentTree(tournament: Tournament) {
 	shuffle(tournament.participants)
 	console.log('Shuffled participants:', tournament.participants)
 	if (tournament.participants.length !== tournament.maxParticipants) {
-		throw createHttpError.Conflict('Not enough participants to create the tournament tree')
+		throw createHttpError.Conflict(
+			'Not enough participants to create the tournament tree'
+		)
 	}
 	let maxRound = Math.log2(tournament.maxParticipants)
 	for (let match = 0; match < tournament.maxParticipants / 2; match++) {
@@ -132,7 +139,9 @@ function createTournamentTree(tournament: Tournament) {
 		const player1 = tournament.participants[player1Index]
 		const player2 = tournament.participants[player2Index]
 		if (player1 === undefined || player2 === undefined) {
-			throw createHttpError.InternalServerError(`Invalid participant indices: ${player1Index}, ${player2Index}`)
+			throw createHttpError.InternalServerError(
+				`Invalid participant indices: ${player1Index}, ${player2Index}`
+			)
 		}
 		tournament.matchs.push({
 			round: maxRound,
@@ -201,16 +210,14 @@ export function joinTournament(request: FastifyRequest): Tournament {
 	}
 	tournament.participants.push(userId)
 	if (tournament.participants.length === tournament.maxParticipants) {
-			startTournament(tournament)
+		startTournament(tournament)
 	}
 	return tournament
 }
 
 let nextTournamentId = 1
 
-export function createTournament(
-	request: FastifyRequest
-) {
+export function createTournament(request: FastifyRequest) {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -233,10 +240,8 @@ export function createTournament(
 		participants: [userId],
 		matchs: []
 	})
-	return {"code": invitCode,
-			"tournament": tournaments.get(invitCode)
-		}
-	}
+	return { code: invitCode, tournament: tournaments.get(invitCode) }
+}
 
 export function getTournament(request: FastifyRequest): Tournament {
 	const userId = request.user.user_id
@@ -307,7 +312,7 @@ export function onTournamentMatchEnd(
 	if (round === 1) {
 		tournament.status = 'completed'
 		console.log(`Tournament ${tournamentCode} completed! Winner: ${winnerId}`)
-		
+
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
 			usersInTournaments.delete(userId)
@@ -319,8 +324,7 @@ export function onTournamentMatchEnd(
 	const nextRoundMatch = tournament.matchs.find(
 		(m) =>
 			m.round === round - 1 &&
-			(m.previousMatchId1 === matchNumber ||
-				m.previousMatchId2 === matchNumber)
+			(m.previousMatchId1 === matchNumber || m.previousMatchId2 === matchNumber)
 	)
 
 	if (!nextRoundMatch) {
@@ -376,7 +380,9 @@ export function getTournamentByUser(userId: number): string | undefined {
 /**
  * Get tournament code by tournament ID
  */
-export function getTournamentCodeById(tournamentId: number): string | undefined {
+export function getTournamentCodeById(
+	tournamentId: number
+): string | undefined {
 	for (const [code, tournament] of tournaments.entries()) {
 		if (tournament.id === tournamentId) {
 			return code

@@ -5,9 +5,7 @@ import {
 	getTournamentController,
 	quitTournamentController
 } from '../controllers/tournamentControllers.js'
-import {
-	CreateTournamentSchema
-} from '@ft_transcendence/common'
+import { CreateTournamentSchema } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 
 export function tournamentRoutes(app: FastifyInstance) {
