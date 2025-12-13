@@ -187,9 +187,6 @@ Round 1:
 
 ## Possible Improvements
 
-- [ ] Add losers bracket system (double elimination)
-- [ ] Implement timeout for AFK matches
-- [ ] Add WebSocket notifications to players when their next match starts
 - [ ] Save complete tournament history
 - [ ] Real-time tournament bracket visualization page
 
