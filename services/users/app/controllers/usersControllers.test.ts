@@ -9,7 +9,6 @@
  * 4. searchUserByUsernameController - Search user by username (JWT protected)
  */
 
-/*
 import { jest } from '@jest/globals'
 import type { FastifyRequest, FastifyReply } from 'fastify'
 
@@ -35,9 +34,12 @@ beforeAll(async () => {
 	ERROR_MESSAGES = common.ERROR_MESSAGES
 	SUCCESS_MESSAGES = common.SUCCESS_MESSAGES
 	;({ UsersServices } = await import('../usecases/usersServices.js'))
-	;({ handleUserCreated, getPublicUser, getPrivateUser, searchUserByUsernameController } = await import(
-		'./usersControllers.js'
-	))
+	;({
+		handleUserCreated,
+		getPublicUser,
+		getPrivateUser,
+		searchUserByUsernameController
+	} = await import('./usersControllers.js'))
 })
 
 const createMockRequest = (
@@ -197,17 +199,23 @@ describe('Users Controllers', () => {
 					}
 				]
 			}
-			const req = createMockRequest(null, null, { user_id: 1 }, { username: 'testuser' })
+			const req = createMockRequest(
+				null,
+				null,
+				{ user_id: 1 },
+				{ username: 'testuser' }
+			)
 			const reply = createMockReply()
 
 			UsersServices.searchUserByExactUsername.mockResolvedValueOnce(mockResult)
 
 			await searchUserByUsernameController(req, reply)
 
-			expect(UsersServices.searchUserByExactUsername).toHaveBeenCalledWith('testuser')
+			expect(UsersServices.searchUserByExactUsername).toHaveBeenCalledWith(
+				'testuser'
+			)
 			expect(reply.code).toHaveBeenCalledWith(200)
 			expect(reply.send).toHaveBeenCalledWith(mockResult)
 		})
 	})
 })
-*/

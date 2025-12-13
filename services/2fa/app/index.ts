@@ -11,6 +11,7 @@ import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
+import { setupErrorHandler } from '@ft_transcendence/common'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
@@ -34,6 +35,7 @@ app.setSerializerCompiler(serializerCompiler)
 
 runMigrations()
 
+setupErrorHandler(app)
 setupFastifyMonitoringHooks(app)
 
 await app.register(metricPlugin.default, { endpoint: '/metrics' })

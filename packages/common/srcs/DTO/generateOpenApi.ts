@@ -1,12 +1,10 @@
 import { createDocument } from 'zod-openapi'
 import * as usersSchemas from './usersSchema.js'
-import * as responseSchemas from './ResponseSchema.js'
 import * as authSchemas from './authSchema.js'
 import { writeFileSync } from 'node:fs'
 
 const schemas = {
 	...usersSchemas,
-	...responseSchemas,
 	...authSchemas
 }
 

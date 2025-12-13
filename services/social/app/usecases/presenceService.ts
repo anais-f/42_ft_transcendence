@@ -14,9 +14,9 @@ async function notifyStatusChange(
 	status: UserStatus
 ): Promise<void> {
 	const base = process.env.USERS_SERVICE_URL
-	const secret = process.env.USERS_API_SECRET
+	const secret = process.env.INTERNAL_API_SECRET
 	if (!base || !secret) {
-		console.error('Missing USERS_SERVICE_URL or USERS_API_SECRET env')
+		console.error('Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env')
 		return
 	}
 

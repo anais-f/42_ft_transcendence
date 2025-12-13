@@ -48,6 +48,12 @@ const config = {
 			rootDir: '<rootDir>/services/auth/app',
 			testMatch: ['**/*.test.ts']
 		},
+		// {
+		// 	...commonConfig,
+		// 	displayName: 'social',
+		// 	rootDir: '<rootDir>/services/social/app',
+		// 	testMatch: ['**/*.test.ts']
+		// },
 		{
 			...commonConfig,
 			displayName: 'monitoring',
