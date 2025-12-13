@@ -1,9 +1,7 @@
 import { C01Move } from '@ft_transcendence/pong-shared/network/Packet/Client/C01.js'
 import { padDirection } from '@ft_transcendence/pong-shared/engine/PongPad.js'
-import { gameStore } from '../gameStore.js'
-
-const UP_KEYS = ['w', 'W', 'k', 'K', 'ArrowUp']
-const DOWN_KEYS = ['s', 'S', 'J', 'j', 'ArrowDown']
+import { gameStore } from '../../usecases/gameStore.js'
+import { UP_KEYS, DOWN_KEYS } from '../constants.js'
 
 const pressedKeys = new Set<string>()
 
@@ -47,13 +45,17 @@ function onKeyUp(e: KeyboardEvent): void {
 	}
 }
 
-export function bindInputHandler(): void {
-	window.addEventListener('keydown', onKeyDown)
-	window.addEventListener('keyup', onKeyUp)
+export class InputHandler {
+	bind(): void {
+		window.addEventListener('keydown', onKeyDown)
+		window.addEventListener('keyup', onKeyUp)
+	}
+
+	unbind(): void {
+		window.removeEventListener('keydown', onKeyDown)
+		window.removeEventListener('keyup', onKeyUp)
+		pressedKeys.clear()
+	}
 }
 
-export function unbindInputHandler(): void {
-	window.removeEventListener('keydown', onKeyDown)
-	window.removeEventListener('keyup', onKeyUp)
-	pressedKeys.clear()
-}
+export const inputHandler = new InputHandler()

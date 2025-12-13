@@ -3,14 +3,14 @@ import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/S
 import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
 import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
 import { S08Countdown } from '@ft_transcendence/pong-shared/network/Packet/Server/S08.js'
-import { eogHandler } from './handlers/eogHandler.js'
-import { opponentHandler } from './handlers/opponentHandler.js'
-import { startingInHandler } from './handlers/startingInHandler.js'
-import { startHandler } from './handlers/startHandler.js'
-import { slotHandler } from './handlers/slotHandler.js'
-import { scoreHandler } from './handlers/scoreHandler.js'
-import { countdownHandler } from './handlers/countdownHandler.js'
-import { gameRenderer } from './gameRenderer.js'
+import { eogHandler } from './handlers/gameEnd.js'
+import { opponentHandler } from './handlers/opponent.js'
+import { startingInHandler } from './handlers/startingIn.js'
+import { startHandler } from './handlers/gameStart.js'
+import { slotHandler } from './handlers/slot.js'
+import { scoreHandler } from './handlers/score.js'
+import { countdownHandler } from './handlers/countdown.js'
+import { renderer } from '../core/Renderer.js'
 
 type JsonMessage = {
 	type: string
@@ -25,7 +25,7 @@ const jsonHandlers: Record<string, (data: unknown) => void | Promise<void>> = {
 	slot: slotHandler
 }
 
-export function wsDispatcher(event: MessageEvent) {
+function dispatcher(event: MessageEvent) {
 	if (event.data instanceof ArrayBuffer) {
 		handleBinaryMessage(event.data)
 		return
@@ -50,9 +50,9 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	if (!packet) return
 
 	if (packet instanceof S02SegmentUpdate) {
-		gameRenderer.setSegments(packet.segs)
+		renderer.setSegments(packet.segs)
 	} else if (packet instanceof S06BallSync) {
-		gameRenderer.setBallState(
+		renderer.setBallState(
 			packet.getPos(),
 			packet.getVelo(),
 			packet.getFactor()
@@ -63,3 +63,12 @@ function handleBinaryMessage(data: ArrayBuffer) {
 		countdownHandler(packet)
 	}
 }
+
+export function setupNetworkDispatcher(ws: WebSocket): void {
+	ws.addEventListener('message', dispatcher)
+}
+
+export function cleanupNetworkDispatcher(): void {
+}
+
+export { dispatcher }

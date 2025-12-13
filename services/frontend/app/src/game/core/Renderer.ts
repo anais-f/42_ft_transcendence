@@ -1,7 +1,17 @@
 import { Segment, Vector2 } from '@ft_transcendence/pong-shared'
-import { gameStore } from '../gameStore.js'
+import { gameStore } from '../../usecases/gameStore.js'
+import {
+	SEGMENT_LINE_WIDTH,
+	SEGMENT_COLOR,
+	BALL_COLOR,
+	BALL_RADIUS_SCALE,
+	COUNTDOWN_FONT,
+	COUNTDOWN_COLOR,
+	GAME_SPACE_WIDTH,
+	GAME_SPACE_HEIGHT
+} from '../constants.js'
 
-class GameRenderer {
+class Renderer {
 	private segments: Segment[] = []
 	private ballPos: Vector2 = new Vector2(0, 0)
 	private ballVelo: Vector2 = new Vector2(0, 0)
@@ -68,8 +78,8 @@ class GameRenderer {
 
 		ctx.clearRect(0, 0, width, height)
 
-		const scaleX = width / 40
-		const scaleY = height / 20
+		const scaleX = width / GAME_SPACE_WIDTH
+		const scaleY = height / GAME_SPACE_HEIGHT
 		const offsetX = width / 2
 		const offsetY = height / 2
 
@@ -77,8 +87,8 @@ class GameRenderer {
 		const toCanvasX = (x: number) => offsetX + x * flipX * scaleX
 		const toCanvasY = (y: number) => offsetY - y * scaleY
 
-		ctx.strokeStyle = 'black'
-		ctx.lineWidth = 5
+		ctx.strokeStyle = SEGMENT_COLOR
+		ctx.lineWidth = SEGMENT_LINE_WIDTH
 		for (const seg of this.segments) {
 			const p1 = seg.getP1()
 			const p2 = seg.getP2()
@@ -89,20 +99,20 @@ class GameRenderer {
 		}
 
 		const predictedPos = this.getPredictedBallPos()
-		ctx.fillStyle = 'black'
+		ctx.fillStyle = BALL_COLOR
 		ctx.beginPath()
 		ctx.arc(
 			toCanvasX(predictedPos.getX()),
 			toCanvasY(predictedPos.getY()),
-			0.5 * scaleX,
+			BALL_RADIUS_SCALE * scaleX,
 			0,
 			Math.PI * 2
 		)
 		ctx.fill()
 
 		if (this.countdown !== null && this.countdown > 0) {
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
-			ctx.font = 'bold 120px sans-serif'
+			ctx.fillStyle = COUNTDOWN_COLOR
+			ctx.font = COUNTDOWN_FONT
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
 			ctx.fillText(this.countdown.toString(), width / 2, height / 3)
@@ -122,4 +132,4 @@ class GameRenderer {
 	}
 }
 
-export const gameRenderer = new GameRenderer()
+export const renderer = new Renderer()

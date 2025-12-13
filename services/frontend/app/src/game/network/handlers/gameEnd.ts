@@ -1,4 +1,4 @@
-import { gameStore } from '../../gameStore.js'
+import { gameStore } from '../../../usecases/gameStore.js'
 
 export function eogHandler(data: unknown) {
 	const { reason } = data as { reason: string }

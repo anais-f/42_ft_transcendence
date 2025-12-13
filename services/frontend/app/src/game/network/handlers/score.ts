@@ -1,5 +1,5 @@
 import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
-import { gameStore } from '../../gameStore.js'
+import { gameStore } from '../../../usecases/gameStore.js'
 
 export function scoreHandler(packet: S07Score) {
 	const myScoreEl = document.getElementById('my-score')

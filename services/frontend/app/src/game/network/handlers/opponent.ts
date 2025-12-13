@@ -1,5 +1,5 @@
 import { fetchUserById } from '../../../api/usersService.js'
-import { gameStore } from '../../gameStore.js'
+import { gameStore } from '../../../usecases/gameStore.js'
 
 export async function opponentHandler(data: unknown) {
 	const { id } = data as { id: number }

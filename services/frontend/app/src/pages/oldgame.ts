@@ -1,9 +1,5 @@
 import { gameStore } from '../usecases/gameStore.js'
-import { gameRenderer } from '../usecases/game/gameRenderer.js'
-import {
-	bindInputHandler,
-	unbindInputHandler
-} from '../usecases/game/inputHandler.js'
+import { gameEngine } from '../game/core/GameEngine.js'
 
 const DEFAULT_AVATAR = '/assets/images/rhino.png'
 
@@ -52,20 +48,13 @@ export function bindGamePage() {
 	gameStore.navigatingToGame = false
 
 	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
-	if (canvas) {
-		gameRenderer.setCanvas(canvas)
-	}
+	const ws = gameStore.getGameSocket()
 
-	bindInputHandler()
+	if (canvas && ws) {
+		gameEngine.bindAll(canvas, ws)
+	}
 }
 
 export function unbindGamePage() {
-	unbindInputHandler()
-	gameRenderer.clear()
-
-	const ws = gameStore.getGameSocket()
-	if (ws) {
-		ws.close()
-		gameStore.setGameSocket(null)
-	}
+	gameEngine.unbindAll()
 }

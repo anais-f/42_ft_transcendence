@@ -1,7 +1,7 @@
 import { createGameWebSocket } from '../api/game/createGame.js'
 import { routeParams } from '../router/Router.js'
 import { gameStore, PlayerData } from '../usecases/gameStore.js'
-import { wsDispatcher } from '../usecases/game/wsDispatcher.js'
+import { dispatcher } from '../game/network/dispatcher.js'
 import { currentUser } from '../usecases/userStore.js'
 
 export const LobbyPage = (): string => {
@@ -117,7 +117,7 @@ export function bindLobbyPage() {
 			console.log('WS connected')
 		}
 
-		ws.onmessage = wsDispatcher
+		ws.onmessage = dispatcher
 
 		ws.onerror = (error) => {
 			console.error('WS error:', error)

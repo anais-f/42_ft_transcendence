@@ -1,5 +1,6 @@
-import { gameStore, PlayerSlot } from '../../gameStore.js'
-import { currentUser } from '../../userStore.js'
+import { gameStore } from '../../../usecases/gameStore.js'
+import { currentUser } from '../../../usecases/userStore.js'
+import { PlayerSlot } from '../../types.js'
 
 export function slotHandler(data: unknown) {
 	const { slot } = data as { slot: PlayerSlot }
