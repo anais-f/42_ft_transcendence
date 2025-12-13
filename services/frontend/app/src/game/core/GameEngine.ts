@@ -1,6 +1,9 @@
 import { renderer } from './Renderer.js'
 import { inputHandler } from './InputHandler.js'
-import { setupNetworkDispatcher, cleanupNetworkDispatcher } from '../network/dispatcher.js'
+import {
+	setupNetworkDispatcher,
+	cleanupNetworkDispatcher
+} from '../network/dispatcher.js'
 import { gameStore } from '../../usecases/gameStore.js'
 
 export class GameEngine {

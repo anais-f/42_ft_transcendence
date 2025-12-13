@@ -1,5 +1,8 @@
 import { gameStore } from '../usecases/gameStore.js'
-import { gameEngine } from '../game/core/GameEngine.js'
+import {
+	handleBindGameCanvas,
+	handleUnbindGameCanvas
+} from '../events/game/bindGameCanvasHandler.js'
 
 const DEFAULT_AVATAR = '/assets/images/rhino.png'
 
@@ -45,19 +48,11 @@ export const GamePage = (): string => {
 }
 
 export function attachGameEvents() {
-	gameStore.navigatingToGame = false
-
-	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
-	const ws = gameStore.getGameSocket()
-
-	if (canvas && ws) {
-		gameEngine.bindAll(canvas, ws)
-	}
-
+	handleBindGameCanvas()
 	console.log('Game page events attached')
 }
 
 export function cleanupGameEvents() {
-	gameEngine.unbindAll()
+	handleUnbindGameCanvas()
 	console.log('Game page events cleaned up')
 }

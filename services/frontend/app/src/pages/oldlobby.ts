@@ -3,6 +3,7 @@ import { routeParams } from '../router/Router.js'
 import { gameStore, PlayerData } from '../usecases/gameStore.js'
 import { dispatcher } from '../game/network/dispatcher.js'
 import { currentUser } from '../usecases/userStore.js'
+import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 
 export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.getGameCode() || 'G-XXXXX'
@@ -86,35 +87,33 @@ function onOpponentJoin(opponent: PlayerData) {
 	}
 }
 
+let lobbyClickHandler: ((e: Event) => void) | null = null
+
 export function attachLobbyEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	content.addEventListener('click', (e) => {
+	if (lobbyClickHandler) {
+		content.removeEventListener('click', lobbyClickHandler)
+	}
+
+	lobbyClickHandler = (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
 		if (actionButton) {
 			const action = actionButton.getAttribute('data-action')
 
-			// Copy lobby code
 			if (action === 'copy-code') {
-				const codeSpan = document.getElementById('lobby-code')
-				if (codeSpan) {
-					navigator.clipboard.writeText(codeSpan.textContent || '')
-					actionButton.textContent = 'Copied!'
-					setTimeout(() => {
-						actionButton.textContent = 'Copy Lobby Code'
-					}, 2000)
-				}
+				handleCopyCode(actionButton as HTMLElement)
 			}
 		}
-	})
+	}
 
-	// Register callback for opponent joining
+	content.addEventListener('click', lobbyClickHandler)
+
 	gameStore.setOnOpponentJoin(onOpponentJoin)
 
-	// Connect WebSocket
 	const token = gameStore.getSessionToken()
 	if (token) {
 		const ws = createGameWebSocket(token)

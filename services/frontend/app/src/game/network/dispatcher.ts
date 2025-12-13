@@ -52,11 +52,7 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	if (packet instanceof S02SegmentUpdate) {
 		renderer.setSegments(packet.segs)
 	} else if (packet instanceof S06BallSync) {
-		renderer.setBallState(
-			packet.getPos(),
-			packet.getVelo(),
-			packet.getFactor()
-		)
+		renderer.setBallState(packet.getPos(), packet.getVelo(), packet.getFactor())
 	} else if (packet instanceof S07Score) {
 		scoreHandler(packet)
 	} else if (packet instanceof S08Countdown) {
@@ -68,7 +64,6 @@ export function setupNetworkDispatcher(ws: WebSocket): void {
 	ws.addEventListener('message', dispatcher)
 }
 
-export function cleanupNetworkDispatcher(): void {
-}
+export function cleanupNetworkDispatcher(): void {}
 
 export { dispatcher }

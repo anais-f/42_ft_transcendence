@@ -1,8 +1,8 @@
 import { currentUser, setCurrentUser } from '../usecases/userStore.js'
 import { logout } from '../api/authService.js'
 import { gameStore } from '../usecases/gameStore.js'
-import { joinGame } from '../api/game/joinGame.js'
-import { createGame } from '../api/game/createGame.js'
+import { handleCreateGame } from '../events/home/createGameHandler.js'
+import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -111,52 +111,45 @@ export const HomePage = (): string => {
 `
 }
 
+let homeClickHandler: ((e: Event) => void) | null = null
+let homeSubmitHandler: ((e: Event) => void) | null = null
+
 export function attachHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	content.addEventListener('click', async (e) => {
+	if (homeClickHandler) {
+		content.removeEventListener('click', homeClickHandler)
+	}
+	if (homeSubmitHandler) {
+		content.removeEventListener('submit', homeSubmitHandler)
+	}
+
+	homeClickHandler = (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
 		if (actionButton) {
 			const action = actionButton.getAttribute('data-action')
 
-			// Logout
 			if (action === 'logout') {
-				await logout()
-				setCurrentUser(null)
-				window.navigate('/login', true) // skipAuth = true to avoid 401
+				logout().then(() => {
+					setCurrentUser(null)
+					window.navigate('/login', true)
+				})
 			}
 
-			// Navigate to settings
 			if (action === 'navigate-settings') {
 				window.navigate('/settings')
 			}
 
-			// Create game
 			if (action === 'create-game') {
-				const code = await createGame()
-				if (!code) {
-					console.error('Failed to create game')
-					return
-				}
-				gameStore.setGameCode(code)
-
-				const token = await joinGame(code)
-				if (!token) {
-					console.error('Failed to join game')
-					gameStore.clear()
-					return
-				}
-				gameStore.setSessionToken(token)
-				window.navigate(`/lobby/${code}`)
+				handleCreateGame()
 			}
 		}
-	})
+	}
 
-	// Join lobby form
-	content.addEventListener('submit', async (e) => {
+	homeSubmitHandler = (e: Event) => {
 		const form = (e.target as HTMLElement).closest('form[data-form]')
 		if (!form) return
 
@@ -167,19 +160,12 @@ export function attachHomeEvents() {
 			const code = input?.value?.trim()
 
 			if (!code) return
-
-			gameStore.setGameCode(code)
-
-			const token = await joinGame(code)
-			if (!token) {
-				console.error('Failed to join game')
-				gameStore.clear()
-				return
-			}
-			gameStore.setSessionToken(token)
-			window.navigate(`/lobby/${code}`)
+			handleJoinLobby(code)
 		}
-	})
+	}
+
+	content.addEventListener('click', homeClickHandler)
+	content.addEventListener('submit', homeSubmitHandler)
 
 	console.log('Home page events attached')
 }

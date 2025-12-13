@@ -9,6 +9,4 @@ export function eogHandler(data: unknown) {
 		ws.close()
 		gameStore.setGameSocket(null)
 	}
-
-	window.navigate('/home')
 }
