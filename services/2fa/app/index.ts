@@ -13,20 +13,19 @@ import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
 import Swagger from '@fastify/swagger'
-import fs from 'fs'
+import { checkEnv, I2faEnv } from './env/verifEnv.js'
+
+// Initialize and validate environment variables
+export const env: I2faEnv = checkEnv()
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
 }).withTypeProvider<ZodTypeProvider>()
 
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) {
-	throw new Error('JWT_SECRET environment variable is required')
-}
 
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
-	secret: jwtSecret,
+	secret: env.JWT_SECRET,
 	cookie: {
 		cookieName: 'auth_token',
 		signed: false
@@ -42,13 +41,8 @@ setupFastifyMonitoringHooks(app)
 
 await app.register(metricPlugin.default, { endpoint: '/metrics' })
 
-const openapiFilePath = process.env.DTO_OPENAPI_FILE
-if (!openapiFilePath) {
-	throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
-}
-
 await registerRoutes(app)
-const openapiSwagger = JSON.parse(fs.readFileSync(openapiFilePath, 'utf-8'))
+
 app.register(Swagger as any, {
 	openapi: {
 		info: {
@@ -56,7 +50,7 @@ app.register(Swagger as any, {
 			version: '1.0.0'
 		},
 		servers: [{ url: `http://localhost:8080/2fa`, description: 'Local server' }],
-		components: openapiSwagger.components
+		components: env.openAPISchema.components
 	},
 	transform: jsonSchemaTransform
 })
@@ -64,11 +58,11 @@ app.register(Swagger as any, {
 const start = async () => {
 	try {
 		await app.listen({
-			port: parseInt(process.env.PORT as string),
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
 		app.log.info(
-			`2FA Service listening on http://localhost:${process.env.PORT}`
+			`2FA Service listening on http://localhost:${env.PORT}`
 		)
 	} catch (err) {
 		app.log.error(err)
@@ -76,6 +70,6 @@ const start = async () => {
 	}
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (env.NODE_ENV !== 'test') {
 	start()
 }
