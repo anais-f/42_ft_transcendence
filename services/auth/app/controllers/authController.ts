@@ -1,10 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
-import { RegisterSchema, LoginActionSchema, PasswordBodySchema } from '@ft_transcendence/common'
-import { findPublicUserByLogin, findUserById } from '../repositories/userRepository.js'
+import { RegisterSchema, LoginActionSchema} from '@ft_transcendence/common'
+import { findPublicUserByLogin} from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
-import { verifyPassword } from '../utils/password.js'
 import createHttpError from 'http-errors'
 
 
@@ -146,38 +145,4 @@ export async function logoutController(
 	reply.clearCookie('auth_token', { path: '/' })
 	reply.clearCookie('twofa_token', { path: '/' })
 	return reply.code(200).send({ success: true })
-}
-
-
-// Verify the current user's password using their JWT token
-export async function verifyMyPasswordController(
-	request: FastifyRequest,
-	reply: FastifyReply
-) {
-	// Extract token from cookie
-	const cookieToken = request.cookies?.auth_token
-	if (!cookieToken) throw createHttpError.Unauthorized('Missing token')
-
-	// Verify token and extract user_id
-	const payload = verifyToken(cookieToken)
-	if (!payload || !payload.user_id) {
-		throw createHttpError.Unauthorized('Invalid token')
-	}
-
-	// Parse password from body
-	const parsed = PasswordBodySchema.safeParse(request.body)
-	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
-
-	const { password } = parsed.data
-
-	// Get user from database
-	const user = findUserById(payload.user_id)
-	if (!user || !user.password) {
-		throw createHttpError.NotFound('User not found')
-	}
-
-	// Verify password
-	const ok = await verifyPassword(user.password, password)
-
-	return reply.code(200).send({ valid: ok })
 }

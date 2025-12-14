@@ -29,7 +29,8 @@ export async function checkAuth(): Promise<IPrivateUser | null> {
  * @returns Promise that resolves when logout is complete
  */
 export async function logout(): Promise<void> {
-	try {
+	// TODDO : clear websocket connections, etc.
+  try {
 		await fetch('/auth/api/logout', {
 			method: 'POST',
 			credentials: 'include'

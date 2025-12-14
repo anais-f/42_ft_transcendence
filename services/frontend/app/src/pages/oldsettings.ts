@@ -258,12 +258,57 @@ export async function handleChangePassword(form: HTMLFormElement) {
   const confirmNewPassword = formData.get('confirm_new_password') as string
   const twofaCode = formData.get('password_2fa_code') as string | null
 
+  // Client-side validation
   if (newPassword !== confirmNewPassword) {
     alert('New password and confirmation do not match.')
     return
   }
 
-  //TODO : check password validation rules (length, complexity, etc.)
+  if (newPassword.length < 8) {
+    alert('New password must be at least 8 characters long.')
+    return
+  }
+
+  try {
+    const body: {
+      old_password: string
+      new_password: string
+      twofa_code?: string
+    } = {
+      old_password: oldPassword,
+      new_password: newPassword
+    }
+
+    // Add 2FA code if provided
+    if (twofaCode) {
+      body.twofa_code = twofaCode
+    }
+
+    const res = await fetch('/auth/api/user/me/password', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(body)
+    })
+
+    const result = await res.json()
+
+    if (!res.ok) {
+      alert(result.message || result.error || 'Failed to change password. Please try again.')
+      console.error('Failed to change password:', res.status, result)
+      return
+    }
+
+    console.log('Password changed successfully:', result)
+    alert('Password changed successfully!')
+    form.reset()
+
+  } catch (error) {
+    console.error('Error changing password:', error)
+    alert('An error occurred while changing password. Please try again.')
+  }
 }
 
 // 2FA HANDLERS
@@ -275,7 +320,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
  */
 async function verifyCurrentUserPassword(password: string): Promise<boolean> {
   try {
-    const passwordRes = await fetch('/auth/api/verify-my-password', {
+    const res = await fetch('/auth/api/verify-my-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -284,9 +329,8 @@ async function verifyCurrentUserPassword(password: string): Promise<boolean> {
       body: JSON.stringify({ password })
     })
 
-    const passwordResult = await passwordRes.json()
-    if (!passwordRes.ok || !passwordResult.valid) {
-      console.error('Password verification failed:', passwordResult)
+    if (!res.ok) {
+      console.error('Password verification failed:', res.status)
       alert('Invalid password. Please try again.')
       return false
     }
