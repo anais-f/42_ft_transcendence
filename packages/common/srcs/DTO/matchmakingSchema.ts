@@ -12,7 +12,5 @@ export const RemoveFromTournamentSchema = z
 	})
 	.strict()
 
-
 export type CreateTournamentDTO = z.infer<typeof CreateTournamentSchema>
 export type RemoveFromTournamentDTO = z.infer<typeof RemoveFromTournamentSchema>
-export type saveMatchDTO = z.infer<typeof saveMatchShema>
