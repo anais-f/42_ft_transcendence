@@ -20,8 +20,8 @@ Tournament {
 MatchTournament {
   previousMatchId1?: number  // Previous match index (player 1)
   previousMatchId2?: number  // Previous match index (player 2)
-  round: number             // Round number (higher = earlier round)(final = 1)
-  matchNumber: number       // Match number within the round
+  round: number              // Round number (higher = earlier round)(final = 1)
+  matchNumber: number        // Match number within the round
   player1Id?: number
   player2Id?: number
   status: 'ongoing' | 'completed' | 'waiting_for_players'
