@@ -97,7 +97,7 @@ function startNextRound(tournament: Tournament, round: number) {
 	roundMatches.forEach((match) => {
 		if (match.player1Id === undefined || match.player2Id === undefined) {
 			console.error('Invalid match data for next round:', match)
-			return // Skip ce match
+			return
 		}
 		match.status = 'ongoing'
 		simulateMatch(
