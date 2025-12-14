@@ -22,6 +22,9 @@ export function tournamentRoutes(app: FastifyInstance) {
 	app.post(
 		'/api/joinTournament/:code',
 		{
+			schema: {
+				params: CodeParamSchema,                                                                                                                                                                                                                                                                                                                                                                                              
+			},
 			preHandler: jwtAuthMiddleware
 		},
 		joinTournamentController
