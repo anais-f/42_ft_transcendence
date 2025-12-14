@@ -25,8 +25,7 @@ function randomAlphaNumeric(length: number): string {
 	return code
 }
 
-export function createInviteCode(type: string): string {
-	if (type !== 'T' && type !== 'G') throw new Error('Invalid tournament type')
+export function createInviteCode(type: 'T' | 'G'): string {
 	let code: string = ''
 
 	do {
