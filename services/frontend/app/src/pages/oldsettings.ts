@@ -142,7 +142,6 @@ export function attachSettingsEvents() {
   console.log('Settings page events attached')
 }
 
-
 export async function handleUsername(form: HTMLFormElement) {
   const formData = new FormData(form)
   const newUsername = formData.get('change_username') as string
@@ -307,16 +306,17 @@ async function handleGenerateQRCode() {
 }
 
 /**
- * Vérifie le code 2FA et active la 2FA
- * 2-step verification: 1) Verify password 2) Verify 2FA code
- * Utilise: POST /auth/api/auth/verify-password + POST /auth/api/2fa/verify-setup
+ * Enable the 2FA after verifying the code
+ * 2-step verification: 1) Verify password 2) Verify 2FA code and enable
+ * Utilise: POST /auth/api/verify-my-password + POST /auth/api/2fa/verify-setup
+ * @param form
+ * @returns Promise<void>
  */
-async function handleEnable2FA(form: HTMLFormElement) {
+async function handleEnable2FA(form: HTMLFormElement) : Promise<void> {
   const formData = new FormData(form)
   const code = formData.get('code') as string
   const password = formData.get('password') as string
 
-  // Vérifier que l'utilisateur est connecté
   if (!currentUser) {
     alert('User not authenticated')
     return
@@ -325,16 +325,14 @@ async function handleEnable2FA(form: HTMLFormElement) {
   try {
     console.log('Step 1: Verifying password...')
 
-    // STEP 1: Verify password
-    const passwordRes = await fetch('/auth/api/auth/verify-password', {
+    // STEP 1: Verify password using JWT
+    const passwordRes = await fetch('/auth/api/verify-my-password', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'authorization': import.meta.env.VITE_INTERNAL_API_SECRET
+        'Content-Type': 'application/json'
       },
       credentials: 'include',
       body: JSON.stringify({
-        user_id: currentUser.user_id,
         password
       })
     })
@@ -354,7 +352,7 @@ async function handleEnable2FA(form: HTMLFormElement) {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include', // Sends auth_token cookie
+      credentials: 'include',
       body: JSON.stringify({
         twofa_code: code
       })
@@ -369,7 +367,7 @@ async function handleEnable2FA(form: HTMLFormElement) {
 
     console.log('2FA enabled successfully:', result)
 
-    // Synchroniser l'état utilisateur
+    // update user and refresh page to show "DISABLE 2FA" form
     const updatedUser = await checkAuth()
     if (!updatedUser) {
       console.error('Failed to fetch updated user data.')
@@ -378,9 +376,9 @@ async function handleEnable2FA(form: HTMLFormElement) {
     setCurrentUser(updatedUser)
     console.log('Updated user after enabling 2FA:', updatedUser)
 
-    // Feedback et reload de la page pour afficher le nouveau formulaire
+
     alert('Two-Factor Authentication enabled successfully!')
-    window.location.reload() // Recharger pour afficher "DISABLE 2FA"
+    window.location.reload()
 
   } catch (error) {
     console.error('Error enabling 2FA:', error)
@@ -391,14 +389,13 @@ async function handleEnable2FA(form: HTMLFormElement) {
 /**
  * Désactive la 2FA
  * 2-step verification: 1) Verify password 2) Disable 2FA with code
- * Utilise: POST /auth/api/auth/verify-password + DELETE /auth/api/2fa/disable
+ * Utilise: POST /auth/api/verify-my-password + DELETE /auth/api/2fa/disable
  */
 async function handleDisable2FA(form: HTMLFormElement) {
   const formData = new FormData(form)
   const code = formData.get('code') as string
   const password = formData.get('password') as string
 
-  // Vérifier que l'utilisateur est connecté
   if (!currentUser) {
     alert('User not authenticated')
     return
@@ -407,16 +404,14 @@ async function handleDisable2FA(form: HTMLFormElement) {
   try {
     console.log('Step 1: Verifying password...')
 
-    // STEP 1: Verify password
-    const passwordRes = await fetch('/auth/api/auth/verify-password', {
+    // STEP 1: Verify password using JWT (no API key needed)
+    const passwordRes = await fetch('/auth/api/verify-my-password', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'authorization': import.meta.env.VITE_INTERNAL_API_SECRET
+        'Content-Type': 'application/json'
       },
       credentials: 'include',
       body: JSON.stringify({
-        user_id: currentUser.user_id,
         password
       })
     })
@@ -427,6 +422,7 @@ async function handleDisable2FA(form: HTMLFormElement) {
       alert('Invalid password. Please try again.')
       return
     }
+
 
     console.log('Step 2: Disabling 2FA...')
 
@@ -451,7 +447,7 @@ async function handleDisable2FA(form: HTMLFormElement) {
 
     console.log('2FA disabled successfully:', result)
 
-    // Synchroniser l'état utilisateur
+    // update user and refresh page to show "ENABLE 2FA" form
     const updatedUser = await checkAuth()
     if (!updatedUser) {
       console.error('Failed to fetch updated user data.')
@@ -459,9 +455,8 @@ async function handleDisable2FA(form: HTMLFormElement) {
     }
     setCurrentUser(updatedUser)
 
-    // Feedback et reload de la page
     alert('Two-Factor Authentication disabled successfully!')
-    window.location.reload() // Recharger pour afficher "ENABLE 2FA"
+    window.location.reload()
 
   } catch (error) {
     console.error('Error disabling 2FA:', error)

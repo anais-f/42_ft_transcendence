@@ -21,3 +21,11 @@ window.addEventListener('DOMContentLoaded', () => {
 	// Start the router to handle navigation and rendering
 	appRouter.start()
 })
+
+
+/* TODO list:
+- Implement error handling for client
+- Add user feedback for loading states
+- Add primary security measures in API calls
+- change 'alert' pop-ups to modal dialogs - looking fir snackbars or similar
+ */
