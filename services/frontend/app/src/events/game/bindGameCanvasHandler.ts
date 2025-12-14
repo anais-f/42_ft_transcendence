@@ -7,12 +7,18 @@ export function handleBindGameCanvas() {
 	const canvas = document.getElementById('pong') as HTMLCanvasElement | null
 	const ws = gameStore.gameSocket
 
-	if (canvas && ws) {
+	if (!ws) {
+		console.log('No game WebSocket - redirecting to home')
+		window.navigate('/')
+		return
+	}
+
+	if (canvas) {
 		gameEngine.bindAll(canvas, ws)
 
 		ws.onclose = () => {
 			console.log('Game WS closed - redirecting to home')
-			window.navigate('/home')
+			window.navigate('/')
 		}
 
 		ws.onerror = (error) => {

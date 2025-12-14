@@ -19,12 +19,12 @@ export class GameEngine {
 		setupNetworkDispatcher(ws)
 	}
 
-	unbindAll(): void {
+	unbindAll(ws: WebSocket): void {
 		inputHandler.unbind()
 
 		renderer.clear()
 
-		cleanupNetworkDispatcher()
+		cleanupNetworkDispatcher(ws)
 
 		if (this.ws) {
 			this.ws.close()
