@@ -32,6 +32,11 @@ class Renderer {
 		this.segments = segments
 	}
 
+	setBallPos(pos: Vector2): void {
+		this.ballPos = pos
+		this.lastBallUpdate = performance.now()
+	}
+
 	setBallState(pos: Vector2, velo: Vector2, factor: number): void {
 		this.ballPos = pos
 		this.ballVelo = velo

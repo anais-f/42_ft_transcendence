@@ -1,8 +1,11 @@
 import { packetBuilder } from '@ft_transcendence/pong-shared/network/Packet/packetBuilder.js'
-import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/Server/S02.js'
-import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
-import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
-import { S08Countdown } from '@ft_transcendence/pong-shared/network/Packet/Server/S08.js'
+import {
+	S02SegmentUpdate,
+	S05BallPos,
+	S06BallSync,
+	S07Score,
+	S08Countdown
+} from '@ft_transcendence/pong-shared/network/Packet/Server/SPackets.js'
 import { eogHandler } from './handlers/gameEnd.js'
 import { opponentHandler } from './handlers/opponent.js'
 import { startingInHandler } from './handlers/startingIn.js'
@@ -53,6 +56,8 @@ function handleBinaryMessage(data: ArrayBuffer) {
 		renderer.setSegments(packet.segs)
 	} else if (packet instanceof S06BallSync) {
 		renderer.setBallState(packet.pos, packet.velo, packet.factor)
+	} else if (packet instanceof S05BallPos) {
+		renderer.setBallPos(packet.pos)
 	} else if (packet instanceof S07Score) {
 		scoreHandler(packet)
 	} else if (packet instanceof S08Countdown) {
@@ -64,6 +69,8 @@ export function setupNetworkDispatcher(ws: WebSocket): void {
 	ws.addEventListener('message', dispatcher)
 }
 
-export function cleanupNetworkDispatcher(): void {}
+export function cleanupNetworkDispatcher(ws: WebSocket): void {
+	ws.removeEventListener('message', dispatcher)
+}
 
 export { dispatcher }

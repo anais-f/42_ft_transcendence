@@ -1,6 +1,12 @@
-import { GameState, BALL_SPEED } from '@ft_transcendence/pong-shared'
+import {
+	GameState,
+	BALL_SPEED,
+	Vector2,
+	S05BallPos
+} from '@ft_transcendence/pong-shared'
 import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/Server/S02.js'
 import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
+import { AS03BaseBall } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S03.js'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
@@ -9,8 +15,8 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_SCORE = 3
-export const PAD_SPEED = 0.3
+export const MAX_SCORE = 101
+export const PAD_SPEED = 0.5
 export const PAUSE_TICKS = 120
 export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / COUNTDOWN_STEPS
@@ -52,9 +58,17 @@ async function startGameLoop(
 		maxConcurrent: 1
 	})
 
-	let lastP1Score = 0
-	let lastP2Score = 0
-	let lastCountdown = -1
+	const ballState = {
+		pos: new Vector2(),
+		velo: new Vector2(),
+		factor: 0
+	}
+
+	const hudState = {
+		lastP1Score: 0,
+		lastP2Score: 0,
+		lastCountdown: -1
+	}
 
 	while (
 		gameData.gameInstance?.GE.state === GameState.Started &&
@@ -69,14 +83,19 @@ async function startGameLoop(
 			packetSender.push(SPacketsType.S02, segPacket)
 
 			const ball = gameData.gameInstance!.GE.ball
-			const ballPacket = new S06BallSync(ball.shape.pos, BALL_SPEED, ball.velo)
-			packetSender.push(SPacketsType.S06, ballPacket)
+			if (ball.velo.equals(ballState.velo)) {
+				packetSender.push(
+					SPacketsType.S05,
+					new S05BallPos(AS03BaseBall.createS03(), ball.shape.pos)
+				)
+			} else {
+				packetSender.push(
+					SPacketsType.S06,
+					new S06BallSync(ball.shape.pos, BALL_SPEED, ball.velo)
+				)
+			}
 
-			updateHUDs(gameData, packetSender, {
-				lastP1Score,
-				lastP2Score,
-				lastCountdown
-			})
+			updateHUDs(gameData, packetSender, hudState)
 		})
 	}
 
