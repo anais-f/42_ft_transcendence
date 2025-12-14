@@ -7,6 +7,7 @@ import {
 } from '../controllers/tournamentControllers.js'
 import { CreateTournamentSchema } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { CodeParamSchema } from '@ft_transcendence/common'
 
 export function tournamentRoutes(app: FastifyInstance) {
 	app.post(
@@ -23,7 +24,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/joinTournament/:code',
 		{
 			schema: {
-				params: CodeParamSchema,                                                                                                                                                                                                                                                                                                                                                                                              
+				params: CodeParamSchema
 			},
 			preHandler: jwtAuthMiddleware
 		},
@@ -31,12 +32,22 @@ export function tournamentRoutes(app: FastifyInstance) {
 	)
 	app.get(
 		'/api/tournament/:code',
-		{ preHandler: jwtAuthMiddleware },
+		{ 
+			schema: {
+				params: CodeParamSchema
+			},
+			preHandler: jwtAuthMiddleware
+		},
 		getTournamentController
 	)
 	app.delete(
 		'/api/quitTournament/:code',
-		{ preHandler: jwtAuthMiddleware },
+		{ 
+			schema: {
+				params: CodeParamSchema
+			},
+			preHandler: jwtAuthMiddleware
+		},
 		quitTournamentController
 	)
 }
