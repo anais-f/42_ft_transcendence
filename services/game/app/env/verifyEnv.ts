@@ -1,6 +1,6 @@
 import { loadOpenAPISchema } from '@ft_transcendence/common'
 
-export interface IPongServerEnv {
+export interface IGameEnv {
 	HOST: string
 	PORT: number
 	JWT_SECRET: string
@@ -8,7 +8,7 @@ export interface IPongServerEnv {
 	openAPISchema?: any
 }
 
-export function checkEnv(): IPongServerEnv {
+export function checkEnv(): IGameEnv {
 	const variables = {
 		DTO_OPENAPI_FILE: process.env.DTO_OPENAPI_FILE,
 		HOST: process.env.HOSTNAME,
@@ -23,7 +23,7 @@ export function checkEnv(): IPongServerEnv {
 		}
 	}
 
-	const env: IPongServerEnv  =
+	const env: IGameEnv  =
 	{
 		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
 		HOST: `${variables.HOST}/game`,
@@ -31,7 +31,6 @@ export function checkEnv(): IPongServerEnv {
 		JWT_SECRET_GAME: variables.JWT_SECRET_GAME as string,
 		JWT_SECRET: variables.JWT_SECRET as string
 	}
-
 
 	return env
 }
