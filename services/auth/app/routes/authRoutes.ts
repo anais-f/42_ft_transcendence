@@ -3,15 +3,13 @@ import {
 	registerController,
 	loginController,
 	validateAdminController,
-	logoutController,
-	verifyMyPasswordController
+	logoutController
 } from '../controllers/authController.js'
 import { googleLoginController } from '../controllers/oauthController.js'
 import {
 	RegisterSchema,
 	LoginActionSchema,
-	LoginGoogleSchema,
-	PasswordBodySchema
+	LoginGoogleSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 

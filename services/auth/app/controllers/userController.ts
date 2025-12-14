@@ -3,14 +3,17 @@ import createHttpError from 'http-errors'
 import {
 	listPublicUsers,
 	findPublicUserById,
-	deleteUserById
+	deleteUserById,
+  findUserById
 } from '../repositories/userRepository.js'
 import {
 	PublicUserAuthSchema,
 	PublicUserListAuthSchema,
-	IdParamSchema
+	IdParamSchema,
+  PasswordBodySchema
 } from '@ft_transcendence/common'
 import { changeMyPassword } from '../usecases/changeMyPassword.js'
+import { verifyPassword } from '../utils/password.js'
 
 export async function listPublicUsersController(
 	_req: FastifyRequest,

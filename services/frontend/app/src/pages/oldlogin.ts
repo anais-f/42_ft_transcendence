@@ -1,4 +1,4 @@
-import { handleLogin, handleRegister } from '../events/loginPageHandlers.js'
+import { handleLogin, handleRegister, handle2FASubmit } from '../events/loginPageHandlers.js'
 import { checkAuth } from '../api/authService.js'
 import { setCurrentUser } from '../usecases/userStore.js'
 import { CredentialResponse } from '../types/google-type.js'
@@ -40,10 +40,30 @@ export const LoginPage = (): string => {
             <p class="text-sm py-6">Ipsum Conss oledio in ipsa corrupti aliquam qui commodi.ficia. Assumenda reprehendet placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
         </div>
         <h1 class="text-2xl pt-4 pb-1">RESUME READING</h1>
+
+        <!-- Formulaire de login (visible par défaut) -->
         <form id="login_form" data-form="login" class="flex flex-col gap-2">
-        <input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
-        <input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
-        <button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
+            <input id="login_username" type="text" name="login_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
+            <input id="login_password" type="password" name="login_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
+            <button id="login_btn" class="generic_btn mt-4" type="submit">Login</button>
+        </form>
+
+        <!-- Formulaire 2FA (caché par défaut) -->
+        <form id="2fa_form" data-form="2fa" class="hidden flex-col gap-2">
+            <p class="text-sm mb-2">Enter the 6-digit code from your authenticator app:</p>
+            <input
+                id="2fa_code"
+                type="text"
+                name="2fa_code"
+                class="px-2 border-b-2 text-xl border-black bg-inherit w-full text-center tracking-widest font-mono"
+                placeholder="000000"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                autocomplete="one-time-code"
+                required
+            >
+            <button id="2fa_verify_btn" class="generic_btn mt-4" type="submit">Verify</button>
+        </form>
 
         <div class="news_paragraph">
             <h1 class="text-lg pt-4">Title</h1>
@@ -87,6 +107,7 @@ export function attachLoginEvents() {
 		const formName = form.getAttribute('data-form')
 		if (formName === 'register') await handleRegister(form as HTMLFormElement)
 		if (formName === 'login') await handleLogin(form as HTMLFormElement)
+		if (formName === '2fa') await handle2FASubmit(form as HTMLFormElement)
 	}
 
 	// Create and store the click handler
@@ -124,7 +145,6 @@ export function detachLoginEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// Remove the event listeners using stored references
 	if (submitHandler) {
 		content.removeEventListener('submit', submitHandler)
 		submitHandler = null
@@ -150,8 +170,6 @@ export async function initGoogleAuth() {
 	const btnContainer = document.getElementById('google-btn-container')
 	if (!btnContainer) return
 
-  console.log('test')
-	// Clear container before rendering to avoid duplicates
 	btnContainer.replaceChildren()
   
 	try {
