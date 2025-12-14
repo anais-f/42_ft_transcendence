@@ -15,10 +15,10 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_SCORE = 101
-export const PAD_SPEED = 0.5
-export const PAUSE_TICKS = 120
-export const COUNTDOWN_STEPS = 3
+export const MAX_SCORE = 5
+export const PAD_SPEED = 0.3
+export const PAUSE_TICKS = 180
+export const COUNTDOWN_STEPS = 4
 export const TICKS_PER_STEP = PAUSE_TICKS / COUNTDOWN_STEPS
 
 export function startGame(gameData: GameData, gameCode: string): void {
