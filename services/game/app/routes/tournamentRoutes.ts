@@ -32,7 +32,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 	)
 	app.get(
 		'/api/tournament/:code',
-		{ 
+		{
 			schema: {
 				params: CodeParamSchema
 			},
@@ -42,7 +42,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 	)
 	app.delete(
 		'/api/quitTournament/:code',
-		{ 
+		{
 			schema: {
 				params: CodeParamSchema
 			},
