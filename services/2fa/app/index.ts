@@ -12,6 +12,8 @@ import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
+import Swagger from '@fastify/swagger'
+import fs from 'fs'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
@@ -40,7 +42,24 @@ setupFastifyMonitoringHooks(app)
 
 await app.register(metricPlugin.default, { endpoint: '/metrics' })
 
+const openapiFilePath = process.env.DTO_OPENAPI_FILE
+if (!openapiFilePath) {
+	throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
+}
+
 await registerRoutes(app)
+const openapiSwagger = JSON.parse(fs.readFileSync(openapiFilePath, 'utf-8'))
+app.register(Swagger as any, {
+	openapi: {
+		info: {
+			title: 'API for 2FA Service',
+			version: '1.0.0'
+		},
+		servers: [{ url: `http://localhost:8080/2fa`, description: 'Local server' }],
+		components: openapiSwagger.components
+	},
+	transform: jsonSchemaTransform
+})
 
 const start = async () => {
 	try {
