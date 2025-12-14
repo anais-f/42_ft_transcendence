@@ -16,24 +16,22 @@ export function checkEnv(): IPongServerEnv {
 		JWT_SECRET_GAME: process.env.JWT_SECRET_GAME,
 		JWT_SECRET: process.env.JWT_SECRET
 	}
-
+	
 	for (const [key, value] of Object.entries(variables)) {
 		if (value === undefined || value === '') {
 			throw new Error(`${key} is missing or invalid`)
 		}
 	}
 
-	const openapiSwagger = loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string)
-	const HOST = `${variables.HOST}/game`
-	const PORT = parseInt(variables.PORT as string)
-	const JWT_SECRET_GAME = variables.JWT_SECRET_GAME as string
-	const JWT_SECRET = variables.JWT_SECRET as string
-
-	return {
-		HOST: HOST,
-		PORT: PORT,
-		JWT_SECRET: JWT_SECRET,
-		JWT_SECRET_GAME: JWT_SECRET_GAME,
-		openAPISchema: openapiSwagger
+	const env: IPongServerEnv  =
+	{
+		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
+		HOST: `${variables.HOST}/game`,
+		PORT: parseInt(variables.PORT as string),
+		JWT_SECRET_GAME: variables.JWT_SECRET_GAME as string,
+		JWT_SECRET: variables.JWT_SECRET as string
 	}
+
+
+	return env
 }
