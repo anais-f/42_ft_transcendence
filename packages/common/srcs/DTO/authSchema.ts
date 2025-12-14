@@ -39,8 +39,17 @@ export const LoginGoogleSchema = z
 	})
 	.strict()
 
+export const ChangeMyPasswordSchema = z
+	.object({
+		old_password: z.string().min(8).max(128),
+		new_password: z.string().min(8).max(128),
+		twofa_code: z.string().length(6).regex(/^\d{6}$/).optional()
+	})
+	.strict()
+
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>
 export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>
 export type LogoutParamsDTO = z.infer<typeof LogoutParamsSchema>
+export type ChangeMyPasswordDTO = z.infer<typeof ChangeMyPasswordSchema>

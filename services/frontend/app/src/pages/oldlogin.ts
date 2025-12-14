@@ -7,6 +7,7 @@ import {
 	loginWithGoogleCredential
 } from '../api/authService.js'
 
+
 export const LoginPage = (): string => {
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
@@ -62,29 +63,49 @@ export const LoginPage = (): string => {
 `
 }
 
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+let clickHandler: ((e: Event) => void) | null = null
+
+/**
+ * Attach event listeners for the login page.
+ * Sets up handlers for form submissions and button clicks.
+ * Also initializes Google Auth button.
+ * Logs attachment status to the console.
+ * @returns {void}
+ */
 export function attachLoginEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	content.addEventListener('submit', async (e) => {
+	// Create and store the submit handler
+	submitHandler = async (e: Event) => {
+		e.preventDefault()
+
 		const form = (e.target as HTMLElement).closest('form[data-form]')
 		if (!form) return
 
-		e.preventDefault()
 		const formName = form.getAttribute('data-form')
 		if (formName === 'register') await handleRegister(form as HTMLFormElement)
 		if (formName === 'login') await handleLogin(form as HTMLFormElement)
-	})
+	}
 
-	content.addEventListener('click', (e) => {
+	// Create and store the click handler
+	clickHandler = (e: Event) => {
 		const target = e.target as HTMLElement
 
 		const actionButton = target.closest('[data-action]')
 		if (actionButton) {
 			const action = actionButton.getAttribute('data-action')
 		}
-	})
+	}
 
+	// Attach the handlers
+	content.addEventListener('submit', submitHandler)
+	content.addEventListener('click', clickHandler)
+
+  // Initialize Google Auth, it's not a event listener but an initialization step
+  // which load SDK google, configure button oauth and render it + callback to google
+  // this button manages its own events internally
 	initGoogleAuth().catch((err) => {
 		console.error('Failed to initialize Google Auth:', err)
 	})
@@ -92,22 +113,52 @@ export function attachLoginEvents() {
 	console.log('Login page events attached')
 }
 
+/**
+ * Detach event listeners for the login page.
+ * Removes handlers for form submissions and button clicks.
+ * Also cleans up Google Auth button.
+ * Logs detachment status to the console.
+ * @returns {void}
+ */
+export function detachLoginEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	// Remove the event listeners using stored references
+	if (submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	cleanupGoogleAuth()
+
+	console.log('Login page events detached')
+}
+
+/**
+ * Initialize Google Auth button.
+ * Loads the Google API script, configures the button, and sets up the callback.
+ * Renders the Google Sign-In button in the designated container.
+ * @returns {Promise<void>}
+ */
 export async function initGoogleAuth() {
 	const btnContainer = document.getElementById('google-btn-container')
 	if (!btnContainer) return
 
   console.log('test')
 	// Clear container before rendering to avoid duplicates
-	btnContainer.innerHTML = ''
-
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-  console.log(clientId)
+	btnContainer.replaceChildren()
+  
 	try {
 		await loadGoogleScript()
 		if (window.google) {
 			window.google.accounts.id.initialize({
-				client_id: clientId,
-					// '310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
+				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
 				callback: async (response: CredentialResponse) => {
 					console.log('Google Credential received', response)
 
@@ -137,16 +188,20 @@ export async function initGoogleAuth() {
 	}
 }
 
+/**
+ * Cleanup Google Auth button.
+ * Removes the Google Sign-In button from the container and cancels any ongoing processes.
+ * Logs cleanup status to the console.
+ * @returns {void}
+ */
 export function cleanupGoogleAuth() {
 	const btnContainer = document.getElementById('google-btn-container')
 	if (btnContainer) {
-		btnContainer.innerHTML = ''
+		btnContainer.replaceChildren()
 	}
 
-	// Cancel Google One Tap prompt if active
-	if (window.google?.accounts?.id) {
+	if (window.google?.accounts?.id)
 		window.google.accounts.id.cancel()
-	}
 
 	console.log('Google Auth cleaned up')
 }

@@ -1,4 +1,4 @@
-import { currentUser, setCurrentUser } from '../usecases/userStore.js'
+import { currentUser } from '../usecases/userStore.js'
 import { logout } from '../api/authService.js'
 
 export const HomePage = (): string => {
@@ -108,22 +108,29 @@ export const HomePage = (): string => {
 `
 }
 
+
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+
+/**
+ * Attach event listeners for the home page.
+ * Sets up handlers for button clicks such as logout and navigation to settings.
+ * Logs attachment status to the console.
+ * @returns {void}
+ */
 export function attachHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	content.addEventListener('click', async (e) => {
+	// Create and store the click handler
+	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
 		if (actionButton) {
 			const action = actionButton.getAttribute('data-action')
 
-			// Logout
 			if (action === 'logout') {
 				await logout()
-				setCurrentUser(null)
-				window.navigate('/login', true) // skipAuth = true to avoid 401
 			}
 
 			// Navigate to settings
@@ -131,9 +138,31 @@ export function attachHomeEvents() {
 				window.navigate('/settings')
 			}
 		}
-	})
+	}
+
+	// Attach the handler
+	content.addEventListener('click', clickHandler)
 
 	console.log('Home page events attached')
+}
+
+/**
+ * Detach event listeners for the home page.
+ * Removes handlers for button clicks to prevent memory leaks.
+ * Logs detachment status to the console.
+ * @returns {void}
+ */
+export function detachHomeEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	// Remove event listener using stored reference
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	console.log('Home page events detached')
 }
 
 const fr1 = {

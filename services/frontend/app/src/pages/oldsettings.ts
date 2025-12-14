@@ -1,8 +1,6 @@
 import { checkAuth } from '../api/authService'
 import { setCurrentUser, currentUser } from '../usecases/userStore'
 import { UsernameSchema } from '@common/DTO/usersSchema.js'
-import { setup2FASchema } from '@common/DTO/2faSchema.js'
-
 
 export const SettingsPage = (): string => {
 	// Use currentUser from store - will be null on public routes
@@ -102,56 +100,72 @@ export const SettingsPage = (): string => {
 `
 }
 
+// Store event handler references for cleanup
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+let clickHandler: ((e:Event) => Promise<void>) | null = null
+
 export function attachSettingsEvents() {
   const content = document.getElementById('content')
   if (!content) return
 
-  // Event listener pour les formulaires
-  content.addEventListener('submit', async (e) => {
+  // Create and store the submit handler
+  submitHandler = async (e: Event) => {
+    e.preventDefault()
     const form = (e.target as HTMLElement).closest('form[data-form]')
     if (!form) return
 
-    e.preventDefault()
     const formName = form.getAttribute('data-form')
 
-    if (formName === 'username_form') {
-      await handleUsername(form as HTMLFormElement)
-    }
-    if (formName === 'password_form') {
-      // Handle change password
-    }
-    if (formName === 'avatar_form') {
-      await handlerAvatar(form as HTMLFormElement)
-    }
-    if (formName === 'enable_2fa_form') {
-      await handleEnable2FA(form as HTMLFormElement)
-    }
-    if (formName === 'disable_2fa_form') {
-      await handleDisable2FA(form as HTMLFormElement)
-    }
-  })
-
-  // Event listener pour le bouton "Generate QR Code"
-  const generateQRBtn = document.getElementById('generate_qr_btn')
-  if (generateQRBtn) {
-    generateQRBtn.addEventListener('click', async () => {
-      await handleGenerateQRCode()
-    })
+    if (formName === 'username_form') await handleUsername(form as HTMLFormElement)
+    if (formName === 'password_form') await handleChangePassword(form as HTMLFormElement)
+    if (formName === 'avatar_form') await handlerAvatar(form as HTMLFormElement)
+    if (formName === 'enable_2fa_form') await handleEnable2FA(form as HTMLFormElement)
+    if (formName === 'disable_2fa_form') await handleDisable2FA(form as HTMLFormElement)
   }
 
+  clickHandler = async (e: Event) => {
+    const target = e.target as HTMLElement
+    if (target?.id === 'generate_qr_btn') {
+      e.preventDefault()
+      await handleGenerateQRCode()
+    }
+  }
+
+  // Attach handlers
+  content.addEventListener('submit', submitHandler)
+  content.addEventListener('click', clickHandler)
+
+
   console.log('Settings page events attached')
+}
+
+export function detachSettingsEvents() {
+  const content = document.getElementById('content')
+
+  // Remove submit handler
+  if (content && submitHandler) {
+    content.removeEventListener('submit', submitHandler)
+    submitHandler = null
+  }
+
+  // Remove click handler
+  if (content && clickHandler) {
+    content.removeEventListener('click', clickHandler)
+    clickHandler = null
+  }
+
+  console.log('Settings page events detached')
 }
 
 export async function handleUsername(form: HTMLFormElement) {
   const formData = new FormData(form)
   const newUsername = formData.get('change_username') as string
 
-  // Validation avec Zod
+  // Validation with Zod
   const validation = UsernameSchema.safeParse(newUsername)
   if (!validation.success) {
     console.log('Invalid username:', validation.error.errors)
     return
-    // afficher les erreurs en messages frontend
   }
 
   const validatedUsername = validation.data
@@ -169,13 +183,14 @@ export async function handleUsername(form: HTMLFormElement) {
 
     const result = await res.json()
     if (!res.ok) {
+      alert(result.message || 'Failed to change username. Please try again.')
       console.error('Failed to change username:', res.status, result)
       return
-      // faire if ou switch case avec les erreurs possibles
+      // TODO : manage different error cases
     }
     console.log('Username changed successfully:', result)
 
-    // Synchroniser l'état utilisateur avec le backend
+    // Synchronize user state with backend
     const updatedUser = await checkAuth()
     if (!updatedUser) {
       console.error('Failed to fetch updated user data after username change.')
@@ -201,25 +216,25 @@ export async function handlerAvatar(form: HTMLFormElement) {
     return
   }
 
-  // verif taille et type de fichier si besoin
+  // TODO: check file type and size before uploading
 
   try {
-    // Plus besoin de renommer ! Le FormData contient déjà 'avatar'
     const res = await fetch('/users/api/users/me/avatar', {
       method: 'PATCH',
       credentials: 'include',
-      body: formData // Utilise directement formData sans modification
+      body: formData
     })
 
     const result = await res.json()
     if (!res.ok) {
+      alert(result.message || 'Failed to get avatar.')
       console.error('Failed to upload avatar:', res.status, result)
       return
-      // faire if ou switch case avec les erreurs possibles
+      // TODO : manage different error cases
     }
     console.log('Avatar uploaded successfully:', result)
 
-    // Synchroniser l'état utilisateur avec le backend
+    // Synchronize user state with backend
     const updatedUser = await checkAuth()
     if (!updatedUser) {
       console.error('Failed to fetch updated user data after avatar upload.')
@@ -236,28 +251,70 @@ export async function handlerAvatar(form: HTMLFormElement) {
   }
 }
 
-// ============================================
-// 2FA HANDLERS - Using Auth Service Routes
-// ============================================
+export async function handleChangePassword(form: HTMLFormElement) {
+  const formData = new FormData(form)
+  const oldPassword = formData.get('old_password') as string
+  const newPassword = formData.get('new_password') as string
+  const confirmNewPassword = formData.get('confirm_new_password') as string
+  const twofaCode = formData.get('password_2fa_code') as string | null
+
+  if (newPassword !== confirmNewPassword) {
+    alert('New password and confirmation do not match.')
+    return
+  }
+
+  //TODO : check password validation rules (length, complexity, etc.)
+}
+
+// 2FA HANDLERS
 
 /**
- * Génère le QR code pour l'activation de la 2FA
- * Utilise: POST /auth/api/2fa/setup (JWT auth via cookie)
+ * Verify the current user's password using JWT
+ * @param password - The password to verify
+ * @returns true if password is valid, false otherwise
+ */
+async function verifyCurrentUserPassword(password: string): Promise<boolean> {
+  try {
+    const passwordRes = await fetch('/auth/api/verify-my-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({ password })
+    })
+
+    const passwordResult = await passwordRes.json()
+    if (!passwordRes.ok || !passwordResult.valid) {
+      console.error('Password verification failed:', passwordResult)
+      alert('Invalid password. Please try again.')
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error verifying password:', error)
+    alert('An error occurred while verifying password.')
+    return false
+  }
+}
+
+/**
+ * Generate the 2FA QR code and otpauth_url
+ * Use POST /auth/api/2fa/setup
  */
 async function handleGenerateQRCode() {
   try {
     console.log('Generating 2FA QR code...')
 
-    // Vérifier que l'utilisateur est connecté
     if (!currentUser) {
       alert('User not authenticated')
       return
     }
 
-    // Auth service route - uses JWT from cookie, no body needed
     const res = await fetch('/auth/api/2fa/setup', {
       method: 'POST',
-      credentials: 'include' // Sends auth_token cookie
+      credentials: 'include'
     })
 
     if (!res.ok) {
@@ -268,16 +325,16 @@ async function handleGenerateQRCode() {
     }
 
     const data = await res.json()
-    // Format reçu: { otpauth_url: string, qr_base64: string, expires_at: string }
+    // Format received: { otpauth_url: string, qr_base64: string, expires_at: string }
     console.log('QR code generated successfully:', data)
 
-    // Afficher le QR code dans le container
+    // Display the QR code and otpauth_url in the UI
     const qrContainer = document.getElementById('qr_code_container')
     const generateStep = document.getElementById('generate_qr_step')
     const verifyStep = document.getElementById('verify_2fa_step')
 
     if (qrContainer && generateStep && verifyStep) {
-      // Insérer le QR code (qr_base64 est déjà une data URL complète)
+      // Insert QR code and URL into the container
       qrContainer.innerHTML = `
         <div class="flex flex-col gap-2 items-center w-full">
           <p class="text-sm">Scan this QR code with Google Authenticator:</p>
@@ -294,7 +351,7 @@ async function handleGenerateQRCode() {
         </div>
       `
 
-      // Cacher le bouton Generate, afficher le formulaire de vérification
+      // Hide the button step, show the verification step
       generateStep.style.display = 'none'
       verifyStep.style.display = 'block'
     }
@@ -326,21 +383,7 @@ async function handleEnable2FA(form: HTMLFormElement) : Promise<void> {
     console.log('Step 1: Verifying password...')
 
     // STEP 1: Verify password using JWT
-    const passwordRes = await fetch('/auth/api/verify-my-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        password
-      })
-    })
-
-    const passwordResult = await passwordRes.json()
-    if (!passwordRes.ok || !passwordResult.valid) {
-      console.error('Password verification failed:', passwordResult)
-      alert('Invalid password. Please try again.')
+    if (!(await verifyCurrentUserPassword(password))) {
       return
     }
 
@@ -387,9 +430,11 @@ async function handleEnable2FA(form: HTMLFormElement) : Promise<void> {
 }
 
 /**
- * Désactive la 2FA
+ * Disable the 2FA after verifying the code
  * 2-step verification: 1) Verify password 2) Disable 2FA with code
  * Utilise: POST /auth/api/verify-my-password + DELETE /auth/api/2fa/disable
+ * @param form
+ * @returns Promise<void>
  */
 async function handleDisable2FA(form: HTMLFormElement) {
   const formData = new FormData(form)
@@ -404,25 +449,10 @@ async function handleDisable2FA(form: HTMLFormElement) {
   try {
     console.log('Step 1: Verifying password...')
 
-    // STEP 1: Verify password using JWT (no API key needed)
-    const passwordRes = await fetch('/auth/api/verify-my-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        password
-      })
-    })
-
-    const passwordResult = await passwordRes.json()
-    if (!passwordRes.ok || !passwordResult.valid) {
-      console.error('Password verification failed:', passwordResult)
-      alert('Invalid password. Please try again.')
+    // STEP 1: Verify password using JWT
+    if (!(await verifyCurrentUserPassword(password))) {
       return
     }
-
 
     console.log('Step 2: Disabling 2FA...')
 
@@ -432,7 +462,7 @@ async function handleDisable2FA(form: HTMLFormElement) {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include', // Sends auth_token cookie
+      credentials: 'include',
       body: JSON.stringify({
         twofa_code: code
       })

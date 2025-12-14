@@ -45,8 +45,6 @@ export async function authRoutes(app: FastifyInstance) {
 	app.get('/api/admin/validate', validateAdminController)
 	app.post('/api/logout', logoutController)
 
-
-	// Verify current user's password using JWT (no API key needed)
 	app.post(
 		'/api/verify-my-password',
 		{

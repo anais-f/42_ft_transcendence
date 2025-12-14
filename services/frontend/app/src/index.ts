@@ -22,10 +22,17 @@ window.addEventListener('DOMContentLoaded', () => {
 	appRouter.start()
 })
 
-
-/* TODO list:
-- Implement error handling for client
-- Add user feedback for loading states
-- Add primary security measures in API calls
-- change 'alert' pop-ups to modal dialogs - looking fir snackbars or similar
+/* TODO FRONTEND IMPROVEMENTS LIST
+*
+*
+* - review QRcode and sanitization data before innerHTML
+* - sanitize HTML before rendering user-controlled data
+* - review all alert() usage and replace with better UX (toasts/modals) (snackbars ?)
+* - review error handling and add more specific messages
+* - review form validation and improve user feedback
+* - remove inline event handlers to comply with CSP -> see to replace onclick with addEventListener ?
+* - centralize event attachment/detachment to reduce duplication
+* - centralize error handling logic
+* - validation data in front before sending to backend
  */
+

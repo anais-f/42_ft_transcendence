@@ -1,5 +1,5 @@
 import { IPrivateUser } from '@ft_transcendence/common'
-import createError from 'http-errors'
+import { setCurrentUser } from '../usecases/userStore.js'
 
 /**
  * Check if user is authenticated by calling backend
@@ -24,21 +24,21 @@ export async function checkAuth(): Promise<IPrivateUser | null> {
 }
 
 /**
- * Logout user
+ * Logout user, clear user state and redirect to login page
  * JWT cookie will be cleared by backend
- * @returns Promise that resolves to true if logout successful, false otherwise
+ * @returns Promise that resolves when logout is complete
  */
-export async function logout(): Promise<boolean> {
+export async function logout(): Promise<void> {
 	try {
-		const response = await fetch('/auth/api/logout', {
+		await fetch('/auth/api/logout', {
 			method: 'POST',
 			credentials: 'include'
 		})
-
-		return response.ok
 	} catch (error) {
 		console.error('Logout failed:', error)
-		return false
+	} finally {
+		setCurrentUser(null)
+		window.navigate('/login', true) // skipAuth = true to avoid 401
 	}
 }
 
@@ -56,11 +56,6 @@ export const loadGoogleScript = (nonce?: string): Promise<void> => {
 
 		// script creation
 		const script = document.createElement('script')
-		// const effectiveNonce = nonce || (window as any).__cspNonce
-		// if (effectiveNonce) {
-		//   script.setAttribute('nonce', effectiveNonce)
-		//   ;(script as any).nonce = effectiveNonce
-		// }
 
 		// attributes
 		script.src = 'https://accounts.google.com/gsi/client'
@@ -83,7 +78,6 @@ export const loadGoogleScript = (nonce?: string): Promise<void> => {
  * @param credential
  * @returns void
  */
-
 export const loginWithGoogleCredential = async (
 	credential: string
 ): Promise<void> => {
