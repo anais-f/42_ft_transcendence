@@ -33,8 +33,8 @@ export class GameEngine {
 		shape: new Circle(new Vector2(), 0.8),
 		velo: this.getRandomVelo()
 	}
-	private _pauseTicksRemaining: number = 0
 	private readonly PAUSE_TICKS_AFTER_POINT = 120
+	private _pauseTicksRemaining: number = this.PAUSE_TICKS_AFTER_POINT
 	public startTime
 
 	public constructor(
