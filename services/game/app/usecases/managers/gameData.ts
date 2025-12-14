@@ -23,6 +23,7 @@ export interface GameData {
 // individial game
 export const games = new Map<string, GameData>()
 export const playerToGame = new Map<number, string>()
+export const busyPlayers = new Set<number>()
 
 // tournament
 export const tournaments = new Map<string, Tournament>()

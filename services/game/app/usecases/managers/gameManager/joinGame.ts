@@ -1,4 +1,4 @@
-import { games, playerToGame } from '../gameData.js'
+import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 
 export function joinGame(gameCode: string, pID: number) {
@@ -7,23 +7,23 @@ export function joinGame(gameCode: string, pID: number) {
 		throw new Error('unknown game code')
 	}
 
-	if (gameData.p1.id === pID) {
-		if (gameData.p1.ws) {
-			throw new Error('player is already in a game')
-		}
+	if (busyPlayers.has(pID)) {
+		throw new Error('player is already in a game')
+	}
+
+	if (gameData.p1.id === pID || gameData.p2?.id === pID) {
+		busyPlayers.add(pID)
 		return
 	}
 
-	if (gameData.p2?.id === pID) {
-		if (gameData.p2.ws) {
-			throw new Error('player is already in a game')
-		}
-		return
+	if (playerToGame.has(pID)) {
+		throw new Error('player is already in a game')
 	}
 
 	if (!gameData.p2) {
 		gameData.p2 = { id: pID, ws: null }
 		playerToGame.set(pID, gameCode)
+		busyPlayers.add(pID)
 		try {
 			startTimeOut(gameCode, 20000)
 		} catch (_) {

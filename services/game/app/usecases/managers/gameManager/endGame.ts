@@ -1,5 +1,5 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
-import { games, playerToGame } from '../gameData.js'
+import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
 
 export function endGame(code: string) {
@@ -27,5 +27,7 @@ export function endGame(code: string) {
 
 	playerToGame.delete(gameData.p1.id)
 	playerToGame.delete(gameData.p2.id)
+	busyPlayers.delete(gameData.p1.id)
+	busyPlayers.delete(gameData.p2.id)
 	games.delete(code)
 }

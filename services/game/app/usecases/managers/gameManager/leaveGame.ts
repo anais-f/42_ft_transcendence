@@ -1,6 +1,6 @@
 import { GameState } from '@ft_transcendence/pong-shared'
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
-import { games, GameData, playerToGame } from '../gameData.js'
+import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
 
 export function leaveGame(code: string) {
@@ -19,10 +19,12 @@ export function leaveGame(code: string) {
 
 	if (gameData.p1) {
 		playerToGame.delete(gameData.p1.id)
+		busyPlayers.delete(gameData.p1.id)
 	}
 
 	if (gameData.p2) {
 		playerToGame.delete(gameData.p2.id)
+		busyPlayers.delete(gameData.p2.id)
 	}
 	games.delete(code)
 }
