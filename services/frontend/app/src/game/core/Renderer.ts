@@ -116,7 +116,7 @@ class Renderer {
 		ctx.fill()
 
 		if (this.countdown !== null && this.countdown > 0) {
-			ctx.fillStyle = COUNTDOWN_COLOR
+			ctx.strokeStyle = COUNTDOWN_COLOR
 			ctx.font = COUNTDOWN_FONT
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
