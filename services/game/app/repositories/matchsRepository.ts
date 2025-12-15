@@ -41,7 +41,9 @@ export function saveMatchToHistory(
 	return matchId
 }
 
-export function getMatchHistoryByPlayerId(targetUserId: number): MatchHistoryItemDTO[] {
+export function getMatchHistoryByPlayerId(
+	targetUserId: number
+): MatchHistoryItemDTO[] {
 	const db = getDb()
 	const matches = db
 		.prepare(

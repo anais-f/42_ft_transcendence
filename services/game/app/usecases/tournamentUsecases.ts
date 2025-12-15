@@ -218,7 +218,9 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 
 let nextTournamentId = 1
 
-export function createTournament(request: FastifyRequest): CreateTournamentResponseDTO {
+export function createTournament(
+	request: FastifyRequest
+): CreateTournamentResponseDTO {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {

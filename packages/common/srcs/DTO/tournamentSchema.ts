@@ -1,8 +1,16 @@
 import { z } from 'zod'
 
-export const MatchStatusSchema = z.enum(['ongoing', 'completed', 'waiting_for_players'])
+export const MatchStatusSchema = z.enum([
+	'ongoing',
+	'completed',
+	'waiting_for_players'
+])
 
-export const TournamentStatusSchema = z.enum(['pending', 'ongoing', 'completed'])
+export const TournamentStatusSchema = z.enum([
+	'pending',
+	'ongoing',
+	'completed'
+])
 
 export const MatchTournamentSchema = z.object({
 	previousMatchId1: z.number().optional(),
@@ -49,8 +57,16 @@ export type MatchStatus = z.infer<typeof MatchStatusSchema>
 export type TournamentStatus = z.infer<typeof TournamentStatusSchema>
 export type MatchTournamentDTO = z.infer<typeof MatchTournamentSchema>
 export type TournamentDTO = z.infer<typeof TournamentSchema>
-export type GetTournamentResponseDTO = z.infer<typeof GetTournamentResponseSchema>
-export type CreateTournamentResponseDTO = z.infer<typeof CreateTournamentResponseSchema>
-export type JoinTournamentResponseDTO = z.infer<typeof JoinTournamentResponseSchema>
-export type CreateTournamentRequestDTO = z.infer<typeof CreateTournamentRequestSchema>
+export type GetTournamentResponseDTO = z.infer<
+	typeof GetTournamentResponseSchema
+>
+export type CreateTournamentResponseDTO = z.infer<
+	typeof CreateTournamentResponseSchema
+>
+export type JoinTournamentResponseDTO = z.infer<
+	typeof JoinTournamentResponseSchema
+>
+export type CreateTournamentRequestDTO = z.infer<
+	typeof CreateTournamentRequestSchema
+>
 export type TournamentCodeParamDTO = z.infer<typeof TournamentCodeParamSchema>
