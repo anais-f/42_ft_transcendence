@@ -1,4 +1,5 @@
 import { getDb } from '../database/connection.js'
+import type { MatchHistoryItemDTO } from '@ft_transcendence/common'
 
 export function saveMatchToHistory(
 	player1Id: number,
@@ -40,19 +41,31 @@ export function saveMatchToHistory(
 	return matchId
 }
 
-export function getMatchHistoryByPlayerId(targetUserId: number) {
+export function getMatchHistoryByPlayerId(targetUserId: number): MatchHistoryItemDTO[] {
 	const db = getDb()
 	const matches = db
 		.prepare(
 			`
-		SELECT mh.id_match, mh.winner_id, mh.played_at, mp.player_id, mp.score
+		SELECT 
+			mh.id_match,
+			mh.winner_id,
+			mh.played_at,
+			mh.id_tournament,
+			mh.round,
+			mh.match_number,
+			mp1.player_id as player1_id,
+			mp1.score as player1_score,
+			mp2.player_id as player2_id,
+			mp2.score as player2_score
 		FROM match_history mh
-		JOIN match_player mp ON mh.id_match = mp.id_match
-		WHERE mp.player_id = ?
+		JOIN match_player mp1 ON mh.id_match = mp1.id_match
+		JOIN match_player mp2 ON mh.id_match = mp2.id_match
+		WHERE (mp1.player_id = ? OR mp2.player_id = ?)
+		  AND mp1.player_id < mp2.player_id
 		ORDER BY mh.played_at DESC
 		LIMIT 20
 	`
 		)
-		.all(targetUserId)
+		.all(targetUserId, targetUserId) as MatchHistoryItemDTO[]
 	return matches
 }
