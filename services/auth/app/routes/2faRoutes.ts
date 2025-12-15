@@ -12,7 +12,6 @@ import {
 	twofaCodeSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
-import { Schema } from 'zod'
 
 export async function twoFARoutes(app: FastifyInstance) {
 	app.post(
