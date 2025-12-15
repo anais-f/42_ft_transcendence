@@ -6,7 +6,7 @@ import {
 	validateUsername,
 	validatePassword,
 	handleAuthSuccess
-} from '../utils/validation.js'
+} from '../utils/userValidation.js'
 
 /**
  * Handler for the registration form

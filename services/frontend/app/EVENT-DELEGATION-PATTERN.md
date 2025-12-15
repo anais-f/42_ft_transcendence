@@ -419,8 +419,6 @@ export function attachMyPageEvents() {
 }
 ```
 
-
-
 ---
 
 ## Project Architecture
@@ -475,7 +473,7 @@ src/
 │       See: api/README.md
 │
 └── utils/
-    └── validation.ts
+    └── userValidation.ts
         ✅ Role: Reusable validation functions
         - validateUsername(username): boolean
         - validatePassword(password): boolean
@@ -489,6 +487,7 @@ User Action → Event Handler → API/Usecase → Update UI
 ```
 
 Example:
+
 ```
 1. User clicks "Login" button
 2. attachLoginEvents() catches submit event (event delegation)

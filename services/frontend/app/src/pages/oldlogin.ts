@@ -7,6 +7,7 @@ import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser } from '../usecases/userStore.js'
 import { CredentialResponse } from '../types/google-type.js'
 import { loadGoogleScript, loginWithGoogleCredential } from '../api/authApi.js'
+import { notyfGlobal as notyf } from '../utils/notyf.js'
 
 export const LoginPage = (): string => {
 	return /*html*/ `
@@ -173,8 +174,6 @@ export async function initGoogleAuth() {
 			window.google.accounts.id.initialize({
 				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
 				callback: async (response: CredentialResponse) => {
-					console.log('Google Credential received', response)
-
 					try {
 						await loginWithGoogleCredential(response.credential)
 
@@ -183,7 +182,7 @@ export async function initGoogleAuth() {
 						await window.navigate('/', true)
 					} catch (err) {
 						console.error('Google Login Error:', err)
-						alert('Connection error with Google.')
+						notyf.error('Connection error with Google')
 					}
 				}
 			})
@@ -194,7 +193,6 @@ export async function initGoogleAuth() {
 				text: 'continue_with',
 				width: '300'
 			})
-			console.log('Google button rendered')
 		}
 	} catch (e) {
 		console.error('Impossible to load Google API script', e)

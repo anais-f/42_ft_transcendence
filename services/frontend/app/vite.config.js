@@ -13,7 +13,8 @@ export default defineConfig({
 	},
   resolve: {
     alias: {
-      '@common': path.resolve(__dirname, '../../../packages/common/dist')
+      '@common': path.resolve(__dirname, '../../../packages/common/dist'),
+      '@pong-shared': path.resolve(__dirname, '../../../packages/pong-shared/dist')
     }
   }
 })

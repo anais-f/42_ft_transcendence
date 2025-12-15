@@ -23,6 +23,7 @@
 		"build:2fa": "npm run build --workspace=services/2fa/app",
 		"build:game": "npm run build --workspace=services/game/app",
 		"build:social": "npm run build --workspace=services/social/app",
+    "build:frontend": "npm run build --workspace=services/frontend/app",
 		"lint": "eslint 'packages/**/*.ts'",
 		"format": "prettier --write '**/*.{ts,js,json,css,html,md,yml,yaml}'",
 		"format:check": "prettier --check '**/*.{ts,js,json,css,html,md,yml,yaml}'"

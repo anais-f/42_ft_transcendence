@@ -9,7 +9,7 @@ import {
 	validatePassword,
 	validateAvatarFile,
 	syncCurrentUser
-} from '../utils/validation.js'
+} from '../utils/userValidation.js'
 
 /**
  * Handler for changing username
@@ -106,6 +106,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
 		return
 	}
 
+	// TODO : check if the backend already does this
 	if (oldPassword === newPassword) {
 		notyf.error('New password must be different from the old password')
 		return
