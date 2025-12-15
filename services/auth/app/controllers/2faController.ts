@@ -1,8 +1,13 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
 import { verifyToken } from '../utils/jwt.js'
-import { Enable2FAResponseDTO, Status2FAResponseDTO, twofaCodeSchema, Verify2FADTO, Verify2FALoginResponseDTO } from '@ft_transcendence/common'
-import { getEnv } from '../env/verifEnv.js'
+import {
+	Enable2FAResponseDTO,
+	Status2FAResponseDTO,
+	twofaCodeSchema,
+	Verify2FADTO,
+	Verify2FALoginResponseDTO
+} from '@ft_transcendence/common'
 import {
 	enable2FA,
 	verify2FASetup,
@@ -10,6 +15,7 @@ import {
 	disable2FA,
 	status2FA
 } from '../usecases/twofa.js'
+import { env } from '../index.js'
 
 export async function enable2faController(
 	req: FastifyRequest,
@@ -22,7 +28,10 @@ export async function enable2faController(
 	if (!payload || !payload.user_id)
 		throw createHttpError.Unauthorized('Invalid cookieToken')
 
-	const result: Enable2FAResponseDTO = await enable2FA(payload.user_id, payload.login)
+	const result: Enable2FAResponseDTO = await enable2FA(
+		payload.user_id,
+		payload.login
+	)
 
 	return reply.code(200).send(result)
 }
@@ -70,7 +79,6 @@ export async function verify2faLoginController(
 		twofa_code
 	)
 
-	const env = getEnv()
 	reply.setCookie('auth_token', result.auth_token, {
 		httpOnly: true,
 		sameSite: 'strict',
