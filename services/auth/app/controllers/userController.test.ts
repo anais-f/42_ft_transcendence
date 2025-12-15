@@ -85,7 +85,10 @@ describe('userController getPublicUserController', () => {
 	test('returns user when found', async () => {
 		findPublicUserByIdMock.mockReturnValue({ user_id: 5, login: 'boby' })
 		const reply = buildReply()
-		const result = await getPublicUserController({ params: { id: '5' } } as any, reply)
+		const result = await getPublicUserController(
+			{ params: { id: '5' } } as any,
+			reply
+		)
 		expect(result).toEqual({ user_id: 5, login: 'boby' })
 	})
 })
