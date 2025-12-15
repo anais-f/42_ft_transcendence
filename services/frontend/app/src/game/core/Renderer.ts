@@ -120,7 +120,7 @@ class Renderer {
 			ctx.font = COUNTDOWN_FONT
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
-			ctx.fillText(this.countdown.toString(), width / 2, height / 3)
+			ctx.strokeText(this.countdown.toString(), width / 2, height / 3)
 		}
 	}
 
