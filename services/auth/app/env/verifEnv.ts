@@ -8,7 +8,7 @@ export interface IAuthEnv {
 	NODE_ENV: string
 	LOGIN_ADMIN: string
 	PASSWORD_ADMIN: string
-	GOOGLE_CLIENT_ID: string | null
+	GOOGLE_CLIENT_ID: string
 	TWOFA_SERVICE_URL: string
 	TWOFA_ISSUER: string
 	INTERNAL_API_SECRET: string
@@ -33,7 +33,6 @@ export function checkEnv(): IAuthEnv {
 		USERS_SERVICE_URL: process.env.USERS_SERVICE_URL
 	}
 
-	// Check required variables (except GOOGLE_CLIENT_ID which is optional)
 	const required = [
 		'DTO_OPENAPI_FILE',
 		'HOST',
@@ -44,7 +43,8 @@ export function checkEnv(): IAuthEnv {
 		'PASSWORD_ADMIN',
 		'TWOFA_SERVICE_URL',
 		'INTERNAL_API_SECRET',
-		'USERS_SERVICE_URL'
+		'USERS_SERVICE_URL',
+		'GOOGLE_CLIENT_ID'
 	]
 
 	for (const key of required) {
@@ -63,7 +63,7 @@ export function checkEnv(): IAuthEnv {
 		NODE_ENV: variables.NODE_ENV as string,
 		LOGIN_ADMIN: variables.LOGIN_ADMIN as string,
 		PASSWORD_ADMIN: variables.PASSWORD_ADMIN as string,
-		GOOGLE_CLIENT_ID: variables.GOOGLE_CLIENT_ID,
+		GOOGLE_CLIENT_ID: variables.GOOGLE_CLIENT_ID as string,
 		TWOFA_SERVICE_URL: variables.TWOFA_SERVICE_URL as string,
 		TWOFA_ISSUER: variables.TWOFA_ISSUER as string,
 		INTERNAL_API_SECRET: variables.INTERNAL_API_SECRET as string,
