@@ -20,7 +20,7 @@ import { initializeEnv, getEnv } from './env/verifEnv.js'
 
 // Initialize and validate environment variables
 initializeEnv()
-const env = getEnv()
+export const env = getEnv()
 
 const app = Fastify({
 	logger: true
