@@ -16,15 +16,14 @@ export function checkEnv(): IGameEnv {
 		JWT_SECRET_GAME: process.env.JWT_SECRET_GAME,
 		JWT_SECRET: process.env.JWT_SECRET
 	}
-	
+
 	for (const [key, value] of Object.entries(variables)) {
 		if (value === undefined || value === '') {
 			throw new Error(`${key} is missing or invalid`)
 		}
 	}
 
-	const env: IGameEnv  =
-	{
+	const env: IGameEnv = {
 		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
 		HOST: `${variables.HOST}/game`,
 		PORT: parseInt(variables.PORT as string),

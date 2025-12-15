@@ -22,7 +22,6 @@ export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
 }).withTypeProvider<ZodTypeProvider>()
 
-
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
 	secret: env.JWT_SECRET,
@@ -49,7 +48,9 @@ app.register(Swagger as any, {
 			title: 'API for 2FA Service',
 			version: '1.0.0'
 		},
-		servers: [{ url: `http://localhost:8080/2fa`, description: 'Local server' }],
+		servers: [
+			{ url: `http://localhost:8080/2fa`, description: 'Local server' }
+		],
 		components: env.openAPISchema.components
 	},
 	transform: jsonSchemaTransform
@@ -61,9 +62,7 @@ const start = async () => {
 			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		app.log.info(
-			`2FA Service listening on http://localhost:${env.PORT}`
-		)
+		app.log.info(`2FA Service listening on http://localhost:${env.PORT}`)
 	} catch (err) {
 		app.log.error(err)
 		process.exit(1)
