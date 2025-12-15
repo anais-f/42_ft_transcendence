@@ -6,7 +6,11 @@ import {
 	disable2faController,
 	status2faController
 } from '../controllers/2faController.js'
-import { Enable2FAResponseSchema, status2FAResponseSchema, twofaCodeSchema } from '@ft_transcendence/common'
+import {
+	Enable2FAResponseSchema,
+	status2FAResponseSchema,
+	twofaCodeSchema
+} from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { Schema } from 'zod'
 
@@ -26,20 +30,20 @@ export async function twoFARoutes(app: FastifyInstance) {
 	app.post(
 		'/api/2fa/verify-setup',
 		{
-			schema: { body: twofaCodeSchema},
+			schema: { body: twofaCodeSchema },
 			preHandler: jwtAuthMiddleware
 		},
 		verify2faSetupController
 	)
 	app.post(
 		'/api/2fa/verify-login',
-		{ 
-			schema: { 
+		{
+			schema: {
 				body: twofaCodeSchema,
-				response: { 
+				response: {
 					200: Enable2FAResponseSchema
 				}
-			} 
+			}
 		},
 		verify2faLoginController
 	)
@@ -50,7 +54,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 	)
 	app.get(
 		'/api/2fa/status',
-		{ 
+		{
 			schema: {
 				response: {
 					200: status2FAResponseSchema
