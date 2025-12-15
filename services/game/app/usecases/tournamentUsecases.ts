@@ -1,7 +1,10 @@
 import {
 	CodeParamSchema,
 	Tournament,
-	CreateTournamentSchema
+	CreateTournamentSchema,
+	TournamentDTO,
+	CreateTournamentResponseDTO,
+	MatchTournament
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 import { FastifyRequest } from 'fastify'
@@ -12,7 +15,6 @@ import {
 	usersInTournaments
 } from './managers/gameData.js'
 import { requestGame } from './managers/gameManager/requestGame.js'
-import { MatchTournament } from '@ft_transcendence/common'
 import { saveMatch } from './matchUsecases.js'
 
 function randomAlphaNumeric(length: number): string {
@@ -185,7 +187,7 @@ export function deleteTournament(tournamentCode: string) {
 	tournaments.delete(tournamentCode)
 }
 
-export function joinTournament(request: FastifyRequest): Tournament {
+export function joinTournament(request: FastifyRequest): TournamentDTO {
 	const tournamentCode = CodeParamSchema.parse(request.params)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -216,7 +218,7 @@ export function joinTournament(request: FastifyRequest): Tournament {
 
 let nextTournamentId = 1
 
-export function createTournament(request: FastifyRequest) {
+export function createTournament(request: FastifyRequest): CreateTournamentResponseDTO {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -232,17 +234,18 @@ export function createTournament(request: FastifyRequest) {
 		throw createHttpError.BadRequest(parsed.error.message)
 	}
 	const invitCode = createInviteCode('T')
-	tournaments.set(invitCode, {
-		id: nextTournamentId,
+	const tournament: TournamentDTO = {
+		id: nextTournamentId++,
 		status: 'pending',
 		maxParticipants: parsed.data.numberOfPlayers,
 		participants: [userId],
 		matchs: []
-	})
-	return { code: invitCode, tournament: tournaments.get(invitCode) }
+	}
+	tournaments.set(invitCode, tournament)
+	return { code: invitCode, tournament }
 }
 
-export function getTournament(request: FastifyRequest): Tournament {
+export function getTournament(request: FastifyRequest): TournamentDTO {
 	const userId = request.user.user_id
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
