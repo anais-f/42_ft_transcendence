@@ -4,13 +4,13 @@ import {
 	listPublicUsers,
 	findPublicUserById,
 	deleteUserById,
-  findUserById
+	findUserById
 } from '../repositories/userRepository.js'
 import {
 	PublicUserAuthSchema,
 	PublicUserListAuthSchema,
 	IdParamSchema,
-  PasswordBodySchema
+	PasswordBodySchema
 } from '@ft_transcendence/common'
 import { changeMyPassword } from '../usecases/changeMyPassword.js'
 import { verifyPassword } from '../utils/password.js'
@@ -68,24 +68,24 @@ export async function patchUserPassword(
  * @param reply
  */
 export async function verifyMyPasswordController(
-    request: FastifyRequest,
-    reply: FastifyReply
+	request: FastifyRequest,
+	reply: FastifyReply
 ) {
-  const userId = request.user?.user_id
-  if (!userId) throw createHttpError.Unauthorized('Invalid token')
+	const userId = request.user?.user_id
+	if (!userId) throw createHttpError.Unauthorized('Invalid token')
 
-  const parsed = PasswordBodySchema.safeParse(request.body)
-  if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
+	const parsed = PasswordBodySchema.safeParse(request.body)
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
-  const { password } = parsed.data
+	const { password } = parsed.data
 
-  const user = findUserById(userId)
-  if (!user || !user.password) {
-    throw createHttpError.NotFound('User not found')
-  }
+	const user = findUserById(userId)
+	if (!user || !user.password) {
+		throw createHttpError.NotFound('User not found')
+	}
 
-  const ok = await verifyPassword(user.password, password)
-  if (!ok) throw createHttpError.Unauthorized('Invalid password')
+	const ok = await verifyPassword(user.password, password)
+	if (!ok) throw createHttpError.Unauthorized('Invalid password')
 
-  return reply.send({ success: true })
+	return reply.send({ success: true })
 }

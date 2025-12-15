@@ -4,11 +4,9 @@
 		"outDir": "dist",
 		"rootDir": ".",
 		"moduleResolution": "nodenext",
-    "paths": {
-      "@common/*": [
-        "../../../packages/common/dist/*"
-      ]
-    }
+		"paths": {
+			"@common/*": ["../../../packages/common/dist/*"]
+		}
 	},
 	"ts-node": {
 		"esm": true

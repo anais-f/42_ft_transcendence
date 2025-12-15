@@ -1,12 +1,12 @@
-import { handleLogin, handleRegister, handle2FASubmit } from '../events/loginPageHandlers.js'
+import {
+	handleLogin,
+	handleRegister,
+	handle2FASubmit
+} from '../events/loginPageHandlers.js'
 import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser } from '../usecases/userStore.js'
 import { CredentialResponse } from '../types/google-type.js'
-import {
-	loadGoogleScript,
-	loginWithGoogleCredential
-} from '../api/authApi.js'
-
+import { loadGoogleScript, loginWithGoogleCredential } from '../api/authApi.js'
 
 export const LoginPage = (): string => {
 	return /*html*/ `
@@ -166,7 +166,7 @@ export async function initGoogleAuth() {
 	if (!btnContainer) return
 
 	btnContainer.replaceChildren()
-  
+
 	try {
 		await loadGoogleScript()
 		if (window.google) {
@@ -213,8 +213,7 @@ export function cleanupGoogleAuth() {
 		btnContainer.replaceChildren()
 	}
 
-	if (window.google?.accounts?.id)
-		window.google.accounts.id.cancel()
+	if (window.google?.accounts?.id) window.google.accounts.id.cancel()
 
 	console.log('Google Auth cleaned up')
 }
@@ -223,13 +222,13 @@ export function cleanupGoogleAuth() {
  * Switch from login form to 2FA form
  */
 export function switchTo2FAForm() {
-  const loginForm = document.getElementById('login_form')
-  loginForm?.classList.add('hidden')
+	const loginForm = document.getElementById('login_form')
+	loginForm?.classList.add('hidden')
 
-  const twoFAForm = document.getElementById('2fa_form')
-  twoFAForm?.classList.remove('hidden')
-  twoFAForm?.classList.add('flex')
+	const twoFAForm = document.getElementById('2fa_form')
+	twoFAForm?.classList.remove('hidden')
+	twoFAForm?.classList.add('flex')
 
-  const codeInput = document.getElementById('2fa_code') as HTMLInputElement
-  codeInput?.focus()
+	const codeInput = document.getElementById('2fa_code') as HTMLInputElement
+	codeInput?.focus()
 }

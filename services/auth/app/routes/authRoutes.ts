@@ -43,11 +43,7 @@ export async function authRoutes(app: FastifyInstance) {
 	)
 	app.get('/api/admin/validate', validateAdminController)
 
-	app.post(
-		'/api/logout',
-		{ preHandler: jwtAuthMiddleware },
-		logoutController
-	)
+	app.post('/api/logout', { preHandler: jwtAuthMiddleware }, logoutController)
 
 	// Public config endpoint
 	app.get('/api/config', async (_request, reply) => {

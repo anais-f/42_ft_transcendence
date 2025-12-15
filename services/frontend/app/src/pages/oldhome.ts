@@ -108,7 +108,6 @@ export const HomePage = (): string => {
 `
 }
 
-
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 
 /**

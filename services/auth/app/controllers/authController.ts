@@ -1,11 +1,10 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { registerUser, loginUser } from '../usecases/register.js'
-import { RegisterSchema, LoginActionSchema} from '@ft_transcendence/common'
-import { findPublicUserByLogin} from '../repositories/userRepository.js'
+import { RegisterSchema, LoginActionSchema } from '@ft_transcendence/common'
+import { findPublicUserByLogin } from '../repositories/userRepository.js'
 import { deleteUserById } from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
-
 
 export async function registerController(
 	request: FastifyRequest,

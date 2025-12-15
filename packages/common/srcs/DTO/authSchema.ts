@@ -1,15 +1,18 @@
 import { z } from 'zod'
 import { RegisterLoginSchema } from './usersSchema.js'
 
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]{8,128}$/
+const PASSWORD_REGEX =
+	/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]{8,128}$/
 //TODO : enhance password regex to enforce stronger passwords
 
 export const PasswordSchema = z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .max(128, 'Password must be at most 128 characters long')
-    .regex(PASSWORD_REGEX, 'Password must include at least one letter and one number')
-
+	.string()
+	.min(8, 'Password must be at least 8 characters long')
+	.max(128, 'Password must be at most 128 characters long')
+	.regex(
+		PASSWORD_REGEX,
+		'Password must include at least one letter and one number'
+	)
 
 export const RegisterSchema = z
 	.object({
@@ -51,7 +54,8 @@ export const ChangeMyPasswordSchema = z
 	.object({
 		old_password: PasswordSchema,
 		new_password: PasswordSchema,
-		twofa_code: z.string()
+		twofa_code: z
+			.string()
 			.length(6, '2FA code must be exactly 6 digits')
 			.regex(/^\d{6}$/, '2FA code must contain only numbers')
 			.optional()

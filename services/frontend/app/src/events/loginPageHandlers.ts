@@ -2,7 +2,11 @@ import { loginAPI, registerAPI } from '../api/authApi.js'
 import { verify2FALoginAPI } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 import { switchTo2FAForm } from '../pages/oldlogin.js'
-import { validateUsername, validatePassword, handleAuthSuccess } from '../utils/validation.js'
+import {
+	validateUsername,
+	validatePassword,
+	handleAuthSuccess
+} from '../utils/validation.js'
 
 /**
  * Handler for the registration form
@@ -37,9 +41,10 @@ export async function handleRegister(form: HTMLFormElement) {
 		return
 	}
 
-  // const { data, error, status } = await registerAPI(username, password)
-
-	const { data, error, status } = await registerAPI(usernameResult.data, passwordResult.data)
+	const { data, error, status } = await registerAPI(
+		usernameResult.data,
+		passwordResult.data
+	)
 
 	if (error) {
 		switch (status) {
@@ -82,7 +87,10 @@ export async function handleLogin(form: HTMLFormElement) {
 		return
 	}
 
-	const { data, error, status } = await loginAPI(usernameResult.data, passwordResult.data)
+	const { data, error, status } = await loginAPI(
+		usernameResult.data,
+		passwordResult.data
+	)
 
 	if (error) {
 		switch (status) {

@@ -8,7 +8,11 @@ import {
 	cleanupGoogleAuth
 } from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
-import { SettingsPage, attachSettingsEvents, detachSettingsEvents } from '../pages/oldsettings'
+import {
+	SettingsPage,
+	attachSettingsEvents,
+	detachSettingsEvents
+} from '../pages/oldsettings'
 import { TestPage } from '../pages/LoginPage'
 
 export type Pages =

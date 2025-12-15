@@ -8,7 +8,10 @@ export const RegisterLoginSchema = z
 	.string()
 	.min(4, 'Login must be at least 4 characters long')
 	.max(32, 'Login must be at most 32 characters long')
-	.regex(LOGIN_REGEX, 'Login can only contain letters, numbers, underscores, and hyphens')
+	.regex(
+		LOGIN_REGEX,
+		'Login can only contain letters, numbers, underscores, and hyphens'
+	)
 	.refine((value) => !value.startsWith('google-'), {
 		message: 'Login cannot start with "google-"'
 	})
@@ -17,13 +20,19 @@ export const LoginSchema = z
 	.string()
 	.min(4, 'Login must be at least 4 characters long')
 	.max(32, 'Login must be at most 32 characters long')
-	.regex(LOGIN_REGEX, 'Login can only contain letters, numbers, underscores, and hyphens')
+	.regex(
+		LOGIN_REGEX,
+		'Login can only contain letters, numbers, underscores, and hyphens'
+	)
 
 export const UsernameSchema = z
 	.string()
 	.min(4, 'Username must be at least 4 characters long')
 	.max(32, 'Username must be at most 32 characters long')
-	.regex(USERNAME_REGEX, 'Username can only contain letters, numbers, underscores, and hyphens')
+	.regex(
+		USERNAME_REGEX,
+		'Username can only contain letters, numbers, underscores, and hyphens'
+	)
 
 export const UserIdSchema = z
 	.object({

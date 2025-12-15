@@ -21,7 +21,11 @@ interface AvatarPaths {
 	filename: string
 }
 
-const ALLOWED_TYPES: readonly string[] = ['image/jpeg', 'image/png']
+const ALLOWED_TYPES: readonly string[] = [
+	'image/jpeg',
+	'image/png',
+	'image/jpg'
+]
 const ALLOWED_EXTENSIONS: readonly string[] = ['.jpg', '.jpeg', '.png']
 const MAX_SIZE = 5 * 1024 * 1024
 
@@ -100,14 +104,14 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			? originalName.slice(originalName.lastIndexOf('.')).toLowerCase()
 			: ''
 
-  if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
-    console.warn(
-        '[avatars] original file extension not allowed:',
-        fileExtension,
-        ' - continuing based on detectedType'
-    )
-    throw createHttpError.BadRequest('Invalid file extension')
-  }
+	if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
+		console.warn(
+			'[avatars] original file extension not allowed:',
+			fileExtension,
+			' - continuing based on detectedType'
+		)
+		throw createHttpError.BadRequest('Invalid file extension')
+	}
 
 	if (!Buffer.isBuffer(avatarBuffer))
 		throw createHttpError.BadRequest('Missing file')
@@ -130,7 +134,7 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			detectedType.mime
 		)
 	}
-  
+
 	return detectedType
 }
 
