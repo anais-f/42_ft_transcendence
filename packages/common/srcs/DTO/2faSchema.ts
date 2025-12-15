@@ -101,4 +101,6 @@ export type Disable2FAResponseDTO = z.infer<typeof disable2FAResponseSchema>
 export type Status2FAResponseDTO = z.infer<typeof status2FAResponseSchema>
 export type Call2FAResponseDTO = z.infer<typeof Call2FAResponseSchema>
 export type Enable2FAResponseDTO = z.infer<typeof Enable2FAResponseSchema>
-export type Verify2FALoginResponseDTO = z.infer<typeof Verify2FALoginResponseSchema>
+export type Verify2FALoginResponseDTO = z.infer<
+	typeof Verify2FALoginResponseSchema
+>
