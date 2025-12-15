@@ -5,35 +5,39 @@ import {
 	getTournament,
 	quitTournament
 } from '../usecases/tournamentUsecases.js'
+import {
+	GetTournamentResponseDTO,
+	CreateTournamentResponseDTO,
+	JoinTournamentResponseDTO
+} from '@ft_transcendence/common'
 
 export function getTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): GetTournamentResponseDTO {
 	const tournament = getTournament(request)
-	return reply.send({ success: true, tournament })
+	return { tournament }
 }
 
 export function createTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
-	const tournament = createTournament(request)
-	return reply.send(tournament)
+): CreateTournamentResponseDTO {
+	return createTournament(request)
 }
 
 export function joinTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): JoinTournamentResponseDTO {
 	const tournament = joinTournament(request)
-	return reply.send({ success: true, tournament })
+	return { tournament }
 }
 
 export function quitTournamentController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): void {
 	quitTournament(request)
-	return reply.send({ success: true })
+	return
 }

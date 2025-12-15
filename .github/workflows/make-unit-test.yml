@@ -43,7 +43,7 @@ jobs:
           # 2FA service
           TWOFA_SERVICE_URL=http://2fa:3000
           TWOFA_DB_PATH=/data/db-2fa.sqlite
-          TOTP_ENC_KEY=change-me
+          TOTP_ENC_KEY=xxxxxxxxxxxxxxxxxchange-mexxxxxxxxxxxxxxxxx
 
           # Social Service
           SOCIAL_SERVICE_URL=http://social:3000
