@@ -8,7 +8,7 @@ import { PacketSender } from '../PacketSender.js'
 export function updateHUDs(
 	gameData: GameData,
 	packetSender: PacketSender,
-	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+	obj: { lastP1Lives: number; lastP2Lives: number; lastCountdown: number }
 ) {
 	updateScoreHUD(gameData, packetSender, obj)
 	updateCountDownHUD(gameData, packetSender, obj)
@@ -17,12 +17,12 @@ export function updateHUDs(
 async function updateScoreHUD(
 	gameData: GameData,
 	packetSender: PacketSender,
-	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+	obj: { lastP1Lives: number; lastP2Lives: number; lastCountdown: number }
 ) {
-	const score = gameData.gameInstance!.GE.score
-	if (score.p1 !== obj.lastP1Score || score.p2 !== obj.lastP2Score) {
-		obj.lastP1Score = score.p1
-		obj.lastP2Score = score.p2
+	const score = gameData.gameInstance!.GE.lives
+	if (score.p1 !== obj.lastP1Lives || score.p2 !== obj.lastP2Lives) {
+		obj.lastP1Lives = score.p1
+		obj.lastP2Lives = score.p2
 		obj.lastCountdown = -1
 		const scorePacket = new S07Score(score.p1, score.p2)
 		packetSender.push(SPacketsType.S07, scorePacket)
@@ -32,7 +32,7 @@ async function updateScoreHUD(
 async function updateCountDownHUD(
 	gameData: GameData,
 	packetSender: PacketSender,
-	obj: { lastP1Score: number; lastP2Score: number; lastCountdown: number }
+	obj: { lastP1Lives: number; lastP2Lives: number; lastCountdown: number }
 ) {
 	const pauseTicks = gameData.gameInstance!.GE.pauseTicksRemaining
 	if (pauseTicks > 0) {

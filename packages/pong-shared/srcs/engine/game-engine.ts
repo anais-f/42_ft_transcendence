@@ -3,7 +3,7 @@ import { Circle } from '../math/Circle.js'
 import { Segment } from '../math/Segment.js'
 import { Vector2 } from '../math/Vector2.js'
 import { IBall } from './IBall.js'
-import { IScore } from './IScore.js'
+import { ILives } from './IScore.js'
 import { IWinZone } from './IWinZone.js'
 
 export class TPS_MANAGER {
@@ -39,7 +39,7 @@ export class GameEngine {
 
 	public constructor(
 		TPS: number,
-		private _score: IScore,
+		private _live: ILives,
 		private _borders: Segment[],
 		private _winZones: IWinZone[]
 	) {
@@ -81,7 +81,7 @@ export class GameEngine {
 	private checkWin(seg: Segment): boolean {
 		for (const w of this._winZones) {
 			if (w.seg === seg) {
-				++this._score[`p${w.player as 1 | 2}`]
+				--this._live[`p${w.player as 1 | 2}`]
 				return true
 			}
 		}
@@ -133,11 +133,11 @@ export class GameEngine {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
 			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
-			console.log(`[${this._score.p1} | ${this._score.p2}]`)
+			console.log(`[${this._live.p1} | ${this._live.p2}]`)
 		}
 
 		++this._TPS_DATA.tickCount
-		if (this._score.p1 + this._score.p2 >= this._score.max) {
+		if (this.lives.p1 <= 0 || this.lives.p2 <= 0) {
 			this._pauseGame()
 		}
 	}
@@ -173,8 +173,8 @@ export class GameEngine {
 		return this._borders
 	}
 
-	get score(): IScore {
-		return this._score
+	get lives(): ILives {
+		return this._live
 	}
 
 	get pauseTicksRemaining(): number {
