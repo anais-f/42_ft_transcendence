@@ -37,25 +37,12 @@ export async function handleRegister(form: HTMLFormElement) {
 		return
 	}
 
+  // const { data, error, status } = await registerAPI(username, password)
+
 	const { data, error, status } = await registerAPI(usernameResult.data, passwordResult.data)
 
 	if (error) {
 		switch (status) {
-			case 400:
-				notyf.error('Invalid username or password format')
-				break
-			case 409:
-				notyf.error('Username already taken')
-				break
-			case 429:
-				notyf.error('Too many registration attempts, please wait')
-				break
-			case 502:
-				notyf.error('Registration failed - service error. Please try again.')
-				break
-			case 503:
-				notyf.error('Service temporarily unavailable. Please try again later.')
-				break
 			case 0:
 				notyf.error('Network error, check your connection')
 				break
@@ -99,21 +86,6 @@ export async function handleLogin(form: HTMLFormElement) {
 
 	if (error) {
 		switch (status) {
-			case 400:
-				notyf.error('Invalid username or password format')
-				break
-			case 401:
-				notyf.error('Invalid username or password')
-				break
-			case 429:
-				notyf.error('Too many login attempts, please wait')
-				break
-			case 502:
-				notyf.error('Login failed - service error. Please try again.')
-				break
-			case 503:
-				notyf.error('Service temporarily unavailable. Please try again later.')
-				break
 			case 0:
 				notyf.error('Network error, check your connection')
 				break
@@ -150,21 +122,6 @@ export async function handle2FASubmit(form: HTMLFormElement) {
 
 	if (error) {
 		switch (status) {
-      case 400:
-        notyf.error('Invalid code format')
-        break
-      case 401:
-				notyf.error('Invalid or expired 2FA code')
-				break
-      case 429:
-        notyf.error('Too many login attempts, please wait')
-        break
-      case 502:
-        notyf.error('Login failed - service error. Please try again.')
-        break
-      case 503:
-        notyf.error('Service temporarily unavailable. Please try again later.')
-        break
 			case 0:
 				notyf.error('Network error, check your connection')
 				break

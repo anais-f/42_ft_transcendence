@@ -16,11 +16,11 @@ export async function loginAPI(username: string, password: string) {
     })
 
     if (!res.ok) {
-      const error = await res.json()
+      const errorData = await res.json()
       return {
         data: null,
-        error: error.message || 'Login failed',
-        status: error.statusCode || res.status
+        error: errorData.error || errorData.message || 'Login failed',
+        status: errorData.statusCode || res.status
       }
     }
 
@@ -49,11 +49,11 @@ export async function registerAPI(username: string, password: string) {
     })
 
     if (!res.ok) {
-      const error = await res.json()
+      const errorData = await res.json()
       return {
         data: null,
-        error: error.message || 'Registration failed',
-        status: error.statusCode || res.status
+        error: errorData.error || errorData.message || 'Registration failed',
+        status: errorData.statusCode || res.status
       }
     }
 
@@ -76,11 +76,11 @@ export async function logoutAPI() {
 		})
 
 		if (!res.ok) {
-			const error = await res.json()
+			const errorData = await res.json()
 			return {
 				data: null,
-				error: error.message || 'Logout failed',
-				status: error.statusCode || res.status
+				error: errorData.error || errorData.message || 'Logout failed',
+				status: errorData.statusCode || res.status
 			}
 		}
 
@@ -108,11 +108,11 @@ export const loginWithGoogleCredential = async (
 		})
 
 		if (!res.ok) {
-			const error = await res.json()
+			const errorData = await res.json()
 			return {
 				data: null,
-				error: error.message || 'Google login failed',
-				status: error.statusCode || res.status
+				error: errorData.error || errorData.message || 'Google login failed',
+				status: errorData.statusCode || res.status
 			}
 		}
 

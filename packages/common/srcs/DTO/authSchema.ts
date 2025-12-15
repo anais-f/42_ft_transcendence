@@ -6,9 +6,9 @@ const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\
 
 export const PasswordSchema = z
     .string()
-    .min(8)
-    .max(128)
-    .regex(PASSWORD_REGEX, 'Password must be 8-128 characters long and include at least one letter and one number')
+    .min(8, 'Password must be at least 8 characters long')
+    .max(128, 'Password must be at most 128 characters long')
+    .regex(PASSWORD_REGEX, 'Password must include at least one letter and one number')
 
 
 export const RegisterSchema = z
@@ -27,7 +27,7 @@ export const LoginActionSchema = z
 
 export const RegisterGoogleSchema = z
 	.object({
-		google_id: z.string().min(1)
+		google_id: z.string().min(1, 'Google ID is required')
 	})
 	.strict()
 
@@ -43,7 +43,7 @@ export const PasswordBodySchema = z
 
 export const LoginGoogleSchema = z
 	.object({
-		credential: z.string().min(1)
+		credential: z.string().min(1, 'Google credential is required')
 	})
 	.strict()
 
@@ -51,7 +51,10 @@ export const ChangeMyPasswordSchema = z
 	.object({
 		old_password: PasswordSchema,
 		new_password: PasswordSchema,
-		twofa_code: z.string().length(6).regex(/^\d{6}$/).optional()
+		twofa_code: z.string()
+			.length(6, '2FA code must be exactly 6 digits')
+			.regex(/^\d{6}$/, '2FA code must contain only numbers')
+			.optional()
 	})
 	.strict()
 
