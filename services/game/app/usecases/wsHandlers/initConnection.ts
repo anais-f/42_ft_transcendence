@@ -59,13 +59,11 @@ function notifyOpponent(
 	user: WsTokenPayload,
 	socket: WebSocket
 ) {
-	opponentData?.ws?.send(
+	opponentData.ws?.send(
 		JSON.stringify({ type: 'opponent', data: { id: user.user_id } })
 	)
 
-	if (opponentData) {
-		socket.send(
-			JSON.stringify({ type: 'opponent', data: { id: opponentData.id } })
-		)
-	}
+	socket.send(
+		JSON.stringify({ type: 'opponent', data: { id: opponentData.id } })
+	)
 }
