@@ -9,7 +9,6 @@ import {
 import { registerRoutes } from './routes/registerRoutes.js'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
-import fs from 'fs'
 import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { findPublicUserByLogin } from './repositories/userRepository.js'
@@ -17,18 +16,19 @@ import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
+import { initializeEnv, getEnv } from './env/verifEnv.js'
+
+// Initialize and validate environment variables
+initializeEnv()
+const env = getEnv()
 
 const app = Fastify({
 	logger: true
 }).withTypeProvider<ZodTypeProvider>()
 
 app.register(cookie)
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) {
-	throw new Error('JWT_SECRET environment variable is required')
-}
 app.register(fastifyJwt, {
-	secret: jwtSecret,
+	secret: env.JWT_SECRET,
 	cookie: {
 		cookieName: 'auth_token',
 		signed: false
@@ -48,20 +48,7 @@ async function runServer() {
 	runMigrations()
 	console.log('Admin user ensured')
 
-	const openapiFilePath = process.env.DTO_OPENAPI_FILE
-	// prefer env variables for CI/local, fall back to docker secrets if present
-	const login_admin = process.env.LOGIN_ADMIN
-	const password_admin = process.env.PASSWORD_ADMIN
-	if (!login_admin || !password_admin) {
-		throw new Error(
-			'Admin credentials are not defined. Set LOGIN_ADMIN and PASSWORD_ADMIN in your .env or Docker secrets. See .env.example'
-		)
-	}
-	if (!openapiFilePath) {
-		throw new Error('DTO_OPENAPI_FILE is not defined in environment variables')
-	}
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
-	const openapiSwagger = JSON.parse(fs.readFileSync(openapiFilePath, 'utf-8'))
 	await app.register(Swagger, {
 		openapi: {
 			info: {
@@ -71,39 +58,33 @@ async function runServer() {
 			servers: [
 				{ url: 'http://localhost:8080/auth', description: 'Local server' }
 			],
-			components: openapiSwagger.components
+			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform
 	})
 	await app.register(SwaggerUI, {
 		routePrefix: '/docs'
 	})
-	if (findPublicUserByLogin(login_admin) === undefined) {
-		registerAdminUser(login_admin, password_admin)
+	if (findPublicUserByLogin(env.LOGIN_ADMIN) === undefined) {
+		registerAdminUser(env.LOGIN_ADMIN, env.PASSWORD_ADMIN)
 	}
 
 	// Vérifier les credentials Google (pour google-auth-library)
-	const googleClientId = process.env.GOOGLE_CLIENT_ID
-
-	if (googleClientId) {
+	if (env.GOOGLE_CLIENT_ID) {
 		console.log(
 			'Google Sign-In configured with Client ID:',
-			googleClientId.substring(0, 20) + '...'
+			env.GOOGLE_CLIENT_ID.substring(0, 20) + '...'
 		)
 	} else {
 		console.warn('GOOGLE_CLIENT_ID not found, Google Sign-In will be disabled')
 	}
 
 	await registerRoutes(app)
-	const port = Number(process.env.PORT)
-	if (!port) {
-		throw new Error('PORT is not defined in environment variables')
-	}
 	await app.listen({
-		port: port,
-		host: '0.0.0.0'
+		port: env.PORT,
+		host: env.HOST
 	})
-	console.log('Auth service running on http://localhost:', port)
+	console.log('Auth service running on http://localhost:', env.PORT)
 }
 
 runServer().catch((err) => {
