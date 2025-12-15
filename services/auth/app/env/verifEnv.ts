@@ -26,7 +26,7 @@ export function checkEnv(): IAuthEnv {
 		NODE_ENV: process.env.NODE_ENV || 'development',
 		LOGIN_ADMIN: process.env.LOGIN_ADMIN,
 		PASSWORD_ADMIN: process.env.PASSWORD_ADMIN,
-		GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || null,
+		GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 		TWOFA_SERVICE_URL: process.env.TWOFA_SERVICE_URL,
 		TWOFA_ISSUER: process.env.TWOFA_ISSUER || 'FtTranscendence',
 		INTERNAL_API_SECRET: process.env.INTERNAL_API_SECRET,
