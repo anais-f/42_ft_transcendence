@@ -5,7 +5,6 @@ import {
 	Enable2FAResponseDTO,
 	Status2FAResponseDTO,
 	twofaCodeSchema,
-	Verify2FADTO,
 	Verify2FALoginResponseDTO
 } from '@ft_transcendence/common'
 import {
@@ -20,7 +19,7 @@ import { env } from '../index.js'
 export async function enable2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<Enable2FAResponseDTO> {
 	const cookieToken = req.cookies.auth_token
 	if (!cookieToken) throw createHttpError.Unauthorized('Missing cookieToken')
 
@@ -39,7 +38,7 @@ export async function enable2faController(
 export async function verify2faSetupController(
 	req: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const cookieToken = req.cookies.auth_token
 	if (!cookieToken)
 		throw createHttpError.Unauthorized('Missing cookieToken (setup)')
@@ -60,7 +59,7 @@ export async function verify2faSetupController(
 export async function verify2faLoginController(
 	req: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<Verify2FALoginResponseDTO> {
 	const cookieToken = req.cookies.twofa_token
 	if (!cookieToken) throw createHttpError.Unauthorized('Missing cookieToken')
 
@@ -87,13 +86,13 @@ export async function verify2faLoginController(
 		maxAge: 60 * 15
 	})
 	reply.clearCookie('twofa_token', { path: '/' })
-	return reply.code(200).send({ cookieToken: result.auth_token })
+	return reply.code(200).send(result)
 }
 
 export async function disable2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const cookieToken = req.cookies.auth_token
 	if (!cookieToken) throw createHttpError.Unauthorized('Missing cookieToken')
 
@@ -116,7 +115,7 @@ export async function disable2faController(
 export async function status2faController(
 	req: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<Status2FAResponseDTO> {
 	const cookieToken = req.cookies.auth_token
 	if (!cookieToken) throw createHttpError.Unauthorized('Missing cookieToken')
 

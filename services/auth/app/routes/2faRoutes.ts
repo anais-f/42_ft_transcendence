@@ -9,7 +9,8 @@ import {
 import {
 	Enable2FAResponseSchema,
 	status2FAResponseSchema,
-	twofaCodeSchema
+	twofaCodeSchema,
+	Verify2FALoginResponseSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { Schema } from 'zod'
@@ -41,7 +42,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 			schema: {
 				body: twofaCodeSchema,
 				response: {
-					200: Enable2FAResponseSchema
+					200: Verify2FALoginResponseSchema
 				}
 			}
 		},

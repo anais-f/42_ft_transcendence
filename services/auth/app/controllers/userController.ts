@@ -15,14 +15,14 @@ import { hashPassword } from '../utils/password.js'
 
 export async function listPublicUsersController(
 	_req: FastifyRequest,
-	reply: FastifyReply
+	_reply: FastifyReply
 ): Promise<PublicUserListAuthDTO> {
 	return listPublicUsersUsecase()
 }
 
 export async function getPublicUserController(
 	request: FastifyRequest,
-	reply: FastifyReply
+	_reply: FastifyReply
 ): Promise<PublicUserAuthDTO> {
 	const { id } = request.params as { id: string }
 	const userId = Number(id)
@@ -43,7 +43,7 @@ export async function deleteUser(
 
 export async function patchUserPassword(
 	request: FastifyRequest,
-	reply: FastifyReply
+	_reply: FastifyReply
 ): Promise<PasswordChangeResponseDTO> {
 	const { id } = request.params as { id: string }
 	const userId = Number(id)
