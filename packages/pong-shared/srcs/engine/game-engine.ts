@@ -23,7 +23,7 @@ export enum GameState {
 	Started
 }
 
-export const BALL_SPEED = 0.6
+export const BALL_SPEED = 0.4
 
 export class GameEngine {
 	private _currentState: GameState = GameState.Paused
@@ -88,22 +88,78 @@ export class GameEngine {
 		return false
 	}
 
+	private getCollisionNormal(
+		border: Segment,
+		hitPoints: Vector2[]
+	): Vector2 | null {
+		const ballCenter = this._ball.shape.pos
+
+		const closestHit = border.closestPointToPoint(ballCenter)
+		const segNormal = border.getNormal()
+
+		const dotVeloNormal = Vector2.dot(this._ball.velo, segNormal)
+		if (Math.abs(dotVeloNormal) < 0.001) {
+			const altNormal = Vector2.subtract(ballCenter, closestHit).normalize()
+			if (Vector2.dot(this._ball.velo, altNormal) >= 0) {
+				return null
+			}
+			return altNormal
+		}
+
+		const toBall = Vector2.subtract(ballCenter, closestHit)
+		const orientedNormal =
+			Vector2.dot(toBall, segNormal) >= 0 ? segNormal : segNormal.negate()
+
+		if (Vector2.dot(this._ball.velo, orientedNormal) >= 0) {
+			return null
+		}
+
+		if (hitPoints.length === 1) {
+			const pointNormal = Vector2.subtract(ballCenter, hitPoints[0]).normalize()
+			if (Vector2.dot(this._ball.velo, pointNormal) >= 0) {
+				return null
+			}
+			return pointNormal
+		}
+
+		return orientedNormal
+	}
+
 	private checkColision(): boolean {
+		interface CollisionData {
+			border: Segment
+			normal: Vector2
+		}
+
+		const collisions: CollisionData[] = []
+
 		for (const border of this._borders) {
 			const hitData = border.intersect(this._ball.shape)
 			if (Array.isArray(hitData) && hitData.length > 0) {
-				if (this.checkWin(border)) {
-					return true
+				const normal = this.getCollisionNormal(border, hitData)
+				if (normal) {
+					collisions.push({ border, normal })
 				}
-
-				const velo: Vector2 = Vector2.reflect(
-					this._ball.velo,
-					border.getNormal()
-				)
-				this._ball.velo = velo
-				return false
 			}
 		}
+
+		if (collisions.length === 0) {
+			return false
+		}
+
+		for (const collision of collisions) {
+			if (this.checkWin(collision.border)) {
+				return true
+			}
+		}
+
+		let combinedNormal = new Vector2(0, 0)
+		for (const collision of collisions) {
+			combinedNormal.add(collision.normal)
+		}
+		combinedNormal.normalize()
+
+		this._ball.velo = Vector2.reflect(this._ball.velo, combinedNormal)
 		return false
 	}
 
