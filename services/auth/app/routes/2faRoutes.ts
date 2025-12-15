@@ -4,15 +4,17 @@ import {
 	verify2faSetupController,
 	verify2faLoginController,
 	disable2faController,
-	status2faController
+	status2faController,
+	internalStatus2faController
 } from '../controllers/2faController.js'
 import {
 	Enable2FAResponseSchema,
+	IdParamSchema,
 	status2FAResponseSchema,
 	twofaCodeSchema,
 	Verify2FALoginResponseSchema
 } from '@ft_transcendence/common'
-import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
 
 export async function twoFARoutes(app: FastifyInstance) {
 	app.post(
@@ -63,5 +65,18 @@ export async function twoFARoutes(app: FastifyInstance) {
 			preHandler: jwtAuthMiddleware
 		},
 		status2faController
+	)
+	app.get(
+		'/api/internal/2fa/status/:id',
+		{
+			schema: {
+				params: IdParamSchema,
+				response: {
+					200: status2FAResponseSchema
+				}
+			},
+			preHandler: apiKeyMiddleware
+		},
+		internalStatus2faController
 	)
 }

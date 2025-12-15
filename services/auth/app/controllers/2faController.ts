@@ -126,3 +126,15 @@ export async function status2faController(
 	const result: Status2FAResponseDTO = status2FA(payload.user_id)
 	return reply.code(200).send(result)
 }
+
+export async function internalStatus2faController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<Status2FAResponseDTO> {
+	const { id } = req.params as { id: string }
+	const userId = Number(id)
+	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')
+
+	const result: Status2FAResponseDTO = status2FA(userId)
+	return reply.code(200).send(result)
+}

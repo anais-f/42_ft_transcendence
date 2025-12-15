@@ -69,12 +69,11 @@ export class AuthApi {
 				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
 			)
 
-		const url = `${base}/api/internal/auth/${userId}/2fa-status`
+		const url = `${base}/api/internal/2fa/status/${userId}`
 		const headers = {
 			'content-type': 'application/json',
 			authorization: secret
 		}
-
 		let response
 		try {
 			response = await fetch(url, {
