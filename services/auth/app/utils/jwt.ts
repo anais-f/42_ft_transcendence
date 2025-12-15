@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
-import createHttpError from 'http-errors'
-import { getEnv } from '../env/verifEnv.js'
+import { env } from '../index.js'
 
 function getJWTSecret(): string {
-	return getEnv().JWT_SECRET
+	return env.JWT_SECRET
 }
 
 export function signToken(
