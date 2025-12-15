@@ -10,19 +10,24 @@ import { AS03BaseBall } from '@ft_transcendence/pong-shared/network/Packet/Serve
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
-import { createGame, DEFAULT_TPS, IGameData } from '../../createGame.js'
+import {
+	createDiamondMap,
+	createGame,
+	DEFAULT_TPS,
+	IGameData
+} from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_LIVES = 5
+export const MAX_LIVES = 50
 export const PAD_SPEED = 0.3
 export const PAUSE_TICKS = 180
-export const COUNTDOWN_STEPS = 4
-export const TICKS_PER_STEP = PAUSE_TICKS / COUNTDOWN_STEPS
+export const COUNTDOWN_STEPS = 3
+export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createGame(MAX_LIVES)
+	const gameInstance = createDiamondMap(MAX_LIVES)
 	gameData.gameInstance = gameInstance
 
 	const mapPacket = new S02SegmentUpdate(gameInstance.GE.borders)
