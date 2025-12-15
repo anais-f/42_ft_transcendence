@@ -1,5 +1,4 @@
 import createHttpError from 'http-errors'
-import { getEnv } from '../env/verifEnv.js'
 import {
 	setUser2FAEnabled,
 	isUser2FAEnabled
@@ -11,11 +10,12 @@ import {
 	Verify2FALoginResponseDTO,
 	Status2FAResponseDTO
 } from '@ft_transcendence/common'
+import { env } from '../index.js'
 
-
-async function call2faService(path: string, body: any): Promise<Call2FAResponseDTO> {
-	const env = getEnv()
-
+async function call2faService(
+	path: string,
+	body: any
+): Promise<Call2FAResponseDTO> {
 	try {
 		const res = await fetch(`${env.TWOFA_SERVICE_URL}${path}`, {
 			method: 'POST',
@@ -40,7 +40,6 @@ export async function enable2FA(
 	userId: number,
 	login?: string
 ): Promise<Enable2FAResponseDTO> {
-	const env = getEnv()
 	const issuer = env.TWOFA_ISSUER
 	const label = login || String(userId)
 
