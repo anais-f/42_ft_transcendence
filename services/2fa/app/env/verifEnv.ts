@@ -49,7 +49,7 @@ export function checkEnv(): I2faEnv {
 
 	const env: I2faEnv = {
 		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
-		HOST: `${variables.HOST}/2fa`,
+		HOST: variables.HOST as string,
 		PORT: parseInt(variables.PORT as string),
 		JWT_SECRET: variables.JWT_SECRET as string,
 		TWOFA_DB_PATH: variables.TWOFA_DB_PATH as string,

@@ -80,7 +80,7 @@ jobs:
 
           DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
 
-          HOSTNAME=0.0.0.0
+          HOST=0.0.0.0
 
           EOF
 
