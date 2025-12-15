@@ -4,39 +4,42 @@ import {
 	verify2faSetupController,
 	verify2faLoginController,
 	disable2faController,
-	status2faController,
-	get2FAStatusInternalController
+	status2faController
 } from '../controllers/2faController.js'
-import { twofaCodeSchema } from '@ft_transcendence/common'
-import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
-import { z } from 'zod'
+import { Enable2FAResponseSchema, status2FAResponseSchema, twofaCodeSchema } from '@ft_transcendence/common'
+import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { Schema } from 'zod'
 
 export async function twoFARoutes(app: FastifyInstance) {
-	// Setup 2FA - requires auth_token (user already authenticated)
 	app.post(
 		'/api/2fa/setup',
-		{ preHandler: jwtAuthMiddleware },
+		{
+			schema: {
+				response: {
+					200: Enable2FAResponseSchema
+				}
+			},
+			preHandler: jwtAuthMiddleware
+		},
 		enable2faController
 	)
-
-	// Verify during setup - requires auth_token
 	app.post(
 		'/api/2fa/verify-setup',
 		{
-			schema: { body: twofaCodeSchema },
+			schema: { body: twofaCodeSchema},
 			preHandler: jwtAuthMiddleware
 		},
 		verify2faSetupController
 	)
 	app.post(
 		'/api/2fa/verify-login',
-		{ schema: { body: twofaCodeSchema } },
-		verify2faLoginController
-	)
-	app.post(
-		'/api/2fa/verify',
-		{
-			schema: { body: twofaCodeSchema }
+		{ 
+			schema: { 
+				body: twofaCodeSchema,
+				response: { 
+					200: Enable2FAResponseSchema
+				}
+			} 
 		},
 		verify2faLoginController
 	)
@@ -47,26 +50,14 @@ export async function twoFARoutes(app: FastifyInstance) {
 	)
 	app.get(
 		'/api/2fa/status',
-		{ preHandler: jwtAuthMiddleware },
-		status2faController
-	)
-
-	// INTERNAL: Get 2FA status by user_id (service-to-service)
-	app.get(
-		'/api/internal/auth/:user_id/2fa-status',
-		{
-			preHandler: apiKeyMiddleware,
+		{ 
 			schema: {
-				params: z.object({
-					user_id: z.coerce.number().int().positive()
-				}),
 				response: {
-					200: z.object({
-						two_fa_enabled: z.boolean()
-					})
+					200: status2FAResponseSchema
 				}
-			}
+			},
+			preHandler: jwtAuthMiddleware
 		},
-		get2FAStatusInternalController
+		status2faController
 	)
 }
