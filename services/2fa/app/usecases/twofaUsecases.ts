@@ -18,10 +18,6 @@ import type {
 
 const SETUP_EXPIRATION_MS = 5 * 60 * 1000 // 5 minutes
 
-/**
- * Setup 2FA for a user
- * Generates a new secret, encrypts it, stores it as pending, and returns QR code
- */
 export async function setup2FA(
 	userId: number,
 	issuer: string,
@@ -43,17 +39,12 @@ export async function setup2FA(
 	}
 }
 
-/**
- * Verify 2FA code during setup (activation) or login
- * Returns whether the code was valid and if it resulted in activation
- */
 export function verify2FA(
 	userId: number,
 	twofaCode: string,
 	hasAuthToken: boolean,
 	has2FAToken: boolean
 ): Verify2FAResponseDTO {
-	// Try pending secret first (setup/activation flow)
 	const pending = getPendingSecretEnc(userId)
 
 	if (pending) {
@@ -81,7 +72,6 @@ export function verify2FA(
 		return { success: true, activated: true }
 	}
 
-	// Try active secret (login flow)
 	const activeEnc = getSecretEnc(userId)
 	if (!activeEnc) {
 		throw createHttpError.NotFound('No 2FA secret')
@@ -101,18 +91,11 @@ export function verify2FA(
 	return { success: true, activated: false }
 }
 
-/**
- * Disable 2FA for a user
- * Removes both pending and active secrets
- */
 export function disable2FA(userId: number): Disable2FAResponseDTO {
 	deleteSecret(userId)
 	return { success: true }
 }
 
-/**
- * Check if 2FA is enabled for a user
- */
 export function status2FA(userId: number): Status2FAResponseDTO {
 	const enc = getSecretEnc(userId)
 	return { enabled: !!enc }
