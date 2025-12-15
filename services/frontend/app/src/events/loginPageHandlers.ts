@@ -1,5 +1,8 @@
-import { checkAuth } from '../api/authService.js'
-import { setCurrentUser } from '../usecases/userStore.js'
+import { loginAPI, registerAPI } from '../api/authApi.js'
+import { verify2FALoginAPI } from '../api/twoFAApi.js'
+import { notyfGlobal as notyf } from '../utils/notyf.js'
+import { switchTo2FAForm } from '../pages/oldlogin.js'
+import { validateUsername, validatePassword, handleAuthSuccess } from '../utils/validation.js'
 
 /**
  * Handler for the registration form
@@ -12,52 +15,57 @@ export async function handleRegister(form: HTMLFormElement) {
 	const password = formData.get('register_password')
 	const confPassword = formData.get('register_conf_password')
 
-	if (!password || !username) return
+	if (!password || !username) {
+		notyf.open({ type: 'info', message: 'Please fill all fields' })
+		return
+	}
 
 	if (password !== confPassword) {
-		console.log("Passwords don't match")
+		notyf.error("Passwords don't match")
 		return
 	}
 
-  //TODO : validation username and password schema before sending to server -> function to validate credentials
-
-
-	if (password.toString().length < 8) {
-    alert('Password must be at least 8 characters long')
-		console.log('Password too short')
+	const usernameResult = validateUsername(username)
+	if (!usernameResult.success) {
+		notyf.error(usernameResult.error)
 		return
 	}
 
-	const user = {
-		login: username,
-		password: password
+	const passwordResult = validatePassword(password)
+	if (!passwordResult.success) {
+		notyf.error(passwordResult.error)
+		return
 	}
 
-	try {
-		const res = await fetch('/auth/api/register', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			credentials: 'include',
-			body: JSON.stringify(user)
-		})
+	const { data, error, status } = await registerAPI(usernameResult.data, passwordResult.data)
 
-		if (!res.ok) {
-      // TODO: improve error handling and messages + specific cases (username taken, weak password, etc)
-			const error = await res.json()
-      alert('Registration failed: ' + error.message)
-			console.error('Register failed:', res.status, error)
-      return
+	if (error) {
+		switch (status) {
+			case 400:
+				notyf.error('Invalid username or password format')
+				break
+			case 409:
+				notyf.error('Username already taken')
+				break
+			case 429:
+				notyf.error('Too many registration attempts, please wait')
+				break
+			case 502:
+				notyf.error('Registration failed - service error. Please try again.')
+				break
+			case 503:
+				notyf.error('Service temporarily unavailable. Please try again later.')
+				break
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
 		}
-
-    // TODO: an utilitary function to handle auth response and set user state
-		const authResult = await checkAuth()
-		setCurrentUser(authResult)
-		await window.navigate('/', true)
-	} catch (e) {
-		console.error('Register error:', e)
+		return
 	}
+
+	await handleAuthSuccess('Account created successfully!')
 }
 
 /**
@@ -70,69 +78,58 @@ export async function handleLogin(form: HTMLFormElement) {
 	const username = formData.get('login_username')
 	const password = formData.get('login_password')
 
-	if (!password || !username) return
-
-  //TODO : validation username and password schema before sending to server -> function to validate credentials
-
-	if (password.toString().length < 8) {
-		console.log('Password too short')
+	if (!password || !username) {
+		notyf.open({ type: 'info', message: 'Please fill all fields' })
 		return
 	}
 
-	const credentials = {
-		login: username,
-		password: password
+	const usernameResult = validateUsername(username)
+	if (!usernameResult.success) {
+		notyf.error(usernameResult.error)
+		return
 	}
 
-	try {
-		const res = await fetch('/auth/api/login', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			credentials: 'include',
-			body: JSON.stringify(credentials)
-		})
-
-
-    if (!res.ok) {
-      // TODO: improve error handling and messages + specific cases
-      const error = await res.json()
-      alert(`An error occurred. Please try again.`)
-      console.error('Login failed:', res.status, error)
-      return
-		}
-
-		const data = await res.json()
-    // login with 2FA required
-		if (data.pre_2fa_required) {
-			switchTo2FAForm()
-			return
-		}
-
-		// Login without 2FA
-		const authResult = await checkAuth()
-		setCurrentUser(authResult)
-		await window.navigate('/', true)
-	} catch (e) {
-		console.error('Login error:', e)
+	const passwordResult = validatePassword(password)
+	if (!passwordResult.success) {
+		notyf.error(passwordResult.error)
+		return
 	}
-}
 
-/**
- * Switch from login form to 2FA form
- */
-export function switchTo2FAForm() {
-	const loginForm = document.getElementById('login_form')
-	loginForm?.classList.add('hidden')
+	const { data, error, status } = await loginAPI(usernameResult.data, passwordResult.data)
 
-	const twoFAForm = document.getElementById('2fa_form')
-	twoFAForm?.classList.remove('hidden')
-	twoFAForm?.classList.add('flex')
+	if (error) {
+		switch (status) {
+			case 400:
+				notyf.error('Invalid username or password format')
+				break
+			case 401:
+				notyf.error('Invalid username or password')
+				break
+			case 429:
+				notyf.error('Too many login attempts, please wait')
+				break
+			case 502:
+				notyf.error('Login failed - service error. Please try again.')
+				break
+			case 503:
+				notyf.error('Service temporarily unavailable. Please try again later.')
+				break
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
+		}
+		return
+	}
 
-	// Focus sur le champ 2FA
-	const codeInput = document.getElementById('2fa_code') as HTMLInputElement
-	codeInput?.focus()
+	if (data.pre_2fa_required) {
+		notyf.open({ type: 'info', message: 'Please enter your 2FA code' })
+		switchTo2FAForm()
+		return
+	}
+
+	await handleAuthSuccess('Login successful!')
 }
 
 /**
@@ -145,37 +142,40 @@ export async function handle2FASubmit(form: HTMLFormElement) {
 	const code = formData.get('2fa_code')
 
 	if (!code || code.toString().length !== 6) {
-		alert('Please enter a valid 6-digit code')
+		notyf.error('Please enter a valid 6-digit code')
 		return
 	}
 
-	try {
-		const res = await fetch('/auth/api/2fa/verify-login', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			credentials: 'include',
-			body: JSON.stringify({ twofa_code: code })
-		})
+	const { data, error, status } = await verify2FALoginAPI(code.toString())
 
-		if (!res.ok) {
-			const error = await res.json()
-			alert('Invalid 2FA code. Please try again.')
-			console.error('2FA verification failed:', error)
-
-			// Effacer le champ 2FA
-			const codeInput = document.getElementById('2fa_code') as HTMLInputElement
-			if (codeInput) codeInput.value = ''
-			return
+	if (error) {
+		switch (status) {
+      case 400:
+        notyf.error('Invalid code format')
+        break
+      case 401:
+				notyf.error('Invalid or expired 2FA code')
+				break
+      case 429:
+        notyf.error('Too many login attempts, please wait')
+        break
+      case 502:
+        notyf.error('Login failed - service error. Please try again.')
+        break
+      case 503:
+        notyf.error('Service temporarily unavailable. Please try again later.')
+        break
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
 		}
 
-		// 2FA validée, rediriger vers la page d'accueil
-		const authResult = await checkAuth()
-		setCurrentUser(authResult)
-		await window.navigate('/', true)
-	} catch (e) {
-		console.error('2FA verification error:', e)
-		alert('An error occurred during verification')
+		const codeInput = document.getElementById('2fa_code') as HTMLInputElement
+		if (codeInput) codeInput.value = ''
+		return
 	}
+
+	await handleAuthSuccess('Login successful!')
 }

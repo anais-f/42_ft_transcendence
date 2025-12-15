@@ -1,11 +1,11 @@
 import { handleLogin, handleRegister, handle2FASubmit } from '../events/loginPageHandlers.js'
-import { checkAuth } from '../api/authService.js'
+import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser } from '../usecases/userStore.js'
 import { CredentialResponse } from '../types/google-type.js'
 import {
 	loadGoogleScript,
 	loginWithGoogleCredential
-} from '../api/authService.js'
+} from '../api/authApi.js'
 
 
 export const LoginPage = (): string => {
@@ -97,7 +97,6 @@ export function attachLoginEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// Create and store the submit handler
 	submitHandler = async (e: Event) => {
 		e.preventDefault()
 
@@ -110,7 +109,6 @@ export function attachLoginEvents() {
 		if (formName === '2fa') await handle2FASubmit(form as HTMLFormElement)
 	}
 
-	// Create and store the click handler
 	clickHandler = (e: Event) => {
 		const target = e.target as HTMLElement
 
@@ -120,13 +118,9 @@ export function attachLoginEvents() {
 		}
 	}
 
-	// Attach the handlers
 	content.addEventListener('submit', submitHandler)
 	content.addEventListener('click', clickHandler)
 
-  // Initialize Google Auth, it's not a event listener but an initialization step
-  // which load SDK google, configure button oauth and render it + callback to google
-  // this button manages its own events internally
 	initGoogleAuth().catch((err) => {
 		console.error('Failed to initialize Google Auth:', err)
 	})
@@ -164,6 +158,7 @@ export function detachLoginEvents() {
  * Initialize Google Auth button.
  * Loads the Google API script, configures the button, and sets up the callback.
  * Renders the Google Sign-In button in the designated container.
+ * Google manages its own events internally.
  * @returns {Promise<void>}
  */
 export async function initGoogleAuth() {
@@ -188,7 +183,7 @@ export async function initGoogleAuth() {
 						await window.navigate('/', true)
 					} catch (err) {
 						console.error('Google Login Error:', err)
-						alert('Erreur de connexion Google')
+						alert('Connection error with Google.')
 					}
 				}
 			})
@@ -222,4 +217,19 @@ export function cleanupGoogleAuth() {
 		window.google.accounts.id.cancel()
 
 	console.log('Google Auth cleaned up')
+}
+
+/**
+ * Switch from login form to 2FA form
+ */
+export function switchTo2FAForm() {
+  const loginForm = document.getElementById('login_form')
+  loginForm?.classList.add('hidden')
+
+  const twoFAForm = document.getElementById('2fa_form')
+  twoFAForm?.classList.remove('hidden')
+  twoFAForm?.classList.add('flex')
+
+  const codeInput = document.getElementById('2fa_code') as HTMLInputElement
+  codeInput?.focus()
 }

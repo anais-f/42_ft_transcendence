@@ -1,4 +1,4 @@
-import { checkAuth } from '../api/authService'
+import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore'
 import { UsernameSchema } from '@common/DTO/usersSchema.js'
 

@@ -1,5 +1,5 @@
 import { currentUser } from '../usecases/userStore.js'
-import { logout } from '../api/authService.js'
+import { logout } from '../usecases/userSession.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {

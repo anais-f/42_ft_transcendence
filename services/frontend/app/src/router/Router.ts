@@ -1,5 +1,5 @@
 import { routerMap, Route, Pages } from './routerMap.js'
-import { checkAuth } from '../api/authService.js'
+import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
 
