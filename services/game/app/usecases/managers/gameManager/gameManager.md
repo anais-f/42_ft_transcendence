@@ -1,0 +1,219 @@
+## Overview
+
+The game management system relies on two main data structures: `games` and
+`playerToGame`. The `games` map stores all games, identified by a unique
+code in `XXXX-XXXX` format. Each game contains information about both players
+(`p1` and `p2`), the game instance, a status, and a creation timestamp. Each
+player is represented by the `Iplayer` interface which combines their identifier
+and their WebSocket connection state (`connState`). The `playerToGame` map
+provides a reverse lookup to find a player's current game.
+
+Games can be created in two modes:
+
+- **Open game**: `p2` is `undefined`, anyone with the code can join
+- **Locked game**: `p1` and `p2` are pre-assigned, only these specific players can join
+
+---
+
+## Data Structures
+
+### `GameStatus`
+
+| Value     | Description                                            |
+| --------- | ------------------------------------------------------ |
+| `waiting` | Game created, waiting for player(s)                    |
+| `active`  | Both players connected via WebSocket, game in progress |
+
+> [!NOTE]
+> The `finished` status is not used for now. Completed games are saved to the
+> database then deleted from memory.
+
+### `Iplayer`
+
+| Property    | Type      | Description                |
+| ----------- | --------- | -------------------------- |
+| `id`        | `number`  | Player ID                  |
+| `connState` | `boolean` | WebSocket connection state |
+
+### `GameData`
+
+| Property       | Type                     | Description               |
+| -------------- | ------------------------ | ------------------------- |
+| `p1`           | `Iplayer`                | Player 1 data             |
+| `p2`           | `Iplayer \| undefined`   | Player 2 data             |
+| `gameInstance` | `IGameData \| undefined` | Game instance             |
+| `status`       | `GameStatus`             | Current state of the game |
+| `createdAt`    | `number`                 | Creation timestamp (ms)   |
+
+### `games:  Map<string, GameData>`
+
+| Key                     | Value      |
+| ----------------------- | ---------- |
+| Game code (`XXXX-XXXX`) | `GameData` |
+
+### `playerToGame: Map<number, string>`
+
+| Key       | Value     | Description           |
+| --------- | --------- | --------------------- |
+| Player ID | Game code | Currently active game |
+
+> [!NOTE]
+> A player can have at most ONE game at a time.
+
+---
+
+## State Transitions
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   requestGame()                                                             │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌─────────┐                                                               │
+│   │ waiting │ ◄─── Game created (p1 set, p2 undefined OR both pre-set)      │
+│   └────┬────┘                                                               │
+│        │                                                                    │
+│        │ joinGame() ─► p2 assigned (if open game)                           │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌─────────────────────┐                                                   │
+│   │ waiting (2 players) │ ◄─── Timeout starts here                          │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ├────────────────────────────────────────────────┐             │
+│              │                                                │             │
+│              ▼                                                ▼             │
+│   ┌──────────────────────┐                          ┌────────────────────┐  │
+│   │ Both WS connected    │                          │ Timeout expired    │  │
+│   └────┬─────────────────┘                          └─────────┬──────────┘  │
+│        │                                                      │             │
+│        ▼                                                      ▼             │
+│   ┌─────────┐                                    ┌─────────────────────────┐│
+│   │ active  │                                    │ Game deleted            ││
+│   └────┬────┘                                    │ - 1 connected:  other   ││
+│        │                                         │   player loses          ││
+│        ├─── Game ends normally ──────┐           │ - 0 connected: random   ││
+│        │                             │           │   loser                 ││
+│        ├─── Player disconnects ──┐   │           └────────────┬────────────┘│
+│        │                         │   │                        ▼             │
+│        ▼                         ▼   ▼                        │             │
+│   ┌──────────────────────────────────────────┐                │             │
+│   │ Game saved to DB then deleted            │                │             │
+│   │ (disconnected player loses)              ├────────────────┘             │
+│   └──────────────────────────────────────────┘                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+> [!NOTE]
+> The timeout duration is configurable via an environment variable.
+
+---
+
+## Functions
+
+### `generateCode()`
+
+- Generates unique game codes in `XXXX-XXXX` format (uppercase)
+- Uses a `do-while` loop to ensure the generated code doesn't already exist in the map
+
+### `requestGame(pID, pID2?)`
+
+Creates a new game and returns the game code.
+
+- **If `pID2` is undefined (open game)**:
+  - Creates a new game with `p1` assigned and `p2: undefined`
+  - `p1: { id:  pID, connState: false }`
+  - Anyone can join with the code
+- **If `pID2` is provided (locked game)**:
+  - Creates a new game with both players pre-assigned
+  - `p1: { id: pID, connState:  false }`
+  - `p2: { id: pID2, connState: false }`
+  - Only these two players can connect
+- Adds `pID` (and `pID2` if provided) to `playerToGame`
+- Sets `createdAt` to `Date.now()` on creation
+
+> [!NOTE]
+> No validation is performed on `pID` or `pID2` (e.g., checking if they exist in
+> the database). This is the caller's responsibility.
+
+**Errors:**
+
+| Error                             | Cause                                       |
+| --------------------------------- | ------------------------------------------- |
+| `'a player is already in a game'` | `pID1` or `pID2` already has an active game |
+
+### `joinGame(gameCode, playerId)`
+
+Attempts to add/connect a player to an existing game. On success, the associated
+route will handle JWT token generation for WebSocket connection.
+
+- **Open game (`p2` is undefined)**:
+  - If `playerId === p1.id`: no-op (creator rejoining their own game)
+  - Otherwise: assigns player as `p2`, adds to `playerToGame`
+- **Locked game (`p2` is defined)**:
+  - If `playerId === p1.id` or `playerId === p2.id`: allowed to join
+  - Otherwise: throws error
+
+> [!NOTE]
+> No validation is performed on `pID` (e.g., checking if they exist in
+> the database). This is the caller's responsibility.
+
+**Errors:**
+
+| Error                               | Cause                                                     |
+| ----------------------------------- | --------------------------------------------------------- |
+| `'unknow game code'`                | Game code doesn't exist in `games` map                    |
+| `'player is already in a game'`     | Player already has an active game                         |
+| `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id` |
+
+### `startTimeOut(pID, ms?)`
+
+Starts a timeout for a player. When the timeout expires, `leaveGame(pID)` is
+called automatically. The timeout duration is configurable.
+
+- Called in `requestGame` for locked games (when both players are pre-assigned)
+- Called in `joinGame` when a second player joins an open game
+
+### `leaveGame(playerId)`
+
+Removes a player from their active game. The game is deleted and the opponent
+wins by forfeit (if applicable).
+
+> [!NOTE]
+> No validation is performed on `pID` (e.g., checking if they exist in
+> the database). This is the caller's responsibility.
+
+**Errors:**
+
+| Error                  | Cause                                           |
+| ---------------------- | ----------------------------------------------- |
+| `'player not in game'` | Player has no active game in `playerToGame`     |
+| `'game not found'`     | Game code from mapping doesn't exist in `games` |
+
+---
+
+## Error Summary
+
+| Function      | Error                               | Cause                                                     |
+| ------------- | ----------------------------------- | --------------------------------------------------------- |
+| `requestGame` | `'a player is already in a game'`   | `pID1` or `pID2` already has an active game               |
+| `joinGame`    | `'unknow game code'`                | Game code doesn't exist in `games` map                    |
+| `joinGame`    | `'player is already in a game'`     | Player already has an active game                         |
+| `joinGame`    | `'player not allowed in this game'` | Locked game and `playerId` is neither `p1.id` nor `p2.id` |
+| `leaveGame`   | `'player not in game'`              | Player has no active game in `playerToGame`               |
+| `leaveGame`   | `'game not found'`                  | Game code from mapping doesn't exist in `games`           |
+
+---
+
+## TODOs
+
+- [x] #108
+- [ ] #109
+- [ ] #110
+- [ ] #111
+- [x] #112
+- [x] #113
+- [ ] #114
+- [x] #115

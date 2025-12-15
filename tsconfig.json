@@ -20,16 +20,16 @@
 	},
 	"exclude": ["node_modules", "**/*.test.ts", "**/dist/**"],
 	"references": [
-		{ "path": "./services/frontend/app" },
 		{ "path": "./packages/pong-shared" },
 		{ "path": "./packages/security" },
 		{ "path": "./packages/common" },
 		{ "path": "./services/users/app" },
 		{ "path": "./services/auth/app" },
-		{ "path": "./services/pong-server/app" },
+		{ "path": "./services/game/app" },
 		{ "path": "./services/2fa/app" },
 		{ "path": "./services/frontend/app" },
-		{ "path": "./services/social/app" }
+		{ "path": "./services/social/app" },
+		{ "path": "./services/game/app" }
 	],
 	"ts-node": {
 		"esm": true

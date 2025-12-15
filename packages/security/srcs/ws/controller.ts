@@ -9,5 +9,5 @@ export async function createTokenController(
 	const user = request.user as { user_id: number; login: string }
 	if (!user) throw createHttpError.Unauthorized('User not authenticated')
 
-	reply.send(createWsToken(request.server, user))
+	reply.code(201).send(createWsToken(request.server, user))
 }

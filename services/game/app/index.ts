@@ -1,13 +1,17 @@
 //import { GameState } from '@ft_transcendence/pong-shared'
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 //import { createGame } from './utils/createGame.js'
-import { loadOpenAPISchema } from '@ft_transcendence/common'
 import { createWsApp } from '@ft_transcendence/security'
+import { registerRoutes } from './routes/registerRoutes.js'
+import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
+import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
 
-console.log('test: ', process.env.HOST as string)
-const openapiSwager = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+runMigrations()
+
 async function start(): Promise<void> {
+	const env: IPongServerEnv = checkEnv() // throw on error
 	const app = createWsApp(
 		gameRoutes,
 		{
@@ -18,29 +22,31 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: `${process.env.HOST as string}/pong-server`,
+						url: env.HOST,
 						description: 'idk'
 					}
 				],
-				components: openapiSwager.components
+				components: env.openAPISchema.components
 			},
 			transform: jsonSchemaTransform
 		},
 		{
-			main: process.env.JWT_SECRET as string,
-			service: process.env.JWT_SECRET_GAME as string
+			main: env.JWT_SECRET,
+			service: env.JWT_SECRET_GAME
 		}
 	)
+	setupFastifyMonitoringHooks(app)
+	await registerRoutes(app)
 
 	try {
 		await app.ready()
 		await app.listen({
-			port: parseInt(process.env.PORT as string),
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		console.log('Listening on port', process.env.PORT)
+		console.log(`listening on port: ${env.PORT}`)
 	} catch (err) {
-		console.error('Error starting server: ', err)
+		console.error('Error starting server:', err)
 		process.exit(1)
 	}
 }

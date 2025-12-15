@@ -53,23 +53,10 @@ services:
       install-dependencies:
         condition: service_completed_successfully
 
-  matchmaking:
+  game:
     build:
       context: .
-      dockerfile: services/matchmaking/Dockerfile.dev
-    volumes:
-      - ./:/app
-    environment:
-      - DTO_OPENAPI_FILE=../../../packages/common/openapiDTO.json
-    restart: none
-    depends_on:
-      install-dependencies:
-        condition: service_completed_successfully
-
-  pong-server:
-    build:
-      context: .
-      dockerfile: services/pong-server/Dockerfile.dev
+      dockerfile: services/game/Dockerfile.dev
     volumes:
       - ./:/app
     environment:
