@@ -11,7 +11,7 @@ export interface IGameEnv {
 export function checkEnv(): IGameEnv {
 	const variables = {
 		DTO_OPENAPI_FILE: process.env.DTO_OPENAPI_FILE,
-		HOST: process.env.HOSTNAME,
+		HOST: process.env.HOST,
 		PORT: process.env.PORT,
 		JWT_SECRET_GAME: process.env.JWT_SECRET_GAME,
 		JWT_SECRET: process.env.JWT_SECRET

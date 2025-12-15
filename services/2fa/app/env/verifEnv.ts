@@ -13,7 +13,7 @@ export interface I2faEnv {
 export function checkEnv(): I2faEnv {
 	const variables = {
 		DTO_OPENAPI_FILE: process.env.DTO_OPENAPI_FILE,
-		HOST: process.env.HOSTNAME,
+		HOST: process.env.HOST,
 		PORT: process.env.PORT,
 		JWT_SECRET: process.env.JWT_SECRET,
 		TWOFA_DB_PATH: process.env.TWOFA_DB_PATH,
