@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { IdParamSchema } from '@ft_transcendence/common'
-import { getMatchHistoryByPlayerId } from '../repositories/matchsRepository.js'
+import { IdParamSchema, type MatchHistoryResponseDTO } from '@ft_transcendence/common'
+import { getUserMatchHistory } from '../usecases/historyUsecases.js'
 import createHttpError from 'http-errors'
 
 export function getUserMatchHistoryController(
@@ -12,6 +12,6 @@ export function getUserMatchHistoryController(
 		throw createHttpError.Unauthorized()
 	}
 	const targetUserId = IdParamSchema.parse(request.params).id
-	const matches = getMatchHistoryByPlayerId(Number(targetUserId))
-	return reply.send({ success: true, matches })
+	const result: MatchHistoryResponseDTO = getUserMatchHistory(Number(targetUserId))
+	return reply.send(result)
 }
