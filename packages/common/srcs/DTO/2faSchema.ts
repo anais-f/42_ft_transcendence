@@ -68,6 +68,28 @@ export const status2FAResponseSchema = z
 	})
 	.strict()
 
+export const Call2FAResponseSchema = z
+	.object({
+		ok: z.boolean(),
+		status: z.number().int().positive(),
+		data: z.any()
+	})
+	.strict()
+
+export const Enable2FAResponseSchema = z
+	.object({
+		otpauth_url: z.url(),
+		qr_base64: z.string(),
+		expires_at: z.string()
+	})
+	.strict()
+
+export const Verify2FALoginResponseSchema = z
+	.object({
+		auth_token: z.string()
+	})
+	.strict()
+
 export type Verify2FADTO = z.infer<typeof verify2FASchema>
 export type Setup2FADTO = z.infer<typeof setup2FASchema>
 export type Disable2FADTO = z.infer<typeof disable2FASchema>
@@ -77,3 +99,8 @@ export type Setup2FAResponseDTO = z.infer<typeof setup2FAResponseSchema>
 export type Verify2FAResponseDTO = z.infer<typeof verify2FAResponseSchema>
 export type Disable2FAResponseDTO = z.infer<typeof disable2FAResponseSchema>
 export type Status2FAResponseDTO = z.infer<typeof status2FAResponseSchema>
+export type Call2FAResponseDTO = z.infer<typeof Call2FAResponseSchema>
+export type Enable2FAResponseDTO = z.infer<typeof Enable2FAResponseSchema>
+export type Verify2FALoginResponseDTO = z.infer<
+	typeof Verify2FALoginResponseSchema
+>

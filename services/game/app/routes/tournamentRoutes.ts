@@ -1,20 +1,28 @@
 import { FastifyInstance } from 'fastify'
 import { CreateTournamentSchema } from '@ft_transcendence/common'
+import {
+	CodeParamSchema,
+	CreateTournamentResponseSchema,
+	GetTournamentResponseSchema,
+	JoinTournamentResponseSchema
+} from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import {
 	createTournamentController,
-	joinTournamentController,
 	getTournamentController,
+	joinTournamentController,
 	quitTournamentController
 } from '../controllers/tournament/tournamentControllers.js'
-import { CodeParamSchema } from '@ft_transcendence/common'
 
 export function tournamentRoutes(app: FastifyInstance) {
 	app.post(
 		'/api/createTournament',
 		{
 			schema: {
-				body: CreateTournamentSchema
+				body: CreateTournamentSchema,
+				response: {
+					200: CreateTournamentResponseSchema
+				}
 			},
 			preHandler: jwtAuthMiddleware
 		},
@@ -24,7 +32,10 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/joinTournament/:code',
 		{
 			schema: {
-				params: CodeParamSchema
+				params: CodeParamSchema,
+				response: {
+					200: JoinTournamentResponseSchema
+				}
 			},
 			preHandler: jwtAuthMiddleware
 		},
@@ -34,7 +45,10 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/tournament/:code',
 		{
 			schema: {
-				params: CodeParamSchema
+				params: CodeParamSchema,
+				response: {
+					200: GetTournamentResponseSchema
+				}
 			},
 			preHandler: jwtAuthMiddleware
 		},
