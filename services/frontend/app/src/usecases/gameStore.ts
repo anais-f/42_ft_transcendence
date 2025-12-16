@@ -1,11 +1,8 @@
-export type PlayerSlot = 'p1' | 'p2'
-
-export interface PlayerData {
-	username: string
-	avatar: string
-}
-
-export type OnOpponentJoinCallback = (opponent: PlayerData) => void
+import {
+	PlayerSlot,
+	PlayerData,
+	OnOpponentJoinCallback
+} from '../types/game.js'
 
 class GameStore {
 	private _gameCode: string | null = null

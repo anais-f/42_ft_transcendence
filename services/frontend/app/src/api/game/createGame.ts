@@ -1,12 +1,12 @@
-import { tr } from "zod/v4/locales"
-
 export interface NewGameResponse {
 	code: string
 }
 
-export async function createGameApi(): Promise<{data: any, error: string | null , status: number}>
-{
-
+export async function createGameApi(): Promise<{
+	data: any
+	error: string | null
+	status: number
+}> {
 	try {
 		const response = await fetch('/game/api/game/new-game', {
 			method: 'POST',
@@ -17,11 +17,11 @@ export async function createGameApi(): Promise<{data: any, error: string | null 
 		if (!response.ok) {
 			return {
 				data: null,
-				error: payload.message || 'Request failed',
+				error: payload.error || payload.message || 'Request failed',
 				status: payload.statusCode || response.status
 			}
 		}
-		return {  data: payload, error: null, status: 200 }
+		return { data: payload, error: null, status: 200 }
 	} catch {
 		return { data: null, error: 'Network error', status: 0 }
 	}

@@ -4,7 +4,7 @@ export function handleCopyCode(actionButton: HTMLElement) {
 	const codeSpan = document.getElementById('lobby-code')
 	if (codeSpan) {
 		if (!navigator?.clipboard?.writeText) {
-			notyf.error('Can\'t copy game code')
+			notyf.error("Can't copy game code")
 		}
 
 		navigator.clipboard.writeText(codeSpan.textContent || '')
