@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
-import createHttpError from 'http-errors'
+import { env } from '../index.js'
+
+function getJWTSecret(): string {
+	return env.JWT_SECRET
+}
 
 export function signToken(
 	payload: {
@@ -11,12 +15,7 @@ export function signToken(
 	},
 	expiresIn: ms.StringValue
 ): string {
-	const secret = process.env.JWT_SECRET
-	if (!secret)
-		throw createHttpError.InternalServerError(
-			'JWT_SECRET environment variable is required to sign tokens'
-		)
-
+	const secret = getJWTSecret()
 	return jwt.sign(payload, secret, { expiresIn: expiresIn })
 }
 
@@ -27,11 +26,6 @@ export function verifyToken(token: string): {
 	iat: number
 	exp: number
 } {
-	const secret = process.env.JWT_SECRET
-	if (!secret)
-		throw createHttpError.InternalServerError(
-			'JWT_SECRET environment variable is required to verify tokens'
-		)
-
+	const secret = getJWTSecret()
 	return jwt.verify(token, secret) as any
 }

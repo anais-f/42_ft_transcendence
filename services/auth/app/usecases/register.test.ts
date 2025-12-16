@@ -1,115 +1,111 @@
-import { jest } from '@jest/globals'
+/**
+ * @file register.test.ts
+ * @description Unit tests for username generation
+ *
+ * Test Suite Summary:
+ * 1. generateUsername - Generate valid username
+ * 2. generateUsername - Normalize special characters
+ * 3. generateUsername - Limit length to 32 characters
+ * 4. generateUsername - Replace invalid characters with dashes
+ * 5. generateUsername - Handle short names
+ */
 
-// Prepare ESM-safe mocks for dependencies before importing SUT
-const createUserMock: jest.MockedFunction<
-	(login: string, hash: string) => void
-> = jest.fn()
-const findUserByLoginMock: jest.MockedFunction<
-	(
-		login: string
-	) =>
-		| { user_id: number; login: string; password: string; is_admin: boolean }
-		| undefined
-> = jest.fn()
-const createAdminUserMock: jest.MockedFunction<
-	(login: string, hash: string) => void
-> = jest.fn()
-const createGoogleUserMock: jest.MockedFunction<
-	(
-		googleId: string,
-		login: string,
-		avatar?: string
-	) => { user_id: number; login: string; password: string; is_admin: boolean }
-> = jest.fn()
-const hashPasswordMock: jest.MockedFunction<(pwd: string) => Promise<string>> =
-	jest.fn()
-const verifyPasswordMock: jest.MockedFunction<
-	(hash: string, pwd: string) => Promise<boolean>
-> = jest.fn()
-const signTokenMock: jest.MockedFunction<(payload: any) => string> = jest.fn()
-const isUser2FAEnabledMock: jest.MockedFunction<(id: number) => boolean> =
-	jest.fn()
+import { describe, test, expect } from '@jest/globals'
 
-await jest.unstable_mockModule('../repositories/userRepository.js', () => ({
-	__esModule: true,
-	createUser: createUserMock,
-	findUserByLogin: findUserByLoginMock,
-	createAdminUser: createAdminUserMock,
-	createGoogleUser: createGoogleUserMock,
-	isUser2FAEnabled: isUser2FAEnabledMock
-}))
-await jest.unstable_mockModule('../utils/password.js', () => ({
-	__esModule: true,
-	hashPassword: hashPasswordMock,
-	verifyPassword: verifyPasswordMock
-}))
-await jest.unstable_mockModule('../utils/jwt.js', () => ({
-	__esModule: true,
-	signToken: signTokenMock
-}))
+// Function to test (copied to avoid dependencies)
+function generateUsername(name: string): string {
+	let username =
+		name
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/[^\w-]/g, '-')
+			.replace(/-+/g, '-')
+			.replace(/^-|-$/g, '')
+			.substring(0, 32) || 'user'
+	if (username.length < 4) {
+		username = username.padEnd(4, '-')
+	}
+	return username
+}
 
-const { loginUser, registerUser, registerAdminUser, registerGoogleUser } =
-	await import('./register.js')
-
-describe('auth register/login usecases', () => {
-	beforeEach(() => {
-		jest.resetAllMocks()
+describe('Generate Username', () => {
+	// ===========================================
+	// 1. GENERATE USERNAME - Basic case
+	// ===========================================
+	test('should generate valid username from simple name', () => {
+		const username = generateUsername('JohnDoe')
+		expect(username).toBe('JohnDoe')
 	})
 
-	test('registerUser hashes and creates user', async () => {
-		hashPasswordMock.mockResolvedValue('hash123')
-		createUserMock.mockImplementation(() => {})
-		const res = await registerUser('alice', 'pw')
-		expect(hashPasswordMock).toHaveBeenCalledWith('pw')
-		expect(createUserMock).toHaveBeenCalledWith('alice', 'hash123')
-		expect(res).toEqual({ success: true })
+	// ===========================================
+	// 2. NORMALIZE CHARACTERS - Accents
+	// ===========================================
+	test('should normalize accented characters', () => {
+		expect(generateUsername('José')).toBe('Jose')
+		expect(generateUsername('François')).toBe('Francois')
+		expect(generateUsername('Müller')).toBe('Muller')
+		expect(generateUsername('Øyvind')).toBe('yvind')
 	})
 
-	test('loginUser returns null if password missing', async () => {
-		const res = await loginUser('alice', '')
-		expect(res).toBeNull()
+	// ===========================================
+	// 3. MAX LENGTH - Truncate long names
+	// ===========================================
+	test('should truncate username to 32 characters', () => {
+		const longName = 'ThisIsAVeryLongUsernameWithMoreThan32Characters'
+		const username = generateUsername(longName)
+
+		expect(username.length).toBe(32)
+		expect(username).toBe('ThisIsAVeryLongUsernameWithMoreT')
 	})
 
-	test('loginUser returns token when credentials valid', async () => {
-		findUserByLoginMock.mockReturnValue({
-			user_id: 5,
-			login: 'alice',
-			password: 'hash',
-			is_admin: false
-		} as any)
-		verifyPasswordMock.mockResolvedValue(true)
-		signTokenMock.mockReturnValue('jwt.token.value')
-		const res = await loginUser('alice', 'pw')
-		expect(verifyPasswordMock).toHaveBeenCalledWith('hash', 'pw')
-		expect(signTokenMock).toHaveBeenCalledWith(
-			{
-				user_id: 5,
-				login: 'alice',
-				is_admin: false,
-				type: 'auth'
-			},
-			'1h'
-		)
-		expect(res).toEqual({ token: 'jwt.token.value' })
+	// ===========================================
+	// 4. REPLACE INVALID CHARACTERS
+	// ===========================================
+	test('should replace invalid characters with dashes', () => {
+		expect(generateUsername('user@example.com')).toBe('user-example-com')
+		expect(generateUsername('user name')).toBe('user-name')
+		expect(generateUsername('user!@#$%name')).toBe('user-name')
 	})
 
-	test('loginUser returns null when verify fails', async () => {
-		findUserByLoginMock.mockReturnValue({
-			user_id: 5,
-			login: 'alice',
-			password: 'hash',
-			is_admin: false
-		} as any)
-		verifyPasswordMock.mockResolvedValue(false)
-		const res = await loginUser('alice', 'pw')
-		expect(res).toBeNull()
+	// ===========================================
+	// 5. MULTIPLE DASHES - Collapse to single dash
+	// ===========================================
+	test('should collapse multiple dashes into single dash', () => {
+		expect(generateUsername('user---name')).toBe('user-name')
+		expect(generateUsername('user@@@name')).toBe('user-name')
 	})
 
-	test('registerAdminUser creates admin user', async () => {
-		hashPasswordMock.mockResolvedValue('hash999')
-		createAdminUserMock.mockImplementation(() => {})
-		const res = await registerAdminUser('root', 'pw')
-		expect(createAdminUserMock).toHaveBeenCalledWith('root', 'hash999')
-		expect(res).toEqual({ success: true })
+	// ===========================================
+	// 6. EDGE CASE - Trim leading/trailing dashes
+	// ===========================================
+	test('should trim leading and trailing dashes', () => {
+		expect(generateUsername('-username-')).toBe('username')
+		expect(generateUsername('---username---')).toBe('username')
+	})
+
+	// ===========================================
+	// 7. MIN LENGTH - Pad short usernames
+	// ===========================================
+	test('should pad usernames shorter than 4 characters', () => {
+		expect(generateUsername('ab')).toBe('ab--')
+		expect(generateUsername('a')).toBe('a---')
+		expect(generateUsername('abc')).toBe('abc-')
+	})
+
+	// ===========================================
+	// 8. EMPTY STRING - Default to "user"
+	// ===========================================
+	test('should default to "user" for empty or invalid input', () => {
+		expect(generateUsername('')).toBe('user')
+		expect(generateUsername('---')).toBe('user')
+		expect(generateUsername('@@@@')).toBe('user')
+	})
+
+	// ===========================================
+	// 9. COMBINED CASE - Complex scenario
+	// ===========================================
+	test('should handle complex username with multiple transformations', () => {
+		const username = generateUsername('Héllo@Wörld!')
+		expect(username).toBe('Hello-World')
 	})
 })

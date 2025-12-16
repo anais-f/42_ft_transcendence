@@ -1,48 +1,61 @@
-import { jest } from '@jest/globals'
+/**
+ * @file password.test.ts
+ * @description Tests unitaires pour les fonctions de gestion des mots de passe
+ *
+ * Test Suite Summary:
+ * 1. hashPassword - Crée un hash valide
+ * 2. verifyPassword - Vérifie un mot de passe correct
+ * 3. verifyPassword - Rejette un mot de passe incorrect
+ */
 
-// We mock argon2 to avoid heavy hashing cost and to control outputs
-const hashMock: jest.MockedFunction<
-	(password: string, opts: any) => Promise<string>
-> = jest.fn()
-const verifyMock: jest.MockedFunction<
-	(hash: string, password: string) => Promise<boolean>
-> = jest.fn()
+import { describe, test, expect } from '@jest/globals'
+import { hashPassword, verifyPassword } from './password.js'
 
-await jest.unstable_mockModule('argon2', () => ({
-	__esModule: true,
-	default: { hash: hashMock, verify: verifyMock },
-	hash: hashMock,
-	verify: verifyMock,
-	argon2id: 2
-}))
+describe('Password Utils', () => {
+	// ===========================================
+	// 1. HASH PASSWORD - SUCCESS
+	// ===========================================
+	test('hashPassword should create a valid argon2 hash', async () => {
+		const password = 'SecurePassword123!'
+		const hash = await hashPassword(password)
 
-const { hashPassword, verifyPassword } = await import('./password.js')
+		// Vérifier que le hash est créé
+		expect(hash).toBeDefined()
+		expect(typeof hash).toBe('string')
+		expect(hash.length).toBeGreaterThan(50)
 
-describe('password utils', () => {
-	beforeEach(() => {
-		jest.resetAllMocks()
+		// Vérifier que le hash commence par $argon2id$
+		expect(hash).toMatch(/^\$argon2id\$/)
 	})
 
-	test('hashPassword passes argon2id and returns hash', async () => {
-		hashMock.mockResolvedValue('hashed-value')
-		const result = await hashPassword('supersecret')
-		expect(result).toBe('hashed-value')
-		expect(hashMock).toHaveBeenCalledWith(
-			'supersecret',
-			expect.objectContaining({ type: 2 })
-		)
+	// ===========================================
+	// 2. VERIFY PASSWORD - SUCCESS
+	// ===========================================
+	test('verifyPassword should validate correct password', async () => {
+		const password = 'MyTestPassword456!'
+		const hash = await hashPassword(password)
+
+		const isValid = await verifyPassword(hash, password)
+		expect(isValid).toBe(true)
 	})
 
-	test('verifyPassword returns true when argon2.verify succeeds', async () => {
-		verifyMock.mockResolvedValue(true)
-		const ok = await verifyPassword('hashed-value', 'supersecret')
-		expect(ok).toBe(true)
-		expect(verifyMock).toHaveBeenCalledWith('hashed-value', 'supersecret')
+	// ===========================================
+	// 3. VERIFY PASSWORD - FAILURE (Wrong password)
+	// ===========================================
+	test('verifyPassword should reject incorrect password', async () => {
+		const password = 'CorrectPassword'
+		const wrongPassword = 'WrongPassword'
+		const hash = await hashPassword(password)
+
+		const isValid = await verifyPassword(hash, wrongPassword)
+		expect(isValid).toBe(false)
 	})
 
-	test('verifyPassword returns false for mismatch', async () => {
-		verifyMock.mockResolvedValue(false)
-		const ok = await verifyPassword('hashed-value', 'wrong')
-		expect(ok).toBe(false)
+	// ===========================================
+	// 4. VERIFY PASSWORD - FAILURE (Invalid hash)
+	// ===========================================
+	test('verifyPassword should return false for invalid hash', async () => {
+		const isValid = await verifyPassword('invalid-hash-format', 'password123')
+		expect(isValid).toBe(false)
 	})
 })

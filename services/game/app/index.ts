@@ -3,7 +3,7 @@ import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 //import { createGame } from './utils/createGame.js'
 import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { checkEnv, IPongServerEnv } from './env/verifyEnv.js'
+import { checkEnv, IGameEnv } from './env/verifyEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
@@ -11,7 +11,7 @@ import { gameRoutes } from './routes/gameRoutes.js'
 runMigrations()
 
 async function start(): Promise<void> {
-	const env: IPongServerEnv = checkEnv() // throw on error
+	const env: IGameEnv = checkEnv() // throw on error
 	const app = createWsApp(
 		gameRoutes,
 		{

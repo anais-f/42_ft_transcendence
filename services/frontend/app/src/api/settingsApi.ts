@@ -96,7 +96,6 @@ export async function changePasswordAPI(
 			credentials: 'include',
 			body: JSON.stringify(body)
 		})
-
 		if (!res.ok) {
 			const errorData = await res.json()
 			return {
@@ -107,8 +106,7 @@ export async function changePasswordAPI(
 			}
 		}
 
-		const data = await res.json()
-		return { data, error: null, status: res.status }
+		return { data: null, error: null, status: res.status }
 	} catch {
 		return { data: null, error: 'Network error', status: 0 }
 	}

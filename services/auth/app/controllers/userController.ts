@@ -1,53 +1,51 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
+import { findUserById } from '../repositories/userRepository.js'
 import {
-	listPublicUsers,
-	findPublicUserById,
-	deleteUserById,
-	findUserById
-} from '../repositories/userRepository.js'
-import {
-	PublicUserAuthSchema,
-	PublicUserListAuthSchema,
-	IdParamSchema,
-	PasswordBodySchema
+	PasswordBodySchema,
+	PublicUserAuthDTO,
+	PublicUserListAuthDTO
 } from '@ft_transcendence/common'
+import {
+	listPublicUsersUsecase,
+	getPublicUserUsecase,
+	deleteUserUsecase
+} from '../usecases/userUsecases.js'
 import { changeMyPassword } from '../usecases/changeMyPassword.js'
 import { verifyPassword } from '../utils/password.js'
 
 export async function listPublicUsersController(
 	_req: FastifyRequest,
-	reply: FastifyReply
-) {
-	const users = listPublicUsers()
-	return reply.send(PublicUserListAuthSchema.parse(users))
+	_reply: FastifyReply
+): Promise<PublicUserListAuthDTO> {
+	return listPublicUsersUsecase()
 }
 
 export async function getPublicUserController(
 	request: FastifyRequest,
-	reply: FastifyReply
-) {
-	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
-	const idNum = Number(parsed.data.id)
-	const user = findPublicUserById(idNum)
-	if (!user) throw createHttpError.NotFound('User not found')
-	return reply.send(PublicUserAuthSchema.parse(user))
+	_reply: FastifyReply
+): Promise<PublicUserAuthDTO> {
+	const { id } = request.params as { id: string }
+	const userId = Number(id)
+	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid id')
+	return getPublicUserUsecase(userId)
 }
 
-export async function deleteUser(request: FastifyRequest, reply: FastifyReply) {
-	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
-	const idNum = Number(parsed.data.id)
-	const ok = deleteUserById(idNum)
-	if (!ok) throw createHttpError.NotFound('User not found')
-	return reply.code(204).send({ success: true })
+export async function deleteUser(
+	request: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	const { id } = request.params as { id: string }
+	const userId = Number(id)
+	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid id')
+	reply.code(204)
+	return deleteUserUsecase(userId)
 }
 
 export async function patchUserPassword(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const userId = request.user?.user_id
 	if (!userId) throw createHttpError.Unauthorized('Invalid token')
 
@@ -59,7 +57,7 @@ export async function patchUserPassword(
 
 	await changeMyPassword(userId, old_password, new_password, twofa_code)
 
-	return reply.send({ success: true })
+	return reply.send()
 }
 
 /**
@@ -70,7 +68,7 @@ export async function patchUserPassword(
 export async function verifyMyPasswordController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const userId = request.user?.user_id
 	if (!userId) throw createHttpError.Unauthorized('Invalid token')
 
@@ -87,5 +85,5 @@ export async function verifyMyPasswordController(
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) throw createHttpError.Unauthorized('Invalid password')
 
-	return reply.send({ success: true })
+	return reply.send()
 }

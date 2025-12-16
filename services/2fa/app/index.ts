@@ -12,19 +12,19 @@ import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
+import Swagger from '@fastify/swagger'
+import { checkEnv, I2faEnv } from './env/verifEnv.js'
+
+// Initialize and validate environment variables
+export const env: I2faEnv = checkEnv()
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
 }).withTypeProvider<ZodTypeProvider>()
 
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) {
-	throw new Error('JWT_SECRET environment variable is required')
-}
-
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
-	secret: jwtSecret,
+	secret: env.JWT_SECRET,
 	cookie: {
 		cookieName: 'auth_token',
 		signed: false
@@ -42,21 +42,33 @@ await app.register(metricPlugin.default, { endpoint: '/metrics' })
 
 await registerRoutes(app)
 
+app.register(Swagger as any, {
+	openapi: {
+		info: {
+			title: 'API for 2FA Service',
+			version: '1.0.0'
+		},
+		servers: [
+			{ url: `http://localhost:8080/2fa`, description: 'Local server' }
+		],
+		components: env.openAPISchema.components
+	},
+	transform: jsonSchemaTransform
+})
+
 const start = async () => {
 	try {
 		await app.listen({
-			port: parseInt(process.env.PORT as string),
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		app.log.info(
-			`2FA Service listening on http://localhost:${process.env.PORT}`
-		)
+		app.log.info(`2FA Service listening on http://localhost:${env.PORT}`)
 	} catch (err) {
 		app.log.error(err)
 		process.exit(1)
 	}
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (env.NODE_ENV !== 'test') {
 	start()
 }
