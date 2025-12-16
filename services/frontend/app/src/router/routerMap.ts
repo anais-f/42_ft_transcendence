@@ -81,6 +81,6 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'test',
 		url: '/test',
 		page: TestPage,
-    public: true
+		public: true
 	}
 }

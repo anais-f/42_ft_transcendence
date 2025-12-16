@@ -25,24 +25,28 @@
 		@apply bg-blue-100 text-blue-900 rounded-lg shadow-md px-4 py-2;
 		border: 1px solid rgba(0, 0, 0, 0.06);
 	}
+	.img_style {
+		@apply w-full py-4 opacity-50 object-cover select-none;
+	}
+	.form_style {
+		@apply flex flex-col gap-2 w-full;
+	}
 
-    .generic_btn {
-        @apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
-    }
+	.generic_btn {
+		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
+	}
 }
 
 @layer utilities {
-    .title_font {
-        @apply font-HoldMoney text-5xl;
-    }
-    .title_bloc {
-        @apply mt-1 text-2xl font-semibold;
-    }
-
-	.news_paragraph {
-		@apply text-black opacity-15 select-none text-justify;
+	.title_font {
+		@apply font-HoldMoney text-5xl;
 	}
-
+	.title_bloc {
+		@apply mb-4 text-2xl font-semibold;
+	}
+	.news_paragraph {
+		@apply text-black opacity-20 select-none text-justify;
+	}
 }
 
 body {

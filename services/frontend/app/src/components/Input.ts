@@ -12,16 +12,16 @@
  * inputmode: optional inputmode attribute
  */
 interface InputProps {
-  id: string,
-  name: string,
-  placeholder: string,
-  type: 'text' | 'password',
-  required: boolean,
-  additionalClasses?: string,
-  maxLength?: number,
-  pattern?: string,
-  autoComplete?: string,
-  inputmode?: string
+	id: string
+	name: string
+	placeholder: string
+	type: 'text' | 'password'
+	required: boolean
+	additionalClasses?: string
+	maxLength?: number
+	pattern?: string
+	autoComplete?: string
+	inputmode?: string
 }
 
 /**
@@ -30,32 +30,33 @@ interface InputProps {
  * @constructor
  */
 export const Input = (props: InputProps): string => {
-  const {
-    id,
-    name,
-    placeholder,
-    type,
-    required,
-    additionalClasses = '',
-    maxLength,
-    pattern,
-    autoComplete,
-    inputmode
-  } = props
+	const {
+		id,
+		name,
+		placeholder,
+		type,
+		required,
+		additionalClasses = '',
+		maxLength,
+		pattern,
+		autoComplete,
+		inputmode
+	} = props
 
-  // base classes CSS for the input
-  const baseClasses = 'px-2 border-b-2 text-lg border-black bg-inherit w-full font-special'
+	// base classes CSS for the input
+	const baseClasses =
+		'px-2 border-b-2 text-lg border-black bg-inherit w-full font-special'
 
-  // combinate all classes for the input
-  const classes = `${baseClasses} ${additionalClasses}`.trim()
+	// combinate all classes for the input
+	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
-  // conditionnal attributes
-  const maxLengthAttr = maxLength ? `maxlength="${maxLength}"` : ''
-  const patternAttr = pattern ? `pattern="${pattern}"` : ''
-  const autoCompleteAttr = autoComplete ? `autocomplete="${autoComplete}"` : ''
-  const inputmodeAttr = inputmode ? `inputmode="${inputmode}"` : ''
+	// conditionnal attributes
+	const maxLengthAttr = maxLength ? `maxlength="${maxLength}"` : ''
+	const patternAttr = pattern ? `pattern="${pattern}"` : ''
+	const autoCompleteAttr = autoComplete ? `autocomplete="${autoComplete}"` : ''
+	const inputmodeAttr = inputmode ? `inputmode="${inputmode}"` : ''
 
-  return /*html*/ `
+	return /*html*/ `
   <input
     id="${id}"
     name="${name}"

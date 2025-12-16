@@ -7,11 +7,11 @@
  * additionalClasses: optional additional classes for the button
  */
 interface ButtonProps {
-  text: string,
-  id: string,
-  type: 'button' | 'submit',
-  action?: string,
-  additionalClasses?: string
+	text: string
+	id: string
+	type: 'button' | 'submit'
+	action?: string
+	additionalClasses?: string
 }
 
 /**
@@ -20,25 +20,19 @@ interface ButtonProps {
  * @constructor
  */
 export const Button = (props: ButtonProps): string => {
-  const {
-    text,
-    id,
-    type,
-    action,
-    additionalClasses = ''
-  } = props
+	const { text, id, type, action, additionalClasses = '' } = props
 
-  // base classes CSS for the button
-  const baseClasses = 'border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors'
+	// base classes CSS for the button
+	const baseClasses =
+		'border-2 border-black hover:bg-black hover:text-white w-full py-2 my-4 transition-colors text-lg'
 
-  // conditionnal data attribute
-  const dataActionAttr = action ? `data-action="${action}"` : ''
+	// conditionnal data attribute
+	const dataActionAttr = action ? `data-action="${action}"` : ''
 
-  // combinate all classes for the button
-  const classes = `${baseClasses} ${additionalClasses}`.trim()
+	// combinate all classes for the button
+	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
-
-  return /*html*/ `
+	return /*html*/ `
     <button id="${id}" type="${type}" class="${classes}" ${dataActionAttr}>
       ${text}
     </button>
