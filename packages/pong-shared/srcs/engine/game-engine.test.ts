@@ -42,7 +42,8 @@ describe('game-engine', () => {
 		game = new GameEngine(
 			60,
 			scoreData,
-			[segA, segB, segC, segD, padSeg1, padSeg2],
+			[segA, segB, segC, segD],
+			[padSeg1, padSeg2],
 			[
 				{ seg: segC, player: 1 },
 				{ seg: segD, player: 2 }

@@ -22,7 +22,9 @@ export class PongPad {
 			s.p2.add(offset)
 		}
 
-		const blocked = this.border?.some((b) => this.seg.some((s) => b.intersect(s)))
+		const blocked = this.border?.some((b) =>
+			this.seg.some((s) => b.intersect(s))
+		)
 		if (blocked) {
 			const reverseOffset = new Vector2(0, -dist)
 			for (const s of this.seg) {

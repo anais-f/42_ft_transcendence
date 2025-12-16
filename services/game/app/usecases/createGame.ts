@@ -67,28 +67,29 @@ export function createDiamondMap(maxScore: number): IGameData {
 	const pad1 = new PongPad([padSegL1, padSegL2], [borderDown, borderUp])
 	const pad2 = new PongPad([padSegR1, padSegR2], [borderDown, borderUp])
 
+	const staticSegments = [
+		borderDown,
+		borderUp,
+		borderL,
+		borderR,
+		diamondTopSeg1,
+		diamondTopSeg2,
+		diamondTopSeg3,
+		diamondTopSeg4,
+		diamondBotSeg1,
+		diamondBotSeg2,
+		diamondBotSeg3,
+		diamondBotSeg4
+	]
+
+	const dynamicSegments = [padSegL1, padSegL2, padSegR1, padSegR2]
+
 	return {
 		GE: new GameEngine(
 			DEFAULT_TPS,
 			createScore(maxScore),
-			[
-				borderDown,
-				borderUp,
-				borderL,
-				borderR,
-				padSegL1,
-				padSegL2,
-				padSegR1,
-				padSegR2,
-				diamondTopSeg1,
-				diamondTopSeg2,
-				diamondTopSeg3,
-				diamondTopSeg4,
-				diamondBotSeg1,
-				diamondBotSeg2,
-				diamondBotSeg3,
-				diamondBotSeg4
-			],
+			staticSegments,
+			dynamicSegments,
 			[
 				{ seg: borderL, player: 1 },
 				{ seg: borderR, player: 2 }
@@ -126,13 +127,16 @@ export function createGame(maxScore: number): IGameData {
 	const pad1 = new PongPad([padSeg1], [borderDown, borderUp])
 	const pad2 = new PongPad([padSeg2], [borderDown, borderUp])
 
+	const staticSegments = [borderDown, borderUp, borderL, borderR]
+	const dynamicSegments = [padSeg1, padSeg2]
+
 	return {
 		GE: new GameEngine(
 			DEFAULT_TPS,
 			createScore(maxScore),
-			[borderDown, borderUp, borderL, borderR, padSeg1, padSeg2], // solid obj
+			staticSegments,
+			dynamicSegments,
 			[
-				// win zones
 				{ seg: borderL, player: 1 },
 				{ seg: borderR, player: 2 }
 			]

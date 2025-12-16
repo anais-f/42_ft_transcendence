@@ -40,7 +40,8 @@ export class GameEngine {
 	public constructor(
 		TPS: number,
 		private _live: ILives,
-		private _borders: Segment[],
+		private _staticBorders: Segment[],
+		private _dynamicBorders: Segment[],
 		private _winZones: IWinZone[]
 	) {
 		this._TPS_DATA = new TPS_MANAGER(TPS)
@@ -132,8 +133,9 @@ export class GameEngine {
 		}
 
 		const collisions: CollisionData[] = []
+		const allBorders = [...this._staticBorders, ...this._dynamicBorders]
 
-		for (const border of this._borders) {
+		for (const border of allBorders) {
 			const hitData = border.intersect(this._ball.shape)
 			if (Array.isArray(hitData) && hitData.length > 0) {
 				const normal = this.getCollisionNormal(border, hitData)
@@ -226,7 +228,15 @@ export class GameEngine {
 	}
 
 	get borders(): Segment[] {
-		return this._borders
+		return [...this._staticBorders, ...this._dynamicBorders]
+	}
+
+	get staticBorders(): Segment[] {
+		return this._staticBorders
+	}
+
+	get dynamicBorders(): Segment[] {
+		return this._dynamicBorders
 	}
 
 	get lives(): ILives {

@@ -2,11 +2,12 @@ import {
 	GameState,
 	BALL_SPEED,
 	Vector2,
-	S05BallPos
+	S05BallPos,
+	S09DynamicSegments,
+	S02SegmentUpdate,
+	S06BallSync,
+	AS03BaseBall
 } from '@ft_transcendence/pong-shared'
-import { S02SegmentUpdate } from '@ft_transcendence/pong-shared/network/Packet/Server/S02.js'
-import { S06BallSync } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S06.js'
-import { AS03BaseBall } from '@ft_transcendence/pong-shared/network/Packet/Server/S03/S03.js'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
@@ -30,10 +31,10 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createDiamondMap(MAX_LIVES)
 	gameData.gameInstance = gameInstance
 
-	const mapPacket = new S02SegmentUpdate(gameInstance.GE.borders)
-	const mapBuffer = mapPacket.serialize()
-	gameData.p1.ws?.send(mapBuffer)
-	gameData.p2?.ws?.send(mapBuffer)
+	const staticPacket = new S02SegmentUpdate(gameInstance.GE.staticBorders)
+	const staticBuffer = staticPacket.serialize()
+	gameData.p1.ws?.send(staticBuffer)
+	gameData.p2?.ws?.send(staticBuffer)
 
 	const packetSender = new PacketSender(gameData)
 	packetSender.start()
@@ -84,8 +85,10 @@ async function startGameLoop(
 
 			updatePadMovements(gameData.gameInstance!)
 
-			const segPacket = new S02SegmentUpdate(gameData.gameInstance!.GE.borders)
-			packetSender.push(SPacketsType.S02, segPacket)
+			const dynamicPacket = new S09DynamicSegments(
+				gameData.gameInstance!.GE.dynamicBorders
+			)
+			packetSender.push(SPacketsType.S09, dynamicPacket)
 
 			const ball = gameData.gameInstance!.GE.ball
 			if (ball.velo.equals(ballState.velo)) {

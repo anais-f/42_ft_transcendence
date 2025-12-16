@@ -12,7 +12,8 @@ import {
 } from '../constants.js'
 
 class Renderer {
-	private segments: Segment[] = []
+	private staticSegments: Segment[] = []
+	private dynamicSegments: Segment[] = []
 	private ballPos: Vector2 = new Vector2(0, 0)
 	private ballVelo: Vector2 = new Vector2(0, 0)
 	private ballFactor: number = 1
@@ -28,8 +29,12 @@ class Renderer {
 		this.startAnimation()
 	}
 
-	setSegments(segments: Segment[]): void {
-		this.segments = segments
+	setStaticSegments(segments: Segment[]): void {
+		this.staticSegments = segments
+	}
+
+	setDynamicSegments(segments: Segment[]): void {
+		this.dynamicSegments = segments
 	}
 
 	setBallPos(pos: Vector2): void {
@@ -94,7 +99,8 @@ class Renderer {
 
 		ctx.strokeStyle = SEGMENT_COLOR
 		ctx.lineWidth = SEGMENT_LINE_WIDTH
-		for (const seg of this.segments) {
+		const allSegments = [...this.staticSegments, ...this.dynamicSegments]
+		for (const seg of allSegments) {
 			const p1 = seg.p1
 			const p2 = seg.p2
 			ctx.beginPath()
@@ -126,7 +132,8 @@ class Renderer {
 
 	clear(): void {
 		this.stopAnimation()
-		this.segments = []
+		this.staticSegments = []
+		this.dynamicSegments = []
 		this.ballPos = new Vector2(0, 0)
 		this.ballVelo = new Vector2(0, 0)
 		this.ballFactor = 1
