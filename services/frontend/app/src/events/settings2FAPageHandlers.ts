@@ -13,13 +13,15 @@ import { syncCurrentUser } from '../utils/userValidation.js'
  * @param password - The password to verify
  * @returns true if password is valid, false otherwise
  */
-async function verifyCurrentUserPassword(password: string): Promise<boolean> {
+export async function verifyCurrentUserPassword(
+	password: string
+): Promise<boolean> {
 	const { error, status } = await verifyMyPasswordAPI(password)
 
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection password')
 				break
 			default:
 				notyf.error(error)
@@ -34,7 +36,7 @@ async function verifyCurrentUserPassword(password: string): Promise<boolean> {
  * Generate the 2FA QR code and otpauth_url
  * Use POST /auth/api/2fa/setup
  */
-async function handleGenerateQRCode() {
+export async function handleGenerateQRCode() {
 	if (!currentUser) {
 		notyf.error('User not authenticated')
 		return
@@ -45,7 +47,7 @@ async function handleGenerateQRCode() {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection qrcode')
 				break
 			default:
 				notyf.error(error)
@@ -88,7 +90,7 @@ async function handleGenerateQRCode() {
  * @param form
  * @returns Promise<void>
  */
-async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
+export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	const formData = new FormData(form)
 	const code = formData.get('code') as string
 	const password = formData.get('password') as string
@@ -109,7 +111,7 @@ async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection enable')
 				break
 			default:
 				notyf.error(error)
@@ -129,7 +131,7 @@ async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
  * @param form
  * @returns Promise<void>
  */
-async function handleDisable2FA(form: HTMLFormElement) {
+export async function handleDisable2FA(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const code = formData.get('code') as string
 	const password = formData.get('password') as string
@@ -150,7 +152,7 @@ async function handleDisable2FA(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection disbable')
 				break
 			default:
 				notyf.error(error)

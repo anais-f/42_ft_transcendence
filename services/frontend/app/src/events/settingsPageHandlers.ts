@@ -36,7 +36,7 @@ export async function handleUsername(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection username')
 				break
 			default:
 				notyf.error(error)
@@ -70,7 +70,7 @@ export async function handlerAvatar(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection avatr')
 				break
 			default:
 				notyf.error(error)
@@ -133,7 +133,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.error('Network error, check your connection mot de passe')
 				break
 			default:
 				notyf.error(error)

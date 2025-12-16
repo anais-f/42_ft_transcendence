@@ -50,7 +50,7 @@ export async function verifyMyPasswordAPI(password: string) {
 			const errorData = await res.json()
 			return {
 				data: null,
-				error: errorData.error || errorData.message || 'Invalid password',
+				error: 'Invalid password',
 				status: errorData.statusCode || res.status
 			}
 		}
