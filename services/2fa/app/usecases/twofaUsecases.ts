@@ -29,7 +29,9 @@ export async function setup2FA(
 	const pendingUntil = Date.now() + SETUP_EXPIRATION_MS
 
 	upsertPendingSecret(userId, enc, pendingUntil)
-	console.log(`[2FA] Pending secret saved for user ${userId}, expires at ${new Date(pendingUntil).toISOString()}`)
+	console.log(
+		`[2FA] Pending secret saved for user ${userId}, expires at ${new Date(pendingUntil).toISOString()}`
+	)
 
 	const otpauth_url = authenticator.keyuri(label, issuer, secret)
 	const qr_base64 = await qrcode.toDataURL(otpauth_url)
@@ -43,7 +45,7 @@ export async function setup2FA(
 
 export function verify2FA(
 	userId: number,
-	twofaCode: string,
+	twofaCode: string
 ): Verify2FAResponseDTO {
 	console.log(`[2FA] Verifying 2FA for user ${userId}`)
 	const pending = getPendingSecretEnc(userId)
@@ -72,7 +74,9 @@ export function verify2FA(
 		return { success: true, activated: true }
 	}
 
-	console.log(`[2FA] No pending secret, checking active secret for user ${userId}`)
+	console.log(
+		`[2FA] No pending secret, checking active secret for user ${userId}`
+	)
 	const activeEnc = getSecretEnc(userId)
 	if (!activeEnc) {
 		console.log(`[2FA] No active secret found for user ${userId}`)

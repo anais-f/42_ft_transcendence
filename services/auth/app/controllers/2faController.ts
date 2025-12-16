@@ -134,7 +134,7 @@ export async function internalStatus2faController(
 	const { id } = req.params as { id: string }
 	const userId = Number(id)
 	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')
-		
+
 	const result: Status2FAResponseDTO = status2FA(userId)
 	console.log('[2FAController] internalStatus2faController called', result)
 	return reply.code(200).send(result)

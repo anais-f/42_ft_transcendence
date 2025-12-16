@@ -106,7 +106,6 @@ export async function changePasswordAPI(
 			}
 		}
 
-		
 		return { data: null, error: null, status: res.status }
 	} catch {
 		return { data: null, error: 'Network error', status: 0 }
