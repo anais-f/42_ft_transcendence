@@ -1,4 +1,4 @@
-import { Segment, Vector2 } from '@ft_transcendence/pong-shared'
+import { Segment, Vector2 } from '@pong-shared/index.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import {
 	SEGMENT_LINE_WIDTH,

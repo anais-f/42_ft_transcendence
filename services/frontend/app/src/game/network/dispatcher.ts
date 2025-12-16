@@ -1,12 +1,12 @@
-import { packetBuilder } from '@ft_transcendence/pong-shared/network/Packet/packetBuilder.js'
 import {
+	packetBuilder,
 	S02SegmentUpdate,
 	S05BallPos,
 	S06BallSync,
 	S07Score,
 	S08Countdown,
 	S09DynamicSegments
-} from '@ft_transcendence/pong-shared/network/Packet/Server/SPackets.js'
+} from '@pong-shared/index.js'
 import { eogHandler } from './handlers/gameEnd.js'
 import { opponentHandler } from './handlers/opponent.js'
 import { startingInHandler } from './handlers/startingIn.js'

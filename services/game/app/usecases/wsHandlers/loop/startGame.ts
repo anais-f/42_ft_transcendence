@@ -28,7 +28,7 @@ export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createGame(MAX_LIVES)
+	const gameInstance = createDiamondMap(MAX_LIVES)
 	gameData.gameInstance = gameInstance
 
 	const staticPacket = new S02SegmentUpdate(gameInstance.GE.staticBorders)
