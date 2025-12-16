@@ -72,20 +72,8 @@ export const LoginResponseSchema = z.object({
 	token: z.string().optional()
 })
 
-export const ValidateAdminResponseSchema = z.object({
-	success: z.boolean()
-})
-
-export const LogoutResponseSchema = z.object({
-	success: z.boolean()
-})
-
 export const ConfigResponseSchema = z.object({
 	googleClientId: z.string().nullable()
-})
-
-export const PasswordChangeResponseSchema = z.object({
-	success: z.boolean()
 })
 
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
@@ -96,11 +84,4 @@ export type LogoutParamsDTO = z.infer<typeof LogoutParamsSchema>
 export type ChangeMyPasswordDTO = z.infer<typeof ChangeMyPasswordSchema>
 export type RegisterResponseDTO = z.infer<typeof RegisterResponseSchema>
 export type LoginResponseDTO = z.infer<typeof LoginResponseSchema>
-export type ValidateAdminResponseDTO = z.infer<
-	typeof ValidateAdminResponseSchema
->
-export type LogoutResponseDTO = z.infer<typeof LogoutResponseSchema>
 export type ConfigResponseDTO = z.infer<typeof ConfigResponseSchema>
-export type PasswordChangeResponseDTO = z.infer<
-	typeof PasswordChangeResponseSchema
->
