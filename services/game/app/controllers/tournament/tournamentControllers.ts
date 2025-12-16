@@ -3,7 +3,7 @@ import {
 	joinTournament,
 	createTournament,
 	getTournament,
-    quitTournament
+	quitTournament
 } from '../../usecases/tournamentUsecases.js'
 
 export function getTournamentController(

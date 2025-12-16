@@ -5,7 +5,7 @@ import {
 	createTournamentController,
 	joinTournamentController,
 	getTournamentController,
-    quitTournamentController,
+	quitTournamentController
 } from '../controllers/tournament/tournamentControllers.js'
 import { CodeParamSchema } from '@ft_transcendence/common'
 

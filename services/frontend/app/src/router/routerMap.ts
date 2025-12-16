@@ -1,6 +1,18 @@
-import { HomePage, attachHomeEvents, detachHomeEvents } from '../pages/oldhome.js'
-import { attachGameEvents, detachGameEvents, GamePage } from '../pages/oldgame.js'
-import { attachLobbyEvents, detachLobbyEvents, LobbyPage } from '../pages/oldlobby.js'
+import {
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
+} from '../pages/oldhome.js'
+import {
+	attachGameEvents,
+	detachGameEvents,
+	GamePage
+} from '../pages/oldgame.js'
+import {
+	attachLobbyEvents,
+	detachLobbyEvents,
+	LobbyPage
+} from '../pages/oldlobby.js'
 import {
 	LoginPage,
 	attachLoginEvents,

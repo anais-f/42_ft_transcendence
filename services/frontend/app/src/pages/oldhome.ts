@@ -1,9 +1,8 @@
-import { handleCreateGame } from "../events/home/createGameHandler.js"
-import { handleJoinLobby } from "../events/home/joinLobbyHandler.js"
-import { handleLogin } from "../events/loginPageHandlers.js"
-import { logout } from "../usecases/userSession.js"
-import { currentUser } from "../usecases/userStore.js"
-
+import { handleCreateGame } from '../events/home/createGameHandler.js'
+import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
+import { handleLogin } from '../events/loginPageHandlers.js'
+import { logout } from '../usecases/userSession.js'
+import { currentUser } from '../usecases/userStore.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -124,7 +123,7 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
 export function attachHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) {
-		return 
+		return
 	}
 
 	// Create and store the click handler
@@ -152,7 +151,7 @@ export function attachHomeEvents() {
 	submitHandler = async (e: Event) => {
 		const form = e.target as HTMLElement
 		const formName = form.getAttribute('data-form')
-		
+
 		if (formName === 'join-lobby') handleJoinLobby(e)
 	}
 

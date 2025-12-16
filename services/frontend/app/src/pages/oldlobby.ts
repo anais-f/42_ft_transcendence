@@ -74,7 +74,6 @@ export const LobbyPage = (): string => {
 `
 }
 
-
 let clickHandler: ((e: Event) => void) | null = null
 
 export function attachLobbyEvents() {
