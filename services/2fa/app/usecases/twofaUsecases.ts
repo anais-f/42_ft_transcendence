@@ -23,11 +23,13 @@ export async function setup2FA(
 	issuer: string,
 	label: string
 ): Promise<Setup2FAResponseDTO> {
+	console.log(`[2FA] Setting up 2FA for user ${userId}`)
 	const secret = authenticator.generateSecret()
 	const enc = encryptSecret(secret)
 	const pendingUntil = Date.now() + SETUP_EXPIRATION_MS
 
 	upsertPendingSecret(userId, enc, pendingUntil)
+	console.log(`[2FA] Pending secret saved for user ${userId}, expires at ${new Date(pendingUntil).toISOString()}`)
 
 	const otpauth_url = authenticator.keyuri(label, issuer, secret)
 	const qr_base64 = await qrcode.toDataURL(otpauth_url)
@@ -42,17 +44,15 @@ export async function setup2FA(
 export function verify2FA(
 	userId: number,
 	twofaCode: string,
-	hasAuthToken: boolean,
-	has2FAToken: boolean
 ): Verify2FAResponseDTO {
+	console.log(`[2FA] Verifying 2FA for user ${userId}`)
 	const pending = getPendingSecretEnc(userId)
 
 	if (pending) {
-		if (!hasAuthToken) {
-			throw createHttpError.Unauthorized('Auth token missing')
-		}
+		console.log(`[2FA] Found pending secret for user ${userId}`)
 
 		if (pending.pending_until && Date.now() > pending.pending_until) {
+			console.log(`[2FA] Setup expired for user ${userId}`)
 			deleteSecret(userId)
 			throw createHttpError.Gone('Setup expired')
 		}
@@ -72,14 +72,13 @@ export function verify2FA(
 		return { success: true, activated: true }
 	}
 
+	console.log(`[2FA] No pending secret, checking active secret for user ${userId}`)
 	const activeEnc = getSecretEnc(userId)
 	if (!activeEnc) {
+		console.log(`[2FA] No active secret found for user ${userId}`)
 		throw createHttpError.NotFound('No 2FA secret')
 	}
-
-	if (!has2FAToken) {
-		throw createHttpError.Unauthorized('2FA token missing')
-	}
+	console.log(`[2FA] Found active secret for user ${userId}`)
 
 	const activeSecret = decryptSecret(activeEnc)
 	const isValid = authenticator.check(twofaCode, activeSecret)

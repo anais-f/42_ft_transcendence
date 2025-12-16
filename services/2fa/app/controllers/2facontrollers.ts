@@ -34,10 +34,7 @@ export async function verify2FAController(
 	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
 	const { user_id, twofa_code } = parsed.data
-	const hasAuthToken = req.headers.cookie?.includes('auth_token=') ?? false
-	const has2FAToken = req.headers.cookie?.includes('2fa_token=') ?? false
-
-	const result = verify2FA(user_id, twofa_code, hasAuthToken, has2FAToken)
+	const result = verify2FA(user_id, twofa_code)
 
 	return reply.code(200).send(result)
 }
