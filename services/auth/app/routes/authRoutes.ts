@@ -11,6 +11,7 @@ import {
 	LoginActionSchema,
 	LoginGoogleSchema
 } from '@ft_transcendence/common'
+import { jwtAuthMiddleware } from '@ft_transcendence/security'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(
@@ -41,7 +42,8 @@ export async function authRoutes(app: FastifyInstance) {
 		googleLoginController
 	)
 	app.get('/api/admin/validate', validateAdminController)
-	app.post('/api/logout', logoutController)
+
+	app.post('/api/logout', { preHandler: jwtAuthMiddleware }, logoutController)
 
 	// Public config endpoint
 	app.get('/api/config', async (_request, reply) => {

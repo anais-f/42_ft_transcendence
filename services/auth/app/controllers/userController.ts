@@ -4,7 +4,7 @@ import {
 	listPublicUsers,
 	findPublicUserById,
 	deleteUserById,
-	changeUserPassword
+	findUserById
 } from '../repositories/userRepository.js'
 import {
 	PublicUserAuthSchema,
@@ -12,7 +12,8 @@ import {
 	IdParamSchema,
 	PasswordBodySchema
 } from '@ft_transcendence/common'
-import { hashPassword } from '../utils/password.js'
+import { changeMyPassword } from '../usecases/changeMyPassword.js'
+import { verifyPassword } from '../utils/password.js'
 
 export async function listPublicUsersController(
 	_req: FastifyRequest,
@@ -47,13 +48,44 @@ export async function patchUserPassword(
 	request: FastifyRequest,
 	reply: FastifyReply
 ) {
-	const parsed = IdParamSchema.safeParse(request.params)
-	if (!parsed.success) throw createHttpError.BadRequest('Invalid id')
-	const idNum = Number(parsed.data.id)
-	const body = PasswordBodySchema.safeParse(request.body)
-	if (!body.success) throw createHttpError.BadRequest('Invalid password')
-	const hashed = await hashPassword(body.data.password)
-	const ok = changeUserPassword(idNum, hashed)
-	if (!ok) throw createHttpError.NotFound('User not found')
+	const userId = request.user?.user_id
+	if (!userId) throw createHttpError.Unauthorized('Invalid token')
+
+	const { old_password, new_password, twofa_code } = request.body as {
+		old_password: string
+		new_password: string
+		twofa_code?: string
+	}
+
+	await changeMyPassword(userId, old_password, new_password, twofa_code)
+
+	return reply.send({ success: true })
+}
+
+/**
+ * Verify the password of the authenticated user.
+ * @param request
+ * @param reply
+ */
+export async function verifyMyPasswordController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	const userId = request.user?.user_id
+	if (!userId) throw createHttpError.Unauthorized('Invalid token')
+
+	const parsed = PasswordBodySchema.safeParse(request.body)
+	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
+
+	const { password } = parsed.data
+
+	const user = findUserById(userId)
+	if (!user || !user.password) {
+		throw createHttpError.NotFound('User not found')
+	}
+
+	const ok = await verifyPassword(user.password, password)
+	if (!ok) throw createHttpError.Unauthorized('Invalid password')
+
 	return reply.send({ success: true })
 }
