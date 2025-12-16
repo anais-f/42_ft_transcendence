@@ -9,7 +9,7 @@ import { CredentialResponse } from '../types/google-type.js'
 import { loadGoogleScript, loginWithGoogleCredential } from '../api/authApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 
-export const LoginPage = (): string => {
+export const TestPage = (): string => {
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
     <div class="col-span-1 flex flex-col items-start">

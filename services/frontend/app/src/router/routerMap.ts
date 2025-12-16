@@ -1,19 +1,19 @@
 import { HomePage, attachHomeEvents, detachHomeEvents } from '../pages/oldhome'
 import { GamePage } from '../pages/oldgame'
 import { LobbyPage } from '../pages/oldlobby'
-import {
-	LoginPage,
-	attachLoginEvents,
-	detachLoginEvents,
-	cleanupGoogleAuth
-} from '../pages/oldlogin'
 import { ProfilePage } from '../pages/oldprofile'
 import {
 	SettingsPage,
 	attachSettingsEvents,
 	detachSettingsEvents
 } from '../pages/oldsettings'
-import { TestPage } from '../pages/LoginPage'
+import {
+	LoginPage,
+	attachLoginEvents,
+	detachLoginEvents,
+	cleanupGoogleAuth
+} from '../pages/LoginPage'
+import { TestPage } from '../pages/HomePage.js'
 
 export type Pages =
 	| 'home'
@@ -81,6 +81,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'test',
 		url: '/test',
 		page: TestPage,
+		binds: [attachLoginEvents],
+		unbinds: [detachLoginEvents, cleanupGoogleAuth],
 		public: true
 	}
 }
