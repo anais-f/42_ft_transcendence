@@ -4,7 +4,8 @@ import {
 	S05BallPos,
 	S06BallSync,
 	S07Score,
-	S08Countdown
+	S08Countdown,
+	S09DynamicSegments
 } from '@ft_transcendence/pong-shared/network/Packet/Server/SPackets.js'
 import { eogHandler } from './handlers/gameEnd.js'
 import { opponentHandler } from './handlers/opponent.js'
@@ -53,7 +54,9 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	if (!packet) return
 
 	if (packet instanceof S02SegmentUpdate) {
-		renderer.setSegments(packet.segs)
+		renderer.setStaticSegments(packet.segs)
+	} else if (packet instanceof S09DynamicSegments) {
+		renderer.setDynamicSegments(packet.segs)
 	} else if (packet instanceof S06BallSync) {
 		renderer.setBallState(packet.pos, packet.velo, packet.factor)
 	} else if (packet instanceof S05BallPos) {

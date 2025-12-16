@@ -4,6 +4,7 @@ import { Vector2 } from '../../math/Vector2.js'
 import { C01Move as C01 } from './Client/CPackets.js'
 import { CPacketsType, SPacketsType } from './packetTypes.js'
 import { S02SegmentUpdate } from './Server/S02.js'
+import { S09DynamicSegments } from './Server/S09.js'
 
 import {
 	S01ServerTickConfirmation as S01,
@@ -44,7 +45,7 @@ export class packetBuilder {
 
 	public static deserializeS(
 		buff: ArrayBuffer
-	): S01 | S03 | S04 | S05 | S06 | S07 | S08 | null {
+	): S01 | S03 | S04 | S05 | S06 | S07 | S08 | S09DynamicSegments | null {
 		const view = new DataView(buff)
 		let velo: Vector2
 		let pos: Vector2
@@ -98,6 +99,25 @@ export class packetBuilder {
 					return new S07(view.getUint8(1), view.getUint8(2))
 				case SPacketsType.S08:
 					return new S08(view.getUint8(1))
+				case SPacketsType.S09:
+					const nbsegDyn = view.getUint8(1)
+					const tabDyn: Segment[] = []
+					for (let i = 0; i < nbsegDyn; ++i) {
+						const offset = 2 + i * 32
+						tabDyn.push(
+							new Segment(
+								new Vector2(
+									view.getFloat64(offset, true),
+									view.getFloat64(offset + 8, true)
+								),
+								new Vector2(
+									view.getFloat64(offset + 16, true),
+									view.getFloat64(offset + 24, true)
+								)
+							)
+						)
+					}
+					return new S09DynamicSegments(tabDyn)
 				default:
 					break
 			}

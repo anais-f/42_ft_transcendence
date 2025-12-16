@@ -77,14 +77,19 @@
     - S08Countdown (2 bytes):
         - byte 0: type
         - byte 1: remaining seconds (uint8)
+    - S09DynamicSegments (2 + 32n bytes):
+        - byte 0: type
+        - byte 1: segment count (uint8, max 255)
+        - bytes 2+: segments (32 bytes each: 4x float64 for x1,y1,x2,y2)
 
     [ type       ][ data ]
     [ 0000 0001  ][   0o ] S00 (1 byte)
     [ 0000 0011  ][   0o ] S01 (1 byte)
-    [ 0010 0001  ][ 1+32n] S02 (2 + 32n bytes)
+    [ 0010 0001  ][ 1+32n] S02 (2 + 32n bytes) - static segments (sent once)
     [ 0000 0101  ][   0o ] S03 (1 byte)
     [ 0000 1101  ][  24o ] S04 (25 bytes)
     [ 0001 0101  ][  16o ] S05 (17 bytes)
     [ 0001 1101  ][  40o ] S06 (41 bytes)
     [ 0000 0111  ][   2o ] S07 (3 bytes)
     [ 0000 1001  ][   1o ] S08 (2 bytes)
+    [ 0000 1011  ][ 1+32n] S09 (2 + 32n bytes) - dynamic segments (sent each tick)
