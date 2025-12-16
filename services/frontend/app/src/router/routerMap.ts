@@ -14,6 +14,7 @@ import {
 	detachSettingsEvents
 } from '../pages/oldsettings'
 import { TestPage } from '../pages/LoginPage'
+import { TournamentPage } from '../pages/TournamentPage'
 
 export type Pages =
 	| 'home'
@@ -23,6 +24,7 @@ export type Pages =
 	| 'profile'
 	| 'settings'
 	| 'test'
+	| 'tournament'
 
 export type Route = {
 	id: string
@@ -80,6 +82,14 @@ export const routerMap: Record<Pages, Route> = {
 	test: {
 		id: 'test',
 		url: '/test',
-		page: TestPage
+		page: TestPage,
+		public: true
+	},
+
+	tournament: {
+		id: 'tournament',
+		url: '/tournament',
+		page: TournamentPage,
+		public: true
 	}
 }
