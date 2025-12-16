@@ -38,7 +38,7 @@ export class UsersServices {
 	static async getPublicUserProfile(
 		user: IUserId
 	): Promise<UserPublicProfileDTO> {
-		if (!user?.user_id || user.user_id <= 0)
+		if (!user.user_id || user.user_id <= 0)
 			throw createHttpError.BadRequest('Invalid user ID')
 
 		const localUser = await UsersRepository.getUserById({
