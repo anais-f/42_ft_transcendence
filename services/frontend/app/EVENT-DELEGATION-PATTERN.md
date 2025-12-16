@@ -418,3 +418,81 @@ export function attachMyPageEvents() {
 	})
 }
 ```
+
+---
+
+## Project Architecture
+
+This project follows a clean separation of concerns:
+
+```
+src/
+├── pages/
+│   └── oldlogin.ts
+│       📄 Role: View (HTML) + DOM manipulation
+│       - LoginPage(): returns HTML
+│       - switchTo2FAForm(): show/hide forms
+│       - attachLoginEvents(): attach event listeners
+│       - detachLoginEvents(): cleanup (if needed)
+│
+├── events/
+│   └── loginPageHandlers.ts
+│       🎯 Role: Event handlers + orchestration
+│       - handleLogin(form)
+│           1. Get data from form
+│           2. Validate input
+│           3. Call API
+│           4. Handle errors with switch/case
+│           5. Display success/navigate
+│       - handleRegister(form)
+│       - handle2FASubmit(form)
+│       See: events/README.md
+│
+├── usecases/
+│   ├── userStore.ts
+│   │   📦 Role: State management
+│   │   - currentUser
+│   │   - setCurrentUser(user)
+│   │
+│   └── userSession.ts
+│       🔐 Role: Session operations
+│       - checkAuth(): Promise<user | null>
+│       - logout(): cleanup + redirect
+│       - cleanupUserSession()
+│       See: usecases/README.md
+│
+├── api/
+│   ├── authApi.ts
+│   │   🌐 Role: Pure HTTP calls
+│   │   - loginAPI(username, password): { data, error, status }
+│   │   - registerAPI(username, password): { data, error, status }
+│   │   - logoutAPI(): { data, error, status }
+│   │
+│   └── twoFAApi.ts
+│       - verify2FALoginAPI(code): { data, error, status }
+│       See: api/README.md
+│
+└── utils/
+    └── userValidation.ts
+        ✅ Role: Reusable validation functions
+        - validateUsername(username): boolean
+        - validatePassword(password): boolean
+```
+
+### Data Flow
+
+```
+User Action → Event Handler → API/Usecase → Update UI
+   (DOM)         (events/)      (api/)      (Notyf/navigate)
+```
+
+Example:
+
+```
+1. User clicks "Login" button
+2. attachLoginEvents() catches submit event (event delegation)
+3. handleLogin() validates form, calls loginAPI()
+4. loginAPI() returns { data, error, status }
+5. handleLogin() displays error/success with Notyf
+6. On success: checkAuth(), setCurrentUser(), navigate()
+```

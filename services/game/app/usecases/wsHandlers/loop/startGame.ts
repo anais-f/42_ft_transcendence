@@ -21,14 +21,14 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_LIVES = 50
+export const MAX_LIVES = 3
 export const PAD_SPEED = 0.3
 export const PAUSE_TICKS = 180
 export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createDiamondMap(MAX_LIVES)
+	const gameInstance = createGame(MAX_LIVES)
 	gameData.gameInstance = gameInstance
 
 	const staticPacket = new S02SegmentUpdate(gameInstance.GE.staticBorders)

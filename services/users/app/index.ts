@@ -1,9 +1,9 @@
 import './database/usersDatabase.js'
 import Fastify, { FastifyInstance } from 'fastify'
+import fastifyCookie from '@fastify/cookie'
+import fastifyJwt from '@fastify/jwt'
 import Swagger from '@fastify/swagger'
 import SwaggerUI from '@fastify/swagger-ui'
-import fastifyJwt from '@fastify/jwt'
-import fastifyCookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
 import {
 	ZodTypeProvider,

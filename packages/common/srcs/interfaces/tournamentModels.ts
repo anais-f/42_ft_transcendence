@@ -1,12 +1,12 @@
 export type Tournament = {
 	id: number
-	status: 'pending' | 'ongoing'
+	status: 'pending' | 'ongoing' | 'completed'
 	maxParticipants: number
 	participants: number[]
 	matchs: MatchTournament[]
 }
 
-type MatchTournament = {
+export type MatchTournament = {
 	previousMatchId1?: number
 	previousMatchId2?: number
 	round: number

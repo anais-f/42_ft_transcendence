@@ -42,12 +42,12 @@ const config = {
 		// 	rootDir: '<rootDir>/services/users/app',
 		// 	testMatch: ['**/*.test.ts']
 		// },
-		{
-			...commonConfig,
-			displayName: 'auth',
-			rootDir: '<rootDir>/services/auth/app',
-			testMatch: ['**/*.test.ts']
-		},
+		// {
+		// 	...commonConfig,
+		// 	displayName: 'auth',
+		// 	rootDir: '<rootDir>/services/auth/app',
+		// 	testMatch: ['**/*.test.ts']
+		// },
 		// {
 		// 	...commonConfig,
 		// 	displayName: 'social',

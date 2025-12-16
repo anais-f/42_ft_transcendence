@@ -52,7 +52,7 @@ export function attachGameEvents() {
 	console.log('Game page events attached')
 }
 
-export function cleanupGameEvents() {
+export function detachGameEvents() {
 	handleUnbindGameCanvas()
 	console.log('Game page events cleaned up')
 }

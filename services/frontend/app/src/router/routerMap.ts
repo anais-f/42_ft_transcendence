@@ -1,21 +1,18 @@
-import { HomePage, attachHomeEvents } from '../pages/oldhome.js'
-import {
-	GamePage,
-	attachGameEvents,
-	cleanupGameEvents
-} from '../pages/oldgame.js'
-import {
-	LobbyPage,
-	attachLobbyEvents,
-	cleanupLobbyEvents
-} from '../pages/oldlobby.js'
+import { HomePage, attachHomeEvents, detachHomeEvents } from '../pages/oldhome.js'
+import { attachGameEvents, detachGameEvents, GamePage } from '../pages/oldgame.js'
+import { attachLobbyEvents, detachLobbyEvents, LobbyPage } from '../pages/oldlobby.js'
 import {
 	LoginPage,
 	attachLoginEvents,
+	detachLoginEvents,
 	cleanupGoogleAuth
 } from '../pages/oldlogin.js'
 import { ProfilePage } from '../pages/oldprofile.js'
-import { SettingsPage } from '../pages/oldsettings.js'
+import {
+	SettingsPage,
+	attachSettingsEvents,
+	detachSettingsEvents
+} from '../pages/oldsettings.js'
 import { TestPage } from '../pages/LoginPage.js'
 
 export type Pages =
@@ -41,7 +38,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'home',
 		url: '/',
 		page: HomePage,
-		binds: [attachHomeEvents]
+		binds: [attachHomeEvents],
+		unbinds: [detachHomeEvents]
 	},
 
 	game: {
@@ -49,7 +47,7 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/play',
 		page: GamePage,
 		binds: [attachGameEvents],
-		unbinds: [cleanupGameEvents]
+		unbinds: [detachGameEvents]
 	},
 
 	lobby: {
@@ -57,7 +55,7 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/lobby/:code',
 		page: LobbyPage,
 		binds: [attachLobbyEvents],
-		unbinds: [cleanupLobbyEvents]
+		unbinds: [detachLobbyEvents]
 	},
 
 	login: {
@@ -65,7 +63,7 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/login',
 		page: LoginPage,
 		binds: [attachLoginEvents],
-		unbinds: [cleanupGoogleAuth],
+		unbinds: [detachLoginEvents, cleanupGoogleAuth],
 		public: true
 	},
 
@@ -78,7 +76,9 @@ export const routerMap: Record<Pages, Route> = {
 	settings: {
 		id: 'settings',
 		url: '/settings',
-		page: SettingsPage
+		page: SettingsPage,
+		binds: [attachSettingsEvents],
+		unbinds: [detachSettingsEvents]
 	},
 
 	test: {

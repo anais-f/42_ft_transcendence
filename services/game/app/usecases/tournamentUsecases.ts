@@ -11,6 +11,9 @@ import {
 	tournaments,
 	usersInTournaments
 } from './managers/gameData.js'
+import { requestGame } from './managers/gameManager/requestGame.js'
+import { MatchTournament } from '@ft_transcendence/common'
+import { saveMatch } from './matchUsecases.js'
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -22,8 +25,7 @@ function randomAlphaNumeric(length: number): string {
 	return code
 }
 
-export function createInviteCode(type: string): string {
-	if (type !== 'T' && type !== 'G') throw new Error('Invalid tournament type')
+export function createInviteCode(type: 'T' | 'G'): string {
 	let code: string = ''
 
 	do {
@@ -46,17 +48,78 @@ function shuffle(array: any[]) {
 	}
 }
 
-export function startTournament(tournamentName: string) {
-	const tournament = tournaments.get(tournamentName)
-	if (!tournament) {
-		throw new Error('Tournament not found')
-	}
-	tournament.status = 'ongoing'
-	createTournamentTree(tournamentName)
+export async function simulateMatch(
+	player1Id: number,
+	player2Id: number,
+	tournamentId: number,
+	round: number,
+	matchNumber: number
+) {
+	// Random match duration between 5 and 60 seconds
+	const duration = Math.floor(Math.random() * 55000) + 5000
+
+	console.log(
+		`[MOCK] Starting match: Player ${player1Id} vs Player ${player2Id} (duration: ${duration}ms)`
+	)
+
+	// Wait for the match duration
+	await new Promise((resolve) => setTimeout(resolve, duration))
+
+	// Random winner (50/50 chance)
+	const player1Wins = Math.random() < 0.5
+	const winnerId = player1Wins ? player1Id : player2Id
+	const loserId = player1Wins ? player2Id : player1Id
+
+	const scoreWinner = 10
+	const scoreLoser = Math.floor(Math.random() * 9) // 0-4
+
+	const scorePlayer1 = player1Wins ? scoreWinner : scoreLoser
+	const scorePlayer2 = player1Wins ? scoreLoser : scoreWinner
+
+	console.log(
+		`[MOCK] Match ended: Player ${winnerId} wins! Score: ${scorePlayer1}-${scorePlayer2}`
+	)
+	saveMatch(
+		player1Id,
+		player2Id,
+		scorePlayer1,
+		scorePlayer2,
+		tournamentId,
+		round,
+		matchNumber
+	)
 }
 
-export function createTournamentTree(tournamentName: string) {
-	const tournament = tournaments.get(tournamentName)
+function startNextRound(tournament: Tournament, round: number) {
+	const roundMatches = tournament.matchs.filter(
+		(match) => match.round === round
+	)
+	roundMatches.forEach((match) => {
+		if (match.player1Id === undefined || match.player2Id === undefined) {
+			console.error('Invalid match data for next round:', match)
+			return
+		}
+		match.status = 'ongoing'
+		simulateMatch(
+			match.player1Id,
+			match.player2Id,
+			tournament.id,
+			match.round,
+			match.matchNumber
+		)
+		// requestGame(match.player1Id, match.player2Id)
+	})
+}
+
+export function startTournament(tournament: Tournament) {
+	tournament.status = 'ongoing'
+	createTournamentTree(tournament)
+	// Only start the first round (highest round number)
+	const firstRound = Math.log2(tournament.maxParticipants)
+	startNextRound(tournament, firstRound)
+}
+
+function createTournamentTree(tournament: Tournament) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
@@ -64,7 +127,9 @@ export function createTournamentTree(tournamentName: string) {
 	shuffle(tournament.participants)
 	console.log('Shuffled participants:', tournament.participants)
 	if (tournament.participants.length !== tournament.maxParticipants) {
-		throw new Error('Not enough participants to create the tournament tree')
+		throw createHttpError.Conflict(
+			'Not enough participants to create the tournament tree'
+		)
 	}
 	let maxRound = Math.log2(tournament.maxParticipants)
 	for (let match = 0; match < tournament.maxParticipants / 2; match++) {
@@ -72,6 +137,11 @@ export function createTournamentTree(tournamentName: string) {
 		const player2Index = player1Index + 1
 		const player1 = tournament.participants[player1Index]
 		const player2 = tournament.participants[player2Index]
+		if (player1 === undefined || player2 === undefined) {
+			throw createHttpError.InternalServerError(
+				`Invalid participant indices: ${player1Index}, ${player2Index}`
+			)
+		}
 		tournament.matchs.push({
 			round: maxRound,
 			matchNumber: match,
@@ -109,7 +179,9 @@ export function deleteTournament(tournamentCode: string) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
-
+	tournament.participants.forEach((userId) => {
+		usersInTournaments.delete(userId)
+	})
 	tournaments.delete(tournamentCode)
 }
 
@@ -136,14 +208,15 @@ export function joinTournament(request: FastifyRequest): Tournament {
 		throw createHttpError.Conflict('User already joined the tournament')
 	}
 	tournament.participants.push(userId)
+	if (tournament.participants.length === tournament.maxParticipants) {
+		startTournament(tournament)
+	}
 	return tournament
 }
 
 let nextTournamentId = 1
 
-export function createTournament(
-	request: FastifyRequest
-): Tournament | undefined {
+export function createTournament(request: FastifyRequest) {
 	const parsed = CreateTournamentSchema.safeParse(request.body)
 	const userId = request.user.user_id
 	if (userId === undefined) {
@@ -166,7 +239,7 @@ export function createTournament(
 		participants: [userId],
 		matchs: []
 	})
-	return tournaments.get(invitCode)
+	return { code: invitCode, tournament: tournaments.get(invitCode) }
 }
 
 export function getTournament(request: FastifyRequest): Tournament {
@@ -183,4 +256,136 @@ export function getTournament(request: FastifyRequest): Tournament {
 		throw createHttpError.Forbidden()
 	}
 	return tournament
+}
+
+export function quitTournament(request: FastifyRequest): void {
+	const userId = request.user.user_id
+	if (userId === undefined) {
+		throw createHttpError.Unauthorized()
+	}
+	const tournamentCode = CodeParamSchema.parse(request.params)
+	const tournament = tournaments.get(tournamentCode.code)
+	if (!tournament) {
+		throw createHttpError.NotFound()
+	}
+	const participantIndex = tournament.participants.indexOf(userId)
+	if (participantIndex === -1) {
+		throw createHttpError.Forbidden()
+	}
+	if (tournament.status !== 'pending') {
+		throw createHttpError.Conflict(
+			'Cannot quit a tournament that has already started'
+		)
+	}
+	tournament.participants.splice(participantIndex, 1)
+	usersInTournaments.delete(userId)
+}
+
+export function onTournamentMatchEnd(
+	tournamentCode: string,
+	round: number,
+	matchNumber: number,
+	winnerId: number,
+	scorePlayer1: number,
+	scorePlayer2: number
+): void {
+	const tournament = tournaments.get(tournamentCode)
+	if (!tournament) {
+		throw createHttpError.NotFound('Tournament not found')
+	}
+
+	// Find the match that just ended
+	const currentMatch = tournament.matchs.find(
+		(m) => m.round === round && m.matchNumber === matchNumber
+	)
+	if (!currentMatch) {
+		throw createHttpError.NotFound('Match not found')
+	}
+
+	// Update match status and scores
+	currentMatch.status = 'completed'
+	currentMatch.scorePlayer1 = scorePlayer1
+	currentMatch.scorePlayer2 = scorePlayer2
+
+	// If this was the final (round 1), tournament is over
+	if (round === 1) {
+		tournament.status = 'completed'
+		console.log(`Tournament ${tournamentCode} completed! Winner: ${winnerId}`)
+
+		// Clean up participants from tracking
+		tournament.participants.forEach((userId) => {
+			usersInTournaments.delete(userId)
+		})
+		return
+	}
+
+	// Find the next round match that this winner should advance to
+	const nextRoundMatch = tournament.matchs.find(
+		(m) =>
+			m.round === round - 1 &&
+			(m.previousMatchId1 === matchNumber || m.previousMatchId2 === matchNumber)
+	)
+
+	if (!nextRoundMatch) {
+		console.error('No next round match found for winner')
+		return
+	}
+
+	// Place winner in the appropriate slot of next match
+	if (nextRoundMatch.previousMatchId1 === matchNumber) {
+		nextRoundMatch.player1Id = winnerId
+	} else if (nextRoundMatch.previousMatchId2 === matchNumber) {
+		nextRoundMatch.player2Id = winnerId
+	}
+
+	console.log(
+		`Winner ${winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
+	)
+
+	// Check if both players are ready for the next match
+	if (
+		nextRoundMatch.player1Id !== undefined &&
+		nextRoundMatch.player2Id !== undefined &&
+		nextRoundMatch.status === 'waiting_for_players'
+	) {
+		// Both players ready, start the match!
+		nextRoundMatch.status = 'ongoing'
+		console.log(
+			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+		)
+		simulateMatch(
+			nextRoundMatch.player1Id,
+			nextRoundMatch.player2Id,
+			tournament.id,
+			nextRoundMatch.round,
+			nextRoundMatch.matchNumber
+		)
+		// requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id)
+	}
+}
+
+/**
+ * Helper to get tournament code from a user or game
+ */
+export function getTournamentByUser(userId: number): string | undefined {
+	for (const [code, tournament] of tournaments.entries()) {
+		if (tournament.participants.includes(userId)) {
+			return code
+		}
+	}
+	return undefined
+}
+
+/**
+ * Get tournament code by tournament ID
+ */
+export function getTournamentCodeById(
+	tournamentId: number
+): string | undefined {
+	for (const [code, tournament] of tournaments.entries()) {
+		if (tournament.id === tournamentId) {
+			return code
+		}
+	}
+	return undefined
 }

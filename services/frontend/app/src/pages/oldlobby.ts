@@ -1,9 +1,10 @@
 import { createGameWebSocket } from '../api/game/createGame.js'
 import { routeParams } from '../router/Router.js'
-import { gameStore, PlayerData } from '../usecases/gameStore.js'
+import { gameStore } from '../usecases/gameStore.js'
 import { dispatcher } from '../game/network/dispatcher.js'
 import { currentUser } from '../usecases/userStore.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
+import { oppenentJoinHandler } from '../events/lobby/opponentJoinHandler.js'
 
 export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
@@ -73,31 +74,14 @@ export const LobbyPage = (): string => {
 `
 }
 
-function onOpponentJoin(opponent: PlayerData) {
-	const avatarEl = document.getElementById(
-		'opponent-avatar'
-	) as HTMLImageElement | null
-	const usernameEl = document.getElementById('opponent-username')
 
-	if (avatarEl) {
-		avatarEl.src = opponent.avatar
-	}
-	if (usernameEl) {
-		usernameEl.textContent = opponent.username
-	}
-}
-
-let lobbyClickHandler: ((e: Event) => void) | null = null
+let clickHandler: ((e: Event) => void) | null = null
 
 export function attachLobbyEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	if (lobbyClickHandler) {
-		content.removeEventListener('click', lobbyClickHandler)
-	}
-
-	lobbyClickHandler = (e: Event) => {
+	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
@@ -110,10 +94,11 @@ export function attachLobbyEvents() {
 		}
 	}
 
-	content.addEventListener('click', lobbyClickHandler)
+	content.addEventListener('click', clickHandler)
 
-	gameStore.setOnOpponentJoin(onOpponentJoin)
+	gameStore.setOnOpponentJoin(oppenentJoinHandler)
 
+	// TODO: move this
 	const token = gameStore.sessionToken
 	if (token) {
 		const ws = createGameWebSocket(token)
@@ -141,9 +126,18 @@ export function attachLobbyEvents() {
 	console.log('Lobby page events attached')
 }
 
-export function cleanupLobbyEvents() {
-	// Unregister callback
+export function detachLobbyEvents() {
+	const content = document.getElementById('content')
+	if (!content) {
+		return
+	}
+
 	gameStore.setOnOpponentJoin(null)
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
 
 	// close WS only if not navigating to /game
 	if (!gameStore.navigatingToGame) {

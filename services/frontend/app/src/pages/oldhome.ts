@@ -1,8 +1,8 @@
-import { currentUser, setCurrentUser } from '../usecases/userStore.js'
-import { logout } from '../api/authService.js'
-import { gameStore } from '../usecases/gameStore.js'
-import { handleCreateGame } from '../events/home/createGameHandler.js'
-import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
+import { handleCreateGame } from "../events/home/createGameHandler.js"
+import { handleJoinLobby } from "../events/home/joinLobbyHandler.js"
+import { logout } from "../usecases/userSession.js"
+import { currentUser } from "../usecases/userStore.js"
+
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -111,21 +111,23 @@ export const HomePage = (): string => {
 `
 }
 
-let homeClickHandler: ((e: Event) => void) | null = null
-let homeSubmitHandler: ((e: Event) => void) | null = null
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+let submitHandler: ((e: Event) => Promise<void>) | null = null
 
+/**
+ * Attach event listeners for the home page.
+ * Sets up handlers for button clicks such as logout and navigation to settings.
+ * Logs attachment status to the console.
+ * @returns {void}
+ */
 export function attachHomeEvents() {
 	const content = document.getElementById('content')
-	if (!content) return
-
-	if (homeClickHandler) {
-		content.removeEventListener('click', homeClickHandler)
-	}
-	if (homeSubmitHandler) {
-		content.removeEventListener('submit', homeSubmitHandler)
+	if (!content) {
+		return 
 	}
 
-	homeClickHandler = (e: Event) => {
+	// Create and store the click handler
+	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
@@ -133,10 +135,7 @@ export function attachHomeEvents() {
 			const action = actionButton.getAttribute('data-action')
 
 			if (action === 'logout') {
-				logout().then(() => {
-					setCurrentUser(null)
-					window.navigate('/login', true)
-				})
+				await logout()
 			}
 
 			if (action === 'navigate-settings') {
@@ -149,25 +148,48 @@ export function attachHomeEvents() {
 		}
 	}
 
-	homeSubmitHandler = (e: Event) => {
-		const form = (e.target as HTMLElement).closest('form[data-form]')
-		if (!form) return
-
+	submitHandler = async (e: Event) => {
+		const form = e.target as HTMLElement
 		const formName = form.getAttribute('data-form')
+		
 		if (formName === 'join-lobby') {
 			e.preventDefault()
 			const input = document.getElementById('join_lobby') as HTMLInputElement
 			const code = input?.value?.trim()
 
-			if (!code) return
-			handleJoinLobby(code)
+			if (code) {
+				handleJoinLobby(code)
+			}
 		}
 	}
-
-	content.addEventListener('click', homeClickHandler)
-	content.addEventListener('submit', homeSubmitHandler)
+	// Attach the handler
+	content.addEventListener('click', clickHandler)
+	content.addEventListener('submit', submitHandler)
 
 	console.log('Home page events attached')
+}
+
+/**
+ * Detach event listeners for the home page.
+ * Removes handlers for button clicks to prevent memory leaks.
+ * Logs detachment status to the console.
+ * @returns {void}
+ */
+export function detachHomeEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	if (submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	console.log('Home page events detached')
 }
 
 const fr1 = {

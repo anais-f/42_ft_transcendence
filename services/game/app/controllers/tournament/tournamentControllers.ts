@@ -2,7 +2,8 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import {
 	joinTournament,
 	createTournament,
-	getTournament
+	getTournament,
+    quitTournament
 } from '../../usecases/tournamentUsecases.js'
 
 export function getTournamentController(
@@ -27,4 +28,12 @@ export function joinTournamentController(
 ) {
 	const tournament = joinTournament(request)
 	return reply.send({ success: true, tournament })
+}
+
+export function quitTournamentController(
+	request: FastifyRequest,
+	reply: FastifyReply
+) {
+	quitTournament(request)
+	return reply.send({ success: true })
 }

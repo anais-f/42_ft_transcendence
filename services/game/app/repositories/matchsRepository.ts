@@ -6,6 +6,7 @@ export function saveMatchToHistory(
 	scorePlayer1: number,
 	scorePlayer2: number,
 	idTournament: number = -1,
+	matchNumber: number = -1,
 	round: number = -1
 ): number {
 	console.log(
@@ -17,11 +18,11 @@ export function saveMatchToHistory(
 	const matchResult = db
 		.prepare(
 			`
-		INSERT INTO match_history (winner_id, id_tournament, round)
-		VALUES (?, ?, ?)
+		INSERT INTO match_history (winner_id, id_tournament, round, match_number)
+		VALUES (?, ?, ?, ?)
 	`
 		)
-		.run(winnerId, idTournament, round)
+		.run(winnerId, idTournament, round, matchNumber)
 
 	const matchId = matchResult.lastInsertRowid as number
 

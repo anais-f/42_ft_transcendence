@@ -1,5 +1,12 @@
-import { checkAuth } from '../api/authService.js'
-import { setCurrentUser } from '../usecases/userStore.js'
+import { loginAPI, registerAPI } from '../api/authApi.js'
+import { verify2FALoginAPI } from '../api/twoFAApi.js'
+import { notyfGlobal as notyf } from '../utils/notyf.js'
+import { switchTo2FAForm } from '../pages/oldlogin.js'
+import {
+	validateUsername,
+	validatePassword,
+	handleAuthSuccess
+} from '../utils/userValidation.js'
 
 /**
  * Handler for the registration form
@@ -12,44 +19,45 @@ export async function handleRegister(form: HTMLFormElement) {
 	const password = formData.get('register_password')
 	const confPassword = formData.get('register_conf_password')
 
-	if (!password || !username) return
+	if (!password || !username) {
+		notyf.open({ type: 'info', message: 'Please fill all fields' })
+		return
+	}
 
 	if (password !== confPassword) {
-		console.log("Passwords don't match")
+		notyf.error("Passwords don't match")
 		return
 	}
 
-	if (password.toString().length < 8) {
-		console.log('Password too short')
+	const usernameResult = validateUsername(username)
+	if (!usernameResult.success) {
+		notyf.error(usernameResult.error)
 		return
 	}
 
-	const user = {
-		login: username,
-		password: password
+	const passwordResult = validatePassword(password)
+	if (!passwordResult.success) {
+		notyf.error(passwordResult.error)
+		return
 	}
 
-	try {
-		const res = await fetch('/auth/api/register', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify(user)
-		})
+	const { data, error, status } = await registerAPI(
+		usernameResult.data,
+		passwordResult.data
+	)
 
-		if (!res.ok) {
-			const error = await res.json()
-			console.error('Register failed:', res.status, error)
-			return
+	if (error) {
+		switch (status) {
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
 		}
-
-		const authResult = await checkAuth()
-		setCurrentUser(authResult)
-		await window.navigate('/', true)
-	} catch (e) {
-		console.error('Register error:', e)
+		return
 	}
+
+	await handleAuthSuccess('Account created successfully!')
 }
 
 /**
@@ -62,37 +70,77 @@ export async function handleLogin(form: HTMLFormElement) {
 	const username = formData.get('login_username')
 	const password = formData.get('login_password')
 
-	if (!password || !username) return
-
-	if (password.toString().length < 8) {
-		console.log('Password too short')
+	if (!password || !username) {
+		notyf.open({ type: 'info', message: 'Please fill all fields' })
 		return
 	}
 
-	const credentials = {
-		login: username,
-		password: password
+	const usernameResult = validateUsername(username)
+	if (!usernameResult.success) {
+		notyf.error(usernameResult.error)
+		return
 	}
 
-	try {
-		const res = await fetch('/auth/api/login', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify(credentials)
-		})
+	const passwordResult = validatePassword(password)
+	if (!passwordResult.success) {
+		notyf.error(passwordResult.error)
+		return
+	}
 
-		if (!res.ok) {
-			const error = await res.json()
-			console.error('Login failed:', res.status, error)
-			return
+	const { data, error, status } = await loginAPI(
+		usernameResult.data,
+		passwordResult.data
+	)
+
+	if (error) {
+		switch (status) {
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
+		}
+		return
+	}
+
+	if (data.pre_2fa_required) {
+		notyf.open({ type: 'info', message: 'Please enter your 2FA code' })
+		switchTo2FAForm()
+		return
+	}
+
+	await handleAuthSuccess('Login successful!')
+}
+
+/**
+ * Handler for the 2FA form
+ * @param form
+ * @return void
+ */
+export async function handle2FASubmit(form: HTMLFormElement) {
+	const formData = new FormData(form)
+	const code = formData.get('2fa_code')
+
+	if (!code || code.toString().length !== 6) {
+		notyf.error('Please enter a valid 6-digit code')
+		return
+	}
+
+	const { data, error, status } = await verify2FALoginAPI(code.toString())
+
+	if (error) {
+		switch (status) {
+			case 0:
+				notyf.error('Network error, check your connection')
+				break
+			default:
+				notyf.error(error)
 		}
 
-		const authResult = await checkAuth()
-		setCurrentUser(authResult)
-		await window.navigate('/', true)
-	} catch (e) {
-		console.error('Login error:', e)
+		const codeInput = document.getElementById('2fa_code') as HTMLInputElement
+		if (codeInput) codeInput.value = ''
+		return
 	}
+
+	await handleAuthSuccess('Login successful!')
 }
