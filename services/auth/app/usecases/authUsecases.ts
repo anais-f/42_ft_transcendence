@@ -1,9 +1,4 @@
-import {
-	LoginResponseDTO,
-	ValidateAdminResponseDTO,
-	LogoutResponseDTO,
-	ConfigResponseDTO
-} from '@ft_transcendence/common'
+import { LoginResponseDTO } from '@ft_transcendence/common'
 import { registerUser, loginUser } from './register.js'
 import {
 	findPublicUserByLogin,
@@ -85,18 +80,8 @@ export async function loginUserUsecase(
 	throw createHttpError.InternalServerError('Login failed')
 }
 
-export function validateAdminUsecase(token: string): ValidateAdminResponseDTO {
+export function validateAdminUsecase(token: string): void {
 	const payload = verifyToken(token)
 	if (!payload.is_admin) throw createHttpError.Forbidden('Forbidden')
-	return { success: true }
-}
-
-export function logoutUsecase(): LogoutResponseDTO {
-	return { success: true }
-}
-
-export function getConfigUsecase(): ConfigResponseDTO {
-	return {
-		googleClientId: env.GOOGLE_CLIENT_ID
-	}
+	return
 }

@@ -1,25 +1,15 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
+import { findUserById } from '../repositories/userRepository.js'
 import {
-	listPublicUsers,
-	findPublicUserById,
-	deleteUserById,
-	findUserById
-} from '../repositories/userRepository.js'
-import {
-	PublicUserAuthSchema,
-	PublicUserListAuthSchema,
-	IdParamSchema,
-	PasswordBodySchema
+	PasswordBodySchema,
 	PublicUserAuthDTO,
-	PublicUserListAuthDTO,
-	PasswordChangeResponseDTO
+	PublicUserListAuthDTO
 } from '@ft_transcendence/common'
 import {
 	listPublicUsersUsecase,
 	getPublicUserUsecase,
-	deleteUserUsecase,
-	changeUserPasswordUsecase
+	deleteUserUsecase
 } from '../usecases/userUsecases.js'
 import { changeMyPassword } from '../usecases/changeMyPassword.js'
 import { verifyPassword } from '../utils/password.js'
@@ -55,7 +45,7 @@ export async function deleteUser(
 export async function patchUserPassword(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const userId = request.user?.user_id
 	if (!userId) throw createHttpError.Unauthorized('Invalid token')
 
@@ -67,7 +57,7 @@ export async function patchUserPassword(
 
 	await changeMyPassword(userId, old_password, new_password, twofa_code)
 
-	return reply.send({ success: true })
+	return reply.send()
 }
 
 /**
@@ -78,7 +68,7 @@ export async function patchUserPassword(
 export async function verifyMyPasswordController(
 	request: FastifyRequest,
 	reply: FastifyReply
-) {
+): Promise<void> {
 	const userId = request.user?.user_id
 	if (!userId) throw createHttpError.Unauthorized('Invalid token')
 
@@ -95,5 +85,5 @@ export async function verifyMyPasswordController(
 	const ok = await verifyPassword(user.password, password)
 	if (!ok) throw createHttpError.Unauthorized('Invalid password')
 
-	return reply.send({ success: true })
+	return reply.send()
 }

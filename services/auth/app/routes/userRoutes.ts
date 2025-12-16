@@ -2,28 +2,20 @@ import type { FastifyInstance } from 'fastify'
 import {
 	listPublicUsersController,
 	getPublicUserController,
-	deleteUser,
 	patchUserPassword,
 	verifyMyPasswordController
 } from '../controllers/userController.js'
-import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
 import {
 	ChangeMyPasswordSchema,
-	PasswordBodySchema
-} from '@ft_transcendence/common'
-import {
 	PublicUserListAuthSchema,
 	PublicUserAuthSchema,
-	PasswordChangeResponseSchema,
 	IdParamSchema,
 	PasswordBodySchema
 } from '@ft_transcendence/common'
 
 // TODO : Add authentication/authorization middleware where necessary and delete user only by himself or admin
 export async function userRoutes(app: FastifyInstance) {
-	app.get('/api/users', listPublicUsersController)
-	app.get('/api/users/:id', getPublicUserController)
-	app.delete('/api/users/:id', deleteUser) // TODO : delete this route or protect it !
 	app.patch(
 		'/api/user/me/password',
 		{
@@ -46,13 +38,14 @@ export async function userRoutes(app: FastifyInstance) {
 		verifyMyPasswordController
 	)
 	app.get(
-		'/api/users',
+		'/api/internal/users',
 		{
 			schema: {
 				response: {
 					200: PublicUserListAuthSchema
 				}
-			}
+			},
+			preHandler: apiKeyMiddleware
 		},
 		listPublicUsersController
 	)
@@ -64,30 +57,9 @@ export async function userRoutes(app: FastifyInstance) {
 				response: {
 					200: PublicUserAuthSchema
 				}
-			}
+			},
+			preHandler: jwtAuthMiddleware
 		},
 		getPublicUserController
-	)
-	app.delete(
-		'/api/users/:id',
-		{
-			schema: {
-				params: IdParamSchema
-			}
-		},
-		deleteUser
-	)
-	app.patch(
-		'/api/user/:id/password',
-		{
-			schema: {
-				params: IdParamSchema,
-				body: PasswordBodySchema,
-				response: {
-					200: PasswordChangeResponseSchema
-				}
-			}
-		},
-		patchUserPassword
 	)
 }

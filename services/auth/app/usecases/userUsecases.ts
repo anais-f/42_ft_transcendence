@@ -1,7 +1,6 @@
 import {
 	PublicUserAuthDTO,
-	PublicUserListAuthDTO,
-	PasswordChangeResponseDTO
+	PublicUserListAuthDTO
 } from '@ft_transcendence/common'
 import {
 	listPublicUsers,
@@ -31,8 +30,8 @@ export function deleteUserUsecase(userId: number): void {
 export function changeUserPasswordUsecase(
 	userId: number,
 	hashedPassword: string
-): PasswordChangeResponseDTO {
+): void {
 	const ok = changeUserPassword(userId, hashedPassword)
 	if (!ok) throw createHttpError.NotFound('User not found')
-	return { success: true }
+	return
 }

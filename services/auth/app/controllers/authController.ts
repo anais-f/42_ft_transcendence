@@ -2,16 +2,12 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import {
 	RegisterResponseDTO,
 	LoginResponseDTO,
-	ValidateAdminResponseDTO,
-	LogoutResponseDTO,
 	ConfigResponseDTO
 } from '@ft_transcendence/common'
 import {
 	registerUserUsecase,
 	loginUserUsecase,
-	validateAdminUsecase,
-	logoutUsecase,
-	getConfigUsecase
+	validateAdminUsecase
 } from '../usecases/authUsecases.js'
 import createHttpError from 'http-errors'
 import { env } from '../index.js'
@@ -77,8 +73,8 @@ export async function loginController(
 
 export async function validateAdminController(
 	request: FastifyRequest,
-	reply: FastifyReply
-): Promise<ValidateAdminResponseDTO> {
+	_reply: FastifyReply
+): Promise<void> {
 	const cookieToken = request.cookies?.auth_token
 	const authHeader = request.headers.authorization
 	let token: string | undefined = cookieToken
@@ -98,17 +94,19 @@ export async function validateAdminController(
 }
 
 export async function logoutController(
-	request: FastifyRequest,
+	_request: FastifyRequest,
 	reply: FastifyReply
-): Promise<LogoutResponseDTO> {
+): Promise<void> {
 	reply.clearCookie('auth_token', { path: '/' })
 	reply.clearCookie('twofa_token', { path: '/' })
-	return logoutUsecase()
+	return reply.code(200).send()
 }
 
 export async function getConfigController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<ConfigResponseDTO> {
-	return getConfigUsecase()
+	return {
+		googleClientId: env.GOOGLE_CLIENT_ID
+	}
 }

@@ -13,8 +13,6 @@ import {
 	LoginGoogleSchema,
 	RegisterResponseSchema,
 	LoginResponseSchema,
-	ValidateAdminResponseSchema,
-	LogoutResponseSchema,
 	ConfigResponseSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
@@ -56,28 +54,8 @@ export async function authRoutes(app: FastifyInstance) {
 		},
 		googleLoginController
 	)
-	app.get(
-		'/api/admin/validate',
-		{
-			schema: {
-				response: {
-					200: ValidateAdminResponseSchema
-				}
-			}
-		},
-		validateAdminController
-	)
-	app.post(
-		'/api/logout',
-		{
-			schema: {
-				response: {
-					200: LogoutResponseSchema
-				}
-			}
-		},
-		logoutController
-	)
+	app.get('/api/admin/validate', validateAdminController)
+	app.post('/api/logout', { preHandler: jwtAuthMiddleware }, logoutController)
 	app.get(
 		'/api/config',
 		{
@@ -89,15 +67,4 @@ export async function authRoutes(app: FastifyInstance) {
 		},
 		getConfigController
 	)
-	app.get('/api/admin/validate', validateAdminController)
-
-	app.post('/api/logout', { preHandler: jwtAuthMiddleware }, logoutController)
-
-	// Public config endpoint
-	app.get('/api/config', async (_request, reply) => {
-		console.log('GET /api/config called')
-		return reply.send({
-			googleClientId: process.env.GOOGLE_CLIENT_ID || null
-		})
-	})
 }
