@@ -3,27 +3,26 @@ export interface JoinGameResponse {
 	expiresIn: number
 }
 
-export async function joinGame(code: string): Promise<string | null> {
+
+export async function joinGameApi(code: string): Promise<{data: any, error: null | string, status: number}> {
+
 	try {
 		const response = await fetch(`/game/api/game/join-game/${code}`, {
 			method: 'POST',
 			credentials: 'include'
 		})
 
+		const payload = await response.json()
 		if (!response.ok) {
-			const status = response.status
-			if (status === 404) {
-				console.error('Unknown game code')
-			} else if (status === 409) {
-				console.error('Player already in a game or not allowed')
+			return {
+				data: null,
+				error: payload.message || 'Request failed',
+				status: payload.statusCode || response.status
 			}
-			return null
 		}
-
-		const data = (await response.json()) as JoinGameResponse
-		return data.wsToken
-	} catch (error) {
-		console.error('Join game failed:', error)
-		return null
+		return { data: payload, error: null, status: 200 }
+	} catch {
+		return {data: null, error: 'Network error', status: 0 }
 	}
 }
+

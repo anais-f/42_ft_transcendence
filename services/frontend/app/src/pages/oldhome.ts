@@ -1,5 +1,6 @@
 import { handleCreateGame } from "../events/home/createGameHandler.js"
 import { handleJoinLobby } from "../events/home/joinLobbyHandler.js"
+import { handleLogin } from "../events/loginPageHandlers.js"
 import { logout } from "../usecases/userSession.js"
 import { currentUser } from "../usecases/userStore.js"
 
@@ -143,7 +144,7 @@ export function attachHomeEvents() {
 			}
 
 			if (action === 'create-game') {
-				handleCreateGame()
+				await handleCreateGame()
 			}
 		}
 	}
@@ -152,16 +153,9 @@ export function attachHomeEvents() {
 		const form = e.target as HTMLElement
 		const formName = form.getAttribute('data-form')
 		
-		if (formName === 'join-lobby') {
-			e.preventDefault()
-			const input = document.getElementById('join_lobby') as HTMLInputElement
-			const code = input?.value?.trim()
-
-			if (code) {
-				handleJoinLobby(code)
-			}
-		}
+		if (formName === 'join-lobby') handleJoinLobby(e)
 	}
+
 	// Attach the handler
 	content.addEventListener('click', clickHandler)
 	content.addEventListener('submit', submitHandler)

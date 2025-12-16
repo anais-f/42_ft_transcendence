@@ -1,27 +1,29 @@
+import { tr } from "zod/v4/locales"
+
 export interface NewGameResponse {
 	code: string
 }
 
-export async function createGame(): Promise<string | null> {
+export async function createGameApi(): Promise<{data: any, error: string | null , status: number}>
+{
+
 	try {
 		const response = await fetch('/game/api/game/new-game', {
 			method: 'POST',
 			credentials: 'include'
 		})
 
+		const payload = await response.json()
 		if (!response.ok) {
-			const status = response.status
-			if (status === 409) {
-				console.error('Player already in a game')
+			return {
+				data: null,
+				error: payload.message || 'Request failed',
+				status: payload.statusCode || response.status
 			}
-			return null
 		}
-
-		const data = (await response.json()) as NewGameResponse
-		return data.code
-	} catch (error) {
-		console.error('Create game failed:', error)
-		return null
+		return {  data: payload, error: null, status: 200 }
+	} catch {
+		return { data: null, error: 'Network error', status: 0 }
 	}
 }
 

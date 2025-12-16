@@ -1,15 +1,22 @@
+import { joinGameApi } from '../../api/game/joinGame.js'
 import { gameStore } from '../../usecases/gameStore.js'
-import { joinGame } from '../../api/game/joinGame.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
 
-export async function handleJoinLobby(code: string) {
+export async function handleJoinLobby(e: Event) {
+
+	e.preventDefault()
+	const input = document.getElementById('join_lobby') as HTMLInputElement
+	const code = input?.value?.trim()
+
+
+	const { data, error, status } = await joinGameApi(code)
+
 	gameStore.gameCode = code
-
-	const token = await joinGame(code)
-	if (!token) {
-		console.error('Failed to join game')
+	if (error) {
 		gameStore.clear()
-		return
+		notyf.error(`TODOOOOOOO: ${status}`)
 	}
-	gameStore.sessionToken = token
+
+	gameStore.sessionToken = data.wsToken
 	window.navigate(`/lobby/${code}`)
 }
