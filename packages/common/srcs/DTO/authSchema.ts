@@ -62,9 +62,26 @@ export const ChangeMyPasswordSchema = z
 	})
 	.strict()
 
+export const RegisterResponseSchema = z.object({
+	message: z.string(),
+	token: z.string()
+})
+
+export const LoginResponseSchema = z.object({
+	pre_2fa_required: z.boolean(),
+	token: z.string().optional()
+})
+
+export const ConfigResponseSchema = z.object({
+	googleClientId: z.string().nullable()
+})
+
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>
 export type LoginActionDTO = z.infer<typeof LoginActionSchema>
 export type RegisterGoogleDTO = z.infer<typeof RegisterGoogleSchema>
 export type LogoutParamsDTO = z.infer<typeof LogoutParamsSchema>
 export type ChangeMyPasswordDTO = z.infer<typeof ChangeMyPasswordSchema>
+export type RegisterResponseDTO = z.infer<typeof RegisterResponseSchema>
+export type LoginResponseDTO = z.infer<typeof LoginResponseSchema>
+export type ConfigResponseDTO = z.infer<typeof ConfigResponseSchema>

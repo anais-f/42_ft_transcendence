@@ -2,20 +2,15 @@ import BetterSqlite3 from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
 import { mkdirSync } from 'fs'
 import { dirname } from 'path'
+import { env } from '../index.js'
 
 let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		const path = process.env.TWOFA_DB_PATH
-		if (!path) {
-			throw new Error(
-				'TWOFA_DB_PATH environment variable is required to connect to the database'
-			)
-		}
 		// Ensure directory exists
-		mkdirSync(dirname(path), { recursive: true })
-		db = new BetterSqlite3(path)
+		mkdirSync(dirname(env.TWOFA_DB_PATH), { recursive: true })
+		db = new BetterSqlite3(env.TWOFA_DB_PATH)
 	}
 	return db
 }

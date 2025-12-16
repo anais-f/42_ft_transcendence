@@ -74,6 +74,7 @@ export class UsersServices {
 				'Failed to get 2FA status from auth service'
 			)
 		}
+		console.log(`User ${user.user_id} 2FA status: ${two_fa_status}`)
 
 		return {
 			user_id: localUser.user_id,

@@ -1,6 +1,6 @@
 import { loadOpenAPISchema } from '@ft_transcendence/common'
 
-export interface IPongServerEnv {
+export interface IGameEnv {
 	HOST: string
 	PORT: number
 	JWT_SECRET: string
@@ -8,10 +8,10 @@ export interface IPongServerEnv {
 	openAPISchema?: any
 }
 
-export function checkEnv(): IPongServerEnv {
+export function checkEnv(): IGameEnv {
 	const variables = {
 		DTO_OPENAPI_FILE: process.env.DTO_OPENAPI_FILE,
-		HOST: process.env.HOSTNAME,
+		HOST: process.env.HOST,
 		PORT: process.env.PORT,
 		JWT_SECRET_GAME: process.env.JWT_SECRET_GAME,
 		JWT_SECRET: process.env.JWT_SECRET
@@ -23,17 +23,13 @@ export function checkEnv(): IPongServerEnv {
 		}
 	}
 
-	const openapiSwagger = loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string)
-	const HOST = `${variables.HOST}/game`
-	const PORT = parseInt(variables.PORT as string)
-	const JWT_SECRET_GAME = variables.JWT_SECRET_GAME as string
-	const JWT_SECRET = variables.JWT_SECRET as string
-
-	return {
-		HOST: HOST,
-		PORT: PORT,
-		JWT_SECRET: JWT_SECRET,
-		JWT_SECRET_GAME: JWT_SECRET_GAME,
-		openAPISchema: openapiSwagger
+	const env: IGameEnv = {
+		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
+		HOST: `${variables.HOST}/game`,
+		PORT: parseInt(variables.PORT as string),
+		JWT_SECRET_GAME: variables.JWT_SECRET_GAME as string,
+		JWT_SECRET: variables.JWT_SECRET as string
 	}
+
+	return env
 }

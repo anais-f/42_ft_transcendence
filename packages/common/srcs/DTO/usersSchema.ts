@@ -133,10 +133,8 @@ export const UserSearchResultSchema = z
 	})
 	.meta({ description: 'Simple user search result schema' })
 
-// Webhook alias
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
 
-// Typescript types
 export type LoginDTO = z.infer<typeof LoginSchema>
 export type UsernameDTO = z.infer<typeof UsernameSchema>
 export type UserIdDTO = z.infer<typeof UserIdSchema>

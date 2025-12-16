@@ -1,23 +1,17 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { authenticator } from 'otplib'
 import {
 	verify2FASchema,
 	setup2FASchema,
 	disable2FASchema,
 	status2FASchema
 } from '@ft_transcendence/common'
-import { encryptSecret, decryptSecret } from '../utils/crypto.js'
 import {
-	upsertPendingSecret,
-	getPendingSecretEnc,
-	activateSecret,
-	deleteSecret,
-	getSecretEnc
-} from '../repositories/twofaRepository.js'
-import qrcode from 'qrcode'
+	setup2FA,
+	verify2FA,
+	disable2FA,
+	status2FA
+} from '../usecases/twofaUsecases.js'
 import createHttpError from 'http-errors'
-
-const SETUP_EXPIRATION_MS = 5 * 60 * 1000 // 5 minutes
 
 export async function setup2FAController(
 	req: FastifyRequest,
@@ -27,18 +21,9 @@ export async function setup2FAController(
 	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
 	const { user_id, issuer, label } = parsed.data
-	const secret = authenticator.generateSecret()
-	const enc = encryptSecret(secret)
-	const pendingUntil = Date.now() + SETUP_EXPIRATION_MS
-	upsertPendingSecret(user_id, enc, pendingUntil)
-	const otpauth_url = authenticator.keyuri(label, issuer, secret)
-	const qr_base64 = await qrcode.toDataURL(otpauth_url)
+	const result = await setup2FA(user_id, issuer, label)
 
-	return reply.code(200).send({
-		otpauth_url,
-		qr_base64,
-		expires_at: new Date(pendingUntil).toISOString()
-	})
+	return reply.code(200).send(result)
 }
 
 export async function verify2FAController(
@@ -49,39 +34,9 @@ export async function verify2FAController(
 	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
 	const { user_id, twofa_code } = parsed.data
-	const pending = getPendingSecretEnc(user_id)
+	const result = verify2FA(user_id, twofa_code)
 
-	if (pending) {
-		if (req.headers.cookie?.includes('auth_token=') === false) {
-			throw createHttpError.Unauthorized('Auth token missing')
-		}
-		if (pending.pending_until && Date.now() > pending.pending_until) {
-			deleteSecret(user_id)
-			throw createHttpError.Gone('Setup expired')
-		}
-
-		const secret = decryptSecret(pending.secret_enc)
-		const ok = authenticator.check(twofa_code, secret)
-		if (!ok) throw createHttpError.Unauthorized('Invalid code')
-
-		const activated = activateSecret(user_id)
-		if (!activated)
-			req.log.warn(`Failed to activate 2FA secret for user ${user_id}`)
-		return reply.code(200).send({ success: true, activated: true })
-	}
-
-	const activeEnc = getSecretEnc(user_id)
-	if (!activeEnc) throw createHttpError.NotFound('No 2FA secret')
-
-	if (req.headers.cookie?.includes('2fa_token=') === false) {
-		throw createHttpError.Unauthorized('2FA token missing')
-	}
-
-	const activeSecret = decryptSecret(activeEnc)
-	const ok = authenticator.check(twofa_code, activeSecret)
-	if (!ok) throw createHttpError.Unauthorized('Invalid code')
-
-	return reply.code(200).send({ success: true, activated: false })
+	return reply.code(200).send(result)
 }
 
 export async function disable2FAController(
@@ -92,9 +47,9 @@ export async function disable2FAController(
 	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
 	const { user_id } = parsed.data
-	deleteSecret(user_id)
+	const result = disable2FA(user_id)
 
-	return reply.code(200).send({ success: true })
+	return reply.code(200).send(result)
 }
 
 export async function status2FAController(
@@ -105,7 +60,7 @@ export async function status2FAController(
 	if (!parsed.success) throw createHttpError.BadRequest('Invalid payload')
 
 	const { user_id } = parsed.data
-	const enc = getSecretEnc(user_id)
+	const result = status2FA(user_id)
 
-	return reply.code(200).send({ enabled: !!enc })
+	return reply.code(200).send(result)
 }
