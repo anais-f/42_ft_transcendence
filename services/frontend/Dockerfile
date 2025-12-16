@@ -7,14 +7,17 @@ WORKDIR /build
 
 COPY package.json package-lock.json ./
 COPY services/frontend/app/package.json ./services/frontend/app/package.json
+COPY packages/common/package.json ./packages/common/
 
 RUN npm ci
 
 COPY tsconfig.json ./
 COPY services/frontend/app ./services/frontend/app
+COPY packages/common ./packages/common
 
 
 # Compile TypeScript + Build Vite + Tailwind
+RUN npm run build --workspace=packages/common
 RUN npm run build --workspace=frontend
 
 # ============================================

@@ -42,7 +42,6 @@ debug:
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
-	docker volume rm ft_transcendence_nginx_logs || true
 
 .PHONY: sh-%
 sh-%:
@@ -60,12 +59,12 @@ format:
 format-check:
 	npm run format:check
 
-.PHONY: build-dev
+.PHONY: dev-build
 build-dev:
 	rm -rf node_modules packages/*/node_modules services/*/app/node_modules
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) build
 
-.PHONY: up-dev
+.PHONY: dev-up
 up-dev: verif-env
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_DEV) up --remove-orphans || make down
 	
