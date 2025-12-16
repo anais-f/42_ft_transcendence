@@ -19,7 +19,7 @@ export class AuthApi {
 				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
 			)
 
-		const url = `${base}/api/users`
+		const url = `${base}/api/internal/users`
 		const headers = {
 			'content-type': 'application/json',
 			authorization: secret
@@ -90,11 +90,9 @@ export class AuthApi {
 				'Failed to fetch 2FA status from auth: ' + error.message
 			)
 		}
-
 		if (!response.ok)
 			throw createHttpError.BadGateway(`Auth service HTTP ${response.status}`)
-
-		const raw = (await response.json()) as { two_fa_enabled: boolean }
-		return raw.two_fa_enabled
+		const raw = (await response.json()) as { enabled: boolean }
+		return raw.enabled
 	}
 }
