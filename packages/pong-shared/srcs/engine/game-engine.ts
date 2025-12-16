@@ -5,6 +5,7 @@ import { Vector2 } from '../math/Vector2.js'
 import { IBall } from './IBall.js'
 import { ILives } from './IScore.js'
 import { IWinZone } from './IWinZone.js'
+import { EPSILON } from '../define.js'
 
 export class TPS_MANAGER {
 	public tickCount: number = 0
@@ -51,7 +52,18 @@ export class GameEngine {
 	private getRandomVelo(): Vector2 {
 		const x = Math.random() < 0.5 ? 1 : -1
 		const y = (Math.random() - 0.5) * 1.4
-		return new Vector2(x, y).normalize()
+		const velo = new Vector2(x, y).normalize()
+
+		let dir
+		if (this.lives.p1 > this.lives.p2) {
+			dir = new Vector2(1, 0)
+		} else if (this.lives.p1 < this.lives.p2) {
+			dir = new Vector2(-1, 0)
+		} else {
+			dir = Math.random() < 0.5 ? new Vector2(1, 0) : new Vector2(-1, 0)
+		}
+
+		return Vector2.dot(velo, dir) < 0 ? velo : velo.negate()
 	}
 
 	private _startGame(): void {
@@ -99,7 +111,7 @@ export class GameEngine {
 		const segNormal = border.getNormal()
 
 		const dotVeloNormal = Vector2.dot(this._ball.velo, segNormal)
-		if (Math.abs(dotVeloNormal) < 0.001) {
+		if (Math.abs(dotVeloNormal) < EPSILON) {
 			const altNormal = Vector2.subtract(ballCenter, closestHit).normalize()
 			if (Vector2.dot(this._ball.velo, altNormal) >= 0) {
 				return null
