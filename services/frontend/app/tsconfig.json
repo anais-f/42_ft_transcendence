@@ -5,7 +5,8 @@
 		"rootDir": ".",
 		"moduleResolution": "nodenext",
 		"paths": {
-			"@common/*": ["../../../packages/common/dist/*"]
+			"@common/*": ["../../../packages/common/dist/*"],
+			"@pong-shared/*": ["../../../packages/pong-shared/dist/*"]
 		}
 	},
 	"ts-node": {
