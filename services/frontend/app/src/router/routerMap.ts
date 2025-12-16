@@ -80,6 +80,7 @@ export const routerMap: Record<Pages, Route> = {
 	test: {
 		id: 'test',
 		url: '/test',
-		page: TestPage
+		page: TestPage,
+    public: true
 	}
 }

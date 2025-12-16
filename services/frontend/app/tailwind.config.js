@@ -5,6 +5,10 @@
 					extend: {
 							fontFamily: {
 									HoldMoney: ['HoldMoney', 'sans-serif'],
+									birthstone: ['"Birthstone"', 'cursive'],
+									newsreader: ['"Newsreader"', 'serif'],
+									rye: ['"Rye"', 'cursive'],
+									special: ['"Special Elite"', 'cursive'],
 							},
 					},
 			},
