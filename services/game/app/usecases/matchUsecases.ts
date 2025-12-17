@@ -28,7 +28,7 @@ export function saveMatch(
 
 		if (tournamentCode) {
 			onTournamentMatchEnd(
-				tournamentCode,
+				tournamentId,
 				round,
 				matchNumber,
 				winnerId,
