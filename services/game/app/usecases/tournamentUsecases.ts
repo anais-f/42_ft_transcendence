@@ -3,8 +3,7 @@ import {
 	Tournament,
 	CreateTournamentSchema,
 	TournamentDTO,
-	CreateTournamentResponseDTO,
-	MatchTournament
+	CreateTournamentResponseDTO
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 import { FastifyRequest } from 'fastify'
@@ -23,8 +22,36 @@ export interface ITournamentMatchData {
 	matchNumber: number
 }
 
+export interface ITournamentMatchResult {
+	tournamentId: number
+	round: number
+	matchNumber: number
+	winnerId: number
+	scorePlayer1: number
+	scorePlayer2: number
+}
+
 // Auto-incrementing tournament ID (initialized from DB)
 let nextTournamentId = 1
+
+export function createTournamentMatchResult(
+	tournamentData: ITournamentMatchData | undefined,
+	winnerId: number,
+	scoreP1: number,
+	scoreP2: number
+): ITournamentMatchResult | null {
+	if (!tournamentData) {
+		return null
+	}
+	return {
+		tournamentId: tournamentData.tournamentId,
+		round: tournamentData.round,
+		matchNumber: tournamentData.matchNumber,
+		winnerId: winnerId,
+		scorePlayer1: scoreP1,
+		scorePlayer2: scoreP2
+	}
+}
 
 export function initializeTournamentId(): void {
 	nextTournamentId = getNextTournamentId()
@@ -256,14 +283,9 @@ export function quitTournament(request: FastifyRequest): void {
 }
 
 export function onTournamentMatchEnd(
-	tournamentId: number,
-	round: number,
-	matchNumber: number,
-	winnerId: number,
-	scorePlayer1: number,
-	scorePlayer2: number
+	tournamentData: ITournamentMatchResult
 ): void {
-	const tournamentCode = getTournamentCodeById(tournamentId)
+	const tournamentCode = getTournamentCodeById(tournamentData.tournamentId)
 	if (!tournamentCode) {
 		throw createHttpError.NotFound('Tournament code not found')
 	}
@@ -274,7 +296,9 @@ export function onTournamentMatchEnd(
 
 	// Find the match that just ended
 	const currentMatch = tournament.matchs.find(
-		(m) => m.round === round && m.matchNumber === matchNumber
+		(m) =>
+			m.round === tournamentData.round &&
+			m.matchNumber === tournamentData.matchNumber
 	)
 	if (!currentMatch) {
 		throw createHttpError.NotFound('Match not found')
@@ -282,13 +306,15 @@ export function onTournamentMatchEnd(
 
 	// Update match status and scores
 	currentMatch.status = 'completed'
-	currentMatch.scorePlayer1 = scorePlayer1
-	currentMatch.scorePlayer2 = scorePlayer2
+	currentMatch.scorePlayer1 = tournamentData.scorePlayer1
+	currentMatch.scorePlayer2 = tournamentData.scorePlayer2
 
 	// If this was the final (round 1), tournament is over
-	if (round === 1) {
+	if (tournamentData.round === 1) {
 		tournament.status = 'completed'
-		console.log(`Tournament ${tournamentId} completed! Winner: ${winnerId}`)
+		console.log(
+			`Tournament ${tournamentData.tournamentId} completed! Winner: ${tournamentData.winnerId}`
+		)
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
@@ -300,8 +326,9 @@ export function onTournamentMatchEnd(
 	// Find the next round match that this winner should advance to
 	const nextRoundMatch = tournament.matchs.find(
 		(m) =>
-			m.round === round - 1 &&
-			(m.previousMatchId1 === matchNumber || m.previousMatchId2 === matchNumber)
+			m.round === tournamentData.round - 1 &&
+			(m.previousMatchId1 === tournamentData.matchNumber ||
+				m.previousMatchId2 === tournamentData.matchNumber)
 	)
 
 	if (!nextRoundMatch) {
@@ -310,14 +337,14 @@ export function onTournamentMatchEnd(
 	}
 
 	// Place winner in the appropriate slot of next match
-	if (nextRoundMatch.previousMatchId1 === matchNumber) {
-		nextRoundMatch.player1Id = winnerId
-	} else if (nextRoundMatch.previousMatchId2 === matchNumber) {
-		nextRoundMatch.player2Id = winnerId
+	if (nextRoundMatch.previousMatchId1 === tournamentData.matchNumber) {
+		nextRoundMatch.player1Id = tournamentData.winnerId
+	} else if (nextRoundMatch.previousMatchId2 === tournamentData.matchNumber) {
+		nextRoundMatch.player2Id = tournamentData.winnerId
 	}
 
 	console.log(
-		`Winner ${winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
+		`Winner ${tournamentData.winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
 	)
 
 	// Check if both players are ready for the next match

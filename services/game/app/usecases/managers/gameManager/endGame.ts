@@ -1,7 +1,11 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import { onTournamentMatchEnd } from '../../tournamentUsecases.js'
+import {
+	onTournamentMatchEnd,
+	createTournamentMatchResult,
+	ITournamentMatchResult
+} from '../../tournamentUsecases.js'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -35,16 +39,13 @@ export function endGame(code: string) {
 	gameData.p2.ws?.send(eogMessage)
 
 	// Store tournament data before cleanup
-	const tournamentData = gameData.tournamentMatchData
-		? {
-				tournamentId: gameData.tournamentMatchData.tournamentId,
-				round: gameData.tournamentMatchData.round,
-				matchNumber: gameData.tournamentMatchData.matchNumber,
-				winnerId: p1Won ? gameData.p1.id : gameData.p2.id,
-				scorePlayer1: score.p1,
-				scorePlayer2: score.p2
-			}
-		: null
+	const tournamentData: ITournamentMatchResult | null =
+		createTournamentMatchResult(
+			gameData.tournamentMatchData,
+			score.p1 > score.p2 ? gameData.p1.id : gameData.p2.id,
+			score.p1,
+			score.p2
+		)
 
 	playerToGame.delete(gameData.p1.id)
 	playerToGame.delete(gameData.p2.id)
@@ -54,13 +55,6 @@ export function endGame(code: string) {
 
 	// Call tournament callback after cleanup
 	if (tournamentData) {
-		onTournamentMatchEnd(
-			tournamentData.tournamentId,
-			tournamentData.round,
-			tournamentData.matchNumber,
-			tournamentData.winnerId,
-			tournamentData.scorePlayer1,
-			tournamentData.scorePlayer2
-		)
+		onTournamentMatchEnd(tournamentData)
 	}
 }

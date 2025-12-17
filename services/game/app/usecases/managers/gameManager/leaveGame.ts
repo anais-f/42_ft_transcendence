@@ -2,7 +2,11 @@ import { GameState } from '@ft_transcendence/pong-shared'
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import { onTournamentMatchEnd } from '../../tournamentUsecases.js'
+import {
+	onTournamentMatchEnd,
+	createTournamentMatchResult,
+	ITournamentMatchResult
+} from '../../tournamentUsecases.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -12,18 +16,11 @@ export function leaveGame(code: string) {
 
 	clearGameTimeout(code)
 
-	let tournamentData: {
-		tournamentId: number
-		round: number
-		matchNumber: number
-		winnerId: number
-		scorePlayer1: number
-		scorePlayer2: number
-	} | null = null
+	let tournamentCpy: ITournamentMatchResult | null = null
 
 	if (gameData.status !== 'ended') {
 		gameData.gameInstance?.GE.setState(GameState.Paused)
-		tournamentData = forfeit(gameData)
+		tournamentCpy = forfeit(gameData)
 		gameData.status = 'ended'
 	}
 
@@ -39,26 +36,12 @@ export function leaveGame(code: string) {
 	games.delete(code)
 
 	// Call tournament callback after cleanup
-	if (tournamentData) {
-		onTournamentMatchEnd(
-			tournamentData.tournamentId,
-			tournamentData.round,
-			tournamentData.matchNumber,
-			tournamentData.winnerId,
-			tournamentData.scorePlayer1,
-			tournamentData.scorePlayer2
-		)
+	if (tournamentCpy) {
+		onTournamentMatchEnd(tournamentCpy)
 	}
 }
 
-function forfeit(gameData: GameData): {
-	tournamentId: number
-	round: number
-	matchNumber: number
-	winnerId: number
-	scorePlayer1: number
-	scorePlayer2: number
-} | null {
+function forfeit(gameData: GameData): ITournamentMatchResult | null {
 	if (!gameData.p2) {
 		// open game, nobody joined
 		return null
@@ -105,14 +88,12 @@ function forfeit(gameData: GameData): {
 	}
 
 	if (gameData.tournamentMatchData) {
-		return {
-			tournamentId: gameData.tournamentMatchData.tournamentId,
-			round: gameData.tournamentMatchData.round,
-			matchNumber: gameData.tournamentMatchData.matchNumber,
+		return createTournamentMatchResult(
+			gameData.tournamentMatchData,
 			winnerId,
 			scorePlayer1,
 			scorePlayer2
-		}
+		)
 	}
 
 	return null
