@@ -18,6 +18,11 @@ export interface GameData {
 	status: GameStatus
 	createdAt: number
 	timeoutId: ReturnType<typeof setTimeout> | null
+	tournamentMatchData?: {
+		tournamentId: number
+		round: number
+		matchNumber: number
+	}
 }
 
 // individial game
