@@ -1,7 +1,7 @@
 import { Segment, Vector2 } from '@pong-shared/index.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import {
-	SEGMENT_LINE_WIDTH,
+	SEGMENT_LINE_WIDTH_SCALE,
 	SEGMENT_COLOR,
 	BALL_COLOR,
 	BALL_RADIUS_SCALE,
@@ -97,7 +97,7 @@ class Renderer {
 		ctx.globalCompositeOperation = 'source-over'
 		ctx.clearRect(0, 0, width, height)
 		ctx.strokeStyle = SEGMENT_COLOR
-		ctx.lineWidth = SEGMENT_LINE_WIDTH
+		ctx.lineWidth = SEGMENT_LINE_WIDTH_SCALE * scaleX
 		const allSegments = [...this.staticSegments, ...this.dynamicSegments]
 		for (const seg of allSegments) {
 			const p1 = seg.p1
@@ -138,7 +138,6 @@ class Renderer {
 
 			ctx.save()
 			ctx.globalCompositeOperation = 'source-over'
-			ctx.lineWidth = 3
 			ctx.strokeStyle = COUNTDOWN_COLOR
 			ctx.strokeText(string, x, y)
 			ctx.restore()

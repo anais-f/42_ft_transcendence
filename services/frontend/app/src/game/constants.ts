@@ -8,7 +8,7 @@ export const GAME_SPACE_WIDTH = 40
 export const GAME_SPACE_HEIGHT = 20
 
 // Rendering constants
-export const SEGMENT_LINE_WIDTH = 5
+export const SEGMENT_LINE_WIDTH_SCALE = 0.25
 export const SEGMENT_COLOR = 'black'
 export const BALL_COLOR = 'black'
 export const BALL_RADIUS_SCALE = 0.5
