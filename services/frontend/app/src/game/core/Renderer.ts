@@ -8,7 +8,8 @@ import {
 	COUNTDOWN_FONT,
 	COUNTDOWN_COLOR,
 	GAME_SPACE_WIDTH,
-	GAME_SPACE_HEIGHT
+	GAME_SPACE_HEIGHT,
+    COUNTDOWN_FONT_SCALE
 } from '../constants.js'
 
 class Renderer {
@@ -122,10 +123,11 @@ class Renderer {
 
 		if (this.countdown !== null && this.countdown > 0) {
 			const x = width / 2
-			const y = height / 2
+			const y = height / 3
+			const fontSize = height * COUNTDOWN_FONT_SCALE
 			const string = this.countdown.toString()
 
-			ctx.font = COUNTDOWN_FONT
+			ctx.font = `bold ${fontSize}px ${COUNTDOWN_FONT}`
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
 
