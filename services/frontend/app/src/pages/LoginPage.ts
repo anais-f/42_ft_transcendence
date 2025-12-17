@@ -16,7 +16,7 @@ export const LoginPage = (): string => {
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
 
-    <div class="flex flex-col items-start min-h-0">
+    <div class="col-4-span-flex">
       <h1 class="title_bloc">SUBSCRIBE TO OUR NEWSPAPER</h1>
       <form id="register_form" data-form="register" class="form_style">
           ${Input({
@@ -44,7 +44,7 @@ export const LoginPage = (): string => {
 						text: 'Subscribe',
 						id: 'register_btn',
 						type: 'submit',
-						additionalClasses: 'mb-4 mt-1'
+						additionalClasses: 'form_button'
 					})}
       </form>
 
@@ -54,7 +54,7 @@ export const LoginPage = (): string => {
 			})}
     </div>
 
-     <div class="flex flex-col items-start min-h-0">
+     <div class="col-4-span-flex">
       ${LoremSection({
 				variant: 'long'
 			})}
@@ -65,7 +65,7 @@ export const LoginPage = (): string => {
 			})}
      </div>
 
-     <div class="flex flex-col items-start min-h-0">
+     <div class="col-4-span-flex">
       ${LoremSection({
 				variant: 'short'
 			})}
@@ -90,7 +90,7 @@ export const LoginPage = (): string => {
 						text: 'Login',
 						id: 'login_btn',
 						type: 'submit',
-						additionalClasses: 'mb-4 mt-1'
+						additionalClasses: 'form_button'
 					})}
       </form>
 
@@ -122,7 +122,7 @@ export const LoginPage = (): string => {
 			})}
      </div>
 
-     <div class="flex flex-col items-start min-h-0">
+     <div class="col-4-span-flex">
       ${LoremSection({
 				title: 'New Partener',
 				variant: 'medium',

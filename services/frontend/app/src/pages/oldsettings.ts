@@ -26,10 +26,12 @@ export const SettingsPage = (): string => {
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in a. Asesciunt. Voluptates dolores doloremque. Beatae quii aliquam qui commodi. Eveniet possimus voluptas voluptatem.</p>
 		</div>
 		<h1 class="text-2xl py-4">CHANGE USERNAME ?</h1>
+	
 		<form id="change_username_form" data-form="username_form" class="flex flex-col gap-2 w-full">
 			<input id="change_username" type="text" name="change_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
 			<button id="change_username_btn" class="generic_btn mt-4" type="submit">Save it</button>
 		</form>
+	
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi.  Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi.  Consectetur minus maiores qui.  Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae.</p>
@@ -42,14 +44,18 @@ export const SettingsPage = (): string => {
 		</div>
 		<img src="/assets/images/paddle.png" alt="paddle" class="w-full object-cover opacity-50 select-none">
 		<h1 class="text-2xl pt-8 pb-1">CHANGE PASSWORD ?</h1>
+		
 		<form id="change_password_form" data-form="password_form" class="flex flex-col gap-2 w-full">
 			<input id="old_password" type="password" name="old_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="OLD PASSWORD" required>
 			<input id="new_password" type="password" name="new_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="NEW PASSWORD" required>
 			<input id="confirm_new_password" type="password" name="confirm_new_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="CONFIRM NEW PASSWORD" required>
-			${is2FAEnabled ? '<input id="password_2fa_code" type="text" name="password_2fa_code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required maxlength="6" pattern="[0-9]{6}">' : ''}
+			
+${is2FAEnabled ? '<input id="password_2fa_code" type="text" name="password_2fa_code" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="2FA CODE" required maxlength="6" pattern="[0-9]{6}">' : ''}
 			<button id="change_password_btn" class="generic_btn mt-4" type="submit">Save it</button>
 		</form>
+		
 	</div>
+
 
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph">
@@ -97,7 +103,9 @@ export const SettingsPage = (): string => {
 				</div>`
 			}
 		</div>
+		
 		<img src="/assets/images/tiger.png" alt="tiger" class="w-full object-cover opacity-50 select-none">
+		
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-6">Title</h1>
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Nam perferendis facilis asperiores ea qui voluptates dolor eveniet. Omnis voluptas et ut est porro soluta ut est.</p>

@@ -31,6 +31,9 @@
 	.form_style {
 		@apply flex flex-col gap-2 w-full;
 	}
+	.col-4-span-flex {
+		@apply col-span-1 flex flex-col items-start min-h-0;
+	}
 
 	.generic_btn {
 		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
@@ -46,6 +49,9 @@
 	}
 	.news_paragraph {
 		@apply text-black opacity-20 select-none text-justify;
+	}
+	.form_button {
+		@apply mb-4 mt-2;
 	}
 
 	/* Line clamp utilities */
