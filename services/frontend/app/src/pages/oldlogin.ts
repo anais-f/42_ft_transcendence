@@ -9,11 +9,11 @@ import { CredentialResponse } from '../types/google-type.js'
 import { loadGoogleScript, loginWithGoogleCredential } from '../api/authApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 
-export const LoginPage = (): string => {
+export const TestPage = (): string => {
 	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
     <div class="col-span-1 flex flex-col items-start">
-        <h1 class="text-2xl py-4">SUBSCRIBE TO OUR NEWSPAPER</h1>
+        <h1 class="title_bloc">SUBSCRIBE TO OUR NEWSPAPER</h1>
         <form id="register_form" data-form="register" class="flex flex-col gap-2">
             <input id="register_username" type="text" name="register_username" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="USERNAME" required>
             <input id="register_password" type="password" name="register_password" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="PASSWORD" required>
@@ -25,6 +25,8 @@ export const LoginPage = (): string => {
             <p class="text-sm py-2">Ipsi et pltre veam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
         </div>
     </div>
+    
+    
     <div class="col-span-1 flex flex-col items-start">
         <div class="news_paragraph">
             <p class="text-sm pt-6 pb-2">Ipsum doiquams volup qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
@@ -36,6 +38,8 @@ export const LoginPage = (): string => {
             <p class="text-sm py-2">Ipsum . Eaque optirem. Qutates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
         </div>
     </div>
+    
+    
     <div class="col-span-1 flex flex-col items-start">
         <div class="news_paragraph">
             <p class="text-sm py-6">Ipsum Conss oledio in ipsa corrupti aliquam qui commodi.ficia. Assumenda reprehendet placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
@@ -70,8 +74,9 @@ export const LoginPage = (): string => {
             <h1 class="text-lg pt-4">Title</h1>
             <p class="text-sm pb-2">Ipsum qa reprehenderit nesciunt. </p>
         </div>
-
     </div>
+    
+    
     <div class="col-span-1 flex flex-col items-start">
         <div class="news_paragraph">
             <h1 class="text-lg pt-6 pb-4">Title</h1>
