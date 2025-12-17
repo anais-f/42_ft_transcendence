@@ -1,55 +1,51 @@
-import { games, GameData, playerToGame } from '../gameData.js'
+import { GameState } from '@ft_transcendence/pong-shared'
+import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
+import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
+import { clearGameTimeout } from './startTimeOut.js'
 
-export function leaveGame(pID: number) {
-	const gameCode = playerToGame.get(pID)
-	if (!gameCode) {
-		throw new Error('player not in game')
-	}
-
-	deleteGame(gameCode)
-}
-
-function deleteGame(gameCode: string) {
-	const gameData = games.get(gameCode)
+export function leaveGame(code: string) {
+	const gameData = games.get(code)
 	if (!gameData) {
-		throw new Error('game not found')
+		return
 	}
 
-	forfeit(gameData) // set game in DB
+	clearGameTimeout(code)
+
+	if (gameData.status !== 'ended') {
+		gameData.gameInstance?.GE.setState(GameState.Paused)
+		forfeit(gameData)
+		gameData.status = 'ended'
+	}
 
 	if (gameData.p1) {
 		playerToGame.delete(gameData.p1.id)
+		busyPlayers.delete(gameData.p1.id)
 	}
 
 	if (gameData.p2) {
 		playerToGame.delete(gameData.p2.id)
+		busyPlayers.delete(gameData.p2.id)
 	}
-	games.delete(gameCode)
+	games.delete(code)
 }
 
 function forfeit(gameData: GameData) {
 	if (!gameData.p2) {
-		// open game nobody join
-		return // no op
+		// open game, nobody joined
+		return
 	}
 
-	if (gameData.status == 'active') {
-		// game already started
-		if (gameData.p1?.connState) {
-			// p2 disconect
-			// TODO: P1 win
-		} else {
-			// p1 disconect
-			// TODO: P2 win
-		}
+	if (!gameData.p1.ws) {
+		// p1 left, p2 wins
+		gameData.p2.ws?.send(
+			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
+		)
+		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
 	} else {
-		// waiting
-		if (!gameData.p1.connState) {
-			// p1 disconect
-			// TODO: P2 win
-		} else if (!gameData.p2.connState) {
-			// p2 disconect
-			// TODO: P1 win
-		}
+		// p2 left, p1 wins
+		gameData.p1.ws.send(
+			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
+		)
+		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
 	}
 }

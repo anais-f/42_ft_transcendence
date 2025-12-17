@@ -25,8 +25,8 @@ describe('', () => {
 		expect(p2.equals(new Vector2(0, 1))).toBe(true)
 
 		pad.move(padDirection.DOWN, 1.5)
-		console.log(`${p1.getX()} : ${p1.getY()}`)
-		console.log(`${p2.getX()} : ${p2.getY()}`)
+		console.log(`${p1.x} : ${p1.y}`)
+		console.log(`${p2.x} : ${p2.y}`)
 		expect(p1.equals(new Vector2(0, -1))).toBe(true)
 		expect(p2.equals(new Vector2(0, 1))).toBe(true)
 	})

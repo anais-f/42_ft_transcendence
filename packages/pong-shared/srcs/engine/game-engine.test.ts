@@ -42,7 +42,8 @@ describe('game-engine', () => {
 		game = new GameEngine(
 			60,
 			scoreData,
-			[segA, segB, segC, segD, padSeg1, padSeg2],
+			[segA, segB, segC, segD],
+			[padSeg1, padSeg2],
 			[
 				{ seg: segC, player: 1 },
 				{ seg: segD, player: 2 }
@@ -51,8 +52,8 @@ describe('game-engine', () => {
 	})
 
 	test('init', () => {
-		expect(game?.getTickCount()).toBe(0)
-		expect(game?.getState()).toEqual(GameState.Paused)
+		expect(game?.tickCount).toBe(0)
+		expect(game?.state).toEqual(GameState.Paused)
 	})
 
 	test('loop', async () => {
@@ -72,23 +73,23 @@ describe('game-engine', () => {
 	})
 
 	test('move pad', () => {
-		const y1 = padSeg1.getP1().getY()
-		const y2 = padSeg1.getP2().getY()
+		const y1 = padSeg1.p1.y
+		const y2 = padSeg1.p2.y
 		pad1.move(padDirection.UP, 1)
-		expect(padSeg1.getP1().getY()).toEqual(y1 + 1)
-		expect(padSeg1.getP2().getY()).toEqual(y2 + 1)
-		expect(padSeg1.getP1().getX()).toEqual(-18)
+		expect(padSeg1.p1.y).toEqual(y1 + 1)
+		expect(padSeg1.p2.y).toEqual(y2 + 1)
+		expect(padSeg1.p1.x).toEqual(-18)
 		pad1.move(padDirection.DOWN, 5.3)
-		expect(padSeg1.getP1().getY()).toBeCloseTo(y1 - 4.3)
-		expect(padSeg1.getP2().getY()).toBeCloseTo(y2 - 4.3)
-		expect(padSeg1.getP1().getX()).toEqual(-18)
+		expect(padSeg1.p1.y).toBeCloseTo(y1 - 4.3)
+		expect(padSeg1.p2.y).toBeCloseTo(y2 - 4.3)
+		expect(padSeg1.p1.x).toEqual(-18)
 		// reference test
 		expect(
 			// @ts-ignore
 			game.borders.some(
 				(e) =>
-					e.getP1().equals(new Vector2(-18, y1 - 4.3)) &&
-					e.getP2().equals(new Vector2(-18, y2 - 4.3))
+					e.p1.equals(new Vector2(-18, y1 - 4.3)) &&
+					e.p2.equals(new Vector2(-18, y2 - 4.3))
 			)
 		).toBe(true)
 	})

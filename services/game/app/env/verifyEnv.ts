@@ -23,13 +23,11 @@ export function checkEnv(): IGameEnv {
 		}
 	}
 
-	const env: IGameEnv = {
+	return {
 		openAPISchema: loadOpenAPISchema(variables.DTO_OPENAPI_FILE as string),
 		HOST: `${variables.HOST}/game`,
 		PORT: parseInt(variables.PORT as string),
 		JWT_SECRET_GAME: variables.JWT_SECRET_GAME as string,
 		JWT_SECRET: variables.JWT_SECRET as string
 	}
-
-	return env
 }

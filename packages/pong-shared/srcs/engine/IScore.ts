@@ -1,9 +1,8 @@
-export interface IScore {
+export interface ILives {
 	p1: number
 	p2: number
-	max: number
 }
 
-export function createScore(maxPoint: number): IScore {
-	return { p1: 0, p2: 0, max: maxPoint }
+export function createScore(maxPoint: number): ILives {
+	return { p1: maxPoint, p2: maxPoint }
 }

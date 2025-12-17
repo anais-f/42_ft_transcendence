@@ -1,18 +1,18 @@
 import { FastifyInstance } from 'fastify'
+import { CreateTournamentSchema } from '@ft_transcendence/common'
 import {
-	createTournamentController,
-	joinTournamentController,
-	getTournamentController,
-	quitTournamentController
-} from '../controllers/tournamentControllers.js'
-import {
-	CreateTournamentSchema,
 	CodeParamSchema,
 	CreateTournamentResponseSchema,
 	GetTournamentResponseSchema,
 	JoinTournamentResponseSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import {
+	createTournamentController,
+	getTournamentController,
+	joinTournamentController,
+	quitTournamentController
+} from '../controllers/tournament/tournamentControllers.js'
 
 export function tournamentRoutes(app: FastifyInstance) {
 	app.post(

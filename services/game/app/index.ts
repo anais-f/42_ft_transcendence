@@ -1,6 +1,4 @@
-//import { GameState } from '@ft_transcendence/pong-shared'
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
-//import { createGame } from './utils/createGame.js'
 import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
 import { checkEnv, IGameEnv } from './env/verifyEnv.js'

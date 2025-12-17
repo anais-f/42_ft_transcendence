@@ -1,5 +1,8 @@
-import { currentUser } from '../usecases/userStore.js'
+import { handleCreateGame } from '../events/home/createGameHandler.js'
+import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
+import { handleLogin } from '../events/loginPageHandlers.js'
 import { logout } from '../usecases/userSession.js'
+import { currentUser } from '../usecases/userStore.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -29,8 +32,8 @@ export const HomePage = (): string => {
 			<p class="text-sm pb-2">Ipst quam. Euidem nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
-		<button id="remote_btn" type="button" class="generic_btn my-2" onclick="navigate('/lobby')">Remote</button>
-		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/game')">Tournament</button>
+		<button id="create_game_btn" data-action="create-game" type="button" class="generic_btn my-2">Create</button>
+		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/play')">Tournament</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipeat. Ipsum dolore vericorrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
@@ -44,7 +47,7 @@ export const HomePage = (): string => {
 		</div>
 		<h1 class="text-2xl py-2">FEELING LONELY ?</h1>
 		<p class="text-lg">You can join a game by enter the lobby code below</p>
-		<form id="join_lobby_form" class="flex flex-col gap-2">
+		<form id="join_lobby_form" data-form="join-lobby" class="flex flex-col gap-2">
 			 <input id="join_lobby" type="text" name="join_lobby" class="px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER LOBBY CODE HERE" required>
 			 <button id="join_btn" class="generic_btn" type="submit">Join</button>
 		 </form>
@@ -116,6 +119,7 @@ export const HomePage = (): string => {
 }
 
 let clickHandler: ((e: Event) => Promise<void>) | null = null
+let submitHandler: ((e: Event) => Promise<void>) | null = null
 
 /**
  * Attach event listeners for the home page.
@@ -125,7 +129,9 @@ let clickHandler: ((e: Event) => Promise<void>) | null = null
  */
 export function attachHomeEvents() {
 	const content = document.getElementById('content')
-	if (!content) return
+	if (!content) {
+		return
+	}
 
 	// Create and store the click handler
 	clickHandler = async (e: Event) => {
@@ -139,15 +145,26 @@ export function attachHomeEvents() {
 				await logout()
 			}
 
-			// Navigate to settings
 			if (action === 'navigate-settings') {
 				window.navigate('/settings')
+			}
+
+			if (action === 'create-game') {
+				await handleCreateGame()
 			}
 		}
 	}
 
+	submitHandler = async (e: Event) => {
+		const form = e.target as HTMLElement
+		const formName = form.getAttribute('data-form')
+
+		if (formName === 'join-lobby') handleJoinLobby(e)
+	}
+
 	// Attach the handler
 	content.addEventListener('click', clickHandler)
+	content.addEventListener('submit', submitHandler)
 
 	console.log('Home page events attached')
 }
@@ -162,7 +179,11 @@ export function detachHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// Remove event listener using stored reference
+	if (submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
+
 	if (clickHandler) {
 		content.removeEventListener('click', clickHandler)
 		clickHandler = null

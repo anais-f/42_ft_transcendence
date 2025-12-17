@@ -1,5 +1,4 @@
-import { checkAuth } from '../usecases/userSession.js'
-import { setCurrentUser, currentUser } from '../usecases/userStore'
+import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import {
 	handleUsername,
 	handleChangePassword,

@@ -1,11 +1,19 @@
 import {
+	attachGameEvents,
+	detachGameEvents,
+	GamePage
+} from '../pages/oldgame.js'
+import {
+	attachLobbyEvents,
+	detachLobbyEvents,
+	LobbyPage
+} from '../pages/oldlobby.js'
+import { ProfilePage } from '../pages/oldprofile.js'
+import {
 	HomePage,
 	attachHomeEvents,
 	detachHomeEvents
 } from '../pages/oldhome.js'
-import { GamePage } from '../pages/oldgame.js'
-import { LobbyPage } from '../pages/oldlobby.js'
-import { ProfilePage } from '../pages/oldprofile.js'
 import {
 	LoginPage,
 	attachLoginEvents,
@@ -47,14 +55,18 @@ export const routerMap: Record<Pages, Route> = {
 
 	game: {
 		id: 'game',
-		url: '/game',
-		page: GamePage
+		url: '/play',
+		page: GamePage,
+		binds: [attachGameEvents],
+		unbinds: [detachGameEvents]
 	},
 
 	lobby: {
 		id: 'lobby',
-		url: '/lobby',
-		page: LobbyPage
+		url: '/lobby/:code',
+		page: LobbyPage,
+		binds: [attachLobbyEvents],
+		unbinds: [detachLobbyEvents]
 	},
 
 	login: {

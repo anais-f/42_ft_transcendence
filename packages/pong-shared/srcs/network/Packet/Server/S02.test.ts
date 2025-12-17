@@ -20,15 +20,13 @@ describe('S02', () => {
 
 	const tab = [S1, S2, S3, S4, S5]
 	test('serialize returns correct buffer', () => {
-		const time = 123456789.1
-		const buff = new S02(time, tab).serialize()
+		const buff = new S02(tab).serialize()
 		const view = new DataView(buff)
-		const HEADER_SIZE = 8 + 1 + 1
+		const HEADER_SIZE = 1 + 1
 		const SEG_SIZE = 32
 
-		expect(view.getFloat64(0, true)).toBeCloseTo(time, 6)
-		expect(view.getUint8(8)).toBe(SPacketsType.S02)
-		expect(view.getUint8(9)).toBe(tab.length)
+		expect(view.getUint8(0)).toBe(SPacketsType.S02)
+		expect(view.getUint8(1)).toBe(tab.length)
 
 		const pairs = [
 			[p1, p2],
@@ -47,30 +45,26 @@ describe('S02', () => {
 			const x2 = view.getFloat64(offset + 16, true)
 			const y2 = view.getFloat64(offset + 24, true)
 
-			expect(x1).toBeCloseTo(pa.getX(), 6)
-			expect(y1).toBeCloseTo(pa.getY(), 6)
-			expect(x2).toBeCloseTo(pb.getX(), 6)
-			expect(y2).toBeCloseTo(pb.getY(), 6)
+			expect(x1).toBeCloseTo(pa.x, 6)
+			expect(y1).toBeCloseTo(pa.y, 6)
+			expect(x2).toBeCloseTo(pb.x, 6)
+			expect(y2).toBeCloseTo(pb.y, 6)
 		}
 	})
 
 	test('deserialize + serialize', () => {
-		const time = new Date(0).getTime()
-		const O2 = new S02(time, tab)
+		const O2 = new S02(tab)
 		const buff = O2.serialize()
 
 		const NO2 = packetBuilder.deserializeS(buff)
 
-		expect(NO2?.time).toBeCloseTo(time)
 		expect(NO2).toBeInstanceOf(S02SegmentUpdate)
 		if (!(NO2 instanceof S02SegmentUpdate)) {
 			throw '...'
 		}
 		tab.forEach((seg) =>
 			expect(
-				NO2.segs.some(
-					(e) => e.getP1().equals(seg.getP1()) && e.getP2().equals(seg.getP2())
-				)
+				NO2.segs.some((e) => e.p1.equals(seg.p1) && e.p2.equals(seg.p2))
 			).toBe(true)
 		)
 	})
