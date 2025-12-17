@@ -2,6 +2,7 @@ import { GameState } from '@ft_transcendence/pong-shared'
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
+import { onTournamentMatchEnd } from '../../tournamentUsecases.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -11,9 +12,18 @@ export function leaveGame(code: string) {
 
 	clearGameTimeout(code)
 
+	let tournamentData: {
+		tournamentId: number
+		round: number
+		matchNumber: number
+		winnerId: number
+		scorePlayer1: number
+		scorePlayer2: number
+	} | null = null
+
 	if (gameData.status !== 'ended') {
 		gameData.gameInstance?.GE.setState(GameState.Paused)
-		forfeit(gameData)
+		tournamentData = forfeit(gameData)
 		gameData.status = 'ended'
 	}
 
@@ -27,25 +37,83 @@ export function leaveGame(code: string) {
 		busyPlayers.delete(gameData.p2.id)
 	}
 	games.delete(code)
+
+	// Call tournament callback after cleanup
+	if (tournamentData) {
+		onTournamentMatchEnd(
+			tournamentData.tournamentId,
+			tournamentData.round,
+			tournamentData.matchNumber,
+			tournamentData.winnerId,
+			tournamentData.scorePlayer1,
+			tournamentData.scorePlayer2
+		)
+	}
 }
 
-function forfeit(gameData: GameData) {
+function forfeit(gameData: GameData): {
+	tournamentId: number
+	round: number
+	matchNumber: number
+	winnerId: number
+	scorePlayer1: number
+	scorePlayer2: number
+} | null {
 	if (!gameData.p2) {
 		// open game, nobody joined
-		return
+		return null
 	}
+
+	let winnerId: number
+	let scorePlayer1: number
+	let scorePlayer2: number
 
 	if (!gameData.p1.ws) {
 		// p1 left, p2 wins
 		gameData.p2.ws?.send(
 			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
 		)
-		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 0, 1)
+		winnerId = gameData.p2.id
+		scorePlayer1 = 0
+		scorePlayer2 = 1
+		saveMatchToHistory(
+			gameData.p1.id,
+			gameData.p2.id,
+			scorePlayer1,
+			scorePlayer2,
+			gameData.tournamentMatchData?.tournamentId ?? -1,
+			gameData.tournamentMatchData?.round ?? -1,
+			gameData.tournamentMatchData?.matchNumber ?? -1
+		)
 	} else {
 		// p2 left, p1 wins
 		gameData.p1.ws.send(
 			JSON.stringify({ type: 'EOG', data: { reason: 'opponent left' } })
 		)
-		saveMatchToHistory(gameData.p1.id, gameData.p2.id, 1, 0)
+		winnerId = gameData.p1.id
+		scorePlayer1 = 1
+		scorePlayer2 = 0
+		saveMatchToHistory(
+			gameData.p1.id,
+			gameData.p2.id,
+			scorePlayer1,
+			scorePlayer2,
+			gameData.tournamentMatchData?.tournamentId ?? -1,
+			gameData.tournamentMatchData?.round ?? -1,
+			gameData.tournamentMatchData?.matchNumber ?? -1
+		)
 	}
+
+	if (gameData.tournamentMatchData) {
+		return {
+			tournamentId: gameData.tournamentMatchData.tournamentId,
+			round: gameData.tournamentMatchData.round,
+			matchNumber: gameData.tournamentMatchData.matchNumber,
+			winnerId,
+			scorePlayer1,
+			scorePlayer2
+		}
+	}
+
+	return null
 }
