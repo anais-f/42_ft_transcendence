@@ -1,4 +1,7 @@
-import { createInviteCode, ITournamentMatchData } from '../../tournamentUsecases.js'
+import {
+	createInviteCode,
+	ITournamentMatchData
+} from '../../tournamentUsecases.js'
 import { games, playerToGame } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 

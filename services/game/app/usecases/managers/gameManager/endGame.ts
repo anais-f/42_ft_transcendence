@@ -35,14 +35,16 @@ export function endGame(code: string) {
 	gameData.p2.ws?.send(eogMessage)
 
 	// Store tournament data before cleanup
-	const tournamentData = gameData.tournamentMatchData ? {
-		tournamentId: gameData.tournamentMatchData.tournamentId,
-		round: gameData.tournamentMatchData.round,
-		matchNumber: gameData.tournamentMatchData.matchNumber,
-		winnerId: p1Won ? gameData.p1.id : gameData.p2.id,
-		scorePlayer1: score.p1,
-		scorePlayer2: score.p2
-	} : null
+	const tournamentData = gameData.tournamentMatchData
+		? {
+				tournamentId: gameData.tournamentMatchData.tournamentId,
+				round: gameData.tournamentMatchData.round,
+				matchNumber: gameData.tournamentMatchData.matchNumber,
+				winnerId: p1Won ? gameData.p1.id : gameData.p2.id,
+				scorePlayer1: score.p1,
+				scorePlayer2: score.p2
+			}
+		: null
 
 	playerToGame.delete(gameData.p1.id)
 	playerToGame.delete(gameData.p2.id)

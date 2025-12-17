@@ -28,7 +28,9 @@ let nextTournamentId = 1
 
 export function initializeTournamentId(): void {
 	nextTournamentId = getNextTournamentId()
-	console.log(`[Tournament] Next tournament ID initialized to: ${nextTournamentId}`)
+	console.log(
+		`[Tournament] Next tournament ID initialized to: ${nextTournamentId}`
+	)
 }
 
 function randomAlphaNumeric(length: number): string {
