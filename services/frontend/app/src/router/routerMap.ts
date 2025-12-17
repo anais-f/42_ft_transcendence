@@ -1,9 +1,4 @@
 import {
-	HomePage,
-	attachHomeEvents,
-	detachHomeEvents
-} from '../pages/oldhome.js'
-import {
 	attachGameEvents,
 	detachGameEvents,
 	GamePage
@@ -13,19 +8,25 @@ import {
 	detachLobbyEvents,
 	LobbyPage
 } from '../pages/oldlobby.js'
+import {
+	attachLoginEvents,
+	detachLoginEvents,
+	cleanupGoogleAuth,
+	TestPage
+} from '../pages/oldlogin.js'
 import { ProfilePage } from '../pages/oldprofile.js'
+
+import {
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
+} from '../pages/oldhome.js'
 import {
 	SettingsPage,
 	attachSettingsEvents,
 	detachSettingsEvents
 } from '../pages/oldsettings.js'
-import {
-	LoginPage,
-	attachLoginEvents,
-	detachLoginEvents,
-	cleanupGoogleAuth
-} from '../pages/LoginPage.js'
-import { TestPage } from '../pages/SettingsPage.js'
+import { LoginPage } from '../pages/LoginPage.js'
 
 export type Pages =
 	| 'home'
