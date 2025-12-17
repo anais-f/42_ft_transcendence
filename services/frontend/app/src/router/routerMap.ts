@@ -13,7 +13,7 @@ import {
 	detachLoginEvents,
 	cleanupGoogleAuth
 } from '../pages/LoginPage'
-import { TestPage } from '../pages/HomePage.js'
+import { TestPage } from '../pages/SettingsPage.js'
 
 export type Pages =
 	| 'home'
