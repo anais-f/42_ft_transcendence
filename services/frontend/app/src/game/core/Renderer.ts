@@ -9,7 +9,7 @@ import {
 	COUNTDOWN_COLOR,
 	GAME_SPACE_WIDTH,
 	GAME_SPACE_HEIGHT,
-    COUNTDOWN_FONT_SCALE
+	COUNTDOWN_FONT_SCALE
 } from '../constants.js'
 
 class Renderer {

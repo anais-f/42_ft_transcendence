@@ -14,6 +14,6 @@ export const BALL_COLOR = 'black'
 export const BALL_RADIUS_SCALE = 0.5
 
 // Countdown display
-export const COUNTDOWN_FONT_SCALE = 0.30
+export const COUNTDOWN_FONT_SCALE = 0.3
 export const COUNTDOWN_FONT = 'HoldMoney'
 export const COUNTDOWN_COLOR = 'rgba(0, 0, 0, 1)'

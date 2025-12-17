@@ -9,8 +9,7 @@ interface PlayerProps {
 export const PlayerComp = (props: PlayerProps): string => {
 	const { username, avatar, scoreID, position, additionalClasses = '' } = props
 
-	const baseClasses =
-		'col-span-1 flex flex-col items-center justify-center'
+	const baseClasses = 'col-span-1 flex flex-col items-center justify-center'
 
 	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
