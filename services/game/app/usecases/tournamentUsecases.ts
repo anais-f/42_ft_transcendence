@@ -15,7 +15,21 @@ import {
 	usersInTournaments
 } from './managers/gameData.js'
 import { requestGame } from './managers/gameManager/requestGame.js'
-import { saveMatch } from './matchUsecases.js'
+import { getNextTournamentId } from '../repositories/matchsRepository.js'
+
+export interface ITournamentMatchData {
+	tournamentId: number
+	round: number
+	matchNumber: number
+}
+
+// Auto-incrementing tournament ID (initialized from DB)
+let nextTournamentId = 1
+
+export function initializeTournamentId(): void {
+	nextTournamentId = getNextTournamentId()
+	console.log(`[Tournament] Next tournament ID initialized to: ${nextTournamentId}`)
+}
 
 function randomAlphaNumeric(length: number): string {
 	let code: string
@@ -50,48 +64,6 @@ function shuffle(array: any[]) {
 	}
 }
 
-export async function simulateMatch(
-	player1Id: number,
-	player2Id: number,
-	tournamentId: number,
-	round: number,
-	matchNumber: number
-) {
-	// Random match duration between 5 and 60 seconds
-	const duration = Math.floor(Math.random() * 55000) + 5000
-
-	console.log(
-		`[MOCK] Starting match: Player ${player1Id} vs Player ${player2Id} (duration: ${duration}ms)`
-	)
-
-	// Wait for the match duration
-	await new Promise((resolve) => setTimeout(resolve, duration))
-
-	// Random winner (50/50 chance)
-	const player1Wins = Math.random() < 0.5
-	const winnerId = player1Wins ? player1Id : player2Id
-	const loserId = player1Wins ? player2Id : player1Id
-
-	const scoreWinner = 10
-	const scoreLoser = Math.floor(Math.random() * 9) // 0-4
-
-	const scorePlayer1 = player1Wins ? scoreWinner : scoreLoser
-	const scorePlayer2 = player1Wins ? scoreLoser : scoreWinner
-
-	console.log(
-		`[MOCK] Match ended: Player ${winnerId} wins! Score: ${scorePlayer1}-${scorePlayer2}`
-	)
-	saveMatch(
-		player1Id,
-		player2Id,
-		scorePlayer1,
-		scorePlayer2,
-		tournamentId,
-		round,
-		matchNumber
-	)
-}
-
 function startNextRound(tournament: Tournament, round: number) {
 	const roundMatches = tournament.matchs.filter(
 		(match) => match.round === round
@@ -102,14 +74,11 @@ function startNextRound(tournament: Tournament, round: number) {
 			return
 		}
 		match.status = 'ongoing'
-		simulateMatch(
-			match.player1Id,
-			match.player2Id,
-			tournament.id,
-			match.round,
-			match.matchNumber
-		)
-		// requestGame(match.player1Id, match.player2Id)
+		requestGame(match.player1Id, match.player2Id, {
+			tournamentId: tournament.id,
+			round: match.round,
+			matchNumber: match.matchNumber
+		})
 	})
 }
 
@@ -216,8 +185,6 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 	return tournament
 }
 
-let nextTournamentId = 1
-
 export function createTournament(
 	request: FastifyRequest
 ): CreateTournamentResponseDTO {
@@ -287,13 +254,17 @@ export function quitTournament(request: FastifyRequest): void {
 }
 
 export function onTournamentMatchEnd(
-	tournamentCode: string,
+	tournamentId: number,
 	round: number,
 	matchNumber: number,
 	winnerId: number,
 	scorePlayer1: number,
 	scorePlayer2: number
 ): void {
+	const tournamentCode = getTournamentCodeById(tournamentId)
+	if (!tournamentCode) {
+		throw createHttpError.NotFound('Tournament code not found')
+	}
 	const tournament = tournaments.get(tournamentCode)
 	if (!tournament) {
 		throw createHttpError.NotFound('Tournament not found')
@@ -315,7 +286,7 @@ export function onTournamentMatchEnd(
 	// If this was the final (round 1), tournament is over
 	if (round === 1) {
 		tournament.status = 'completed'
-		console.log(`Tournament ${tournamentCode} completed! Winner: ${winnerId}`)
+		console.log(`Tournament ${tournamentId} completed! Winner: ${winnerId}`)
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
@@ -358,14 +329,11 @@ export function onTournamentMatchEnd(
 		console.log(
 			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
-		simulateMatch(
-			nextRoundMatch.player1Id,
-			nextRoundMatch.player2Id,
-			tournament.id,
-			nextRoundMatch.round,
-			nextRoundMatch.matchNumber
-		)
-		// requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id)
+		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id, {
+			tournamentId: tournament.id,
+			round: nextRoundMatch.round,
+			matchNumber: nextRoundMatch.matchNumber
+		})
 	}
 }
 
