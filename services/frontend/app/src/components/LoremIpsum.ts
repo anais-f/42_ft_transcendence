@@ -1,7 +1,6 @@
 interface LoremIpsumProps {
 	title?: string
-	variant?: 'xs' | 'short' | 'medium' | 'long' | 'xl'
-	fillSpace?: boolean
+	variant?: 'xs' | 'short' | 'medium' | 'long' | 'xl' | 'fill'
 	additionalClasses?: string
 }
 
@@ -20,7 +19,6 @@ Vitae pellentesque sem placerat in id cursus mi. Inceptos himenaeos orci varius 
 export const LoremSection = ({
 	title,
 	variant = 'medium',
-	fillSpace = false,
 	additionalClasses = ''
 }: LoremIpsumProps): string => {
 	const variantConfig = {
@@ -28,14 +26,17 @@ export const LoremSection = ({
 		short: 'line-clamp-4',
 		medium: 'line-clamp-8',
 		long: 'line-clamp-12',
-		xl: 'line-clamp-20'
+		xl: 'line-clamp-20',
+		fill: ''
 	} as const
 
-	const paragraphClasses = fillSpace
-		? `text-sm overflow-hidden flex-1 min-h-0 ${variantConfig[variant]} ${additionalClasses}`.trim()
+	const isFillMode = variant === 'fill'
+
+	const paragraphClasses = isFillMode
+		? `text-sm overflow-hidden flex-1 min-h-0 ${additionalClasses}`.trim()
 		: `text-sm overflow-hidden ${variantConfig[variant]} ${additionalClasses}`.trim()
 
-	const containerClasses = fillSpace
+	const containerClasses = isFillMode
 		? 'news_paragraph flex-1 min-h-0 flex flex-col'
 		: 'news_paragraph overflow-hidden'
 

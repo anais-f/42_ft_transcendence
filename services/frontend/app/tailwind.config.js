@@ -17,7 +17,7 @@
 				'line-clamp-4',
 				'line-clamp-8',
 				'line-clamp-12',
-				'line-clamp-20',
+				'line-clamp-20'
 			],
 			plugins: [],
 	};

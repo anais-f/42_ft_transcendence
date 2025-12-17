@@ -49,8 +49,7 @@ export const LoginPage = (): string => {
 
       ${LoremSection({
 				title: 'Newsletter',
-				variant: 'xl',
-				fillSpace: true
+				variant: 'fill'
 			})}
     </div>
 
@@ -61,8 +60,7 @@ export const LoginPage = (): string => {
       <img src="/assets/images/mammoth.png" alt="mamouth" class="img_style">
       ${LoremSection({
 				title: 'Mamamoth',
-				variant: 'medium',
-				fillSpace: true
+				variant: 'fill'
 			})}
      </div>
 
@@ -118,8 +116,7 @@ export const LoginPage = (): string => {
 
       ${LoremSection({
 				title: 'Introduction',
-				variant: 'xl',
-				fillSpace: true
+				variant: 'fill'
 			})}
      </div>
 
@@ -132,8 +129,7 @@ export const LoginPage = (): string => {
       <div id="google-btn-container" class="my-4 w-full flex justify-center"></div>
       <img src="/assets/images/screamer_girl.png" alt="screamer girl" class="img_style">
       ${LoremSection({
-				variant: 'medium',
-				fillSpace: true
+				variant: 'fill'
 			})}
      </div>
 
