@@ -1,26 +1,15 @@
 import { SPacketsType } from '../../packetTypes.js'
 
 export class AS03BaseBall {
-	time: number
-
-	constructor(time: number) {
-		this.time = time
-	}
-
-	getTime(): number {
-		return this.time
-	}
-
 	static createS03() {
-		return new AS03BaseBall(Date.now())
+		return new AS03BaseBall()
 	}
 
 	protected fserialize(): ArrayBuffer {
-		const buff = new ArrayBuffer(9)
+		const buff = new ArrayBuffer(1)
 		const view = new DataView(buff)
 
-		view.setFloat64(0, this.time, true)
-		view.setUint8(8, SPacketsType.S03)
+		view.setUint8(0, SPacketsType.S03)
 
 		return buff
 	}

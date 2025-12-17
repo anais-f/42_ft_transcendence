@@ -14,13 +14,22 @@ export class PongPad {
 	) {}
 
 	public move(dir: padDirection, incr: number) {
+		const dist = incr * dir
+		const offset = new Vector2(0, dist)
+
 		for (const s of this.seg) {
-			const dist = incr * dir
-			s.getP1().add(new Vector2(0, dist))
-			s.getP2().add(new Vector2(0, dist))
-			if (this.border?.some((b) => b.intersect(s))) {
-				s.getP1().add(new Vector2(0, -dist))
-				s.getP2().add(new Vector2(0, -dist))
+			s.p1.add(offset)
+			s.p2.add(offset)
+		}
+
+		const blocked = this.border?.some((b) =>
+			this.seg.some((s) => b.intersect(s))
+		)
+		if (blocked) {
+			const reverseOffset = new Vector2(0, -dist)
+			for (const s of this.seg) {
+				s.p1.add(reverseOffset)
+				s.p2.add(reverseOffset)
 			}
 		}
 	}

@@ -13,41 +13,33 @@ describe('S04', () => {
 
 		const view = new DataView(buff)
 
-		const ts = view.getFloat64(0, true)
-		const type = view.getUint8(8)
-		const x = view.getFloat64(9, true)
-		const y = view.getFloat64(17, true)
+		const type = view.getUint8(0)
+		const x = view.getFloat64(1, true)
+		const y = view.getFloat64(9, true)
 
-		expect(typeof ts).toBe('number')
-		expect(ts).toBeCloseTo(S03.time)
-		expect(ts).toBeCloseTo(S04.time)
 		expect(type).toBe(SPacketsType.S04)
-		expect(x).toBeCloseTo(velo.getX())
-		expect(y).toBeCloseTo(velo.getY())
+		expect(x).toBeCloseTo(velo.x)
+		expect(y).toBeCloseTo(velo.y)
 	})
 
 	test('deserialize', () => {
-		const buff = new ArrayBuffer(33)
+		const buff = new ArrayBuffer(25)
 		const view = new DataView(buff)
-		const timestamp = 123456.789
 		const v = new Vector2(324.32, -42)
 		const factor: number = 0.8
 
-		view.setFloat64(0, timestamp, true)
-		view.setUint8(8, SPacketsType.S04)
-		view.setFloat64(9, v.getX(), true)
-		view.setFloat64(17, v.getY(), true)
-		view.setFloat64(25, factor, true)
+		view.setUint8(0, SPacketsType.S04)
+		view.setFloat64(1, v.x, true)
+		view.setFloat64(9, v.y, true)
+		view.setFloat64(17, factor, true)
 
 		const p = packetBuilder.deserializeS(buff)
-		expect(p).toBeInstanceOf(S04BallVeloChange)
-		expect(p?.time).toBeCloseTo(timestamp)
 		expect(p).toBeInstanceOf(S04BallVeloChange)
 		if (!(p instanceof S04BallVeloChange)) {
 			throw '...'
 		}
-		expect(p.getVelo().equals(v)).toBe(true)
-		expect(p.getFactor()).toBeCloseTo(factor)
+		expect(p.velo.equals(v)).toBe(true)
+		expect(p.factor).toBeCloseTo(factor)
 	})
 
 	test('serialize + deserialize', () => {
@@ -57,11 +49,9 @@ describe('S04', () => {
 		const buff = S04.serialize()
 		const S04Back = packetBuilder.deserializeS(buff)
 
-		expect(S04Back?.time).toEqual(S03.time)
-
 		expect(S04Back).toBeInstanceOf(S04BallVeloChange)
 		if (S04Back instanceof S04BallVeloChange) {
-			expect(S04Back.getVelo().equals(S04.getVelo())).toBe(true)
+			expect(S04Back.velo.equals(S04.velo)).toBe(true)
 		} else {
 			throw new Error('Packet is not S04BallVeloChange')
 		}

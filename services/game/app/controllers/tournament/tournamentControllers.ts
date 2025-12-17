@@ -4,7 +4,7 @@ import {
 	createTournament,
 	getTournament,
 	quitTournament
-} from '../usecases/tournamentUsecases.js'
+} from '../../usecases/tournamentUsecases.js'
 import {
 	GetTournamentResponseDTO,
 	CreateTournamentResponseDTO,

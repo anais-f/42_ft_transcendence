@@ -3,6 +3,8 @@ import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
 
+export let routeParams: Record<string, string> = {}
+
 export class Router {
 	private isNavigating = false
 	private currentRoute: Route | null = null
@@ -14,12 +16,53 @@ export class Router {
 		this.initEventListeners()
 	}
 
-	// Find route by URL
 	private getRoute(url: string): Route {
-		return (
-			Object.values(routerMap).find((route) => route.url === url) ||
-			this.HOME_ROUTE
+		routeParams = {}
+
+		// exact match first
+		const exactMatch = Object.values(routerMap).find(
+			(route) => route.url === url
 		)
+		if (exactMatch) return exactMatch
+
+		// dynamic match
+		for (const route of Object.values(routerMap)) {
+			const match = this.matchDynamicRoute(route.url, url)
+			if (match) {
+				routeParams = match
+				return route
+			}
+		}
+
+		return this.HOME_ROUTE
+	}
+
+	// match a route pattern against a URL and extract params
+	private matchDynamicRoute(
+		pattern: string,
+		url: string
+	): Record<string, string> | null {
+		const patternParts = pattern.split('/')
+		const urlParts = url.split('/')
+
+		if (patternParts.length !== urlParts.length) return null
+
+		const params: Record<string, string> = {}
+
+		for (let i = 0; i < patternParts.length; i++) {
+			const patternPart = patternParts[i]
+			const urlPart = urlParts[i]
+
+			if (patternPart.startsWith(':')) {
+				// dynamic segment
+				params[patternPart.slice(1)] = urlPart
+			} else if (patternPart !== urlPart) {
+				// static segment doesn't match
+				return null
+			}
+		}
+
+		return params
 	}
 
 	// Render the page content and manage binds/unbinds

@@ -1,11 +1,23 @@
-export const LobbyPage = (): string => /*html*/ `
+import { createGameWebSocket } from '../api/game/createGame.js'
+import { routeParams } from '../router/Router.js'
+import { gameStore } from '../usecases/gameStore.js'
+import { dispatcher } from '../game/network/dispatcher.js'
+import { currentUser } from '../usecases/userStore.js'
+import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
+import { oppenentJoinHandler } from '../events/lobby/opponentJoinHandler.js'
+
+export const LobbyPage = (): string => {
+	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
+	const player = currentUser
+
+	return /*html*/ `
 <section class="grid grid-cols-4 gap-11">
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="flex flex-row justify-between pt-10 pb-5 w-full">
-			<h1 class="text-2xl select-none ">LOBBY NUMBER :</h1> 
-			<span class="text-2xl ">${lobby_number}</span>
+			<h1 class="text-2xl select-none ">GAME-TAG:</h1>
+			<span id="lobby-code" class="text-2xl ">${code}</span>
 		</div>
-		<button id="btn-copy" class="generic_btn mb-4">
+		<button id="btn-copy" data-action="copy-code" class="generic_btn mb-4">
 			Copy Lobby Code
 		</button>
 		<div class="text-xl py-4 text-justify select-none">
@@ -22,9 +34,9 @@ export const LobbyPage = (): string => /*html*/ `
 		<div class="news_paragraph">
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
 		</div>
-		<h1 class="text-2xl pt-4 pb-1">PLAYER 1</h1>
-		<img src="${p1.avatar}" alt="Player_1" class="w-[90%] object-cover aspect-square object-center select-none">
-		<span class="text-xl pt-2 pb-4">${p1.username}</span>
+		<h1 class="text-2xl pt-4 pb-1">YOU</h1>
+		<img src="${player?.avatar ?? ''}" alt="You" class="w-[90%] object-cover aspect-square object-center select-none">
+		<span class="text-xl pt-2 pb-4">${player?.username ?? ''}</span>
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-4">Title</h1>
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. </p>
@@ -35,9 +47,9 @@ export const LobbyPage = (): string => /*html*/ `
 		<div class="news_paragraph">
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia.</p>
 		</div>
-		<img src="/assets/images/swords.png" alt="Player_1" class="w-[100%] object-cover aspect-square object-center select-none opacity-30 py-8">
-		<button id="btn-copy" class="generic_btn mt-4">
-			Ready
+		<img src="/assets/images/swords.png" alt="VS" class="w-[100%] object-cover aspect-square object-center select-none opacity-30 py-8">
+		<button id="btn-ready" class="generic_btn mt-4">
+			Waiting...
 		</button>
 		<div class="news_paragraph">
 			<h1 class="text-lg pt-8">Title</h1>
@@ -50,9 +62,9 @@ export const LobbyPage = (): string => /*html*/ `
 			<div class="news_paragraph">
 				<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
 			</div>
-			<h1 class="text-2xl pt-4 pb-1">PLAYER 2</h1>
-			<img src="${p2.avatar}" alt="Player_2" class="w-[90%] object-cover aspect-square object-center select-none">
-			<span class="text-xl pt-2 pb-6">${p2.username}</span>
+			<h1 class="text-2xl pt-4 pb-1">OPPONENT</h1>
+			<img id="opponent-avatar" src="" alt="Opponent" class="w-[90%] object-cover aspect-square object-center select-none">
+			<span id="opponent-username" class="text-xl pt-2 pb-6">Waiting...</span>
 			<div class="news_paragraph">
 				<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus.</p>
 			</div>
@@ -60,15 +72,80 @@ export const LobbyPage = (): string => /*html*/ `
 	</div>
 </section>
 `
-
-let lobby_number = 'XXXX-XXXX'
-
-let p1 = {
-	username: 'Anfichet',
-	avatar: 'assets/images/anfichet.jpeg'
 }
 
-let p2 = {
-	username: 'Lrio',
-	avatar: 'assets/images/lrio.jpg'
+let clickHandler: ((e: Event) => void) | null = null
+
+export function attachLobbyEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	clickHandler = async (e: Event) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
+
+		if (actionButton) {
+			const action = actionButton.getAttribute('data-action')
+
+			if (action === 'copy-code') {
+				handleCopyCode(actionButton as HTMLElement)
+			}
+		}
+	}
+
+	content.addEventListener('click', clickHandler)
+
+	gameStore.setOnOpponentJoin(oppenentJoinHandler)
+
+	// TODO: move this
+	const token = gameStore.sessionToken
+	if (token) {
+		const ws = createGameWebSocket(token)
+		ws.binaryType = 'arraybuffer'
+		gameStore.gameSocket = ws
+
+		ws.onopen = () => {
+			console.log('WS connected')
+		}
+
+		ws.onmessage = dispatcher
+
+		ws.onerror = (error) => {
+			console.error('WS error:', error)
+		}
+
+		ws.onclose = () => {
+			window.navigate('/home')
+			console.log('WS closed')
+		}
+	} else {
+		window.navigate('/home')
+	}
+
+	console.log('Lobby page events attached')
+}
+
+export function detachLobbyEvents() {
+	const content = document.getElementById('content')
+	if (!content) {
+		return
+	}
+
+	gameStore.setOnOpponentJoin(null)
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	// close WS only if not navigating to /game
+	if (!gameStore.navigatingToGame) {
+		const ws = gameStore.gameSocket
+		if (ws) {
+			ws.close()
+			gameStore.gameSocket = null
+		}
+	}
+
+	console.log('Lobby page events cleaned up')
 }

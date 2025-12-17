@@ -3,8 +3,9 @@ import { Circle } from '../math/Circle.js'
 import { Segment } from '../math/Segment.js'
 import { Vector2 } from '../math/Vector2.js'
 import { IBall } from './IBall.js'
-import { IScore } from './IScore.js'
+import { ILives } from './IScore.js'
 import { IWinZone } from './IWinZone.js'
+import { EPSILON } from '../define.js'
 
 export class TPS_MANAGER {
 	public tickCount: number = 0
@@ -23,43 +24,59 @@ export enum GameState {
 	Started
 }
 
+export const BALL_SPEED = 0.4
+
 export class GameEngine {
-	private currentState: GameState = GameState.Paused
-	private TPS_DATA: TPS_MANAGER
-	private tickTimer: ReturnType<typeof setInterval> | null = null
-	private ball: IBall = {
-		shape: new Circle(new Vector2(), 1.5),
+	private _currentState: GameState = GameState.Paused
+	private _TPS_DATA: TPS_MANAGER
+	private _tickTimer: ReturnType<typeof setInterval> | null = null
+	private _ball: IBall = {
+		shape: new Circle(new Vector2(), 0.8),
 		velo: this.getRandomVelo()
 	}
+	private readonly PAUSE_TICKS_AFTER_POINT = 120
+	private _pauseTicksRemaining: number = this.PAUSE_TICKS_AFTER_POINT
 	public startTime
 
 	public constructor(
 		TPS: number,
-		private score: IScore,
-		private borders: Segment[],
-		private winZones: IWinZone[]
+		private _live: ILives,
+		private _staticBorders: Segment[],
+		private _dynamicBorders: Segment[],
+		private _winZones: IWinZone[]
 	) {
-		this.TPS_DATA = new TPS_MANAGER(TPS)
+		this._TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
 	}
 
 	private getRandomVelo(): Vector2 {
-		let x = Math.random() < 0.5 ? 1 : -1
-		let y = Math.random() * 0.25
-		return new Vector2(x, y).normalize()
+		const x = Math.random() < 0.5 ? 1 : -1
+		const y = (Math.random() - 0.5) * 1.4
+		const velo = new Vector2(x, y).normalize()
+
+		let dir
+		if (this.lives.p1 > this.lives.p2) {
+			dir = new Vector2(1, 0)
+		} else if (this.lives.p1 < this.lives.p2) {
+			dir = new Vector2(-1, 0)
+		} else {
+			dir = Math.random() < 0.5 ? new Vector2(1, 0) : new Vector2(-1, 0)
+		}
+
+		return Vector2.dot(velo, dir) < 0 ? velo : velo.negate()
 	}
 
 	private _startGame(): void {
-		if (this.currentState === GameState.Started) return
-		this.currentState = GameState.Started
+		if (this._currentState === GameState.Started) return
+		this._currentState = GameState.Started
 		this.startTickLoop()
 	}
 
 	private _pauseGame(): void {
-		this.currentState = GameState.Paused
-		if (this.tickTimer !== null) {
-			clearInterval(this?.tickTimer)
-			this.tickTimer = null
+		this._currentState = GameState.Paused
+		if (this._tickTimer !== null) {
+			clearInterval(this?._tickTimer)
+			this._tickTimer = null
 		}
 	}
 
@@ -75,64 +92,130 @@ export class GameEngine {
 	}
 
 	private checkWin(seg: Segment): boolean {
-		for (const w of this.winZones) {
+		for (const w of this._winZones) {
 			if (w.seg === seg) {
-				++this.score[`p${w.player as 1 | 2}`]
+				--this._live[`p${w.player as 1 | 2}`]
 				return true
 			}
 		}
 		return false
 	}
 
-	private checkColision(): boolean {
-		for (const border of this.borders) {
-			const hitData = border.intersect(this.ball.shape)
-			if (Array.isArray(hitData) && hitData.length > 0) {
-				if (this.checkWin(border)) {
-					return true
-				}
+	private getCollisionNormal(
+		border: Segment,
+		hitPoints: Vector2[]
+	): Vector2 | null {
+		const ballCenter = this._ball.shape.pos
 
-				const velo: Vector2 = Vector2.reflect(
-					this.ball.velo,
-					border.getNormal()
-				)
-				this.ball.velo = velo
-				return false
+		const closestHit = border.closestPointToPoint(ballCenter)
+		const segNormal = border.getNormal()
+
+		const dotVeloNormal = Vector2.dot(this._ball.velo, segNormal)
+		if (Math.abs(dotVeloNormal) < EPSILON) {
+			const altNormal = Vector2.subtract(ballCenter, closestHit).normalize()
+			if (Vector2.dot(this._ball.velo, altNormal) >= 0) {
+				return null
+			}
+			return altNormal
+		}
+
+		const toBall = Vector2.subtract(ballCenter, closestHit)
+		const orientedNormal =
+			Vector2.dot(toBall, segNormal) >= 0 ? segNormal : segNormal.negate()
+
+		if (Vector2.dot(this._ball.velo, orientedNormal) >= 0) {
+			return null
+		}
+
+		if (hitPoints.length === 1) {
+			const pointNormal = Vector2.subtract(ballCenter, hitPoints[0]).normalize()
+			if (Vector2.dot(this._ball.velo, pointNormal) >= 0) {
+				return null
+			}
+			return pointNormal
+		}
+
+		return orientedNormal
+	}
+
+	private checkColision(): boolean {
+		interface CollisionData {
+			border: Segment
+			normal: Vector2
+		}
+
+		const collisions: CollisionData[] = []
+		const allBorders = [...this._staticBorders, ...this._dynamicBorders]
+
+		for (const border of allBorders) {
+			const hitData = border.intersect(this._ball.shape)
+			if (Array.isArray(hitData) && hitData.length > 0) {
+				const normal = this.getCollisionNormal(border, hitData)
+				if (normal) {
+					collisions.push({ border, normal })
+				}
 			}
 		}
+
+		if (collisions.length === 0) {
+			return false
+		}
+
+		for (const collision of collisions) {
+			if (this.checkWin(collision.border)) {
+				return true
+			}
+		}
+
+		let combinedNormal = new Vector2(0, 0)
+		for (const collision of collisions) {
+			combinedNormal.add(collision.normal)
+		}
+		combinedNormal.normalize()
+
+		this._ball.velo = Vector2.reflect(this._ball.velo, combinedNormal)
 		return false
 	}
 
 	private playTick(): void {
-		if (this.currentState != GameState.Started) {
+		if (this._currentState != GameState.Started) {
+			return
+		}
+
+		// Handle pause between points
+		if (this._pauseTicksRemaining > 0) {
+			--this._pauseTicksRemaining
+			++this._TPS_DATA.tickCount
 			return
 		}
 
 		// TP failsafe
-		if (Vector2.squaredDist(this.ball.shape.getPos(), new Vector2()) > 4096) {
-			console.warn(`ball to far away: ${this.ball.shape.getPos()}`)
-			this.ball.shape.setOrigin(new Vector2())
+		if (Vector2.squaredDist(this._ball.shape.pos, new Vector2()) > 4096) {
+			console.warn(`ball to far away: ${this._ball.shape.pos}`)
+			this._ball.shape.origin = new Vector2()
+			this._ball.velo = this.getRandomVelo()
 		}
 
 		if (!this.checkColision()) {
-			this.ball.shape.getPos().add(this.ball.velo)
+			const movement = this._ball.velo.clone().multiply(BALL_SPEED)
+			this._ball.shape.pos.add(movement)
 		} else {
-			this.ball.shape.getPos().setXY(0, 0)
-			this.ball.velo = this.getRandomVelo()
-			console.log(`[${this.score.p1} | ${this.score.p2}]`)
-			console.log(`${this.ball.velo.getX()} : ${this.ball.velo.getY()}`)
+			this._ball.shape.pos.setXY(0, 0)
+			this._ball.velo = this.getRandomVelo()
+			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
+			console.log(`[${this._live.p1} | ${this._live.p2}]`)
 		}
 
-		++this.TPS_DATA.tickCount
-		if (this.score.p1 + this.score.p2 >= this.score.max) {
+		++this._TPS_DATA.tickCount
+		if (this.lives.p1 <= 0 || this.lives.p2 <= 0) {
 			this._pauseGame()
 		}
 	}
 
 	private async startTickLoop(): Promise<void> {
-		while (this.currentState === GameState.Started) {
+		while (this._currentState === GameState.Started) {
 			try {
-				await this.TPS_DATA.tickLimiter.schedule(async () => {
+				await this._TPS_DATA.tickLimiter.schedule(async () => {
 					this.playTick()
 				})
 			} catch (err) {
@@ -141,22 +224,38 @@ export class GameEngine {
 		}
 	}
 
-	public getSyncedTimeMs(): number {
+	get syncedTimeMs(): number {
 		return Date.now()
 	}
-	public getState(): GameState {
-		return this.currentState
+	get state(): GameState {
+		return this._currentState
 	}
 
-	public getTickCount(): number {
-		return this.TPS_DATA.tickCount
+	get tickCount(): number {
+		return this._TPS_DATA.tickCount
 	}
 
-	public getBall(): IBall {
-		return this.ball
+	get ball(): IBall {
+		return this._ball
 	}
 
-	public getBorders(): Segment[] {
-		return this.borders
+	get borders(): Segment[] {
+		return [...this._staticBorders, ...this._dynamicBorders]
+	}
+
+	get staticBorders(): Segment[] {
+		return this._staticBorders
+	}
+
+	get dynamicBorders(): Segment[] {
+		return this._dynamicBorders
+	}
+
+	get lives(): ILives {
+		return this._live
+	}
+
+	get pauseTicksRemaining(): number {
+		return this._pauseTicksRemaining
 	}
 }

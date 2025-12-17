@@ -8,26 +8,19 @@ describe('S01', () => {
 		const buff = S01.serialize()
 		const view = new DataView(buff)
 
-		const ts = view.getFloat64(0, true)
-		expect(typeof ts).toBe('number')
-		expect(ts).toBeCloseTo(S01.time)
-
-		const type = view.getUint8(8)
+		const type = view.getUint8(0)
 		expect(type).toBe(0b11)
 	})
 	test('deserialize', () => {
-		const buff = new ArrayBuffer(9)
+		const buff = new ArrayBuffer(1)
 		const view = new DataView(buff)
 
-		const timestamp = 123456.789
 		const type = SPacketsType.S01
 
-		view.setFloat64(0, timestamp, true)
-		view.setUint8(8, type)
+		view.setUint8(0, type)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(S01TC)
-		expect(p?.time).toBeCloseTo(timestamp)
 	})
 
 	test('serialize + deserialize', () => {
@@ -35,6 +28,6 @@ describe('S01', () => {
 		const buff = S01.serialize()
 		const SBack = packetBuilder.deserializeS(buff)
 
-		expect(SBack?.getTime()).toBe(S01.time)
+		expect(SBack).toBeInstanceOf(S01TC)
 	})
 })

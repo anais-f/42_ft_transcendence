@@ -1,19 +1,32 @@
-import { HomePage, attachHomeEvents, detachHomeEvents } from '../pages/oldhome'
-import { GamePage } from '../pages/oldgame'
-import { LobbyPage } from '../pages/oldlobby'
-import { ProfilePage } from '../pages/oldprofile'
+import {
+	attachGameEvents,
+	detachGameEvents,
+	GamePage
+} from '../pages/oldgame.js'
+import {
+	attachLobbyEvents,
+	detachLobbyEvents,
+	LobbyPage
+} from '../pages/oldlobby.js'
+import {
+	attachLoginEvents,
+	detachLoginEvents,
+	cleanupGoogleAuth,
+	TestPage
+} from '../pages/oldlogin.js'
+import { ProfilePage } from '../pages/oldprofile.js'
+
+import {
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
+} from '../pages/oldhome.js'
 import {
 	SettingsPage,
 	attachSettingsEvents,
 	detachSettingsEvents
-} from '../pages/oldsettings'
-import {
-	LoginPage,
-	attachLoginEvents,
-	detachLoginEvents,
-	cleanupGoogleAuth
-} from '../pages/LoginPage'
-import { TestPage } from '../pages/SettingsPage.js'
+} from '../pages/oldsettings.js'
+import { LoginPage } from '../pages/LoginPage.js'
 
 export type Pages =
 	| 'home'
@@ -44,14 +57,18 @@ export const routerMap: Record<Pages, Route> = {
 
 	game: {
 		id: 'game',
-		url: '/game',
-		page: GamePage
+		url: '/play',
+		page: GamePage,
+		binds: [attachGameEvents],
+		unbinds: [detachGameEvents]
 	},
 
 	lobby: {
 		id: 'lobby',
-		url: '/lobby',
-		page: LobbyPage
+		url: '/lobby/:code',
+		page: LobbyPage,
+		binds: [attachLobbyEvents],
+		unbinds: [detachLobbyEvents]
 	},
 
 	login: {

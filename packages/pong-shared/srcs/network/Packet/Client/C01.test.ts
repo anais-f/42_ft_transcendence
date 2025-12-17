@@ -5,27 +5,22 @@ import { packetBuilder } from '../packetBuilder.js'
 
 describe('c01', () => {
 	test('serialize returns correct buffer', () => {
-		const time = Date.now()
-
-		const C01Start = new C01Move(true, padDirection.DOWN, time)
+		const C01Start = new C01Move(true, padDirection.DOWN)
 
 		const viewStart = new DataView(C01Start.serialize())
 
-		expect(viewStart.getFloat64(0, true)).toBeCloseTo(C01Start.getTime())
-		expect(viewStart.getUint8(8)).toBe(CPacketsType.C01)
+		expect(viewStart.getUint8(0)).toBe(CPacketsType.C01)
 
-		expect(viewStart.getUint8(9) & 0b10).toEqual(0b10)
-		expect(viewStart.getUint8(9) & 0b01).toEqual(0b00)
+		expect(viewStart.getUint8(1) & 0b10).toEqual(0b10)
+		expect(viewStart.getUint8(1) & 0b01).toEqual(0b00)
 
-		const C01Stop = new C01Move(false, padDirection.UP, time)
+		const C01Stop = new C01Move(false, padDirection.UP)
 		const viewStop = new DataView(C01Stop.serialize())
-		expect(viewStop.getUint8(9) & 0b01).toEqual(0b01)
-		expect(viewStop.getUint8(9) & 0b10).toEqual(0b00)
+		expect(viewStop.getUint8(1) & 0b01).toEqual(0b01)
+		expect(viewStop.getUint8(1) & 0b10).toEqual(0b00)
 	})
 
 	test('serialize test all', () => {
-		const time = Date.now()
-
 		const cases = [
 			{
 				state: true,
@@ -54,9 +49,9 @@ describe('c01', () => {
 		]
 
 		for (const c of cases) {
-			const pkt = new C01Move(c.state, c.dir, time)
+			const pkt = new C01Move(c.state, c.dir)
 			const view = new DataView(pkt.serialize())
-			const data = view.getUint8(9)
+			const data = view.getUint8(1)
 
 			expect(data & 0b10).toEqual(c.expectStartMask)
 			expect(data & 0b01).toEqual(c.expectDirMask)
@@ -65,8 +60,7 @@ describe('c01', () => {
 
 	test('serialize + deserialize', () => {
 		const dir = padDirection.UP
-		const time = Date.now()
-		const original = new C01Move(true, dir, time)
+		const original = new C01Move(true, dir)
 		const buff = original.serialize()
 
 		const reconstructed = packetBuilder.deserializeC(buff)
@@ -77,6 +71,5 @@ describe('c01', () => {
 
 		expect(reconstructed.state).toBe(original.state)
 		expect(reconstructed.dir).toBe(original.dir)
-		expect(reconstructed.getTime()).toBeCloseTo(original.getTime())
 	})
 })
