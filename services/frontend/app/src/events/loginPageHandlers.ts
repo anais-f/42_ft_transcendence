@@ -15,7 +15,7 @@ import {
  */
 export async function handleRegister(form: HTMLFormElement) {
 	const formData = new FormData(form)
-	const username = formData.get('register_username')
+	const username = formData.get('register_login')
 	const password = formData.get('register_password')
 	const confPassword = formData.get('register_conf_password')
 
@@ -67,7 +67,7 @@ export async function handleRegister(form: HTMLFormElement) {
  */
 export async function handleLogin(form: HTMLFormElement) {
 	const formData = new FormData(form)
-	const username = formData.get('login_username')
+	const username = formData.get('login_login')
 	const password = formData.get('login_password')
 
 	if (!password || !username) {
