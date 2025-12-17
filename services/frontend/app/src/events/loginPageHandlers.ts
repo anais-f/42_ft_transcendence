@@ -1,7 +1,7 @@
 import { loginAPI, registerAPI } from '../api/authApi.js'
 import { verify2FALoginAPI } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { switchTo2FAForm } from '../pages/oldlogin.js'
+import { switchTo2FAForm } from '../pages/LoginPage.js'
 import {
 	validateUsername,
 	validatePassword,
