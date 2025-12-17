@@ -4,10 +4,9 @@ import {
 	handleUnbindGameCanvas
 } from '../events/game/bindGameCanvasHandler.js'
 import { PlayerComp } from '../components/game/Player.js'
+import { handleResizeCanvas } from '../events/game/resizeCanvasHandler.js'
 
 const DEFAULT_AVATAR = '/assets/images/rhino.png'
-
-let resizeHandler: (() => void) | null = null
 
 export const GamePage = (): string => {
 	const isP1 = gameStore.playerSlot === 'p1'
@@ -23,7 +22,7 @@ export const GamePage = (): string => {
 	return `
 <div class="min-h-[80vh] w-full flex items-center justify-center p-4">
 	<div class="grid grid-cols-[1fr_5fr_1fr] gap-8 w-full h-full">
-		${PlayerComp({username: me.username, avatar: me.avatar, scoreID: 'my-score', position: 'right'})}
+		${PlayerComp({ username: me.username, avatar: me.avatar, scoreID: 'my-score', position: 'right' })}
 		<div class="col-span-1 flex items-center justify-center">
 			<div class="w-full aspect-[2/1] bg-transparent border-4 border-black rounded flex items-center justify-center">
 				<canvas
@@ -33,23 +32,22 @@ export const GamePage = (): string => {
 				</canvas>
 			</div>
 		</div>
-		${PlayerComp({username: opponent.username, avatar: opponent.avatar, scoreID: 'opponent-score', position: 'right'})}
+		${PlayerComp({ username: opponent.username, avatar: opponent.avatar, scoreID: 'opponent-score', position: 'right' })}
 	</div>
 </div>
 	`
-
 }
+
+let resizeHandler: (() => Promise<void>) | null = null
 
 export function attachGameEvents() {
 	const canvas = document.getElementById('pong') as HTMLCanvasElement
-	if (!canvas) return
+	if (!canvas) {
+		return
+	}
 
-	resizeHandler = () => {
-		const rect = canvas.parentElement?.getBoundingClientRect()
-		if (!rect) return
-
-		canvas.width = rect.width
-		canvas.height = rect.height
+	resizeHandler = async () => {
+		await handleResizeCanvas()
 	}
 
 	resizeHandler()
@@ -67,5 +65,4 @@ export function detachGameEvents() {
 	}
 
 	handleUnbindGameCanvas()
-	console.log('Game page events cleaned up')
 }
