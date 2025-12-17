@@ -1,14 +1,24 @@
 import { getDb } from '../database/connection.js'
 import type { MatchHistoryItemDTO } from '@ft_transcendence/common'
 
+export function getNextTournamentId(): number {
+	const db = getDb()
+	const result = db
+		.prepare('SELECT MAX(id_tournament) as max_id FROM match_history')
+		.get() as { max_id: number | null }
+
+	// If no tournaments exist yet, start at 1, otherwise increment the max
+	return result.max_id !== null && result.max_id >= 0 ? result.max_id + 1 : 1
+}
+
 export function saveMatchToHistory(
 	player1Id: number,
 	player2Id: number,
 	scorePlayer1: number,
 	scorePlayer2: number,
-	idTournament: number = -1,
-	matchNumber: number = -1,
-	round: number = -1
+	tournamentId: number = -1,
+	round: number = -1,
+	matchNumber: number = -1
 ): number {
 	console.log(
 		`[${player1Id}]: ${scorePlayer1} | [${player2Id}]: ${scorePlayer2}`
@@ -23,7 +33,7 @@ export function saveMatchToHistory(
 		VALUES (?, ?, ?, ?)
 	`
 		)
-		.run(winnerId, idTournament, round, matchNumber)
+		.run(winnerId, tournamentId, round, matchNumber)
 
 	const matchId = matchResult.lastInsertRowid as number
 
