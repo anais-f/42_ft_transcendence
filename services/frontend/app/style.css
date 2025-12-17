@@ -47,6 +47,33 @@
 	.news_paragraph {
 		@apply text-black opacity-20 select-none text-justify;
 	}
+
+	/* Line clamp utilities */
+	.line-clamp-2,
+	.line-clamp-4,
+	.line-clamp-8,
+	.line-clamp-12,
+	.line-clamp-20 {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.line-clamp-2 {
+		-webkit-line-clamp: 2;
+	}
+	.line-clamp-4 {
+		-webkit-line-clamp: 4;
+	}
+	.line-clamp-8 {
+		-webkit-line-clamp: 8;
+	}
+	.line-clamp-12 {
+		-webkit-line-clamp: 12;
+	}
+	.line-clamp-20 {
+		-webkit-line-clamp: 20;
+	}
 }
 
 body {

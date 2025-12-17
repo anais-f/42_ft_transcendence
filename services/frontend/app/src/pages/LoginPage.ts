@@ -16,7 +16,7 @@ export const LoginPage = (): string => {
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
 
-    <div class="flex flex-col items-start">
+    <div class="flex flex-col items-start min-h-0">
       <h1 class="title_bloc">SUBSCRIBE TO OUR NEWSPAPER</h1>
       <form id="register_form" data-form="register" class="flex flex-col gap-2">
           ${Input({
@@ -49,22 +49,24 @@ export const LoginPage = (): string => {
 
       ${LoremSection({
 				title: 'Newsletter',
-				variant: 'long'
+				variant: 'xl',
+				fillSpace: true
 			})}
     </div>
 
-     <div class="flex flex-col items-start">
+     <div class="flex flex-col items-start min-h-0">
       ${LoremSection({
-				variant: 'short'
+				variant: 'long'
 			})}
       <img src="/assets/images/mammoth.png" alt="mamouth" class="img_style">
       ${LoremSection({
 				title: 'Mamamoth',
-				variant: 'medium'
+				variant: 'medium',
+				fillSpace: true
 			})}
      </div>
 
-     <div class="flex flex-col items-start">
+     <div class="flex flex-col items-start min-h-0">
       ${LoremSection({
 				variant: 'short'
 			})}
@@ -116,20 +118,22 @@ export const LoginPage = (): string => {
 
       ${LoremSection({
 				title: 'Introduction',
-				variant: 'long'
+				variant: 'xl',
+				fillSpace: true
 			})}
      </div>
 
-     <div class="flex flex-col items-start">
+     <div class="flex flex-col items-start min-h-0">
       ${LoremSection({
 				title: 'New Partener',
-				variant: 'short',
+				variant: 'medium',
 				additionalClasses: 'mb-4'
 			})}
       <div id="google-btn-container" class="my-4 w-full flex justify-center"></div>
       <img src="/assets/images/screamer_girl.png" alt="screamer girl" class="img_style">
       ${LoremSection({
-				variant: 'medium'
+				variant: 'medium',
+				fillSpace: true
 			})}
      </div>
 

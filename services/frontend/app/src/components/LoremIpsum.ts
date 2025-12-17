@@ -1,6 +1,7 @@
 interface LoremIpsumProps {
 	title?: string
-	variant?: 'short' | 'medium' | 'long'
+	variant?: 'xs' | 'short' | 'medium' | 'long' | 'xl'
+	fillSpace?: boolean
 	additionalClasses?: string
 }
 
@@ -19,22 +20,31 @@ Vitae pellentesque sem placerat in id cursus mi. Inceptos himenaeos orci varius 
 export const LoremSection = ({
 	title,
 	variant = 'medium',
+	fillSpace = false,
 	additionalClasses = ''
 }: LoremIpsumProps): string => {
 	const variantConfig = {
-		short: 'line-clamp-3',
+		xs: 'line-clamp-2',
+		short: 'line-clamp-4',
 		medium: 'line-clamp-8',
-		long: 'line-clamp-15'
-	}
+		long: 'line-clamp-12',
+		xl: 'line-clamp-20'
+	} as const
 
-	const clampClass = variantConfig[variant]
-	const paragraphClasses =
-		`text-sm h-full overflow-hidden ${clampClass} ${additionalClasses}`.trim()
+	const paragraphClasses = fillSpace
+		? `text-sm overflow-hidden flex-1 min-h-0 ${variantConfig[variant]} ${additionalClasses}`.trim()
+		: `text-sm overflow-hidden ${variantConfig[variant]} ${additionalClasses}`.trim()
 
-	const titleHtml = title ? `<h2 class="text-lg font-medium">${title}</h2>` : ''
+	const containerClasses = fillSpace
+		? 'news_paragraph flex-1 min-h-0 flex flex-col'
+		: 'news_paragraph overflow-hidden'
+
+	const titleHtml = title
+		? `<h2 class="text-lg font-medium overflow-hidden">${title}</h2>`
+		: ''
 
 	return /*html*/ `
-    <div class="news_paragraph">
+    <div class="${containerClasses}">
       ${titleHtml}
       <p class="${paragraphClasses}">
         ${LOREM_TEXT}
@@ -42,3 +52,10 @@ export const LoremSection = ({
     </div>
   `
 }
+
+/*
+flex-1 to make the section take available space
+min-h-0 to allow the flex item to shrink smaller than its content
+flex flex-col to make the content stack vertically
+overflow-hidden to prevent overflow issues
+ */
