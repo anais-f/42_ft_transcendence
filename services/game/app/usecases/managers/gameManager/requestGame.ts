@@ -1,4 +1,4 @@
-import { createInviteCode } from '../../tournamentUsecases.js'
+import { createInviteCode, ITournamentMatchData } from '../../tournamentUsecases.js'
 import { games, playerToGame } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 
@@ -7,6 +7,7 @@ import { startTimeOut } from './startTimeOut.js'
  * param:
  *  pID1 (player id of player 1)
  *  pID2? (player id of player 2)
+ *  tournamentMatchData? (optional tournament match information)
  * return:
  *  game code
  * error:
@@ -14,7 +15,8 @@ import { startTimeOut } from './startTimeOut.js'
  */
 export function requestGame(
 	pID1: number,
-	pID2: number | undefined = undefined
+	pID2: number | undefined = undefined,
+	tournamentMatchData: ITournamentMatchData | undefined = undefined
 ): string {
 	if (playerToGame.has(pID1) || (pID2 && playerToGame.has(pID2))) {
 		throw new Error('a player is already in a game')
@@ -27,7 +29,8 @@ export function requestGame(
 		gameInstance: undefined,
 		status: 'waiting',
 		createdAt: Date.now(),
-		timeoutId: null
+		timeoutId: null,
+		tournamentMatchData
 	})
 
 	playerToGame.set(pID1, newCode)
