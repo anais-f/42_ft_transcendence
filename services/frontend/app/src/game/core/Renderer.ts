@@ -80,23 +80,21 @@ class Renderer {
 	}
 
 	private render(): void {
-		if (!this.ctx || !this.canvas) return
+		if (!this.canvas || !this.ctx) return
 
 		const ctx = this.ctx
 		const width = this.canvas.width
 		const height = this.canvas.height
-
-		ctx.clearRect(0, 0, width, height)
-
 		const scaleX = width / GAME_SPACE_WIDTH
 		const scaleY = height / GAME_SPACE_HEIGHT
 		const offsetX = width / 2
 		const offsetY = height / 2
-
 		const flipX = gameStore.playerSlot === 'p2' ? -1 : 1
 		const toCanvasX = (x: number) => offsetX + x * flipX * scaleX
 		const toCanvasY = (y: number) => offsetY - y * scaleY
 
+		ctx.globalCompositeOperation = 'source-over'
+		ctx.clearRect(0, 0, width, height)
 		ctx.strokeStyle = SEGMENT_COLOR
 		ctx.lineWidth = SEGMENT_LINE_WIDTH
 		const allSegments = [...this.staticSegments, ...this.dynamicSegments]
@@ -120,13 +118,28 @@ class Renderer {
 			Math.PI * 2
 		)
 		ctx.fill()
+		ctx.closePath()
 
 		if (this.countdown !== null && this.countdown > 0) {
-			ctx.strokeStyle = COUNTDOWN_COLOR
+			const x = width / 2
+			const y = height / 2
+			const string = this.countdown.toString()
+
 			ctx.font = COUNTDOWN_FONT
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
-			ctx.strokeText(this.countdown.toString(), width / 2, height / 3)
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'destination-out'
+			ctx.fillText(string, x, y)
+			ctx.restore()
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'source-over'
+			ctx.lineWidth = 3
+			ctx.strokeStyle = COUNTDOWN_COLOR
+			ctx.strokeText(string, x, y)
+			ctx.restore()
 		}
 	}
 
