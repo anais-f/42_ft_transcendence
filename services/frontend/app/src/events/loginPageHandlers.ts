@@ -54,6 +54,7 @@ export async function handleRegister(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
@@ -100,6 +101,7 @@ export async function handleLogin(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 

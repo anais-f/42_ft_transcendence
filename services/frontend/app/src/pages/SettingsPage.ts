@@ -1,8 +1,7 @@
 import { Button } from '../components/Button.js'
 import { Input } from '../components/Input.js'
 import { LoremSection } from '../components/LoremIpsum.js'
-import { checkAuth } from '../usecases/userSession.js'
-import { setCurrentUser, currentUser } from '../usecases/userStore'
+import { currentUser } from '../usecases/userStore.js'
 import {
 	handleUsername,
 	handleChangePassword,
@@ -14,14 +13,10 @@ import {
 	handleDisable2FA
 } from '../events/settings2FAPageHandlers.js'
 
-// TODO : 2Fa cassé à réparer plus tard
-
-export const TestPage = (): string => {
+export const SettingsPage = (): string => {
 	const is2FAEnabled = currentUser?.two_fa_enabled || false
 	console.log('Rendering SettingsPage, 2FA enabled:', is2FAEnabled)
 	const twoFATitle = is2FAEnabled ? 'DISABLE 2FA ?' : 'ENABLE 2FA ?'
-	const twoFAButtonText = is2FAEnabled ? 'Disable 2FA' : 'Enable 2FA'
-	const login = currentUser?.username // TODO : CHANGE FOR REAL LOGIN
 
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
@@ -48,7 +43,6 @@ export const TestPage = (): string => {
 					additionalClasses: 'form_button'
 				})}
   		</form>
-  		<p class="mb-4 font-special">Reminder of your login credential : ${login}</p>
   		${LoremSection({
 				title: 'New Lifestyle',
 				variant: 'fill'
@@ -138,15 +132,132 @@ export const TestPage = (): string => {
 			})}
    	</div>
 
-   	<div class="bg-yellow-100 col-4-span-flex">
+   	<div class="col-4-span-flex">
     	<h1 class="title_bloc">${twoFATitle}</h1>
-    	${is2FAEnabled ?
-				// Enable 2FA in 2 steps
-				// Step 1: Generate QR Code
-    	
-    	
+    	${
+				is2FAEnabled
+					? // Disable 2FA - Simple form with code and password
+						`<form id="disable_2fa_form" data-form="disable_2fa_form" class="form_style">
+					${Input({
+						id: 'disable_2fa_code',
+						name: 'code',
+						placeholder: '2FA Code',
+						type: 'text',
+						required: true,
+						maxLength: 6,
+						pattern: '[0-9]{6}'
+					})}
+					${Input({
+						id: 'disable_2fa_password',
+						name: 'password',
+						placeholder: 'Password',
+						type: 'password',
+						required: true
+					})}
+					${Button({
+						text: 'Disable 2FA',
+						id: 'disable_2fa_btn',
+						type: 'submit',
+						additionalClasses: 'form_button'
+					})}
+				</form>`
+					: // Enable 2FA - Step 1: Generate QR Code, Step 2: Verify and Enable
+						`${Button({
+							text: 'Generate QR Code',
+							id: 'generate_qr_btn',
+							type: 'button',
+							additionalClasses: 'form_button'
+						})}
+						<div id="verify_2fa_step" class="hidden w-full">
+							<div id="qr_code_container" class="my-4 flex flex-col gap-2 w-full">
+							</div>
+							<form id="enable_2fa_form" data-form="enable_2fa_form" class="form_style">
+								${Input({
+									id: 'enable_2fa_code',
+									name: 'code',
+									placeholder: '2FA Code',
+									type: 'text',
+									required: true,
+									maxLength: 6,
+									pattern: '[0-9]{6}'
+								})}
+								${Input({
+									id: 'enable_2fa_password',
+									name: 'password',
+									placeholder: 'Password',
+									type: 'password',
+									required: true
+								})}
+								${Button({
+									text: 'Verify & Enable',
+									id: 'enable_2fa_btn',
+									type: 'submit',
+									additionalClasses: 'form_button'
+								})}
+							</form>
+						</div>`
+			}  	
+    	<img src="/assets/images/tiger.png" alt="tiger" class="img_style">
+    	${LoremSection({
+				variant: 'fill'
+			})}
    	</div>
 
   </section>
-`
+  `
+}
+
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+
+export function attachSettingsEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	submitHandler = async (e: Event) => {
+		e.preventDefault()
+		const form = (e.target as HTMLElement).closest('form[data-form]')
+		if (!form) return
+
+		const formName = form.getAttribute('data-form')
+
+		if (formName === 'username_form')
+			await handleUsername(form as HTMLFormElement)
+		if (formName === 'password_form')
+			await handleChangePassword(form as HTMLFormElement)
+		if (formName === 'avatar_form') await handlerAvatar(form as HTMLFormElement)
+		if (formName === 'enable_2fa_form')
+			await handleEnable2FA(form as HTMLFormElement)
+		if (formName === 'disable_2fa_form')
+			await handleDisable2FA(form as HTMLFormElement)
+	}
+
+	clickHandler = async (e: Event) => {
+		const target = e.target as HTMLElement
+		if (target?.id === 'generate_qr_btn') {
+			e.preventDefault()
+			await handleGenerateQRCode()
+		}
+	}
+
+	content.addEventListener('submit', submitHandler)
+	content.addEventListener('click', clickHandler)
+
+	console.log('Settings page events attached')
+}
+
+export function detachSettingsEvents() {
+	const content = document.getElementById('content')
+
+	if (content && submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
+
+	if (content && clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	console.log('Settings page events detached')
 }

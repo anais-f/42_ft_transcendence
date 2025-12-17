@@ -11,7 +11,7 @@ import {
 	handleDisable2FA
 } from '../events/settings2FAPageHandlers.js'
 
-export const SettingsPage = (): string => {
+export const SettingPage = (): string => {
 	const is2FAEnabled = currentUser?.two_fa_enabled || false
 	console.log('Rendering SettingsPage, 2FA enabled:', is2FAEnabled)
 	const twoFATitle = is2FAEnabled ? 'DISABLE 2FA ?' : 'ENABLE 2FA ?'
@@ -87,7 +87,7 @@ ${is2FAEnabled ? '<input id="password_2fa_code" type="text" name="password_2fa_c
 					: // ENABLE 2FA - Flow en deux étapes
 						`<!-- Étape 1 : Générer le QR code -->
 				<div id="generate_qr_step">
-					<button id="generate_qr_btn" class="generic_btn mt-4" type="button">Generate QR Code</button>
+					<button id="generate_qr_btn" class="gen	eric_btn mt-4" type="button">Generate QR Code</button>
 				</div>
 
 				<!-- Étape 2 : Vérifier et activer (caché par défaut, affiché après génération) -->
@@ -119,7 +119,7 @@ ${is2FAEnabled ? '<input id="password_2fa_code" type="text" name="password_2fa_c
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 
-export function attachSettingsEvents() {
+export function attacholdSettingsEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
@@ -155,7 +155,7 @@ export function attachSettingsEvents() {
 	console.log('Settings page events attached')
 }
 
-export function detachSettingsEvents() {
+export function detacholdSettingsEvents() {
 	const content = document.getElementById('content')
 
 	if (content && submitHandler) {
