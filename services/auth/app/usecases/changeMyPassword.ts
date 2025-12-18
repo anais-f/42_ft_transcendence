@@ -75,7 +75,7 @@ export async function changeMyPassword(
 	}
 
 	if (oldPassword === newPassword) {
-		throw createHttpError.BadRequest(
+		throw createHttpError.UnprocessableEntity(
 			'New password must be different from old password'
 		)
 	}
