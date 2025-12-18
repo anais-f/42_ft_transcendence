@@ -1,5 +1,6 @@
 import { getDb } from '../database/connection.js'
 import type { MatchHistoryItemDTO } from '@ft_transcendence/common'
+import { ITournamentMatchData } from '../usecases/managers/gameData.js'
 
 export function getNextTournamentId(): number {
 	const db = getDb()
@@ -16,9 +17,7 @@ export function saveMatchToHistory(
 	player2Id: number,
 	scorePlayer1: number,
 	scorePlayer2: number,
-	tournamentId: number = -1,
-	round: number = -1,
-	matchNumber: number = -1
+	tournamentMatchData: ITournamentMatchData | undefined
 ): number {
 	console.log(
 		`[${player1Id}]: ${scorePlayer1} | [${player2Id}]: ${scorePlayer2}`
@@ -33,7 +32,12 @@ export function saveMatchToHistory(
 		VALUES (?, ?, ?, ?)
 	`
 		)
-		.run(winnerId, tournamentId, round, matchNumber)
+		.run(
+			winnerId,
+			tournamentMatchData?.tournamentId ?? -1,
+			tournamentMatchData?.round ?? -1,
+			tournamentMatchData?.matchNumber ?? -1
+		)
 
 	const matchId = matchResult.lastInsertRowid as number
 
