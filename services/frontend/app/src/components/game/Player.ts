@@ -1,26 +1,35 @@
+import { LivesComp } from './Lives.js'
+
 interface PlayerProps {
 	username: string
 	avatar: string
-	scoreID: string
-	position: 'left' | 'right'
+	livesID: 'my-lives' | 'opponent-lives'
+	maxLives: number
+	currentLives: number
 	additionalClasses?: string
 }
 
 export const PlayerComp = (props: PlayerProps): string => {
-	const { username, avatar, scoreID, position, additionalClasses = '' } = props
+	const {
+		username,
+		avatar,
+		livesID,
+		maxLives,
+		currentLives,
+		additionalClasses = ''
+	} = props
 
-	const baseClasses = 'col-span-1 flex flex-col items-center justify-center'
-
+	const baseClasses = 'flex flex-col items-center justify-center'
 	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
 	return /*html*/ `
     <div class="${classes}">
-      <h1 class="text-2xl text-center mb-4">${username}</h1>
-      <h1 id="${scoreID}" class="text-5xl text-center mb-4">?</h1>
+      <h1 class="text-xl text-center w-fit px-2 line-clamp">${username}</h1>
+      ${LivesComp({ max: maxLives, current: currentLives, livesID, additionalClasses: 'mb-4' })}
       <img
         src="${avatar}"
         alt="${username}"
-        class="w-[90%] max-w-[150px] object-cover aspect-square object-center select-none mx-auto border-solid border-2 border-black rounded"
+        class="w-full aspect-square object-cover object-center select-none border-solid border-2 border-black rounded"
       >
     </div>
   `

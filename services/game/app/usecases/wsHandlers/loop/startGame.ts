@@ -21,7 +21,7 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_LIVES = 3
+export const MAX_LIVES = 10
 export const PAD_SPEED = 0.3
 export const PAUSE_TICKS = 180
 export const COUNTDOWN_STEPS = 3

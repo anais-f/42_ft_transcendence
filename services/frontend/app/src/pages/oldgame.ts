@@ -21,10 +21,10 @@ export const GamePage = (): string => {
 
 	return `
 <div class="min-h-[80vh] w-full flex items-center justify-center p-4">
-	<div class="grid grid-cols-[1fr_5fr_1fr] gap-8 w-full h-full">
-		${PlayerComp({ username: me.username, avatar: me.avatar, scoreID: 'my-score', position: 'right' })}
-		<div class="col-span-1 flex items-center justify-center">
-			<div class="w-full aspect-[2/1] bg-transparent border-4 border-black rounded flex items-center justify-center">
+	<div class="grid gap-8 w-full h-full max-h-[80vh] grid-cols-[1fr_5fr_1fr]">
+		${PlayerComp({ username: me.username, avatar: me.avatar, livesID: 'my-lives', maxLives: 10, currentLives: 10 })}
+		<div class="flex items-center justify-center max-h-full">
+			<div class="w-full aspect-[2/1] bg-transparent border-4 border-black rounded flex items-center justify-center max-h-full">
 				<canvas
 					id="pong"
 					class="w-full h-full"
@@ -32,7 +32,7 @@ export const GamePage = (): string => {
 				</canvas>
 			</div>
 		</div>
-		${PlayerComp({ username: opponent.username, avatar: opponent.avatar, scoreID: 'opponent-score', position: 'right' })}
+		${PlayerComp({ username: opponent.username, avatar: opponent.avatar, livesID: 'opponent-lives', maxLives: 10, currentLives: 10 })}
 	</div>
 </div>
 	`
