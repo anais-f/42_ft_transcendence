@@ -28,6 +28,9 @@
 	.img_style {
 		@apply w-full py-4 opacity-50 object-cover select-none;
 	}
+	.avatar_style {
+		@apply w-4/5 m-auto aspect-square object-cover border-2 border-black saturate-[75%];
+	}
 	.form_style {
 		@apply flex flex-col gap-2 w-full;
 	}
@@ -52,6 +55,9 @@
 	}
 	.form_button {
 		@apply mb-4 mt-2;
+	}
+	.username_style {
+		@apply text-2xl font-medium py-4;
 	}
 
 	/* Line clamp utilities */

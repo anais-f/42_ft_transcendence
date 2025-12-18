@@ -25,6 +25,7 @@ import {
 	attachSettingsEvents,
 	detachSettingsEvents
 } from '../pages/SettingsPage.js'
+import { TestPage } from '../pages/HomePage.js'
 
 export type Pages =
 	| 'home'
@@ -95,9 +96,9 @@ export const routerMap: Record<Pages, Route> = {
 	test: {
 		id: 'test',
 		url: '/test',
-		page: SettingsPage,
-		binds: [attachSettingsEvents],
-		unbinds: [detachSettingsEvents],
+		page: TestPage,
+		binds: [],
+		unbinds: [],
 		public: true
 	}
 }

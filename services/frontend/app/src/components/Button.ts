@@ -24,7 +24,7 @@ export const Button = (props: ButtonProps): string => {
 
 	// base classes CSS for the button
 	const baseClasses =
-		'border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors text-lg'
+		'border-2 border-black hover:bg-black hover:text-white w-full py-2 mb-2 transition-colors text-lg'
 
 	// conditionnal data attribute
 	const dataActionAttr = action ? `data-action="${action}"` : ''
