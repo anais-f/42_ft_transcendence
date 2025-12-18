@@ -78,6 +78,7 @@ export const HomePage = (): string => {
 			 <input id="search_usr" type="text" name="search_usr" class=" px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER A USERNAME TO SEARCH HERE" required>
 			 <button id="search_btn" class="generic_btn" type="submit">Search</button>
 		 </form>
+		 
 		 <h1 class="text-2xl pt-6">RELATIONSHIP</h1>
 		 <div class="w-full h-[48%] border-2 border-black py-2">
 			<ul class="overflow-y-scroll">
