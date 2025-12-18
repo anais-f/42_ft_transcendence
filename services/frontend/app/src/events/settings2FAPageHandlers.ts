@@ -123,10 +123,8 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 		return
 	}
 
-	notyf.success('Two-Factor Authentication enabled successfully!')
-	setTimeout(() => {
-		window.location.reload()
-	}, 1500)
+  window.navigate('/settings')
+  notyf.success('Two-Factor Authentication enabled successfully!')
 }
 
 /**
@@ -171,8 +169,6 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 		return
 	}
 
-	notyf.success('Two-Factor Authentication disabled successfully!')
-	setTimeout(() => {
-		window.location.reload()
-	}, 1500)
+  window.navigate('/settings')
+  notyf.success('Two-Factor Authentication disable successfully!')
 }

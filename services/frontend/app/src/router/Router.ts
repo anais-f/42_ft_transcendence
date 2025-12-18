@@ -180,10 +180,6 @@ export class Router {
 		url: string,
 		skipAuth: boolean = false
 	): Promise<void> => {
-		if (window.location.pathname === url) {
-			console.log('Already at', url)
-			return
-		}
 		history.pushState(null, '', url)
 		await this.handleNav(skipAuth)
 	}
