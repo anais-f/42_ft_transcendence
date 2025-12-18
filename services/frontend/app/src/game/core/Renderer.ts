@@ -1,14 +1,15 @@
 import { Segment, Vector2 } from '@pong-shared/index.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import {
-	SEGMENT_LINE_WIDTH,
+	SEGMENT_LINE_WIDTH_SCALE,
 	SEGMENT_COLOR,
 	BALL_COLOR,
 	BALL_RADIUS_SCALE,
 	COUNTDOWN_FONT,
 	COUNTDOWN_COLOR,
 	GAME_SPACE_WIDTH,
-	GAME_SPACE_HEIGHT
+	GAME_SPACE_HEIGHT,
+	COUNTDOWN_FONT_SCALE
 } from '../constants.js'
 
 class Renderer {
@@ -80,25 +81,23 @@ class Renderer {
 	}
 
 	private render(): void {
-		if (!this.ctx || !this.canvas) return
+		if (!this.canvas || !this.ctx) return
 
 		const ctx = this.ctx
 		const width = this.canvas.width
 		const height = this.canvas.height
-
-		ctx.clearRect(0, 0, width, height)
-
 		const scaleX = width / GAME_SPACE_WIDTH
 		const scaleY = height / GAME_SPACE_HEIGHT
 		const offsetX = width / 2
 		const offsetY = height / 2
-
 		const flipX = gameStore.playerSlot === 'p2' ? -1 : 1
 		const toCanvasX = (x: number) => offsetX + x * flipX * scaleX
 		const toCanvasY = (y: number) => offsetY - y * scaleY
 
+		ctx.globalCompositeOperation = 'source-over'
+		ctx.clearRect(0, 0, width, height)
 		ctx.strokeStyle = SEGMENT_COLOR
-		ctx.lineWidth = SEGMENT_LINE_WIDTH
+		ctx.lineWidth = SEGMENT_LINE_WIDTH_SCALE * scaleX
 		const allSegments = [...this.staticSegments, ...this.dynamicSegments]
 		for (const seg of allSegments) {
 			const p1 = seg.p1
@@ -120,13 +119,28 @@ class Renderer {
 			Math.PI * 2
 		)
 		ctx.fill()
+		ctx.closePath()
 
 		if (this.countdown !== null && this.countdown > 0) {
-			ctx.strokeStyle = COUNTDOWN_COLOR
-			ctx.font = COUNTDOWN_FONT
+			const x = width / 2
+			const y = height / 3
+			const fontSize = height * COUNTDOWN_FONT_SCALE
+			const string = this.countdown.toString()
+
+			ctx.font = `bold ${fontSize}px ${COUNTDOWN_FONT}`
 			ctx.textAlign = 'center'
 			ctx.textBaseline = 'middle'
-			ctx.strokeText(this.countdown.toString(), width / 2, height / 3)
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'destination-out'
+			ctx.fillText(string, x, y)
+			ctx.restore()
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'source-over'
+			ctx.strokeStyle = COUNTDOWN_COLOR
+			ctx.strokeText(string, x, y)
+			ctx.restore()
 		}
 	}
 

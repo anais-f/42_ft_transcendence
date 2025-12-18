@@ -1,3 +1,5 @@
+import { Button } from '../components/Button.js'
+import { Input } from '../components/Input.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { handleLogin } from '../events/loginPageHandlers.js'
@@ -32,8 +34,13 @@ export const HomePage = (): string => {
 			<p class="text-sm pb-2">Ipst quam. Euidem nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt.</p>
 		</div>
 		<h1 class="text-2xl py-4">ARE YOU READY ?</h1>
-		<button id="create_game_btn" data-action="create-game" type="button" class="generic_btn my-2">Create</button>
-		<button id="tournament_btn" type="button" class="generic_btn" onclick="navigate('/play')">Tournament</button>
+		${Button({
+			id: 'create_game_btn',
+			text: 'create-game',
+			type: 'button',
+			action: 'create-game'
+		})}
+		${Button({ id: 'tournament_btn', text: 'Tournament', type: 'button' })}
 		<div class="news_paragraph">
 			<h1 class="text-lg py-2">Title</h1>
 			<p class="text-sm pb-2">Ipeat. Ipsum dolore vericorrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
@@ -48,8 +55,14 @@ export const HomePage = (): string => {
 		<h1 class="text-2xl py-2">FEELING LONELY ?</h1>
 		<p class="text-lg">You can join a game by enter the lobby code below</p>
 		<form id="join_lobby_form" data-form="join-lobby" class="flex flex-col gap-2">
-			 <input id="join_lobby" type="text" name="join_lobby" class="px-2 border-b-2 text-xl border-black bg-inherit w-full font-[Birthstone]" placeholder="ENTER LOBBY CODE HERE" required>
-			 <button id="join_btn" class="generic_btn" type="submit">Join</button>
+			 ${Input({
+					id: 'join_lobby',
+					name: 'join_lobby',
+					placeholder: 'Game code',
+					type: 'text',
+					required: true
+				})}
+			 ${Button({ id: 'join_btn', text: 'Join', type: 'submit' })}
 		 </form>
 		<div class="news_paragraph pt-4">
 			<h1 class="text-lg py-2">Title</h1>

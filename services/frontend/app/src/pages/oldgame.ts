@@ -3,6 +3,8 @@ import {
 	handleBindGameCanvas,
 	handleUnbindGameCanvas
 } from '../events/game/bindGameCanvasHandler.js'
+import { PlayerComp } from '../components/game/Player.js'
+import { handleResizeCanvas } from '../events/game/resizeCanvasHandler.js'
 
 const DEFAULT_AVATAR = '/assets/images/rhino.png'
 
@@ -17,42 +19,50 @@ export const GamePage = (): string => {
 		avatar: DEFAULT_AVATAR
 	}
 
-	return /*html*/ `
-<div class="min-h-[80vh] w-full flex items-center justify-center">
-
-	<div class="grid grid-cols-[0.8fr_1fr_1fr_0.8fr] gap-12 py-4 flex-auto">
-		<div class="col-span-1">
-				<h1 class="text-2xl text-center underline">${me.username}</h1>
-				<h1 id="my-score" class="text-4xl py-8 text-center">0</h1>
-				<img src="${me.avatar}" alt="Me" class="w-[80%] object-cover aspect-square object-center select-none mx-auto border-solid border-2 border-black">
+	return `
+<div class="min-h-[80vh] w-full flex items-center justify-center p-4">
+	<div class="grid grid-cols-[1fr_5fr_1fr] gap-8 w-full h-full">
+		${PlayerComp({ username: me.username, avatar: me.avatar, scoreID: 'my-score', position: 'right' })}
+		<div class="col-span-1 flex items-center justify-center">
+			<div class="w-full aspect-[2/1] bg-transparent border-4 border-black rounded flex items-center justify-center">
+				<canvas
+					id="pong"
+					class="w-full h-full"
+					style="background: transparent; display: block;">
+				</canvas>
+			</div>
 		</div>
-
-		<div class="col-span-2 text-center flex-1 my-auto">
-			<canvas
-			id="pong"
-			width="950"
-			height="550"
-			style="background: transparent; border: solid 4px black; display: block; margin: auto">
-			</canvas>
-		</div>
-
-		<div class="col-span-1">
-				<h1 class="text-2xl text-center underline">${opponent.username}</h1>
-				<h1 id="opponent-score" class="text-4xl py-8 text-center">0</h1>
-				<img src="${opponent.avatar}" alt="Opponent" class="w-[80%] object-cover aspect-square object-center select-none mx-auto border-solid border-2 border-black">
-		</div>
-
+		${PlayerComp({ username: opponent.username, avatar: opponent.avatar, scoreID: 'opponent-score', position: 'right' })}
 	</div>
 </div>
-`
+	`
 }
 
+let resizeHandler: (() => Promise<void>) | null = null
+
 export function attachGameEvents() {
+	const canvas = document.getElementById('pong') as HTMLCanvasElement
+	if (!canvas) {
+		return
+	}
+
+	resizeHandler = async () => {
+		await handleResizeCanvas()
+	}
+
+	resizeHandler()
+
+	window.addEventListener('resize', resizeHandler)
+
 	handleBindGameCanvas()
 	console.log('Game page events attached')
 }
 
 export function detachGameEvents() {
+	if (resizeHandler) {
+		window.removeEventListener('resize', resizeHandler)
+		resizeHandler = null
+	}
+
 	handleUnbindGameCanvas()
-	console.log('Game page events cleaned up')
 }

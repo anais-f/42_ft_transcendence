@@ -5,7 +5,7 @@ import { notyfGlobal as notyf } from '../../utils/notyf.js'
 export async function handleJoinLobby(e: Event) {
 	e.preventDefault()
 	const input = document.getElementById('join_lobby') as HTMLInputElement
-	const code = input?.value?.trim()
+	const code = input?.value?.trim().toUpperCase()
 
 	const { data, error, status } = await joinGameApi(code)
 
