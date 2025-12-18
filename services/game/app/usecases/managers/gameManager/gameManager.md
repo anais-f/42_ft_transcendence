@@ -113,7 +113,7 @@ Games can be created in two modes:
 
 ## Functions
 
-### `requestGame(pID, pID2?)`
+### `requestGame(pID, pID2?, tournamentMatchData?)`
 
 Creates a new game and returns the game code.
 
@@ -121,13 +121,14 @@ Creates a new game and returns the game code.
   - Creates a new game with `p1` assigned and `p2: undefined`
   - `p1: { id: pID, ws: null }`
   - Anyone can join with the code
-- **If `pID2` is provided (locked game)**:
+- **If `pID2` and `tournamentMatchData` is provided (locked game)**:
   - Creates a new game with both players pre-assigned
   - `p1: { id: pID, ws: null }`
   - `p2: { id: pID2, ws: null }`
   - Only these two players can connect
 - Adds `pID` (and `pID2` if provided) to `playerToGame`
 - Sets `createdAt` to `Date.now()` on creation
+- Saves score in tournament tree and launch next game if 2 players are defined
 
 > [!NOTE]
 > No validation is performed on `pID` or `pID2` (e.g., checking if they exist in
