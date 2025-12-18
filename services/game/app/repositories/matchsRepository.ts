@@ -1,5 +1,8 @@
 import { getDb } from '../database/connection.js'
-import type { MatchHistoryItemDTO } from '@ft_transcendence/common'
+import type {
+	MatchHistoryItemDTO,
+	PlayerStatsDTO
+} from '@ft_transcendence/common'
 
 export function saveMatchToHistory(
 	player1Id: number,
@@ -73,4 +76,61 @@ export function getMatchHistoryByPlayerId(
 		)
 		.all(targetUserId, targetUserId) as MatchHistoryItemDTO[]
 	return matches
+}
+
+export function getStatsByPlayerId(targetUserId: number): PlayerStatsDTO {
+	const db = getDb()
+
+	const totalGamesRow = db
+		.prepare(
+			`
+		SELECT COUNT(*) as totalGames
+		FROM match_player
+		WHERE player_id = ?
+	`
+		)
+		.get(targetUserId) as { totalGames: number }
+
+	const winsRow = db
+		.prepare(
+			`
+		SELECT COUNT(*) as wins
+		FROM match_history mh
+		JOIN match_player mp ON mh.id_match = mp.id_match
+		WHERE mp.player_id = ? AND mh.winner_id = ?
+	`
+		)
+		.get(targetUserId, targetUserId) as { wins: number }
+	const avgForRow = db
+		.prepare(
+			`
+		SELECT AVG(score) as avgFor
+		FROM match_player
+		WHERE player_id = ?
+	`
+		)
+		.get(targetUserId) as { avgFor: number | null }
+
+	const avgAgainstRow = db
+		.prepare(
+			`
+		SELECT AVG(mp.score) as avgAgainst
+		FROM match_player mp
+		JOIN match_player mp2 ON mp.id_match = mp2.id_match
+		WHERE mp2.player_id = ? AND mp.player_id != mp2.player_id
+	`
+		)
+		.get(targetUserId) as { avgAgainst: number | null }
+
+	return {
+		totalGames: totalGamesRow.totalGames,
+		totalWins: winsRow.wins,
+		totalLosses: totalGamesRow.totalGames - winsRow.wins,
+		winRate:
+			totalGamesRow.totalGames > 0
+				? (winsRow.wins / totalGamesRow.totalGames) * 100
+				: 0,
+		averageScoreFor: avgForRow.avgFor ?? 0,
+		averageScoreAgainst: avgAgainstRow.avgAgainst ?? 0
+	}
 }
