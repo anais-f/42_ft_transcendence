@@ -36,8 +36,7 @@ export function endGame(code: string) {
 
 	let tournamentData = undefined
 	if (gameData.tournamentMatchData) {
-		tournamentData = 
-		createTournamentMatchResult(
+		tournamentData = createTournamentMatchResult(
 			gameData.tournamentMatchData,
 			score.p1 > score.p2 ? gameData.p1.id : gameData.p2.id,
 			score.p1,
