@@ -27,6 +27,7 @@ export enum GameState {
 export const BALL_SPEED = 0.4
 
 export class GameEngine {
+	private _deadTick = false
 	private _currentState: GameState = GameState.Paused
 	private _TPS_DATA: TPS_MANAGER
 	private _tickTimer: ReturnType<typeof setInterval> | null = null
@@ -183,6 +184,9 @@ export class GameEngine {
 			return
 		}
 
+		if (this._deadTick === true && this._pauseTicksRemaining === 0) {
+			this._pauseGame()
+		}
 		// Handle pause between points
 		if (this._pauseTicksRemaining > 0) {
 			--this._pauseTicksRemaining
@@ -209,7 +213,7 @@ export class GameEngine {
 
 		++this._TPS_DATA.tickCount
 		if (this.lives.p1 <= 0 || this.lives.p2 <= 0) {
-			this._pauseGame()
+			this._deadTick = true
 		}
 	}
 
@@ -262,5 +266,9 @@ export class GameEngine {
 
 	get pauseTicksRemaining(): number {
 		return this._pauseTicksRemaining
+	}
+
+	get deadTick(): boolean {
+		return this._deadTick
 	}
 }

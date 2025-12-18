@@ -1,6 +1,7 @@
 import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
 import { gameStore } from '../../../usecases/gameStore.js'
 import { updateLives } from '../../../components/game/Lives.js'
+import { renderer } from '../../core/Renderer.js'
 
 export function scoreHandler(packet: S07Score) {
 	const isP1 = gameStore.playerSlot === 'p1'
@@ -10,4 +11,9 @@ export function scoreHandler(packet: S07Score) {
 	const maxLives = packet.maxLives || gameStore.maxLives || 5
 	updateLives('my-lives', myLives, maxLives)
 	updateLives('opponent-lives', opponentLives, maxLives)
+
+	if (myLives <= 0 || opponentLives <= 0) {
+		const didWin = myLives > opponentLives
+		renderer.setGameResult(didWin ? 'win' : 'lose')
+	}
 }
