@@ -1,10 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import {
-	joinTournament,
-	createTournament,
-	getTournament,
-	quitTournament
-} from '../../usecases/tournamentUsecases.js'
+import { getTournament } from '../../usecases/managers/tournamentManager/getTournament.js'
+import { createTournament } from '../../usecases/managers/tournamentManager/createTournament.js'
+import { joinTournament } from '../../usecases/managers/tournamentManager/joinTournament.js'
+import { quitTournament } from '../../usecases/managers/tournamentManager/quitTournament.js'
 import {
 	GetTournamentResponseDTO,
 	CreateTournamentResponseDTO,
