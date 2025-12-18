@@ -1,6 +1,11 @@
 import { FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
-import { tournaments, usersInTournaments, playerToGame, busyPlayers } from '../gameData.js'
+import {
+	tournaments,
+	usersInTournaments,
+	playerToGame,
+	busyPlayers
+} from '../gameData.js'
 import { CodeParamSchema } from '@ft_transcendence/common'
 import { TournamentDTO } from '@ft_transcendence/common'
 import { startTournament } from './startTournament.js'
