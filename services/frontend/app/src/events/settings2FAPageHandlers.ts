@@ -26,7 +26,7 @@ export async function verifyCurrentUserPassword(
 			default:
 				notyf.error(error)
 		}
-		return
+		return false
 	}
 
 	return true
@@ -55,13 +55,11 @@ export async function handleGenerateQRCode() {
 		return
 	}
 
-	// Display the QR code and otpauth_url in the UI
-	const qrContainer = document.getElementById('qr_code_container')
-	const generateStep = document.getElementById('generate_qr_step')
+	const generateBtn = document.getElementById('generate_qr_btn')
 	const verifyStep = document.getElementById('verify_2fa_step')
+	const qrContainer = document.getElementById('qr_code_container')
 
-	if (qrContainer && generateStep && verifyStep) {
-		// Insert QR code and URL into the container
+	if (generateBtn && qrContainer && verifyStep) {
 		qrContainer.innerHTML = `
 			<div class="flex flex-col gap-2 items-center w-full">
 				<p class="text-sm">Scan this QR code with Google Authenticator:</p>
@@ -78,9 +76,8 @@ export async function handleGenerateQRCode() {
 			</div>
 		`
 
-		// Hide the button step, show the verification step
-		generateStep.style.display = 'none'
-		verifyStep.style.display = 'block'
+		generateBtn.classList.add('hidden')
+		verifyStep.classList.remove('hidden')
 	}
 }
 
@@ -102,6 +99,7 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 
 	// STEP 1: Verify password
 	if (!(await verifyCurrentUserPassword(password))) {
+		form.reset()
 		return
 	}
 
@@ -116,13 +114,19 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
-	if (!(await syncCurrentUser('Failed to update 2FA user data'))) return
+	if (!(await syncCurrentUser('Failed to update 2FA user data'))) {
+		form.reset()
+		return
+	}
 
 	notyf.success('Two-Factor Authentication enabled successfully!')
-	window.location.reload()
+	setTimeout(() => {
+		window.location.reload()
+	}, 1500)
 }
 
 /**
@@ -143,6 +147,7 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 
 	// STEP 1: Verify password
 	if (!(await verifyCurrentUserPassword(password))) {
+		form.reset()
 		return
 	}
 
@@ -152,16 +157,22 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection disbable')
+				notyf.error('Network error, check your connection disable')
 				break
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
-	if (!(await syncCurrentUser('Failed to update 2FA user data'))) return
+	if (!(await syncCurrentUser('Failed to update 2FA user data'))) {
+		form.reset()
+		return
+	}
 
 	notyf.success('Two-Factor Authentication disabled successfully!')
-	window.location.reload()
+	setTimeout(() => {
+		window.location.reload()
+	}, 1500)
 }

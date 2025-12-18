@@ -74,6 +74,12 @@ export async function changeMyPassword(
 		throw createHttpError.NotFound('User not found')
 	}
 
+	if (oldPassword === newPassword) {
+		throw createHttpError.UnprocessableEntity(
+			'New password must be different from old password'
+		)
+	}
+
 	const isOldPasswordValid = await verifyPassword(user.password, oldPassword)
 	if (!isOldPasswordValid) {
 		throw createHttpError.Unauthorized('Invalid old password')

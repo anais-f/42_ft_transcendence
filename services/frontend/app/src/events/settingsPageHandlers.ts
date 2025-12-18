@@ -41,6 +41,7 @@ export async function handleUsername(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
@@ -75,6 +76,7 @@ export async function handlerAvatar(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
@@ -106,7 +108,6 @@ export async function handleChangePassword(form: HTMLFormElement) {
 		return
 	}
 
-	// TODO : check if the backend already does this
 	if (oldPassword === newPassword) {
 		notyf.error('New password must be different from the old password')
 		return
@@ -138,6 +139,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 

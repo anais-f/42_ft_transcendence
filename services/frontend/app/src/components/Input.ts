@@ -15,7 +15,7 @@ interface InputProps {
 	id: string
 	name: string
 	placeholder: string
-	type: 'text' | 'password'
+	type: 'text' | 'password' | 'file'
 	required: boolean
 	additionalClasses?: string
 	maxLength?: number

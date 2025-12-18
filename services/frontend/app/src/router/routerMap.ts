@@ -8,25 +8,23 @@ import {
 	detachLobbyEvents,
 	LobbyPage
 } from '../pages/oldlobby.js'
-import {
-	attachLoginEvents,
-	detachLoginEvents,
-	cleanupGoogleAuth,
-	TestPage
-} from '../pages/oldlogin.js'
 import { ProfilePage } from '../pages/oldprofile.js'
-
 import {
 	HomePage,
 	attachHomeEvents,
 	detachHomeEvents
 } from '../pages/oldhome.js'
 import {
+	LoginPage,
+	attachLoginEvents,
+	detachLoginEvents,
+	cleanupGoogleAuth
+} from '../pages/LoginPage.js'
+import {
 	SettingsPage,
 	attachSettingsEvents,
 	detachSettingsEvents
-} from '../pages/oldsettings.js'
-import { LoginPage } from '../pages/LoginPage.js'
+} from '../pages/SettingsPage.js'
 
 export type Pages =
 	| 'home'
@@ -97,9 +95,9 @@ export const routerMap: Record<Pages, Route> = {
 	test: {
 		id: 'test',
 		url: '/test',
-		page: TestPage,
-		binds: [attachLoginEvents],
-		unbinds: [detachLoginEvents, cleanupGoogleAuth],
+		page: SettingsPage,
+		binds: [attachSettingsEvents],
+		unbinds: [detachSettingsEvents],
 		public: true
 	}
 }

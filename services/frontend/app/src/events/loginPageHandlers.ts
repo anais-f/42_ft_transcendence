@@ -1,7 +1,7 @@
 import { loginAPI, registerAPI } from '../api/authApi.js'
 import { verify2FALoginAPI } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { switchTo2FAForm } from '../pages/oldlogin.js'
+import { switchTo2FAForm } from '../pages/LoginPage.js'
 import {
 	validateUsername,
 	validatePassword,
@@ -54,6 +54,7 @@ export async function handleRegister(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
@@ -100,6 +101,7 @@ export async function handleLogin(form: HTMLFormElement) {
 			default:
 				notyf.error(error)
 		}
+		form.reset()
 		return
 	}
 
