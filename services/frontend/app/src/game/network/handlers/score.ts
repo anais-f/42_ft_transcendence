@@ -7,7 +7,7 @@ export function scoreHandler(packet: S07Score) {
 	const myLives = isP1 ? packet.p1Score : packet.p2Score
 	const opponentLives = isP1 ? packet.p2Score : packet.p1Score
 
-	const maxLives = gameStore.maxLives || 10
+	const maxLives = packet.maxLives || gameStore.maxLives || 5
 	updateLives('my-lives', myLives, maxLives)
 	updateLives('opponent-lives', opponentLives, maxLives)
 }

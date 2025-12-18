@@ -43,7 +43,8 @@ export class GameEngine {
 		private _live: ILives,
 		private _staticBorders: Segment[],
 		private _dynamicBorders: Segment[],
-		private _winZones: IWinZone[]
+		private _winZones: IWinZone[],
+		private _maxLives: number = 10
 	) {
 		this._TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
@@ -253,6 +254,10 @@ export class GameEngine {
 
 	get lives(): ILives {
 		return this._live
+	}
+
+	get maxLives(): number {
+		return this._maxLives
 	}
 
 	get pauseTicksRemaining(): number {
