@@ -14,6 +14,15 @@ Ornare sagittis vehicula praesent dui felis venenatis ultrices. Pretium tellus d
 Potenti ultricies habitant morbi senectus netus suscipit auctor. Fringilla lacus nec metus bibendum egestas iaculis massa. Maximus eget fermentum odio phasellus non purus est. Justo lectus commodo augue arcu dignissim velit aliquam.
 Platea dictumst lorem ipsum dolor sit amet consectetur. Ut hendrerit semper vel class aptent taciti sociosqu. Dictum risus blandit quis suspendisse aliquet nisi sodales. Rutrum gravida cras eleifend turpis fames primis vulputate.
 Vitae pellentesque sem placerat in id cursus mi. Inceptos himenaeos orci varius natoque penatibus et magnis. Luctus nibh finibus facilisis dapibus etiam interdum tortor. Venenatis ultrices proin libero feugiat tristique accumsan maecenas.
+Suspendisse mollis erat et risus. Vestibulum et odio eu nisl malesuada dapibus. Morbi ac tortor et magna tincidunt ullamcorper. Ut pellentesque fermentum mi. Etiam sed neque sit amet leo consectetuer sagittis. Nulla facilisi. 
+Sed lobortis erat vitae nulla. Duis bibendum ipsum et mi scelerisque dapibus. Fusce nonummy vestibulum orci. Donec a nisl. Integer ac nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
+Aenean nec nunc sed dui lobortis vestibulum. Praesent metus ligula, auctor vitae, lacinia sed, hendrerit a, felis. Etiam sapien. Proin et sem vitae dolor sodales venenatis. Integer luctus aliquam risus.
+Suspendisse mollis erat et risus. Vestibulum et odio eu nisl malesuada dapibus. Morbi ac tortor et magna tincidunt ullamcorper. Ut pellentesque fermentum mi. Etiam sed neque sit amet leo consectetuer sagittis.
+Nulla facilisi. Sed lobortis erat vitae nulla. Duis bibendum ipsum et mi scelerisque dapibus. Fusce nonummy vestibulum orci. Donec a nisl. Integer ac nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+Aenean nec nunc sed dui lobortis vestibulum. Praesent metus ligula, auctor vitae, lacinia sed, hendrerit a, felis. Etiam sapien. Proin et sem vitae dolor sodales venenatis. Integer luctus aliquam risus. Proin non sem. Donec nec erat. 
+Proin libero. Aliquam viverra arcu. Donec vitae purus. Donec felis mi, semper id, scelerisque porta, sollicitudin sed, turpis. Nulla in urna. Integer varius wisi non elit. Etiam nec sem. 
+Mauris consequat, risus nec congue condimentum, ligula ligula suscipit urna, vitae porta odio erat quis sapien. Proin luctus leo id erat. Etiam massa metus, accumsan pellentesque, sagittis sit amet, venenatis nec, mauris.
+Praesent urna eros, ornare nec, vulputate eget, cursus sed, justo. Phasellus nec lorem. Nullam ligula ligula, mollis sit amet, faucibus vel, eleifend ac, dui. Aliquam erat volutpat.
 `
 
 export const LoremSection = ({
@@ -33,8 +42,8 @@ export const LoremSection = ({
 	const isFillMode = variant === 'fill'
 
 	const paragraphClasses = isFillMode
-		? `text-sm overflow-hidden flex-1 min-h-0 ${additionalClasses}`.trim()
-		: `text-sm overflow-hidden ${variantConfig[variant]} ${additionalClasses}`.trim()
+		? `text-sm leading-relaxed overflow-hidden flex-1 min-h-0 ${additionalClasses}`.trim()
+		: `text-sm leading-relaxed overflow-hidden ${variantConfig[variant]} ${additionalClasses}`.trim()
 
 	const containerClasses = isFillMode
 		? 'news_paragraph flex-1 min-h-0 flex flex-col'
