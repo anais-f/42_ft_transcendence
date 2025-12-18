@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
-import { tournaments, usersInTournaments, playerToGame } from '../gameData.js'
+import { tournaments, usersInTournaments, playerToGame, busyPlayers } from '../gameData.js'
 import { CodeParamSchema } from '@ft_transcendence/common'
 import { TournamentDTO } from '@ft_transcendence/common'
 import { startTournament } from './startTournament.js'
@@ -16,6 +16,9 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 	}
 	if (playerToGame.has(userId)) {
 		throw createHttpError.Conflict('User is already in a match')
+	}
+	if (busyPlayers.has(userId)) {
+		throw createHttpError.Conflict('User is busy')
 	}
 	const tournament = tournaments.get(tournamentCode.code)
 	if (!tournament) {
