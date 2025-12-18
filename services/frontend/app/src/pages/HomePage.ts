@@ -90,7 +90,7 @@ export const TestPage = (): string => {
         <img src="/assets/images/screamer_boy.png" alt="screamer boy" class="img_style pb-0">
     </div>
 
-    <div class="bg-yellow-100 col-4-span-flex">
+    <div class="col-4-span-flex">
         <h1 class="title_bloc">WANTED</h1>
         <form id="search_usr_form" class="form_style" action="">
             ${Input({
@@ -108,11 +108,11 @@ export const TestPage = (): string => {
         </form>
         
         <!-- FRIENDS SECTION -->
-        <div id="friends_section" class="bg-purple-200 flex flex-col flex-1 w-full min-h-0">
+        <div id="friends_section" class="flex flex-col flex-1 w-full min-h-0">
             <!-- RELATIONSHIP SECTION -->
-            <div id="relationship" class="bg-yellow-500 w-full flex flex-col flex-[70%] min-h-0">
+            <div id="relationship" class="w-full flex flex-col flex-[70%] min-h-0">
                 <h1 class="title_bloc mt-2 !mb-1">RELATIONSHIP</h1>
-                <div id="div_friend_list" class="bg-grey-200 w-full flex-1 border-2 border-black overflow-y-scroll">
+                <div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="friend_list" class="h-full">  
                         <!-- FRIEND ITEMS POPULATED HERE -->
                         <li class="flex flex-row border-b border-black">
@@ -137,9 +137,9 @@ export const TestPage = (): string => {
             </div>
             
             <!-- GET IN TOUCH SECTION -->
-            <div id="request_friend" class="bg-blue-200 w-full flex flex-col flex-[30%] min-h-0">
+            <div id="request_friend" class="w-full flex flex-col flex-[30%] min-h-0">
                 <h1 class="title_bloc mt-2 !mb-1">GET IN TOUCH</h1>
-                <div id="div_request_list" class="bg-grey-800 w-full flex-1 border-2 border-black overflow-y-scroll">
+                <div id="div_request_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="request_list" class="h-full">  
                         ${FriendRequestItem(fr1)}
                         ${FriendRequestItem(fr2)}
@@ -150,7 +150,7 @@ export const TestPage = (): string => {
             </div>
         <!-- END FRIEND SECTION -->
         </div>    
-        
+    
     </div>
 
   </section>

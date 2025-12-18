@@ -26,16 +26,18 @@ export const FriendListItem = (props: FriendListItemProps): string => {
 
 	return /*html*/ `
     <li class="flex flex-row border-b border-black" id="friend_item_${id}">
-      <a data-action="navigate-profile" data-username="${username}" data-id="${id} class="flex items-center gap-4 py-2 px-4">
+      <div class="flex gap-4 py-2 px-4">
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div>
-          <p class="font-medium">${username}</p>
+          <a data-action="navigate-profile" data-username="${username}" data-id="${id}">
+            <p class="font-medium">${username}</p>
+          </a>  
           <p class="text-gray-500 flex items-center gap-2">
             <span class="w-3 h-3 rounded-full ${statusColor}"></span>
             ${status}
           </p>
         </div>
-      </a>
+      </div>
     </li>
     `
 }
