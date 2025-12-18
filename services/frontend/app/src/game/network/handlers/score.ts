@@ -1,5 +1,6 @@
 import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
 import { gameStore } from '../../../usecases/gameStore.js'
+import { renderer } from '../../core/Renderer.js'
 
 export function scoreHandler(packet: S07Score) {
 	const myScoreEl = document.getElementById('my-score')
@@ -14,5 +15,10 @@ export function scoreHandler(packet: S07Score) {
 	}
 	if (opponentScoreEl) {
 		opponentScoreEl.textContent = opponentScore.toString()
+	}
+
+	if (myScore <= 0 || opponentScore <= 0) {
+		const didWin = myScore > opponentScore
+		renderer.setGameResult(didWin ? 'win' : 'lose')
 	}
 }
