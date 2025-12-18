@@ -43,7 +43,7 @@ export type IUserConnection = Pick<IPrivateUser, 'user_id' | 'last_connection'>
 export type IUserAvatar = Pick<IPrivateUser, 'user_id' | 'avatar'>
 export type IPublicProfileUser = Pick<
 	IPrivateUser,
-	'user_id' | 'username' | 'avatar' | 'status'
+	'user_id' | 'username' | 'avatar' | 'status' | 'last_connection'
 >
 
 export enum UserStatus {

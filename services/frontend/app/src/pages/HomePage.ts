@@ -5,7 +5,7 @@ import { FriendListItem } from '../components/friends/FriendListItem.js'
 import { FriendRequestItem } from '../components/friends/FriendRequestItem.js'
 import { currentUser } from '../usecases/userStore.js'
 
-export const TestPage = (): string => {
+export const HomeBisPage = (): string => {
 	const user = currentUser || {
 		username: 'Guest',
 		avatar: '/avatars/img_default.png'

@@ -25,7 +25,8 @@ import {
 	attachSettingsEvents,
 	detachSettingsEvents
 } from '../pages/SettingsPage.js'
-import { TestPage } from '../pages/HomePage.js'
+import { HomeBisPage } from '../pages/HomePage.js'
+import { TestPage } from '../pages/ProfilePage.js'
 
 export type Pages =
 	| 'home'

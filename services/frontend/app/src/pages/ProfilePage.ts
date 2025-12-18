@@ -1,0 +1,101 @@
+import { Button } from '../components/Button.js'
+import { StatBox } from '../components/game/StatBox.js'
+import { LoremSection } from '../components/LoremIpsum.js'
+import { currentUser } from '../usecases/userStore.js'
+import { IPublicProfileUser } from '@ft_transcendence/common'
+
+const userProfile: IPublicProfileUser = {
+	id: 1,
+	username: 'Mammoth',
+	avatar: '/public/assets/images/avatar.png',
+	status: 'Online',
+	last_seen: '05/12/2025 12:32am'
+}
+
+const statusColor =
+	userProfile.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
+
+const isFriend = false
+
+const stats = {
+	games_played: 256,
+	wins: 198,
+	losses: 58,
+	winRate: 10
+}
+
+export const TestPage = (): string => {
+	// Récupérer l'ID depuis l'URL
+	//   const urlParts = window.location.pathname.split('/')
+	//   const userId = urlParts[2]  // /profile/:id → index 2
+
+	// Utiliser l'ID pour charger les données du profil
+	// const userProfile = await fetchUserProfile(userId)
+
+	return /*html*/ `
+  <section class="grid grid-cols-4 gap-10 h-full w-full">
+
+    <div class="col-4-span-flex">
+      <h1 class="title_bloc">PLAYER OF THE MONTH</h1>
+      <img src="${userProfile.avatar}" alt="Avatar" class="avatar_style">
+      <div class="w-full my-4">
+        <h2 class="text-xl font-medium font-special pb-1">${userProfile.username}</h2>
+        <p class="text-gray-500 flex items-center gap-2 pb-1">
+            <span class="w-3 h-3 rounded-full ${statusColor}"></span>${userProfile.status}</p>
+        <p class="font-medium">Last Seen : <span class="font-normal">${userProfile.last_seen}</span></p>
+      </div>
+      ${LoremSection({
+				title: 'Biography',
+				variant: 'fill'
+			})}
+      ${
+				isFriend
+					? `
+        ${Button({
+					id: 'remove_friend_btn',
+					text: 'Remove Friend',
+					type: 'button',
+					action: 'remove-friend',
+					additionalClasses: 'mt-4 !mb-0'
+				})}
+        `
+					: `
+        ${Button({
+					id: 'add_friend_btn',
+					text: 'Add Friend',
+					type: 'button',
+					action: 'add-friend',
+					additionalClasses: 'mt-4 !mb-0'
+				})}
+      `
+			}
+    </div>
+
+
+    <div class="col-4-span-flex">
+      ${LoremSection({
+				variant: 'short'
+			})}
+      <div class=" w-full my-4">
+        <h1 class="title_bloc mb-4">STATISTICS</h1>
+        ${StatBox({ label: 'Games Played', value: stats.games_played, color: 'text-indigo-900' })}
+        ${StatBox({ label: 'Wins', value: stats.wins, color: 'text-emerald-900' })}
+        ${StatBox({ label: 'Losses', value: stats.losses, color: 'text-rose-900' })}
+        ${StatBox({ label: 'Win Rate', value: stats.winRate, color: 'text-yellow-800' })}
+      </div>
+      ${LoremSection({
+				variant: 'fill'
+			})}
+      <img src="/assets/images/cup.png" alt="Cup" class="img_style pb-0">
+
+    </div>
+
+
+    <div class="bg-yellow-200 col-span-2 flex flex-col items-start min-h-0">
+
+    </div>
+
+
+  </section>
+  `
+}
