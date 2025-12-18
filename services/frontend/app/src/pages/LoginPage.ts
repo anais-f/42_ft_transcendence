@@ -14,128 +14,124 @@ import { notyfGlobal as notyf } from '../utils/notyf.js'
 
 export const LoginPage = (): string => {
 	return /*html*/ `
-  <section class="grid grid-cols-4 gap-10 h-full w-full">
-
-    <div class="col-4-span-flex">
-      <h1 class="title_bloc">SUBSCRIBE TO OUR NEWSPAPER</h1>
-      <form id="register_form" data-form="register" class="form_style">
-          ${Input({
-						id: 'register_login',
-						name: 'register_login',
-						placeholder: 'Login',
-						type: 'text',
-						required: true
-					})}
-          ${Input({
-						id: 'register_password',
-						name: 'register_password',
-						placeholder: 'Password',
-						type: 'password',
-						required: true
-					})}
-          ${Input({
-						id: 'register_conf_password',
-						name: 'register_conf_password',
-						placeholder: 'Confirm password',
-						type: 'password',
-						required: true
-					})}
-          ${Button({
-						text: 'Subscribe',
-						id: 'register_btn',
-						type: 'submit',
-						additionalClasses: 'form_button'
-					})}
-      </form>
-
-      ${LoremSection({
-				title: 'Newsletter',
-				variant: 'fill'
+	<section class="grid grid-cols-4 gap-10 h-full w-full">
+	<div class="col-4-span-flex">
+		<h1 class="title_bloc">SUBSCRIBE TO OUR NEWSPAPER</h1>
+		<form id="register_form" data-form="register" class="form_style">
+			${Input({
+				id: 'register_login',
+				name: 'register_login',
+				placeholder: 'Login',
+				type: 'text',
+				required: true
 			})}
-    </div>
-
-     <div class="col-4-span-flex">
-      ${LoremSection({
-				variant: 'long'
+			${Input({
+				id: 'register_password',
+				name: 'register_password',
+				placeholder: 'Password',
+				type: 'password',
+				required: true
 			})}
-      <img src="/assets/images/mammoth.png" alt="mamouth" class="img_style">
-      ${LoremSection({
-				title: 'Mamamoth',
-				variant: 'fill'
+			${Input({
+				id: 'register_conf_password',
+				name: 'register_conf_password',
+				placeholder: 'Confirm password',
+				type: 'password',
+				required: true
 			})}
-     </div>
-
-     <div class="col-4-span-flex">
-      ${LoremSection({
-				variant: 'short'
+			${Button({
+				text: 'Subscribe',
+				id: 'register_btn',
+				type: 'submit',
+				additionalClasses: 'form_button'
 			})}
-      <h1 class="title_bloc mt-4">RESUME READING</h1>
-      <!-- Login Form -->
-      <form id="login_form" data-form="login" class="form_style">
-          ${Input({
-						id: 'login_login',
-						name: 'login_login',
-						placeholder: 'Login',
-						type: 'text',
-						required: true
-					})}
-          ${Input({
-						id: 'login_password',
-						name: 'login_password',
-						placeholder: 'Password',
-						type: 'password',
-						required: true
-					})}
-          ${Button({
-						text: 'Login',
-						id: 'login_btn',
-						type: 'submit',
-						additionalClasses: 'form_button'
-					})}
-      </form>
+		</form>
 
-      <!-- 2FA Form -->
-      <form id="2fa_form" data-form="2fa" class="form_style hidden">
-          ${Input({
-						id: '2fa_code',
-						name: '2fa_code',
-						placeholder: '000000',
-						type: 'text',
-						required: true,
-						maxLength: 6,
-						pattern: '[0-9]{6}',
-						autoComplete: 'one-time-code',
-						inputmode: 'numeric',
-						additionalClasses:
-							'tracking-widest text-center letter-spacing-widest'
-					})}
-          ${Button({
-						id: '2fa_btn',
-						text: 'Validate',
-						type: 'submit'
-					})}
-      </form>
+		${LoremSection({
+			title: 'Newsletter',
+			variant: 'fill'
+		})}
+	</div>
 
-      ${LoremSection({
-				title: 'Introduction',
-				variant: 'fill'
-			})}
-     </div>
+	<div class="col-4-span-flex">
+		${LoremSection({
+			variant: 'long'
+		})}
+	<img src="/assets/images/mammoth.png" alt="mamouth" class="img_style">
+	${LoremSection({
+		title: 'Mamamoth',
+		variant: 'fill'
+	})}
+	</div>
 
-     <div class="col-4-span-flex">
-      ${LoremSection({
-				title: 'New Partener',
-				variant: 'medium',
-				additionalClasses: 'mb-4'
-			})}
-      <div id="google-btn-container" class="my-4 w-full flex justify-center"></div>
-      <img src="/assets/images/screamer_girl.png" alt="screamer girl" class="img_style">
-      ${LoremSection({
-				variant: 'fill'
-			})}
-     </div>
+	<div class="col-4-span-flex">
+		${LoremSection({
+			variant: 'short'
+		})}
+	<h1 class="title_bloc mt-4">RESUME READING</h1>
+	<!-- Login Form -->
+	<form id="login_form" data-form="login" class="form_style">
+	${Input({
+		id: 'login_login',
+		name: 'login_login',
+		placeholder: 'Login',
+		type: 'text',
+		required: true
+	})}
+	${Input({
+		id: 'login_password',
+		name: 'login_password',
+		placeholder: 'Password',
+		type: 'password',
+		required: true
+	})}
+	${Button({
+		text: 'Login',
+		id: 'login_btn',
+		type: 'submit',
+		additionalClasses: 'form_button'
+	})}
+	</form>
 
-  </section>
+	<!-- 2FA Form -->
+	<form id="2fa_form" data-form="2fa" class="form_style hidden">
+		${Input({
+			id: '2fa_code',
+			name: '2fa_code',
+			placeholder: '000000',
+			type: 'text',
+			required: true,
+			maxLength: 6,
+			pattern: '[0-9]{6}',
+			autoComplete: 'one-time-code',
+			inputmode: 'numeric',
+			additionalClasses: 'tracking-widest text-center letter-spacing-widest'
+		})}
+		${Button({
+			id: '2fa_btn',
+			text: 'Validate',
+			type: 'submit'
+		})}
+	</form>
+	${LoremSection({
+		title: 'Introduction',
+		variant: 'fill'
+	})}
+	</div>
+	<div class="col-4-span-flex">
+		${LoremSection({
+			title: 'New Partener',
+			variant: 'medium',
+			additionalClasses: 'mb-4'
+		})}
+		<div id="google-btn-container" class="mx-auto my-4 w-fit flex"></div>
+		<img src="/assets/images/screamer_girl.png" alt="screamer girl" class="img_style">
+		${LoremSection({
+			variant: 'fill'
+		})}
+	</div>
+
+	</section>
 `
 }
 

@@ -9,7 +9,12 @@ import {
 	COUNTDOWN_COLOR,
 	GAME_SPACE_WIDTH,
 	GAME_SPACE_HEIGHT,
-	COUNTDOWN_FONT_SCALE
+	COUNTDOWN_FONT_SCALE,
+	OVERLAY_FONT,
+	OVERLAY_FONT_SCALE,
+	OVERLAY_WIN_COLOR,
+	OVERLAY_LOSE_COLOR,
+	OVERLAY_BACKGROUND
 } from '../constants.js'
 
 class Renderer {
@@ -23,6 +28,7 @@ class Renderer {
 	private ctx: CanvasRenderingContext2D | null = null
 	private animationId: number | null = null
 	private countdown: number | null = null
+	private gameResult: 'win' | 'lose' | null = null
 
 	setCanvas(canvas: HTMLCanvasElement): void {
 		this.canvas = canvas
@@ -54,6 +60,11 @@ class Renderer {
 		this.countdown = value
 	}
 
+	setGameResult(result: 'win' | 'lose' | null): void {
+		this.setBallState(new Vector2(), new Vector2(), 0)
+		this.gameResult = result
+	}
+
 	private startAnimation(): void {
 		if (this.animationId !== null) return
 
@@ -72,6 +83,9 @@ class Renderer {
 	}
 
 	private getPredictedBallPos(): Vector2 {
+		if (this.gameResult) {
+			return this.ballPos
+		}
 		const now = performance.now()
 		const dt = (now - this.lastBallUpdate) / 1000
 		return new Vector2(
@@ -121,7 +135,11 @@ class Renderer {
 		ctx.fill()
 		ctx.closePath()
 
-		if (this.countdown !== null && this.countdown > 0) {
+		if (
+			this.countdown !== null &&
+			this.countdown > 0 &&
+			this.gameResult === null
+		) {
 			const x = width / 2
 			const y = height / 3
 			const fontSize = height * COUNTDOWN_FONT_SCALE
@@ -142,6 +160,22 @@ class Renderer {
 			ctx.strokeText(string, x, y)
 			ctx.restore()
 		}
+
+		if (this.gameResult !== null) {
+			ctx.fillStyle = OVERLAY_BACKGROUND
+			ctx.fillRect(0, 0, width, height)
+
+			const text = this.gameResult === 'win' ? 'VICTORY' : 'DEFEAT'
+			const color =
+				this.gameResult === 'win' ? OVERLAY_WIN_COLOR : OVERLAY_LOSE_COLOR
+			const fontSize = height * OVERLAY_FONT_SCALE
+
+			ctx.font = `bold ${fontSize}px ${OVERLAY_FONT}`
+			ctx.textAlign = 'center'
+			ctx.textBaseline = 'middle'
+			ctx.fillStyle = color
+			ctx.fillText(text, width / 2, height / 2)
+		}
 	}
 
 	clear(): void {
@@ -155,6 +189,7 @@ class Renderer {
 		this.canvas = null
 		this.ctx = null
 		this.countdown = null
+		this.gameResult = null
 	}
 }
 
