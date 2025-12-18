@@ -1,9 +1,7 @@
-import {
-	createInviteCode,
-	ITournamentMatchData
-} from '../../tournamentUsecases.js'
+import { createInviteCode } from '../../../utils/createCode.js'
 import { games, playerToGame } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
+import { ITournamentMatchData } from '../gameData.js'
 
 /*
  * Creates a new game and returns the game code.
