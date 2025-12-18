@@ -5,8 +5,7 @@ import { checkEnv, IGameEnv } from './env/verifyEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
-import { initializeTournamentId } from './usecases/tournamentUsecases.js'
-
+import { initializeTournamentId } from './usecases/managers/tournamentManager/createTournament.js'
 // Run migrations first, then initialize tournament ID
 runMigrations()
 initializeTournamentId()
