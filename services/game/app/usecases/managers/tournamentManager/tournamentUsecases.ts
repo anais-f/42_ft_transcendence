@@ -2,14 +2,11 @@ import { tournaments } from '../gameData.js'
 import { ITournamentMatchResult, ITournamentMatchData } from '../gameData.js'
 
 export function createTournamentMatchResult(
-	tournamentData: ITournamentMatchData | undefined,
+	tournamentData: ITournamentMatchData,
 	winnerId: number,
 	scoreP1: number,
 	scoreP2: number
-): ITournamentMatchResult | null {
-	if (!tournamentData) {
-		return null
-	}
+): ITournamentMatchResult {
 	return {
 		tournamentMatchData: tournamentData,
 		winnerId: winnerId,

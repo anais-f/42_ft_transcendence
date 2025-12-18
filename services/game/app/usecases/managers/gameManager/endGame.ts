@@ -34,14 +34,16 @@ export function endGame(code: string) {
 	gameData.p1.ws?.send(eogMessage)
 	gameData.p2.ws?.send(eogMessage)
 
-	// Store tournament data before cleanup
-	const tournamentData: ITournamentMatchResult | null =
+	let tournamentData = undefined
+	if (gameData.tournamentMatchData) {
+		tournamentData = 
 		createTournamentMatchResult(
 			gameData.tournamentMatchData,
 			score.p1 > score.p2 ? gameData.p1.id : gameData.p2.id,
 			score.p1,
 			score.p2
 		)
+	}
 
 	playerToGame.delete(gameData.p1.id)
 	playerToGame.delete(gameData.p2.id)
