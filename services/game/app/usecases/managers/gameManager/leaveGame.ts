@@ -2,11 +2,9 @@ import { GameState } from '@ft_transcendence/pong-shared'
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import {
-	onTournamentMatchEnd,
-	createTournamentMatchResult,
-	ITournamentMatchResult
-} from '../../tournamentUsecases.js'
+import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
+import { ITournamentMatchResult } from '../gameData.js'
+import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -64,9 +62,7 @@ function forfeit(gameData: GameData): ITournamentMatchResult | null {
 			gameData.p2.id,
 			scorePlayer1,
 			scorePlayer2,
-			gameData.tournamentMatchData?.tournamentId ?? -1,
-			gameData.tournamentMatchData?.round ?? -1,
-			gameData.tournamentMatchData?.matchNumber ?? -1
+			gameData.tournamentMatchData
 		)
 	} else {
 		// p2 left, p1 wins
@@ -81,9 +77,7 @@ function forfeit(gameData: GameData): ITournamentMatchResult | null {
 			gameData.p2.id,
 			scorePlayer1,
 			scorePlayer2,
-			gameData.tournamentMatchData?.tournamentId ?? -1,
-			gameData.tournamentMatchData?.round ?? -1,
-			gameData.tournamentMatchData?.matchNumber ?? -1
+			gameData.tournamentMatchData
 		)
 	}
 

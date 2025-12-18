@@ -1,11 +1,9 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import {
-	onTournamentMatchEnd,
-	createTournamentMatchResult,
-	ITournamentMatchResult
-} from '../../tournamentUsecases.js'
+import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
+import { ITournamentMatchResult } from '../gameData.js'
+import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -26,9 +24,7 @@ export function endGame(code: string) {
 		gameData.p2.id,
 		score.p1,
 		score.p2,
-		gameData.tournamentMatchData?.tournamentId ?? -1,
-		gameData.tournamentMatchData?.round ?? -1,
-		gameData.tournamentMatchData?.matchNumber ?? -1
+		gameData.tournamentMatchData
 	)
 
 	const p1Won = score.p1 > score.p2
