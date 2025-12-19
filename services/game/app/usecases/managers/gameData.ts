@@ -6,6 +6,19 @@ export type TPlayerSlot = 'p1' | 'p2'
 
 import WebSocket from 'ws'
 
+export interface ITournamentMatchData {
+	tournamentId: number
+	round: number
+	matchNumber: number
+}
+
+export interface ITournamentMatchResult {
+	tournamentMatchData: ITournamentMatchData
+	winnerId: number
+	scorePlayer1: number
+	scorePlayer2: number
+}
+
 export interface Iplayer {
 	id: number
 	ws: WebSocket | null
@@ -18,6 +31,7 @@ export interface GameData {
 	status: GameStatus
 	createdAt: number
 	timeoutId: ReturnType<typeof setTimeout> | null
+	tournamentMatchData?: ITournamentMatchData
 }
 
 // individial game

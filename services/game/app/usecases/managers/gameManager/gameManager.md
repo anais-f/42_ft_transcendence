@@ -113,7 +113,7 @@ Games can be created in two modes:
 
 ## Functions
 
-### `requestGame(pID, pID2?)`
+### `requestGame(pID, pID2?, tournamentMatchData?)`
 
 Creates a new game and returns the game code.
 
@@ -126,6 +126,7 @@ Creates a new game and returns the game code.
   - `p1: { id: pID, ws: null }`
   - `p2: { id: pID2, ws: null }`
   - Only these two players can connect
+  - Add `tournamentMatchData` for saving in DB and launch function onTournamentMatchEnd
 - Adds `pID` (and `pID2` if provided) to `playerToGame`
 - Sets `createdAt` to `Date.now()` on creation
 
