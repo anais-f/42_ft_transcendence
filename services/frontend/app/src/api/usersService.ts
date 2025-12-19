@@ -31,9 +31,9 @@ export async function fetchUserByUsername(
 			}
 		)
 
-		if (!response.ok) {
+		if (!response.ok)
 			return null
-		}
+
 		return (await response.json()) as IPublicProfileUser
 	} catch (error) {
 		console.error('Failed to fetch user:', error)
