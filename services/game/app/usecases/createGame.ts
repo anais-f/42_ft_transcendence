@@ -93,7 +93,8 @@ export function createDiamondMap(maxScore: number): IGameData {
 			[
 				{ seg: borderL, player: 1 },
 				{ seg: borderR, player: 2 }
-			]
+			],
+			maxScore
 		),
 		pad1: pad1,
 		pad2: pad2,
@@ -139,7 +140,8 @@ export function createGame(maxScore: number): IGameData {
 			[
 				{ seg: borderL, player: 1 },
 				{ seg: borderR, player: 2 }
-			]
+			],
+			maxScore
 		),
 		pad1: pad1,
 		pad2: pad2,

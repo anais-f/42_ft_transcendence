@@ -47,7 +47,8 @@ describe('game-engine', () => {
 			[
 				{ seg: segC, player: 1 },
 				{ seg: segD, player: 2 }
-			]
+			],
+			5
 		)
 	})
 

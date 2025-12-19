@@ -141,7 +141,7 @@ class Renderer {
 			this.gameResult === null
 		) {
 			const x = width / 2
-			const y = height / 3
+			const y = height / 2
 			const fontSize = height * COUNTDOWN_FONT_SCALE
 			const string = this.countdown.toString()
 
