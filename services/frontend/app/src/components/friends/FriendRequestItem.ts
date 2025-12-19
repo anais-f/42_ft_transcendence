@@ -25,8 +25,8 @@ export const FriendRequestItem = (props: FriendRequestItemProps): string => {
       <div class="flex gap-4 py-2 px-4">
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div id="username_and_buttons" class="flex-1">
-          <a data-action="navigate-profile" data-username="${username}" data-id="${id}">
-            <p class="font-medium">${username}</p>
+          <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
+            <p class="font-medium hover:font-bold">${username}</p>
           </a>
           <div id="request_buttons" class="flex gap-4">
             <button id="accept_friend_btn_${id}" type="button" class="friend_btn">Accept</button>

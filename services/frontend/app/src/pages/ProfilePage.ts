@@ -18,7 +18,6 @@ const statusColor =
 
 const isFriend = false
 
-
 export const ProfilePage = (): string => {
 	// Récupérer l'ID depuis l'URL
 	//   const urlParts = window.location.pathname.split('/')
@@ -110,79 +109,68 @@ export const ProfilePage = (): string => {
   `
 }
 
-
-
-
-
-
-
-
-
-
-
 const stats = {
-  games_played: 256,
-  wins: 198,
-  losses: 58,
-  winRate: 10
+	games_played: 256,
+	wins: 198,
+	losses: 58,
+	winRate: 10
 }
 
 const history = [
-  {
-    date: '2025-05-01',
-    player1: 'Mamth',
-    score1: 21,
-    score2: 15,
-    player2: 'Tiger',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-02',
-    player1: 'Mamjth',
-    score1: 18,
-    score2: 21,
-    player2: 'Eagutle',
-    result: 'Loss'
-  },
-  {
-    date: '2025-05-03',
-    player1: 'Math',
-    score1: 22,
-    score2: 20,
-    player2: 'Shark',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-04',
-    player1: 'Mammh',
-    score1: 19,
-    score2: 21,
-    player2: 'Lion',
-    result: 'Loss'
-  },
-  {
-    date: '2025-05-05',
-    player1: 'Mammoth',
-    score1: 23,
-    score2: 22,
-    player2: 'Wolf',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-03',
-    player1: 'Math',
-    score1: 22,
-    score2: 20,
-    player2: 'Shark',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-05',
-    player1: 'Mammoth',
-    score1: 3,
-    score2: 0,
-    player2: 'Wolf',
-    result: 'Win'
-  }
+	{
+		date: '2025-05-01',
+		player1: 'Mamth',
+		score1: 21,
+		score2: 15,
+		player2: 'Tiger',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-02',
+		player1: 'Mamjth',
+		score1: 18,
+		score2: 21,
+		player2: 'Eagutle',
+		result: 'Loss'
+	},
+	{
+		date: '2025-05-03',
+		player1: 'Math',
+		score1: 22,
+		score2: 20,
+		player2: 'Shark',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-04',
+		player1: 'Mammh',
+		score1: 19,
+		score2: 21,
+		player2: 'Lion',
+		result: 'Loss'
+	},
+	{
+		date: '2025-05-05',
+		player1: 'Mammoth',
+		score1: 23,
+		score2: 22,
+		player2: 'Wolf',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-03',
+		player1: 'Math',
+		score1: 22,
+		score2: 20,
+		player2: 'Shark',
+		result: 'Win'
+	},
+	{
+		date: '2025-05-05',
+		player1: 'Mammoth',
+		score1: 3,
+		score2: 0,
+		player2: 'Wolf',
+		result: 'Win'
+	}
 ]
-

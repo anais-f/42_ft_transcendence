@@ -4,9 +4,10 @@ import { LoremSection } from '../components/LoremIpsum.js'
 import { FriendListItem } from '../components/friends/FriendListItem.js'
 import { FriendRequestItem } from '../components/friends/FriendRequestItem.js'
 import { currentUser } from '../usecases/userStore.js'
-import {logout} from "../usecases/userSession.js";
-import {handleCreateGame} from "../events/home/createGameHandler.js";
-import {handleJoinLobby} from "../events/home/joinLobbyHandler.js";
+import { logout } from '../usecases/userSession.js'
+import { handleCreateGame } from '../events/home/createGameHandler.js'
+import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
+import { handleSearchUser } from '../events/home/searchUserHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -95,16 +96,16 @@ export const HomePage = (): string => {
 
     <div class="col-4-span-flex">
         <h1 class="title_bloc">WANTED</h1>
-        <form id="search_usr_form" class="form_style" action="">
+        <form id="search_user_form" data-form="search-user-form" class="form_style">
             ${Input({
-							id: 'search_usr',
-							name: 'search_usr',
+							id: 'search-user',
+							name: 'search-user',
 							placeholder: 'Enter a username to search here',
 							type: 'text',
 							required: true
 						})}
             ${Button({
-							id: 'search_btn',
+							id: 'search-btn',
 							text: 'Search',
 							type: 'submit'
 						})}
@@ -155,47 +156,47 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
  * @returns {void}
  */
 export function attachHomeEvents() {
-  const content = document.getElementById('content')
-  if (!content) {
-    return
-  }
+	const content = document.getElementById('content')
+	if (!content) {
+		return
+	}
 
-  // Create and store the click handler
-  clickHandler = async (e: Event) => {
-    const target = e.target as HTMLElement
-    const actionButton = target.closest('[data-action]')
+	// Create and store the click handler
+	clickHandler = async (e: Event) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
 
-    if (actionButton) {
-      const action = actionButton.getAttribute('data-action')
+		if (actionButton) {
+			e.preventDefault()
+			const action = actionButton.getAttribute('data-action')
 
-      if (action === 'logout')
-        await logout()
-      if (action === 'navigate-settings')
-        window.navigate('/settings')
-      if (action === 'create-game')
-        await handleCreateGame()
-      if (action === 'navigate-profile') {
-        const id = actionButton.getAttribute('data-id')
-        if (id) {
-          window.navigate(`/profile/${id}`)
-        }
-      }
-    }
-  }
+			if (action === 'logout') await logout()
+			if (action === 'navigate-settings') window.navigate('/settings')
+			if (action === 'create-game') await handleCreateGame()
+			if (action === 'navigate-profile') {
+				const id = actionButton.getAttribute('data-id')
+				if (id) {
+					window.navigate(`/profile/${id}`)
+				}
+			}
+		}
+	}
 
-  submitHandler = async (e: Event) => {
-    const form = e.target as HTMLElement
-    e.preventDefault()
-    const formName = form.getAttribute('data-form')
+	submitHandler = async (e: Event) => {
+		const form = e.target as HTMLElement
+		e.preventDefault()
+		const formName = form.getAttribute('data-form')
+		console.log('e submitted form:', form)
 
-    if (formName === 'join-lobby') await handleJoinLobby(e)
-  }
+		if (formName === 'join-lobby') await handleJoinLobby(e)
+		if (formName === 'search-user-form') await handleSearchUser(e)
+	}
 
-  // Attach the handler
-  content.addEventListener('click', clickHandler)
-  content.addEventListener('submit', submitHandler)
+	// Attach the handler
+	content.addEventListener('click', clickHandler)
+	content.addEventListener('submit', submitHandler)
 
-  console.log('Home page events attached')
+	console.log('Home page events attached')
 }
 
 /**
@@ -205,30 +206,21 @@ export function attachHomeEvents() {
  * @returns {void}
  */
 export function detachHomeEvents() {
-  const content = document.getElementById('content')
-  if (!content) return
+	const content = document.getElementById('content')
+	if (!content) return
 
-  if (submitHandler) {
-    content.removeEventListener('submit', submitHandler)
-    submitHandler = null
-  }
+	if (submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
 
-  if (clickHandler) {
-    content.removeEventListener('click', clickHandler)
-    clickHandler = null
-  }
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
 
-  console.log('Home page events detached')
+	console.log('Home page events detached')
 }
-
-
-
-
-
-
-
-
-
 
 const fr1 = {
 	id: '5',
