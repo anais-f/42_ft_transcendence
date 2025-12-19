@@ -2,7 +2,7 @@ import {
 	attachGameEvents,
 	detachGameEvents,
 	GamePage
-} from '../pages/oldgame.js'
+} from '../pages/GamePage.js'
 import {
 	HomePage,
 	attachHomeEvents,
@@ -21,7 +21,11 @@ import {
 } from '../pages/SettingsPage.js'
 import { HomeBisPage } from '../pages/HomePage.js'
 import { ProfilePage } from '../pages/ProfilePage.js'
-import { LobbyPage, attachLobbyEvents, detachLobbyEvents } from '../pages/LobbyPage.js'
+import {
+	LobbyPage,
+	attachLobbyEvents,
+	detachLobbyEvents
+} from '../pages/LobbyPage.js'
 
 export type Pages =
 	| 'home'

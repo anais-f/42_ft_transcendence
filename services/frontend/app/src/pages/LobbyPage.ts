@@ -47,7 +47,7 @@ export const LobbyPage = (): string => {
 				variant: 'medium'
 			})}
       <div class="flex flex-col justify-between w-full mb-4">
-        <h1 class="lobby_font">YOU - ${player?.username ?? ''}</h1>
+        <h1 class="lobby_font">YOU - <span>${player?.username ?? ''}</span></h1>
         <img id="you_avatar" src="${player?.avatar ?? ''}" alt="You" class="avatar_style">
       </div>
       ${LoremSection({
@@ -80,8 +80,8 @@ export const LobbyPage = (): string => {
 				variant: 'medium'
 			})}
       <div class="flex flex-col justify-between w-full mb-4">
-        <h1 id="opponent-username" class="lobby_font">OPPONENT - Waiting...</h1>
-        <img id="opponent_avatar" src="" alt="Opponent" class="avatar_style">
+        <h1 class="lobby_font">OPPONENT - <span id="opponent-username">Waiting...</span></h1>
+        <img id="opponent-avatar" src="" alt="Opponent" class="avatar_style">
       </div>
       ${LoremSection({
 				title: 'Get ready to play !',
@@ -96,75 +96,75 @@ export const LobbyPage = (): string => {
 let clickHandler: ((e: Event) => void) | null = null
 
 export function attachLobbyEvents() {
-  const content = document.getElementById('content')
-  if (!content) return
+	const content = document.getElementById('content')
+	if (!content) return
 
-  clickHandler = async (e: Event) => {
-    const target = e.target as HTMLElement
-    const actionButton = target.closest('[data-action]')
+	clickHandler = async (e: Event) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
 
-    if (actionButton) {
-      const action = actionButton.getAttribute('data-action')
+		if (actionButton) {
+			const action = actionButton.getAttribute('data-action')
 
-      if (action === 'copy-code') {
-        handleCopyCode(actionButton as HTMLElement)
-      }
-    }
-  }
+			if (action === 'copy-code') {
+				handleCopyCode(actionButton as HTMLElement)
+			}
+		}
+	}
 
-  content.addEventListener('click', clickHandler)
+	content.addEventListener('click', clickHandler)
 
-  gameStore.setOnOpponentJoin(oppenentJoinHandler)
+	gameStore.setOnOpponentJoin(oppenentJoinHandler)
 
-  // TODO: move this
-  const token = gameStore.sessionToken
-  if (token) {
-    const ws = createGameWebSocket(token)
-    ws.binaryType = 'arraybuffer'
-    gameStore.gameSocket = ws
+	// TODO: move this
+	const token = gameStore.sessionToken
+	if (token) {
+		const ws = createGameWebSocket(token)
+		ws.binaryType = 'arraybuffer'
+		gameStore.gameSocket = ws
 
-    ws.onopen = () => {
-      console.log('WS connected')
-    }
+		ws.onopen = () => {
+			console.log('WS connected')
+		}
 
-    ws.onmessage = dispatcher
+		ws.onmessage = dispatcher
 
-    ws.onerror = (error) => {
-      console.error('WS error:', error)
-    }
+		ws.onerror = (error) => {
+			console.error('WS error:', error)
+		}
 
-    ws.onclose = () => {
-      window.navigate('/home')
-      console.log('WS closed')
-    }
-  } else {
-    window.navigate('/home')
-  }
+		ws.onclose = () => {
+			window.navigate('/home')
+			console.log('WS closed')
+		}
+	} else {
+		window.navigate('/home')
+	}
 
-  console.log('Lobby page events attached')
+	console.log('Lobby page events attached')
 }
 
 export function detachLobbyEvents() {
-  const content = document.getElementById('content')
-  if (!content) {
-    return
-  }
+	const content = document.getElementById('content')
+	if (!content) {
+		return
+	}
 
-  gameStore.setOnOpponentJoin(null)
+	gameStore.setOnOpponentJoin(null)
 
-  if (clickHandler) {
-    content.removeEventListener('click', clickHandler)
-    clickHandler = null
-  }
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
 
-  // close WS only if not navigating to /game
-  if (!gameStore.navigatingToGame) {
-    const ws = gameStore.gameSocket
-    if (ws) {
-      ws.close()
-      gameStore.gameSocket = null
-    }
-  }
+	// close WS only if not navigating to /game
+	if (!gameStore.navigatingToGame) {
+		const ws = gameStore.gameSocket
+		if (ws) {
+			ws.close()
+			gameStore.gameSocket = null
+		}
+	}
 
-  console.log('Lobby page events cleaned up')
+	console.log('Lobby page events cleaned up')
 }
