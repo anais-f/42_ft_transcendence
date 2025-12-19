@@ -4,8 +4,11 @@ import { LoremSection } from '../components/LoremIpsum.js'
 import { FriendListItem } from '../components/friends/FriendListItem.js'
 import { FriendRequestItem } from '../components/friends/FriendRequestItem.js'
 import { currentUser } from '../usecases/userStore.js'
+import {logout} from "../usecases/userSession.js";
+import {handleCreateGame} from "../events/home/createGameHandler.js";
+import {handleJoinLobby} from "../events/home/joinLobbyHandler.js";
 
-export const HomeBisPage = (): string => {
+export const HomePage = (): string => {
 	const user = currentUser || {
 		username: 'Guest',
 		avatar: '/avatars/img_default.png'
@@ -115,19 +118,6 @@ export const HomeBisPage = (): string => {
                 <div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="friend_list" class="h-full">  
                         <!-- FRIEND ITEMS POPULATED HERE -->
-                        <li class="flex flex-row border-b border-black">
-                            <a href="/profile/${fr1.username}" data-action="navigate-profile" data-username="${fr1.username}" class="flex items-center gap-4 py-2 px-4">
-                                <img src="${fr1.avatar}" alt="${fr1.username}'s avatar" class="w-12 h-12 object-cover border-black">
-                                <div>
-                                    <p class="font-medium">${fr1.username}</p>
-                                    <p class="text-gray-500">${fr1.status}</p>
-                                </div>
-                            </a>
-                        </li>
-                        ${FriendListItem(fr1)}
-                        ${FriendListItem(fr2)}
-                        ${FriendListItem(fr3)}
-                        ${FriendListItem(fr4)}
                         ${FriendListItem(fr1)}
                         ${FriendListItem(fr2)}
                         ${FriendListItem(fr3)}
@@ -143,8 +133,6 @@ export const HomeBisPage = (): string => {
                     <ul id="request_list" class="h-full">  
                         ${FriendRequestItem(fr1)}
                         ${FriendRequestItem(fr2)}
-                        ${FriendRequestItem(fr3)}
-                        ${FriendRequestItem(fr4)}
                     </ul>
                 </div>
             </div>
@@ -157,8 +145,93 @@ export const HomeBisPage = (): string => {
 `
 }
 
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+
+/**
+ * Attach event listeners for the home page.
+ * Sets up handlers for button clicks such as logout and navigation to settings.
+ * Logs attachment status to the console.
+ * @returns {void}
+ */
+export function attachHomeEvents() {
+  const content = document.getElementById('content')
+  if (!content) {
+    return
+  }
+
+  // Create and store the click handler
+  clickHandler = async (e: Event) => {
+    const target = e.target as HTMLElement
+    const actionButton = target.closest('[data-action]')
+
+    if (actionButton) {
+      const action = actionButton.getAttribute('data-action')
+
+      if (action === 'logout')
+        await logout()
+      if (action === 'navigate-settings')
+        window.navigate('/settings')
+      if (action === 'create-game')
+        await handleCreateGame()
+      if (action === 'navigate-profile') {
+        const id = actionButton.getAttribute('data-id')
+        if (id) {
+          window.navigate(`/profile/${id}`)
+        }
+      }
+    }
+  }
+
+  submitHandler = async (e: Event) => {
+    const form = e.target as HTMLElement
+    e.preventDefault()
+    const formName = form.getAttribute('data-form')
+
+    if (formName === 'join-lobby') await handleJoinLobby(e)
+  }
+
+  // Attach the handler
+  content.addEventListener('click', clickHandler)
+  content.addEventListener('submit', submitHandler)
+
+  console.log('Home page events attached')
+}
+
+/**
+ * Detach event listeners for the home page.
+ * Removes handlers for button clicks to prevent memory leaks.
+ * Logs detachment status to the console.
+ * @returns {void}
+ */
+export function detachHomeEvents() {
+  const content = document.getElementById('content')
+  if (!content) return
+
+  if (submitHandler) {
+    content.removeEventListener('submit', submitHandler)
+    submitHandler = null
+  }
+
+  if (clickHandler) {
+    content.removeEventListener('click', clickHandler)
+    clickHandler = null
+  }
+
+  console.log('Home page events detached')
+}
+
+
+
+
+
+
+
+
+
+
 const fr1 = {
-	id: '1',
+	id: '5',
 	username: 'Anfichet',
 	avatar: '/assets/images/bear.png',
 	status: 'Online'

@@ -5,7 +5,7 @@ import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { logout } from '../usecases/userSession.js'
 import { currentUser } from '../usecases/userStore.js'
 
-export const HomePage = (): string => {
+export const OldHomePage = (): string => {
 	const user = currentUser || {
 		username: 'Guest',
 		avatar: '/avatars/img_default.png'
@@ -25,8 +25,8 @@ export const HomePage = (): string => {
 		<button id="settings_btn" data-action="navigate-settings" type="button" class="generic_btn my-2">Settings</button>
 		<button id="logout_btn" data-action="logout" type="button" class="generic_btn">Logout</button>
 	</div>
-	
-	
+
+
 	<div class="col-span-1">
 		<div class="news_paragraph pt-4">
 			<h1 class="text-lg py-2">Title</h1>
@@ -45,8 +45,8 @@ export const HomePage = (): string => {
 			<p class="text-sm pb-2">Ipeat. Ipsum dolore vericorrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt.</p>
 		</div>
 	</div>
-	
-	
+
+
 	<div class="col-span-1">
 		 <div class="news_paragraph pt-8">
 			<p class="text-sm pb-2">Assumenda repreemque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui.</p>
@@ -69,8 +69,8 @@ export const HomePage = (): string => {
 		</div>
 		<img src="/assets/images/screamer_boy.png" alt="screamer boy" class="w-full object-cover opacity-50 select-none">
 	</div>
-	
-	
+
+
 	<div class="col-span-1">
 		 <h1 class="text-2xl pt-4 pb-1">WANTED</h1>
 		 <form id="search_usr_form" class="flex flex-col gap-2" action="">
@@ -139,7 +139,7 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
  * Logs attachment status to the console.
  * @returns {void}
  */
-export function attachHomeEvents() {
+export function attachOldHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) {
 		return
@@ -187,7 +187,7 @@ export function attachHomeEvents() {
  * Logs detachment status to the console.
  * @returns {void}
  */
-export function detachHomeEvents() {
+export function detachOldHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 

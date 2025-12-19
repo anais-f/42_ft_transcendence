@@ -29,7 +29,7 @@ export const FriendListItem = (props: FriendListItemProps): string => {
       <div class="flex gap-4 py-2 px-4">
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div>
-          <a data-action="navigate-profile" data-username="${username}" data-id="${id}">
+          <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
             <p class="font-medium">${username}</p>
           </a>  
           <p class="text-gray-500 flex items-center gap-2">
