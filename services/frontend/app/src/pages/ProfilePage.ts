@@ -84,7 +84,7 @@ const history = [
 	}
 ]
 
-export const TestPage = (): string => {
+export const TestProfilePage = (): string => {
 	// Récupérer l'ID depuis l'URL
 	//   const urlParts = window.location.pathname.split('/')
 	//   const userId = urlParts[2]  // /profile/:id → index 2

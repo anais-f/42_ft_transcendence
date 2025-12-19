@@ -30,6 +30,8 @@ export const LobbyPage = (): string => {
 		</div>
 	</div>
 
+
+
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph">
 			<p class="text-sm pt-6 pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. Quidem qui autem assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat.</p>
@@ -42,6 +44,8 @@ export const LobbyPage = (): string => {
 			<p class="text-sm py-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Voluptates dolores doloremque. Beatae qui et placeat. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. </p>
 		</div>
 	</div>
+
+
 
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph">
@@ -56,6 +60,8 @@ export const LobbyPage = (): string => {
 			<p class="text-sm py-2">Eos debitis officia assumenda reprehenderit nesciunt. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia assumenda reprehenderit nesciunt. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem.</p>
 		</div>
 	</div>
+
+
 
 	</div>
 		<div class="col-span-1 flex flex-col items-start">

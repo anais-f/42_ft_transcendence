@@ -65,6 +65,9 @@
 	.username_style {
 		@apply text-2xl font-medium py-4;
 	}
+	.lobby_font {
+		@apply text-2xl font-special mt-4 mx-auto mb-4 truncate;
+	}
 
 	/* Line clamp utilities */
 	.line-clamp-2,
