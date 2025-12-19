@@ -50,54 +50,54 @@ const history = [
     player2: 'Shark',
     result: 'Win'
   },
-  {
-    date: '2025-05-04',
-    player1: 'Mammh',
-    score1: 19,
-    score2: 21,
-    player2: 'Lion',
-    result: 'Loss'
-  },
-  {
-    date: '2025-05-05',
-    player1: 'Mammoth',
-    score1: 23,
-    score2: 22,
-    player2: 'Wolf',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-01',
-    player1: 'Mamth',
-    score1: 21,
-    score2: 15,
-    player2: 'Tiger',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-02',
-    player1: 'Mammhjgjth',
-    score1: 18,
-    score2: 21,
-    player2: 'Eagjgtutle',
-    result: 'Loss'
-  },
-  {
-    date: '2025-05-03',
-    player1: 'Math',
-    score1: 22,
-    score2: 20,
-    player2: 'Shark',
-    result: 'Win'
-  },
-  {
-    date: '2025-05-04',
-    player1: 'Mammh',
-    score1: 19,
-    score2: 21,
-    player2: 'Lion',
-    result: 'Loss'
-  },
+  // {
+  //   date: '2025-05-04',
+  //   player1: 'Mammh',
+  //   score1: 19,
+  //   score2: 21,
+  //   player2: 'Lion',
+  //   result: 'Loss'
+  // },
+  // {
+  //   date: '2025-05-05',
+  //   player1: 'Mammoth',
+  //   score1: 23,
+  //   score2: 22,
+  //   player2: 'Wolf',
+  //   result: 'Win'
+  // },
+  // {
+  //   date: '2025-05-01',
+  //   player1: 'Mamth',
+  //   score1: 21,
+  //   score2: 15,
+  //   player2: 'Tiger',
+  //   result: 'Win'
+  // },
+  // {
+  //   date: '2025-05-02',
+  //   player1: 'Mammhjgjth',
+  //   score1: 18,
+  //   score2: 21,
+  //   player2: 'Eagjgtutle',
+  //   result: 'Loss'
+  // },
+  // {
+  //   date: '2025-05-03',
+  //   player1: 'Math',
+  //   score1: 22,
+  //   score2: 20,
+  //   player2: 'Shark',
+  //   result: 'Win'
+  // },
+  // {
+  //   date: '2025-05-04',
+  //   player1: 'Mammh',
+  //   score1: 19,
+  //   score2: 21,
+  //   player2: 'Lion',
+  //   result: 'Loss'
+  // },
   {
     date: '2025-05-05',
     player1: 'Mammoth',
@@ -175,8 +175,8 @@ export const TestPage = (): string => {
 
     <div class="col-span-2 flex flex-col items-start min-h-0">
       <h1 class="title_bloc w-full text-center">GAME HISTORY</h1>
-      <div id="div_history_table" class="w-full overflow-y-auto">
-        <table id="history_table" class="w-full table-fixed border-collapse border border-black">
+      <div id="div_history_table" class="w-[85%] mx-auto overflow-y-auto border-2 border-black rounded-md flex-1">
+        <table id="history_table" class="w-full table-fixed border-collapse">
             <thead>
                 <tr>
                     <th class="table_header w-32">Date</th>
@@ -190,10 +190,7 @@ export const TestPage = (): string => {
             </tbody>
         </table>
       </div>    
-      
-      ${LoremSection({
-        variant: 'fill'
-      })}
+     
 
     </div>
 

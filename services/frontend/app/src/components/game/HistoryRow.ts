@@ -1,3 +1,5 @@
+import {LivesComp} from "./Lives.js";
+
 /**
  * Renders a single line in the game history table.
  * @param props - The properties for the game history line.
@@ -27,7 +29,7 @@ export const GameHistoryRow = (props: GameHistoryProps): string => {
   const {date, player1, score1, score2, player2, result} = props;
   const resultColor = result === 'Win' ? 'text-emerald-900' : 'text-rose-900';
 
-  const baseClass = 'border-y border-black px-2 text-center';
+  const baseClass = 'border-y border-black py-2 text-center';
 
   return /*html*/ `
     <tr>
@@ -35,11 +37,11 @@ export const GameHistoryRow = (props: GameHistoryProps): string => {
       <td class="${baseClass} ${resultColor} font-bold text-lg">${result}</td>
       <td class="${baseClass}">
         <p class="truncate min-w-0">${player1}</p>
-        <p>${</p>
+        <p>${LivesComp({max: 5, current: score1, livesID: "", additionalClasses: "mx-auto"})}</p>
       </td>
       <td class="${baseClass}">
         <p class="truncate min-w-0">${player2}</p>
-        <p>${score2}</p>
+        <p>${LivesComp({max: 5, current: score2, livesID: "", additionalClasses: "mx-auto"})}</p>
       </td>
     </tr>
   `

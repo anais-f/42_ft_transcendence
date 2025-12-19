@@ -41,7 +41,7 @@
 		@apply border border-black hover:bg-black hover:text-white w-full py-1 transition-colors text-xs w-20;
 	}
     .table_header {
-        @apply border-y border-black py-2 font-semibold text-lg font-rye;
+        @apply border-b border-black py-2 font-semibold text-lg font-rye;
     }
 
 	.generic_btn {
