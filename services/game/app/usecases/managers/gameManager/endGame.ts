@@ -1,6 +1,9 @@
 import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
+import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
+import { ITournamentMatchResult } from '../gameData.js'
+import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -16,7 +19,13 @@ export function endGame(code: string) {
 		return
 	}
 
-	saveMatchToHistory(gameData.p1.id, gameData.p2.id, score.p1, score.p2)
+	saveMatchToHistory(
+		gameData.p1.id,
+		gameData.p2.id,
+		score.p1,
+		score.p2,
+		gameData.tournamentMatchData
+	)
 
 	const p1Won = score.p1 > score.p2
 	const reason = p1Won ? 'p1 won' : 'p2 won'
@@ -25,9 +34,24 @@ export function endGame(code: string) {
 	gameData.p1.ws?.send(eogMessage)
 	gameData.p2.ws?.send(eogMessage)
 
+	let tournamentData = undefined
+	if (gameData.tournamentMatchData) {
+		tournamentData = createTournamentMatchResult(
+			gameData.tournamentMatchData,
+			score.p1 > score.p2 ? gameData.p1.id : gameData.p2.id,
+			score.p1,
+			score.p2
+		)
+	}
+
 	playerToGame.delete(gameData.p1.id)
 	playerToGame.delete(gameData.p2.id)
 	busyPlayers.delete(gameData.p1.id)
 	busyPlayers.delete(gameData.p2.id)
 	games.delete(code)
+
+	// Call tournament callback after cleanup
+	if (tournamentData) {
+		onTournamentMatchEnd(tournamentData)
+	}
 }
