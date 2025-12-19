@@ -1,13 +1,13 @@
 import { gameStore } from '../../usecases/gameStore.js'
-import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { createGameApi } from '../../api/game/createGame.js'
 import { joinGameApi } from '../../api/game/joinGame.js'
+import { sendGameError } from './errorMapUtils.js'
 
 export async function handleCreateGame() {
 	const { data, error, status } = await createGameApi()
 
 	if (error) {
-		notyf.error(error)
+		sendGameError(error, status)
 		return
 	}
 
@@ -17,12 +17,7 @@ export async function handleCreateGame() {
 	gameStore.gameCode = code
 	if (joinPayload.error) {
 		gameStore.clear()
-
-		if (status === 400) {
-			notyf.error('Invalid game code!')
-		} else {
-			notyf.error(joinPayload.error)
-		}
+		sendGameError(joinPayload.error, status)
 		return
 	}
 
