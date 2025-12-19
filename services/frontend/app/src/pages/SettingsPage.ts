@@ -117,7 +117,8 @@ export const SettingsPage = (): string => {
 					placeholder: 'Avatar',
 					type: 'file',
 					required: true,
-					additionalClasses: 'p-12 border-2 border-dashed text-center file:hidden'
+					additionalClasses:
+						'p-12 border-2 border-dashed text-center file:hidden'
 				})}
 				${Button({
 					text: 'Save it',
