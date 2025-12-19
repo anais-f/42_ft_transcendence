@@ -15,9 +15,9 @@ import {
 	detachSettingsEvents
 } from '../pages/SettingsPage.js'
 import {
-  HomePage,
-  attachHomeEvents,
-  detachHomeEvents
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
 } from '../pages/HomePage.js'
 import { ProfilePage } from '../pages/ProfilePage.js'
 import {
@@ -82,8 +82,8 @@ export const routerMap: Record<Pages, Route> = {
 		id: 'profile',
 		url: '/profile/:id',
 		page: ProfilePage,
-    binds: [],
-    unbinds: []
+		binds: [],
+		unbinds: []
 	},
 
 	settings: {

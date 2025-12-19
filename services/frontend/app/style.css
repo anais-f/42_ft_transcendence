@@ -43,9 +43,9 @@
 	.table_header {
 		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;
 	}
-    .cursor_pointer {
-        @apply cursor-pointer inline-block px-2 py-1 rounded hover:scale-105 hover:shadow-lg transition transform;
-    }
+	.cursor_pointer {
+		@apply cursor-pointer;
+	}
 }
 
 @layer utilities {

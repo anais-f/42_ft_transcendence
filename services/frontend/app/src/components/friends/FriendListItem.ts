@@ -30,8 +30,8 @@ export const FriendListItem = (props: FriendListItemProps): string => {
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div>
           <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
-            <p class="font-medium">${username}</p>
-          </a>  
+            <p class="font-medium hover:font-bold">${username}</p>
+          </a>
           <p class="text-gray-500 flex items-center gap-2">
             <span class="w-3 h-3 rounded-full ${statusColor}"></span>
             ${status}
