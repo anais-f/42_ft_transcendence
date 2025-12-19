@@ -1,10 +1,14 @@
 import { Button } from '../components/Button.js'
 import { LoremSection } from '../components/LoremIpsum.js'
-import { currentUser } from '../usecases/userStore.js'
+import { createGameWebSocket } from '../api/game/createGame.js'
 import { routeParams } from '../router/Router.js'
 import { gameStore } from '../usecases/gameStore.js'
+import { dispatcher } from '../game/network/dispatcher.js'
+import { currentUser } from '../usecases/userStore.js'
+import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
+import { oppenentJoinHandler } from '../events/lobby/opponentJoinHandler.js'
 
-export const TestPage = (): string => {
+export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
 	const player = currentUser
 
@@ -87,4 +91,80 @@ export const TestPage = (): string => {
 
   </section>
 `
+}
+
+let clickHandler: ((e: Event) => void) | null = null
+
+export function attachLobbyEvents() {
+  const content = document.getElementById('content')
+  if (!content) return
+
+  clickHandler = async (e: Event) => {
+    const target = e.target as HTMLElement
+    const actionButton = target.closest('[data-action]')
+
+    if (actionButton) {
+      const action = actionButton.getAttribute('data-action')
+
+      if (action === 'copy-code') {
+        handleCopyCode(actionButton as HTMLElement)
+      }
+    }
+  }
+
+  content.addEventListener('click', clickHandler)
+
+  gameStore.setOnOpponentJoin(oppenentJoinHandler)
+
+  // TODO: move this
+  const token = gameStore.sessionToken
+  if (token) {
+    const ws = createGameWebSocket(token)
+    ws.binaryType = 'arraybuffer'
+    gameStore.gameSocket = ws
+
+    ws.onopen = () => {
+      console.log('WS connected')
+    }
+
+    ws.onmessage = dispatcher
+
+    ws.onerror = (error) => {
+      console.error('WS error:', error)
+    }
+
+    ws.onclose = () => {
+      window.navigate('/home')
+      console.log('WS closed')
+    }
+  } else {
+    window.navigate('/home')
+  }
+
+  console.log('Lobby page events attached')
+}
+
+export function detachLobbyEvents() {
+  const content = document.getElementById('content')
+  if (!content) {
+    return
+  }
+
+  gameStore.setOnOpponentJoin(null)
+
+  if (clickHandler) {
+    content.removeEventListener('click', clickHandler)
+    clickHandler = null
+  }
+
+  // close WS only if not navigating to /game
+  if (!gameStore.navigatingToGame) {
+    const ws = gameStore.gameSocket
+    if (ws) {
+      ws.close()
+      gameStore.gameSocket = null
+    }
+  }
+
+  console.log('Lobby page events cleaned up')
 }

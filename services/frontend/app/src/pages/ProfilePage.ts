@@ -84,7 +84,7 @@ const history = [
 	}
 ]
 
-export const TestProfilePage = (): string => {
+export const ProfilePage = (): string => {
 	// Récupérer l'ID depuis l'URL
 	//   const urlParts = window.location.pathname.split('/')
 	//   const userId = urlParts[2]  // /profile/:id → index 2
@@ -151,7 +151,7 @@ export const TestProfilePage = (): string => {
 
     <div class="col-span-2 flex flex-col items-start min-h-0">
       <h1 class="title_bloc w-full text-center">GAME HISTORY</h1>
-      <div id="div_history_table" class="w-[85%] mx-auto border-2 border-black flex-1 overflow-hidden flex flex-col rounded-lg">
+      <div id="div_history_table" class="w-[90%] mx-auto border-2 border-black flex-1 overflow-hidden flex flex-col">
         <table id="history_table" class="w-full table-fixed border-collapse flex flex-col h-full">
             <thead class="flex w-full">
                 <tr class="flex w-full">

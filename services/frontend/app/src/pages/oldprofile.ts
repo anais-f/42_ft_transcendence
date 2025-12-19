@@ -1,4 +1,4 @@
-export const ProfilePage = (): string => /*html*/ `
+export const OldProfilePage = (): string => /*html*/ `
 <div class="grid grid-cols-[0.6fr_0.6fr_1fr] gap-16 p-8">
 	
 	<div class="col-span-1 flex flex-col items-start">
