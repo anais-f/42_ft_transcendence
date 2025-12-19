@@ -30,7 +30,7 @@ export class GameEngine {
 	private _deadTick = false
 	private _currentState: GameState = GameState.Paused
 	private _TPS_DATA: TPS_MANAGER
-	private _tickTimer: ReturnType<typeof setInterval> | null = null
+	private _dynamicBorderVelocities: Map<Segment, Vector2> = new Map()
 	private _ball: IBall = {
 		shape: new Circle(new Vector2(), 0.8),
 		velo: this.getRandomVelo()
@@ -71,15 +71,10 @@ export class GameEngine {
 	private _startGame(): void {
 		if (this._currentState === GameState.Started) return
 		this._currentState = GameState.Started
-		this.startTickLoop()
 	}
 
 	private _pauseGame(): void {
 		this._currentState = GameState.Paused
-		if (this._tickTimer !== null) {
-			clearInterval(this?._tickTimer)
-			this._tickTimer = null
-		}
 	}
 
 	public setState(gameState: GameState): void {
@@ -105,17 +100,20 @@ export class GameEngine {
 
 	private getCollisionNormal(
 		border: Segment,
-		hitPoints: Vector2[]
+		hitPoints: Vector2[],
+		borderVelocity: Vector2 = new Vector2(0, 0)
 	): Vector2 | null {
 		const ballCenter = this._ball.shape.pos
+
+		const relativeVelo = Vector2.subtract(this._ball.velo, borderVelocity)
 
 		const closestHit = border.closestPointToPoint(ballCenter)
 		const segNormal = border.getNormal()
 
-		const dotVeloNormal = Vector2.dot(this._ball.velo, segNormal)
+		const dotVeloNormal = Vector2.dot(relativeVelo, segNormal)
 		if (Math.abs(dotVeloNormal) < EPSILON) {
 			const altNormal = Vector2.subtract(ballCenter, closestHit).normalize()
-			if (Vector2.dot(this._ball.velo, altNormal) >= 0) {
+			if (Vector2.dot(relativeVelo, altNormal) >= 0) {
 				return null
 			}
 			return altNormal
@@ -125,13 +123,13 @@ export class GameEngine {
 		const orientedNormal =
 			Vector2.dot(toBall, segNormal) >= 0 ? segNormal : segNormal.negate()
 
-		if (Vector2.dot(this._ball.velo, orientedNormal) >= 0) {
+		if (Vector2.dot(relativeVelo, orientedNormal) >= 0) {
 			return null
 		}
 
 		if (hitPoints.length === 1) {
 			const pointNormal = Vector2.subtract(ballCenter, hitPoints[0]).normalize()
-			if (Vector2.dot(this._ball.velo, pointNormal) >= 0) {
+			if (Vector2.dot(relativeVelo, pointNormal) >= 0) {
 				return null
 			}
 			return pointNormal
@@ -152,7 +150,8 @@ export class GameEngine {
 		for (const border of allBorders) {
 			const hitData = border.intersect(this._ball.shape)
 			if (Array.isArray(hitData) && hitData.length > 0) {
-				const normal = this.getCollisionNormal(border, hitData)
+				const borderVelocity = this.getDynamicBorderVelocity(border)
+				const normal = this.getCollisionNormal(border, hitData, borderVelocity)
 				if (normal) {
 					collisions.push({ border, normal })
 				}
@@ -179,7 +178,7 @@ export class GameEngine {
 		return false
 	}
 
-	private playTick(): void {
+	public playTick(): void {
 		if (this._currentState != GameState.Started) {
 			return
 		}
@@ -217,16 +216,16 @@ export class GameEngine {
 		}
 	}
 
-	private async startTickLoop(): Promise<void> {
-		while (this._currentState === GameState.Started) {
-			try {
-				await this._TPS_DATA.tickLimiter.schedule(async () => {
-					this.playTick()
-				})
-			} catch (err) {
-				console.error('Error during tick execution:', err)
-			}
-		}
+	public setDynamicBorderVelocity(seg: Segment, velocity: Vector2): void {
+		this._dynamicBorderVelocities.set(seg, velocity)
+	}
+
+	public clearDynamicBorderVelocities(): void {
+		this._dynamicBorderVelocities.clear()
+	}
+
+	private getDynamicBorderVelocity(seg: Segment): Vector2 {
+		return this._dynamicBorderVelocities.get(seg) ?? new Vector2(0, 0)
 	}
 
 	get syncedTimeMs(): number {

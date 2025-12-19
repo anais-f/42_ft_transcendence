@@ -44,13 +44,26 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	startGameLoop(gameData, gameCode, packetSender)
 }
 
-// TODO: move this somewhere else
 function updatePadMovements(gameInstance: IGameData): void {
+	gameInstance.GE.clearDynamicBorderVelocities()
+
 	if (gameInstance.p1Movement.isMoving) {
 		gameInstance.pad1.move(gameInstance.p1Movement.direction, PAD_SPEED)
+	} else {
+		gameInstance.pad1.clearVelocity()
 	}
+
 	if (gameInstance.p2Movement.isMoving) {
 		gameInstance.pad2.move(gameInstance.p2Movement.direction, PAD_SPEED)
+	} else {
+		gameInstance.pad2.clearVelocity()
+	}
+
+	for (const seg of gameInstance.pad1.segments) {
+		gameInstance.GE.setDynamicBorderVelocity(seg, gameInstance.pad1.velocity)
+	}
+	for (const seg of gameInstance.pad2.segments) {
+		gameInstance.GE.setDynamicBorderVelocity(seg, gameInstance.pad2.velocity)
 	}
 }
 
@@ -84,6 +97,8 @@ async function startGameLoop(
 			if (gameData.status !== 'active') return
 
 			updatePadMovements(gameData.gameInstance!)
+
+			gameData.gameInstance!.GE.playTick()
 
 			const dynamicPacket = new S09DynamicSegments(
 				gameData.gameInstance!.GE.dynamicBorders
