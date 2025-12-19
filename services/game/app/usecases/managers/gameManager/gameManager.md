@@ -185,13 +185,6 @@ wins by forfeit (if applicable).
 > No validation is performed on `pID` (e.g., checking if they exist in
 > the database). This is the caller's responsibility.
 
-**Errors:**
-
-| Error                  | Cause                                           |
-| ---------------------- | ----------------------------------------------- |
-| `'player not in game'` | Player has no active game in `playerToGame`     |
-| `'game not found'`     | Game code from mapping doesn't exist in `games` |
-
 ---
 
 ## Error Summary

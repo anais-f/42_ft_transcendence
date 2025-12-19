@@ -1,6 +1,6 @@
 import { joinGameApi } from '../../api/game/joinGame.js'
 import { gameStore } from '../../usecases/gameStore.js'
-import { notyfGlobal as notyf } from '../../utils/notyf.js'
+import { sendGameError } from './errorMapUtils.js'
 
 export async function handleJoinLobby(e: Event) {
 	e.preventDefault()
@@ -11,13 +11,8 @@ export async function handleJoinLobby(e: Event) {
 
 	gameStore.gameCode = code
 	if (error) {
+		sendGameError(error, status)
 		gameStore.clear()
-
-		if (status === 400) {
-			notyf.error('Invalid game code!')
-		} else {
-			notyf.error(error)
-		}
 		return
 	}
 
