@@ -206,4 +206,48 @@ export class Segment {
 	clone(): Segment {
 		return new Segment(this._p1.clone(), this._p2.clone())
 	}
+
+	intersectSweptCircle(
+		startPos: Vector2,
+		endPos: Vector2,
+		radius: number
+	): number | null {
+		const movement = Vector2.subtract(endPos, startPos)
+		const movementLength = movement.magnitude()
+
+		if (movementLength < EPSILON) {
+			const dist = this.distanceToPoint(startPos)
+			return dist <= radius ? 0 : null
+		}
+
+		const steps = Math.ceil(movementLength / (radius * 0.5)) + 1
+		const stepSize = 1 / steps
+
+		for (let i = 0; i <= steps; i++) {
+			const t = i * stepSize
+			const pos = Vector2.add(startPos, Vector2.multiply(movement, t))
+			const dist = this.distanceToPoint(pos)
+
+			if (dist <= radius) {
+				let lo = Math.max(0, (i - 1) * stepSize)
+				let hi = t
+
+				for (let j = 0; j < 8; j++) {
+					const mid = (lo + hi) / 2
+					const midPos = Vector2.add(startPos, Vector2.multiply(movement, mid))
+					const midDist = this.distanceToPoint(midPos)
+
+					if (midDist <= radius) {
+						hi = mid
+					} else {
+						lo = mid
+					}
+				}
+
+				return lo
+			}
+		}
+
+		return null
+	}
 }

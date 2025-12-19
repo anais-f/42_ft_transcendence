@@ -32,7 +32,7 @@ export class GameEngine {
 	private _TPS_DATA: TPS_MANAGER
 	private _dynamicBorderVelocities: Map<Segment, Vector2> = new Map()
 	private _ball: IBall = {
-		shape: new Circle(new Vector2(), 0.8),
+		shape: new Circle(new Vector2(), 0.5),
 		velo: this.getRandomVelo()
 	}
 	private readonly PAUSE_TICKS_AFTER_POINT = 120
@@ -178,6 +178,66 @@ export class GameEngine {
 		return false
 	}
 
+	private checkSweptCollision(): boolean {
+		interface SweptCollisionData {
+			border: Segment
+			t: number
+			normal: Vector2
+		}
+
+		const movement = this._ball.velo.clone().multiply(BALL_SPEED)
+		const startPos = this._ball.shape.pos.clone()
+		const endPos = Vector2.add(startPos, movement)
+		const radius = this._ball.shape.rad
+
+		const allBorders = [...this._staticBorders, ...this._dynamicBorders]
+		const sweptCollisions: SweptCollisionData[] = []
+
+		for (const border of allBorders) {
+			const t = border.intersectSweptCircle(startPos, endPos, radius)
+			if (t !== null) {
+				const collisionPos = Vector2.add(
+					startPos,
+					Vector2.multiply(movement, t)
+				)
+
+				const closestPoint = border.closestPointToPoint(collisionPos)
+				const toCenter = Vector2.subtract(collisionPos, closestPoint)
+				const normal =
+					toCenter.magnitude() > EPSILON
+						? toCenter.normalize()
+						: border.getNormal()
+
+				const borderVelocity = this.getDynamicBorderVelocity(border)
+				const relativeVelo = Vector2.subtract(this._ball.velo, borderVelocity)
+
+				if (Vector2.dot(relativeVelo, normal) < 0) {
+					sweptCollisions.push({ border, t, normal })
+				}
+			}
+		}
+
+		if (sweptCollisions.length === 0) {
+			this._ball.shape.pos.add(movement)
+			return false
+		}
+
+		sweptCollisions.sort((a, b) => a.t - b.t)
+		const firstCollision = sweptCollisions[0]
+
+		if (this.checkWin(firstCollision.border)) {
+			return true
+		}
+
+		const safeT = Math.max(0, firstCollision.t - 0.01)
+		const moveToCollision = Vector2.multiply(movement, safeT)
+		this._ball.shape.pos.add(moveToCollision)
+
+		this._ball.velo = Vector2.reflect(this._ball.velo, firstCollision.normal)
+
+		return false
+	}
+
 	public playTick(): void {
 		if (this._currentState != GameState.Started) {
 			return
@@ -200,10 +260,7 @@ export class GameEngine {
 			this._ball.velo = this.getRandomVelo()
 		}
 
-		if (!this.checkColision()) {
-			const movement = this._ball.velo.clone().multiply(BALL_SPEED)
-			this._ball.shape.pos.add(movement)
-		} else {
+		if (this.checkColision() || this.checkSweptCollision()) {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
 			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
