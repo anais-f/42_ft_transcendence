@@ -24,7 +24,8 @@ async function updateScoreHUD(
 		obj.lastP1Lives = score.p1
 		obj.lastP2Lives = score.p2
 		obj.lastCountdown = -1
-		const scorePacket = new S07Score(score.p1, score.p2)
+		const maxLives = gameData.gameInstance!.GE.maxLives
+		const scorePacket = new S07Score(score.p1, score.p2, maxLives)
 		packetSender.push(SPacketsType.S07, scorePacket)
 	}
 }

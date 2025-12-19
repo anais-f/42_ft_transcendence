@@ -96,7 +96,11 @@ export class packetBuilder {
 					)
 					return new S06(pos, factor, velo)
 				case SPacketsType.S07:
-					return new S07(view.getUint8(1), view.getUint8(2))
+					const encoded = view.getUint16(1)
+					const p1Score = (encoded >> 11) & 0x1f
+					const p2Score = (encoded >> 6) & 0x1f
+					const maxLives = (encoded >> 1) & 0x1f
+					return new S07(p1Score, p2Score, maxLives)
 				case SPacketsType.S08:
 					return new S08(view.getUint8(1))
 				case SPacketsType.S09:

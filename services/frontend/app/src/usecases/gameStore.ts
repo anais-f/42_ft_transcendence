@@ -13,6 +13,7 @@ class GameStore {
 	private _p1: PlayerData | null = null
 	private _p2: PlayerData | null = null
 	private _onOpponentJoin: OnOpponentJoinCallback | null = null
+	private _maxLives: number = 10
 
 	get gameCode(): string | null {
 		return this._gameCode
@@ -70,6 +71,14 @@ class GameStore {
 		this._p2 = data
 	}
 
+	get maxLives(): number {
+		return this._maxLives
+	}
+
+	set maxLives(value: number) {
+		this._maxLives = value
+	}
+
 	setOnOpponentJoin(callback: OnOpponentJoinCallback | null): void {
 		this._onOpponentJoin = callback
 	}
@@ -92,6 +101,7 @@ class GameStore {
 		this._p1 = null
 		this._p2 = null
 		this._onOpponentJoin = null
+		this._maxLives = 10
 	}
 }
 

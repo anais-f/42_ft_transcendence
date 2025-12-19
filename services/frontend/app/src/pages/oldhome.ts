@@ -2,7 +2,6 @@ import { Button } from '../components/Button.js'
 import { Input } from '../components/Input.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
-import { handleLogin } from '../events/loginPageHandlers.js'
 import { logout } from '../usecases/userSession.js'
 import { currentUser } from '../usecases/userStore.js'
 

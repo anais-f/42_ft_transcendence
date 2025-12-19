@@ -28,11 +28,20 @@
 	.img_style {
 		@apply w-full py-4 opacity-50 object-cover select-none;
 	}
+	.avatar_style {
+		@apply w-4/5 m-auto aspect-square object-cover border-2 border-black saturate-[75%];
+	}
 	.form_style {
 		@apply flex flex-col gap-2 w-full;
 	}
 	.col-4-span-flex {
 		@apply col-span-1 flex flex-col items-start min-h-0;
+	}
+	.friend_btn {
+		@apply border border-black hover:bg-black hover:text-white w-full py-1 transition-colors text-xs w-20;
+	}
+	.table_header {
+		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;
 	}
 
 	.generic_btn {
@@ -52,6 +61,12 @@
 	}
 	.form_button {
 		@apply mb-4 mt-2;
+	}
+	.username_style {
+		@apply text-2xl font-medium py-4;
+	}
+	.lobby_font {
+		@apply text-2xl font-special mt-4 mx-auto mb-4 truncate;
 	}
 
 	/* Line clamp utilities */
