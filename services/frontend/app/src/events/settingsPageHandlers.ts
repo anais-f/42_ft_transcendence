@@ -58,7 +58,7 @@ export async function handleUsername(form: HTMLFormElement) {
  */
 export async function handlerAvatar(form: HTMLFormElement) {
 	const formData = new FormData(form)
-	const avatarFile = formData.get('avatar') as File
+	const avatarFile = formData.get('change_avatar') as File
 
 	const avatarResult = validateAvatarFile(avatarFile)
 	if (!avatarResult.success) {
