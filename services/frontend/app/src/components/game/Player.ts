@@ -25,7 +25,7 @@ export const PlayerComp = (props: PlayerProps): string => {
 	return /*html*/ `
     <div class="${classes}">
       <h1 class="text-xl text-center w-fit px-2 line-clamp">${username}</h1>
-      ${LivesComp({ max: maxLives, current: currentLives, livesID, additionalClasses: 'mb-4' })}
+      ${LivesComp({ max: maxLives, current: currentLives, livesID, additionalClasses: 'mb-4', size: 5 })}
       <img
         src="${avatar}"
         alt="${username}"

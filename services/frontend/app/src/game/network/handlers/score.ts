@@ -9,8 +9,8 @@ export function scoreHandler(packet: S07Score) {
 	const opponentLives = isP1 ? packet.p2Score : packet.p1Score
 
 	const maxLives = packet.maxLives || gameStore.maxLives || 5
-	updateLives('my-lives', myLives, maxLives)
-	updateLives('opponent-lives', opponentLives, maxLives)
+	updateLives('my-lives', myLives, maxLives, 5)
+	updateLives('opponent-lives', opponentLives, maxLives, 5)
 
 	if (myLives <= 0 || opponentLives <= 0) {
 		const didWin = myLives > opponentLives
