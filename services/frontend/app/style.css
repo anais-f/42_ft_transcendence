@@ -43,10 +43,9 @@
 	.table_header {
 		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;
 	}
-
-	.generic_btn {
-		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
-	}
+    .cursor_pointer {
+        @apply cursor-pointer inline-block px-2 py-1 rounded hover:scale-105 hover:shadow-lg transition transform;
+    }
 }
 
 @layer utilities {
