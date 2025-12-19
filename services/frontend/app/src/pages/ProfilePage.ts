@@ -1,6 +1,7 @@
 import { Button } from '../components/Button.js'
 import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
+import { GameHistoryRow} from "../components/game/HistoryRow.js";
 import { currentUser } from '../usecases/userStore.js'
 import { IPublicProfileUser } from '@ft_transcendence/common'
 
@@ -23,6 +24,89 @@ const stats = {
 	losses: 58,
 	winRate: 10
 }
+
+const history = [
+  {
+    date: '2025-05-01',
+    player1: 'Mamth',
+    score1: 21,
+    score2: 15,
+    player2: 'Tiger',
+    result: 'Win'
+  },
+  {
+    date: '2025-05-02',
+    player1: 'Mamjth',
+    score1: 18,
+    score2: 21,
+    player2: 'Eagutle',
+    result: 'Loss'
+  },
+  {
+    date: '2025-05-03',
+    player1: 'Math',
+    score1: 22,
+    score2: 20,
+    player2: 'Shark',
+    result: 'Win'
+  },
+  {
+    date: '2025-05-04',
+    player1: 'Mammh',
+    score1: 19,
+    score2: 21,
+    player2: 'Lion',
+    result: 'Loss'
+  },
+  {
+    date: '2025-05-05',
+    player1: 'Mammoth',
+    score1: 23,
+    score2: 22,
+    player2: 'Wolf',
+    result: 'Win'
+  },
+  {
+    date: '2025-05-01',
+    player1: 'Mamth',
+    score1: 21,
+    score2: 15,
+    player2: 'Tiger',
+    result: 'Win'
+  },
+  {
+    date: '2025-05-02',
+    player1: 'Mammhjgjth',
+    score1: 18,
+    score2: 21,
+    player2: 'Eagjgtutle',
+    result: 'Loss'
+  },
+  {
+    date: '2025-05-03',
+    player1: 'Math',
+    score1: 22,
+    score2: 20,
+    player2: 'Shark',
+    result: 'Win'
+  },
+  {
+    date: '2025-05-04',
+    player1: 'Mammh',
+    score1: 19,
+    score2: 21,
+    player2: 'Lion',
+    result: 'Loss'
+  },
+  {
+    date: '2025-05-05',
+    player1: 'Mammoth',
+    score1: 3,
+    score2: 0,
+    player2: 'Wolf',
+    result: 'Win'
+  }
+]
 
 export const TestPage = (): string => {
 	// Récupérer l'ID depuis l'URL
@@ -71,7 +155,6 @@ export const TestPage = (): string => {
 			}
     </div>
 
-
     <div class="col-4-span-flex">
       ${LoremSection({
 				variant: 'short'
@@ -87,11 +170,30 @@ export const TestPage = (): string => {
 				variant: 'fill'
 			})}
       <img src="/assets/images/cup.png" alt="Cup" class="img_style pb-0">
-
     </div>
 
 
-    <div class="bg-yellow-200 col-span-2 flex flex-col items-start min-h-0">
+    <div class="col-span-2 flex flex-col items-start min-h-0">
+      <h1 class="title_bloc w-full text-center">GAME HISTORY</h1>
+      <div id="div_history_table" class="w-full overflow-y-auto">
+        <table id="history_table" class="w-full table-fixed border-collapse border border-black">
+            <thead>
+                <tr>
+                    <th class="table_header w-32">Date</th>
+                    <th class="table_header w-24">Result</th>
+                    <th class="table_header w-1/3">Player 1</th>
+                    <th class="table_header w-1/3">Player 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${history.map((game) => GameHistoryRow(game)).join('')}
+            </tbody>
+        </table>
+      </div>    
+      
+      ${LoremSection({
+        variant: 'fill'
+      })}
 
     </div>
 

@@ -1,5 +1,6 @@
 export const ProfilePage = (): string => /*html*/ `
 <div class="grid grid-cols-[0.6fr_0.6fr_1fr] gap-16 p-8">
+	
 	<div class="col-span-1 flex flex-col items-start">
 		<h1 class="text-2xl py-4">PLAYER OF THE MONTH</h1>
 		<img src=${user.avatar} alt="User's avatar" class="w-full object-cover border-2 border-black saturate-[75%] contrast-[100%]">
@@ -12,6 +13,8 @@ export const ProfilePage = (): string => /*html*/ `
 		</div>
 		<button id="add_friend_btn" type="button" class="generic_btn my-2">Add Friend</button>
 	</div>
+	
+	
 	<div class="col-span-1 flex flex-col items-start">
 		<div class="news_paragraph pt-4">
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. </p>
@@ -26,6 +29,11 @@ export const ProfilePage = (): string => /*html*/ `
 			<p class="text-sm pb-2">Ipsum dolore veritatis odio in ipsa corrupti aliquam qui commodi. Eveniet possimus voluptas voluptatem. Consectetur minus maiores qui. Eos debitis officia. Assumenda reprehenderit nesciunt. Voluptates dolores doloremque. Beatae qui et placeat. Eaque optio non quae. Vel sunt in et rem. </p>
 		</div>
 	</div>
+
+
+
+
+
 
 	<div class="col-span-1 flex flex-col size-full justify-center items-center">
 		<div class="size-[80%] border-8 my-20 border-black border-double border-separate">
