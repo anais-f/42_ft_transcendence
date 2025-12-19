@@ -1,0 +1,1 @@
+// routes for fetch friends list and fetch friend requests
