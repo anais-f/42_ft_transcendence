@@ -6,6 +6,7 @@ import { IBall } from './IBall.js'
 import { ILives } from './IScore.js'
 import { IWinZone } from './IWinZone.js'
 import { EPSILON } from '../define.js'
+import { PongPad, padDirection } from './PongPad.js'
 
 export class TPS_MANAGER {
 	public tickCount: number = 0
@@ -26,6 +27,11 @@ export enum GameState {
 
 export const BALL_SPEED = 0.4
 
+export interface PaddleInput {
+	isMoving: boolean
+	direction: padDirection
+}
+
 export class GameEngine {
 	private _deadTick = false
 	private _currentState: GameState = GameState.Paused
@@ -39,6 +45,10 @@ export class GameEngine {
 	private _pauseTicksRemaining: number = this.PAUSE_TICKS_AFTER_POINT
 	public startTime
 
+	private _paddles: PongPad[] = []
+	private _paddleInputs: PaddleInput[] = []
+	private _padSpeed: number = 0
+
 	public constructor(
 		TPS: number,
 		private _live: ILives,
@@ -49,6 +59,48 @@ export class GameEngine {
 	) {
 		this._TPS_DATA = new TPS_MANAGER(TPS)
 		this.startTime = Date.now()
+	}
+
+	public registerPaddles(paddles: PongPad[], padSpeed: number): void {
+		this._paddles = paddles
+		this._paddleInputs = paddles.map(() => ({
+			isMoving: false,
+			direction: padDirection.UP
+		}))
+		this._padSpeed = padSpeed
+	}
+
+	public setPaddleInput(
+		padIndex: number,
+		isMoving: boolean,
+		direction: padDirection
+	): void {
+		if (padIndex >= 0 && padIndex < this._paddleInputs.length) {
+			this._paddleInputs[padIndex] = { isMoving, direction }
+		}
+	}
+
+	private _updatePaddles(): void {
+		this.clearDynamicBorderVelocities()
+
+		for (let i = 0; i < this._paddles.length; i++) {
+			const pad = this._paddles[i]
+			const input = this._paddleInputs[i]
+
+			if (input.isMoving) {
+				pad.move(input.direction, this._padSpeed)
+			} else {
+				pad.clearVelocity()
+			}
+
+			for (const seg of pad.segments) {
+				this.setDynamicBorderVelocity(seg, pad.velocity)
+			}
+		}
+	}
+
+	get paddles(): PongPad[] {
+		return this._paddles
 	}
 
 	private getRandomVelo(): Vector2 {
@@ -98,86 +150,6 @@ export class GameEngine {
 		return false
 	}
 
-	private getCollisionNormal(
-		border: Segment,
-		hitPoints: Vector2[],
-		borderVelocity: Vector2 = new Vector2(0, 0)
-	): Vector2 | null {
-		const ballCenter = this._ball.shape.pos
-
-		const relativeVelo = Vector2.subtract(this._ball.velo, borderVelocity)
-
-		const closestHit = border.closestPointToPoint(ballCenter)
-		const segNormal = border.getNormal()
-
-		const dotVeloNormal = Vector2.dot(relativeVelo, segNormal)
-		if (Math.abs(dotVeloNormal) < EPSILON) {
-			const altNormal = Vector2.subtract(ballCenter, closestHit).normalize()
-			if (Vector2.dot(relativeVelo, altNormal) >= 0) {
-				return null
-			}
-			return altNormal
-		}
-
-		const toBall = Vector2.subtract(ballCenter, closestHit)
-		const orientedNormal =
-			Vector2.dot(toBall, segNormal) >= 0 ? segNormal : segNormal.negate()
-
-		if (Vector2.dot(relativeVelo, orientedNormal) >= 0) {
-			return null
-		}
-
-		if (hitPoints.length === 1) {
-			const pointNormal = Vector2.subtract(ballCenter, hitPoints[0]).normalize()
-			if (Vector2.dot(relativeVelo, pointNormal) >= 0) {
-				return null
-			}
-			return pointNormal
-		}
-
-		return orientedNormal
-	}
-
-	private checkColision(): boolean {
-		interface CollisionData {
-			border: Segment
-			normal: Vector2
-		}
-
-		const collisions: CollisionData[] = []
-		const allBorders = [...this._staticBorders, ...this._dynamicBorders]
-
-		for (const border of allBorders) {
-			const hitData = border.intersect(this._ball.shape)
-			if (Array.isArray(hitData) && hitData.length > 0) {
-				const borderVelocity = this.getDynamicBorderVelocity(border)
-				const normal = this.getCollisionNormal(border, hitData, borderVelocity)
-				if (normal) {
-					collisions.push({ border, normal })
-				}
-			}
-		}
-
-		if (collisions.length === 0) {
-			return false
-		}
-
-		for (const collision of collisions) {
-			if (this.checkWin(collision.border)) {
-				return true
-			}
-		}
-
-		let combinedNormal = new Vector2(0, 0)
-		for (const collision of collisions) {
-			combinedNormal.add(collision.normal)
-		}
-		combinedNormal.normalize()
-
-		this._ball.velo = Vector2.reflect(this._ball.velo, combinedNormal)
-		return false
-	}
-
 	private checkSweptCollision(): boolean {
 		interface SweptCollisionData {
 			border: Segment
@@ -185,32 +157,42 @@ export class GameEngine {
 			normal: Vector2
 		}
 
-		const movement = this._ball.velo.clone().multiply(BALL_SPEED)
+		const ballMovement = this._ball.velo.clone().multiply(BALL_SPEED)
 		const startPos = this._ball.shape.pos.clone()
-		const endPos = Vector2.add(startPos, movement)
 		const radius = this._ball.shape.rad
 
 		const allBorders = [...this._staticBorders, ...this._dynamicBorders]
 		const sweptCollisions: SweptCollisionData[] = []
 
 		for (const border of allBorders) {
-			const t = border.intersectSweptCircle(startPos, endPos, radius)
+			const borderVelocity = this.getDynamicBorderVelocity(border)
+
+			const t = border.intersectSweptCircle(
+				startPos,
+				ballMovement,
+				borderVelocity,
+				radius
+			)
+
 			if (t !== null) {
 				const collisionPos = Vector2.add(
 					startPos,
-					Vector2.multiply(movement, t)
+					Vector2.multiply(ballMovement, t)
 				)
 
-				const closestPoint = border.closestPointToPoint(collisionPos)
+				const segmentOffset = Vector2.multiply(borderVelocity, t)
+				const adjustedP1 = Vector2.add(border.p1, segmentOffset)
+				const adjustedP2 = Vector2.add(border.p2, segmentOffset)
+				const adjustedSegment = new Segment(adjustedP1, adjustedP2)
+
+				const closestPoint = adjustedSegment.closestPointToPoint(collisionPos)
 				const toCenter = Vector2.subtract(collisionPos, closestPoint)
 				const normal =
 					toCenter.magnitude() > EPSILON
 						? toCenter.normalize()
-						: border.getNormal()
+						: adjustedSegment.getNormal()
 
-				const borderVelocity = this.getDynamicBorderVelocity(border)
 				const relativeVelo = Vector2.subtract(this._ball.velo, borderVelocity)
-
 				if (Vector2.dot(relativeVelo, normal) < 0) {
 					sweptCollisions.push({ border, t, normal })
 				}
@@ -218,7 +200,7 @@ export class GameEngine {
 		}
 
 		if (sweptCollisions.length === 0) {
-			this._ball.shape.pos.add(movement)
+			this._ball.shape.pos.add(ballMovement)
 			return false
 		}
 
@@ -230,7 +212,7 @@ export class GameEngine {
 		}
 
 		const safeT = Math.max(0, firstCollision.t - 0.01)
-		const moveToCollision = Vector2.multiply(movement, safeT)
+		const moveToCollision = Vector2.multiply(ballMovement, safeT)
 		this._ball.shape.pos.add(moveToCollision)
 
 		this._ball.velo = Vector2.reflect(this._ball.velo, firstCollision.normal)
@@ -243,10 +225,13 @@ export class GameEngine {
 			return
 		}
 
+		if (this._paddles.length > 0) {
+			this._updatePaddles()
+		}
+
 		if (this._deadTick === true && this._pauseTicksRemaining === 0) {
 			this._pauseGame()
 		}
-		// Handle pause between points
 		if (this._pauseTicksRemaining > 0) {
 			--this._pauseTicksRemaining
 			++this._TPS_DATA.tickCount
@@ -260,7 +245,7 @@ export class GameEngine {
 			this._ball.velo = this.getRandomVelo()
 		}
 
-		if (this.checkColision() || this.checkSweptCollision()) {
+		if (this.checkSweptCollision()) {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
 			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
