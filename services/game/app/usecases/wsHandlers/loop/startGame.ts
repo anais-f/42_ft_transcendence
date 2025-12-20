@@ -13,9 +13,8 @@ import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
 import {
 	createDiamondMap,
-	createGame,
 	DEFAULT_TPS,
-	IGameData
+	IGameData,
 } from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
@@ -28,7 +27,7 @@ export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createGame(MAX_LIVES)
+	const gameInstance = createDiamondMap(MAX_LIVES)
 	gameData.gameInstance = gameInstance
 
 	// Register paddles with the game engine for synchronized updates
@@ -90,7 +89,9 @@ async function startGameLoop(
 		gameData.status === 'active'
 	) {
 		await limiter.schedule(async () => {
-			if (gameData.status !== 'active') return
+			if (gameData.status !== 'active') {
+				return
+			}
 
 			syncPaddleInputs(gameData.gameInstance!)
 

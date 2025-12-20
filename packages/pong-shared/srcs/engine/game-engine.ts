@@ -80,10 +80,25 @@ export class GameEngine {
 		}
 	}
 
-	private _updatePaddles(): void {
+	private _preparePaddleVelocities(): void {
 		this.clearDynamicBorderVelocities()
 
-		for (let i = 0; i < this._paddles.length; i++) {
+		for (let i = 0; i < this._paddles.length; ++i) {
+			const pad = this._paddles[i]
+			const input = this._paddleInputs[i]
+
+			const velocity = input.isMoving
+				? new Vector2(0, this._padSpeed * input.direction)
+				: new Vector2(0, 0)
+
+			for (const seg of pad.segments) {
+				this.setDynamicBorderVelocity(seg, velocity)
+			}
+		}
+	}
+
+	private _movePaddles(): void {
+		for (let i = 0; i < this._paddles.length; ++i) {
 			const pad = this._paddles[i]
 			const input = this._paddleInputs[i]
 
@@ -92,11 +107,17 @@ export class GameEngine {
 			} else {
 				pad.clearVelocity()
 			}
+		}
+	}
 
-			for (const seg of pad.segments) {
-				this.setDynamicBorderVelocity(seg, pad.velocity)
+	private _hasOverlap(): boolean {
+		const radius = this._ball.shape.rad
+		for (const border of this._dynamicBorders) {
+			if (border.distanceToPoint(this._ball.shape.pos) < radius - EPSILON) {
+				return true
 			}
 		}
+		return false
 	}
 
 	get paddles(): PongPad[] {
@@ -150,14 +171,18 @@ export class GameEngine {
 		return false
 	}
 
-	private checkSweptCollision(): boolean {
+	private _doSweptCollision(
+		budget: number,
+		useStaticPaddles: boolean
+	): { scored: boolean; tUsed: number } {
 		interface SweptCollisionData {
 			border: Segment
 			t: number
 			normal: Vector2
 		}
 
-		const ballMovement = this._ball.velo.clone().multiply(BALL_SPEED)
+		const fullMovement = this._ball.velo.clone().multiply(BALL_SPEED)
+		const ballMovement = fullMovement.clone().multiply(budget)
 		const startPos = this._ball.shape.pos.clone()
 		const radius = this._ball.shape.rad
 
@@ -165,7 +190,10 @@ export class GameEngine {
 		const sweptCollisions: SweptCollisionData[] = []
 
 		for (const border of allBorders) {
-			const borderVelocity = this.getDynamicBorderVelocity(border)
+			// for sub-ticks paddles are already at final position and stationary
+			const borderVelocity = useStaticPaddles
+				? new Vector2(0, 0)
+				: this.getDynamicBorderVelocity(border)
 
 			const t = border.intersectSweptCircle(
 				startPos,
@@ -201,14 +229,14 @@ export class GameEngine {
 
 		if (sweptCollisions.length === 0) {
 			this._ball.shape.pos.add(ballMovement)
-			return false
+			return { scored: false, tUsed: budget }
 		}
 
 		sweptCollisions.sort((a, b) => a.t - b.t)
 		const firstCollision = sweptCollisions[0]
 
 		if (this.checkWin(firstCollision.border)) {
-			return true
+			return { scored: true, tUsed: firstCollision.t * budget }
 		}
 
 		const safeT = Math.max(0, firstCollision.t - 0.01)
@@ -217,7 +245,72 @@ export class GameEngine {
 
 		this._ball.velo = Vector2.reflect(this._ball.velo, firstCollision.normal)
 
+		return { scored: false, tUsed: safeT * budget }
+	}
+
+	// main collision routine: handles initial collision + sub-ticks if paddle pushes ball.
+	private _processCollisions(): boolean {
+		const MAX_SUB_TICKS = 20
+
+		// first collision pass (paddles moving)
+		let result = this._doSweptCollision(1.0, false)
+		if (result.scored) {
+			return true
+		}
+
+		// move paddles to final position
+		let budgetRemaining = 1.0 - result.tUsed
+		if (this._paddles.length > 0) {
+			this._movePaddles()
+		}
+
+		// if ball is now inside a paddle simulate sub-ticks to push it out
+		for (let i = 0; i < MAX_SUB_TICKS && budgetRemaining > EPSILON; i++) {
+			if (!this._hasOverlap()) {
+				break
+			}
+
+			// Sub-tick: paddles are now stationary at final position
+			result = this._doSweptCollision(budgetRemaining, true)
+			if (result.scored) {
+				return true
+			}
+
+			// failsafe if ball is stuck
+			budgetRemaining -= result.tUsed
+			if (result.tUsed < EPSILON) {
+				this._forcePushOut()
+				break
+			}
+		}
+
 		return false
+	}
+
+	private _forcePushOut(): void {
+		const radius = this._ball.shape.rad
+		const ballPos = this._ball.shape.pos
+
+		for (const border of this._dynamicBorders) {
+			const dist = border.distanceToPoint(ballPos)
+			if (dist < radius - EPSILON) {
+				const closest = border.closestPointToPoint(ballPos)
+				let pushDir = Vector2.subtract(ballPos, closest)
+
+				if (pushDir.magnitude() < EPSILON) {
+					pushDir = border.getNormal()
+				} else {
+					pushDir.normalize()
+				}
+
+				const overlap = radius - dist + 0.05
+				ballPos.add(Vector2.multiply(pushDir, overlap))
+
+				if (Vector2.dot(this._ball.velo, pushDir) < 0) {
+					this._ball.velo = Vector2.reflect(this._ball.velo, pushDir)
+				}
+			}
+		}
 	}
 
 	public playTick(): void {
@@ -226,7 +319,7 @@ export class GameEngine {
 		}
 
 		if (this._paddles.length > 0) {
-			this._updatePaddles()
+			this._preparePaddleVelocities()
 		}
 
 		if (this._deadTick === true && this._pauseTicksRemaining === 0) {
@@ -235,6 +328,9 @@ export class GameEngine {
 		if (this._pauseTicksRemaining > 0) {
 			--this._pauseTicksRemaining
 			++this._TPS_DATA.tickCount
+			if (this._paddles.length > 0) {
+				this._movePaddles()
+			}
 			return
 		}
 
@@ -245,7 +341,8 @@ export class GameEngine {
 			this._ball.velo = this.getRandomVelo()
 		}
 
-		if (this.checkSweptCollision()) {
+		// process collisions paddle movement + sub-ticks if needed
+		if (this._processCollisions()) {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
 			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
