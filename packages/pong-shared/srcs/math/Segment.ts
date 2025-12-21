@@ -206,4 +206,81 @@ export class Segment {
 	clone(): Segment {
 		return new Segment(this._p1.clone(), this._p2.clone())
 	}
+
+	// uses linear equation for segment body collision and
+	// quadratic equation for endpoint collisions.
+	intersectSweptCircle(
+		startPos: Vector2,
+		ballVelocity: Vector2,
+		segmentVelocity: Vector2,
+		radius: number
+	): number | null {
+		const V = Vector2.subtract(ballVelocity, segmentVelocity)
+		const vLengthSq = V.squaredLength()
+
+		if (vLengthSq < EPSILON * EPSILON) {
+			const dist = this.distanceToPoint(startPos)
+			return dist <= radius ? 0 : null
+		}
+
+		const A = this._p1
+		const B = this._p2
+		const P0 = startPos
+
+		const candidates: number[] = []
+
+		const E = Vector2.subtract(B, A)
+		const eLengthSq = E.squaredLength()
+
+		if (eLengthSq > EPSILON * EPSILON) {
+			const N = new Vector2(-E.y, E.x)
+			const nLen = N.magnitude()
+			N.multiply(1 / nLen)
+
+			const d0 = Vector2.dot(Vector2.subtract(P0, A), N)
+			const vn = Vector2.dot(V, N)
+
+			if (Math.abs(vn) > EPSILON) {
+				for (const sign of [1, -1]) {
+					const t = (sign * radius - d0) / vn
+
+					if (t >= 0 && t <= 1) {
+						// Verify contact point is on the segment
+						const contactPoint = Vector2.add(P0, Vector2.multiply(V, t))
+						const projection =
+							Vector2.dot(Vector2.subtract(contactPoint, A), E) / eLengthSq
+
+						if (projection >= 0 && projection <= 1) {
+							candidates.push(t)
+						}
+					}
+				}
+			}
+		}
+
+		for (const endpoint of [A, B]) {
+			const D = Vector2.subtract(P0, endpoint)
+
+			const a = vLengthSq
+			const b = 2 * Vector2.dot(D, V)
+			const c = D.squaredLength() - radius * radius
+
+			const discriminant = b * b - 4 * a * c
+
+			if (discriminant >= 0) {
+				const sqrtDiscriminant = Math.sqrt(discriminant)
+				const t = (-b - sqrtDiscriminant) / (2 * a)
+
+				if (t >= 0 && t <= 1) {
+					candidates.push(t)
+				}
+			}
+		}
+
+		if (candidates.length === 0) {
+			return null
+		}
+
+		return Math.min(...candidates)
+	}
 }

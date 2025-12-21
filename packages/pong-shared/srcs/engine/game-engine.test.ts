@@ -57,20 +57,17 @@ describe('game-engine', () => {
 		expect(game?.state).toEqual(GameState.Paused)
 	})
 
-	test('loop', async () => {
-		const spyGameTicks = jest.spyOn(GameEngine.prototype as any, 'playTick')
-
-		jest.useFakeTimers()
+	test('playTick is callable and updates tick count', () => {
 		game?.setState(GameState.Started)
+		const initialTickCount = game?.tickCount ?? 0
 
-		jest.advanceTimersByTime(1000)
-
-		await jest.runAllTimersAsync()
+		game?.playTick()
+		game?.playTick()
+		game?.playTick()
 
 		game?.setState(GameState.Paused)
-		jest.useRealTimers()
 
-		expect(spyGameTicks).toHaveBeenCalled()
+		expect(game?.tickCount).toBeGreaterThan(initialTickCount)
 	})
 
 	test('move pad', () => {

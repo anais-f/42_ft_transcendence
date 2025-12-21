@@ -54,8 +54,8 @@ export class UsersRepository {
 			counter++
 			candidateUsername = `${baseUsername}${counter}`
 
-			if (counter > 10000) {
-				throw createHttpError.InternalServerError(
+			if (counter > 10000 || candidateUsername.length > 32) {
+				throw createHttpError.UnprocessableEntity(
 					'Unable to generate unique username'
 				)
 			}
