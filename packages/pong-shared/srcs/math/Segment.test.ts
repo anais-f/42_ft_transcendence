@@ -232,4 +232,276 @@ describe('Segment', () => {
 			expect(Math.abs(normal.y)).toBeCloseTo(expectedY)
 		})
 	})
+
+	describe('intersectSweptCircle', () => {
+		describe('segment body collision (linear equation)', () => {
+			test('ball moving straight toward horizontal segment', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 10) // moving up
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Ball should hit when center is at y = 5 - radius = 4.5
+				// t = 4.5 / 10 = 0.45
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0.45, 2)
+			})
+
+			test('ball moving away from segment - no collision', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, -10) // moving down (away)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				expect(t).toBeNull()
+			})
+
+			test('ball moving parallel to segment - no body collision', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(10, 0) // moving horizontally
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				expect(t).toBeNull()
+			})
+
+			test('ball too far - no collision', () => {
+				const seg = new Segment(new Vector2(-5, 100), new Vector2(5, 100))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 10) // only moves 10 units
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				expect(t).toBeNull()
+			})
+
+			test('ball passes beside segment - no collision', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(-2, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 10)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				expect(t).toBeNull()
+			})
+		})
+
+		describe('endpoint collision (quadratic equation)', () => {
+			test('ball moving toward segment endpoint', () => {
+				const seg = new Segment(new Vector2(5, 0), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(10, 0) // moving toward endpoint at (5,0)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Ball should hit when center is at x = 5 - radius = 4.5
+				// t = 4.5 / 10 = 0.45
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0.45, 2)
+			})
+
+			test('ball grazing past endpoint (near miss)', () => {
+				const seg = new Segment(new Vector2(5, 2), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(10, 0)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Ball at y=0 passes at distance 2 from endpoint at (5,2)
+				// Since radius is 0.5, it won't hit
+				expect(t).toBeNull()
+			})
+		})
+
+		describe('moving segment (relative velocity)', () => {
+			test('segment moving toward stationary ball', () => {
+				const seg = new Segment(new Vector2(-5, 10), new Vector2(5, 10))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 0) // ball stationary
+				const segmentVelocity = new Vector2(0, -20) // segment moving down
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Relative velocity is (0, 20) - segment approaching
+				// Collision when relative distance = radius
+				// Initial distance = 10, relative approach = 20
+				// t = (10 - 0.5) / 20 = 0.475
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0.475, 2)
+			})
+
+			test('ball and segment moving toward each other', () => {
+				const seg = new Segment(new Vector2(-5, 10), new Vector2(5, 10))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 5) // ball moving up
+				const segmentVelocity = new Vector2(0, -5) // segment moving down
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Relative velocity is (0, 10) - approaching at combined speed
+				// t = (10 - 0.5) / 10 = 0.95
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0.95, 2)
+			})
+
+			test('segment moving away faster than ball approaches', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 5) // ball moving up
+				const segmentVelocity = new Vector2(0, 10) // segment moving up faster
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Relative velocity is (0, -5) - moving apart
+				expect(t).toBeNull()
+			})
+		})
+
+		describe('edge cases', () => {
+			test('ball already touching segment', () => {
+				const seg = new Segment(new Vector2(-5, 0.5), new Vector2(5, 0.5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 1)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Ball is exactly touching at t=0
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0, 2)
+			})
+
+			test('zero velocity - stationary and touching', () => {
+				const seg = new Segment(new Vector2(-5, 0.5), new Vector2(5, 0.5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 0)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Already touching, return 0
+				expect(t).toBe(0)
+			})
+
+			test('zero velocity - stationary and not touching', () => {
+				const seg = new Segment(new Vector2(-5, 5), new Vector2(5, 5))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(0, 0)
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				expect(t).toBeNull()
+			})
+
+			test('diagonal collision with vertical segment (paddle)', () => {
+				const seg = new Segment(new Vector2(-16, -2), new Vector2(-16, 2))
+				const startPos = new Vector2(0, 0)
+				const ballVelocity = new Vector2(-20, 1) // moving left with slight up
+				const segmentVelocity = new Vector2(0, 0)
+				const radius = 0.5
+
+				const t = seg.intersectSweptCircle(
+					startPos,
+					ballVelocity,
+					segmentVelocity,
+					radius
+				)
+
+				// Ball should hit the paddle
+				// At collision, x = -16 + 0.5 = -15.5
+				// t = 15.5 / 20 = 0.775
+				expect(t).not.toBeNull()
+				expect(t).toBeCloseTo(0.775, 2)
+			})
+		})
+	})
 })

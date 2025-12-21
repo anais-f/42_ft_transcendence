@@ -1,4 +1,5 @@
 import {
+	S01ServerTickConfirmation,
 	packetBuilder,
 	S02SegmentUpdate,
 	S05BallPos,
@@ -53,7 +54,8 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	const packet = packetBuilder.deserializeS(data)
 	if (!packet) return
 
-	if (packet instanceof S02SegmentUpdate) {
+	if (packet instanceof S01ServerTickConfirmation) {
+	} else if (packet instanceof S02SegmentUpdate) {
 		renderer.setStaticSegments(packet.segs)
 	} else if (packet instanceof S09DynamicSegments) {
 		renderer.setDynamicSegments(packet.segs)

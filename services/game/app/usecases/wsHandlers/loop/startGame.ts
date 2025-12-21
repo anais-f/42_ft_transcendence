@@ -1,6 +1,5 @@
 import {
 	GameState,
-	BALL_SPEED,
 	Vector2,
 	S05BallPos,
 	S09DynamicSegments,
@@ -21,15 +20,21 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
-export const MAX_LIVES = 5
+export const MAX_LIVES = 10
 export const PAD_SPEED = 0.3
 export const PAUSE_TICKS = 180
 export const COUNTDOWN_STEPS = 3
 export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createDiamondMap(MAX_LIVES)
+	const gameInstance = createGame(MAX_LIVES)
 	gameData.gameInstance = gameInstance
+
+	// Register paddles with the game engine for synchronized updates
+	gameInstance.GE.registerPaddles(
+		[gameInstance.pad1, gameInstance.pad2],
+		PAD_SPEED
+	)
 
 	const staticPacket = new S02SegmentUpdate(gameInstance.GE.staticBorders)
 	const staticBuffer = staticPacket.serialize()
@@ -44,14 +49,17 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	startGameLoop(gameData, gameCode, packetSender)
 }
 
-// TODO: move this somewhere else
-function updatePadMovements(gameInstance: IGameData): void {
-	if (gameInstance.p1Movement.isMoving) {
-		gameInstance.pad1.move(gameInstance.p1Movement.direction, PAD_SPEED)
-	}
-	if (gameInstance.p2Movement.isMoving) {
-		gameInstance.pad2.move(gameInstance.p2Movement.direction, PAD_SPEED)
-	}
+function syncPaddleInputs(gameInstance: IGameData): void {
+	gameInstance.GE.setPaddleInput(
+		0,
+		gameInstance.p1Movement.isMoving,
+		gameInstance.p1Movement.direction
+	)
+	gameInstance.GE.setPaddleInput(
+		1,
+		gameInstance.p2Movement.isMoving,
+		gameInstance.p2Movement.direction
+	)
 }
 
 async function startGameLoop(
@@ -81,9 +89,13 @@ async function startGameLoop(
 		gameData.status === 'active'
 	) {
 		await limiter.schedule(async () => {
-			if (gameData.status !== 'active') return
+			if (gameData.status !== 'active') {
+				return
+			}
 
-			updatePadMovements(gameData.gameInstance!)
+			syncPaddleInputs(gameData.gameInstance!)
+
+			gameData.gameInstance!.GE.playTick()
 
 			const dynamicPacket = new S09DynamicSegments(
 				gameData.gameInstance!.GE.dynamicBorders
@@ -99,7 +111,7 @@ async function startGameLoop(
 			} else {
 				packetSender.push(
 					SPacketsType.S06,
-					new S06BallSync(ball.shape.pos, BALL_SPEED, ball.velo)
+					new S06BallSync(ball.shape.pos, ball.speed, ball.velo)
 				)
 			}
 
