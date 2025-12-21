@@ -2,7 +2,7 @@ import { Button } from '../components/Button.js'
 import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
 import { GameHistoryRow } from '../components/game/HistoryRow.js'
-import { initProfilePage } from "../events/profilePageHandler.js";
+import { initProfilePage } from '../events/profile/initProfilePageHandler.js'
 
 export const ProfilePage = (): string => {
 	// Valeurs par défaut (seront overridées par le fetch)
@@ -26,27 +26,9 @@ export const ProfilePage = (): string => {
 				title: 'Biography',
 				variant: 'fill'
 			})}
-      ${
-				isFriend
-					? `
-        ${Button({
-					id: 'remove_friend_btn',
-					text: 'Remove Friend',
-					type: 'button',
-					action: 'remove-friend',
-					additionalClasses: 'mt-4 !mb-0'
-				})}
-        `
-					: `
-        ${Button({
-					id: 'add_friend_btn',
-					text: 'Add Friend',
-					type: 'button',
-					action: 'add-friend',
-					additionalClasses: 'mt-4 !mb-0'
-				})}
-      `
-			}
+      <div id="friend-button-container" class="w-full">                                          
+    		<!-- Le bouton sera inséré dynamiquement -->                                        
+  		</div> 
     </div>
 
     <div class="col-4-span-flex">
@@ -149,8 +131,6 @@ export function detachProfileEvents(): void {
 
 	console.log('Profile page events detached')
 }
-
-
 
 // Mock data for statistics and history
 const stats = {

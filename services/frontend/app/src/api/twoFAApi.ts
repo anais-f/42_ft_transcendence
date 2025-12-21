@@ -1,4 +1,4 @@
-import { IApiResponse } from "../types/api.js";
+import { IApiResponse } from '../types/api.js'
 
 /**
  * Verify 2FA code during login
@@ -37,7 +37,9 @@ export async function verify2FALoginAPI(code: string): Promise<IApiResponse> {
  * @param password - User's password
  * @returns Promise with result containing data, error and status
  */
-export async function verifyMyPasswordAPI(password: string): Promise<IApiResponse> {
+export async function verifyMyPasswordAPI(
+	password: string
+): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/verify-my-password', {
 			method: 'POST',

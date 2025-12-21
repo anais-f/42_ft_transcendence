@@ -1,9 +1,7 @@
 // routes for accept, request, decline, remove friend
-import { IApiResponse} from "../../types/api.js";
+import { IApiResponse } from '../../types/api.js'
 
-export async function requestFriendApi(
-	userId: number
-): Promise<IApiResponse> {
+export async function requestFriendApi(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/request-friend`, {
 			method: 'POST',
@@ -25,15 +23,12 @@ export async function requestFriendApi(
 
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
 
-export async function acceptFriendApi(
-	userId: number
-): Promise<IApiResponse> {
+export async function acceptFriendApi(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/accept-friend`, {
 			method: 'POST',
@@ -55,15 +50,12 @@ export async function acceptFriendApi(
 
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
 
-export async function rejectFriendApi(
-	userId: number
-): Promise<IApiResponse> {
+export async function rejectFriendApi(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/reject-friend`, {
 			method: 'POST',
@@ -84,8 +76,7 @@ export async function rejectFriendApi(
 		}
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
@@ -111,8 +102,7 @@ export async function removeFriendApi(userId: number): Promise<IApiResponse> {
 		}
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }

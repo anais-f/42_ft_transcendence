@@ -8,7 +8,7 @@ import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { handleSearchUser } from '../events/home/searchUserHandler.js'
-import { initHomePage } from "../events/home/friendsHandler.js";
+import { initHomePage } from '../events/home/friendsHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -140,9 +140,6 @@ export const HomePage = (): string => {
 `
 }
 
-
-
-
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 
@@ -220,5 +217,3 @@ export function detachHomeEvents() {
 
 	console.log('Home page events detached')
 }
-
-
