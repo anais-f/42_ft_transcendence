@@ -1,11 +1,13 @@
-import { IApiResponse } from "../types/api.js";
+import { IApiResponse } from '../types/api.js'
 
 /**
  * Update username for current user
  * @param username - New username
  * @returns Promise with result containing data, error and status
  */
-export async function updateUsernameAPI(username: string): Promise<IApiResponse> {
+export async function updateUsernameAPI(
+	username: string
+): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/users/api/users/me', {
 			method: 'PATCH',

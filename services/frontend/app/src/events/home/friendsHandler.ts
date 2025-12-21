@@ -1,7 +1,9 @@
-import { getFriendsListApi, getPendingRequestsApi } from "../../api/friends/getFriendsApi.js";
-import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js';
-import { FriendListItem } from '../../components/friends/FriendListItem.js';
-
+import {
+	getFriendsListApi,
+	getPendingRequestsApi
+} from '../../api/friends/getFriendsApi.js'
+import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
+import { FriendListItem } from '../../components/friends/FriendListItem.js'
 
 /**
  * Initialize the home page by clearing existing friend and request lists.
@@ -17,8 +19,7 @@ export function initHomePage() {
 		} else if (friendsData.data) {
 			renderFriendsList(friendsData.data.friends)
 		}
-	}
-	catch (error) {
+	} catch (error) {
 		console.error('Network error while fetching friends list:', error)
 	}
 }
@@ -33,6 +34,7 @@ export function renderFriendsList(friends: any[]): void {
 		return
 	}
 
-	listFriends.innerHTML = friends.map(friend => FriendListItem(friend)).join('')
-
+	listFriends.innerHTML = friends
+		.map((friend) => FriendListItem(friend))
+		.join('')
 }

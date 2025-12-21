@@ -20,7 +20,8 @@ import {
 	removeFriendController,
 	getFriendsListController,
 	getPendingRequestsController,
-	getPendingSentRequestsController
+	getPendingSentRequestsController,
+	isFriendController
 } from '../controllers/friendControllers.js'
 
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
@@ -142,5 +143,16 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			}
 		},
 		handler: getPendingSentRequestsController
+	})
+
+	// GET /api/social/is-friend/:user_id
+	server.route({
+		method: 'GET',
+		url: '/api/social/is-friend/:user_id',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			params: UserIdCoerceSchema
+		},
+		handler: isFriendController
 	})
 }

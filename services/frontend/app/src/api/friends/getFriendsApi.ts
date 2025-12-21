@@ -1,4 +1,4 @@
-import { IApiResponse } from "../../types/api.js";
+import { IApiResponse } from '../../types/api.js'
 
 export async function getFriendsListApi(): Promise<IApiResponse> {
 	try {
@@ -14,15 +14,15 @@ export async function getFriendsListApi(): Promise<IApiResponse> {
 			const errorData = await res.json()
 			return {
 				data: null,
-				error: errorData.error || errorData.message || 'Fetch friends list failed',
+				error:
+					errorData.error || errorData.message || 'Fetch friends list failed',
 				status: errorData.statusCode || res.status
 			}
 		}
 
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
@@ -41,14 +41,41 @@ export async function getPendingRequestsApi(): Promise<IApiResponse> {
 			const errorData = await res.json()
 			return {
 				data: null,
-				error: errorData.error || errorData.message || 'Fetch friend requests failed',
+				error:
+					errorData.error ||
+					errorData.message ||
+					'Fetch friend requests failed',
 				status: errorData.statusCode || res.status
 			}
 		}
 		const data = await res.json()
 		return { data, error: null, status: res.status }
+	} catch (error) {
+		return { data: null, error: 'Network error', status: 0 }
 	}
-	catch (error) {
+}
+
+export async function checkIsFriendApi(userId: number): Promise<IApiResponse> {
+	try {
+		const res = await fetch(`/social/api/social/is-friend/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+
+		if (!res.ok) {
+			const errorData = await res.json()
+			return {
+				data: null,
+				error: errorData.error || errorData.message || 'Check is friend failed',
+				status: errorData.statusCode || res.status
+			}
+		}
+		const data = await res.json()
+		return { data, error: null, status: res.status }
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
