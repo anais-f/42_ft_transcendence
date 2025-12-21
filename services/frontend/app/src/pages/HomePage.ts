@@ -14,7 +14,6 @@ export const HomePage = (): string => {
 		username: 'Guest',
 		avatar: '/avatars/img_default.png'
 	}
-	const login = 'to-change' // TODO : get actual login credential - voir local storage ?
 
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
@@ -23,7 +22,6 @@ export const HomePage = (): string => {
         <h1 class="title_bloc">PROFILE</h1>
         <img src="${user.avatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">        
         <h1 class="username_style">${user.username}</h1>
-        <p class="font-special text-sm mb-4">Reminder your login credential is : ${login}</p>
         ${LoremSection({
 					variant: 'fill'
 				})}
