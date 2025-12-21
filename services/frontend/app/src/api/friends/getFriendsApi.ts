@@ -1,8 +1,6 @@
-// routes for fetch friends list and fetch friend requests
-
 import { IApiResponse } from "../../types/api.js";
 
-export async function getFriendsApi(): Promise<IApiResponse> {
+export async function getFriendsListApi(): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/friends-list/me`, {
 			method: 'GET',
@@ -29,7 +27,7 @@ export async function getFriendsApi(): Promise<IApiResponse> {
 	}
 }
 
-export async function getFriendRequestsApi(): Promise<IApiResponse> {
+export async function getPendingRequestsApi(): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/pending-requests/me`, {
 			method: 'GET',

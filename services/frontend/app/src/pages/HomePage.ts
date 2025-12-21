@@ -8,6 +8,7 @@ import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { handleSearchUser } from '../events/home/searchUserHandler.js'
+import {initHomePage} from "../events/home/friendsHandler.js";
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -116,11 +117,7 @@ export const HomePage = (): string => {
                 <h1 class="title_bloc mt-2 !mb-1">RELATIONSHIP</h1>
                 <div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="friend_list" class="h-full">  
-                        <!-- FRIEND ITEMS POPULATED HERE -->
-                        ${FriendListItem(fr1)}
-                        ${FriendListItem(fr2)}
-                        ${FriendListItem(fr3)}
-                        ${FriendListItem(fr4)}
+                    	<!-- Friend items will be dynamically loaded here -->
                     </ul>
                 </div>
             </div>
@@ -130,8 +127,7 @@ export const HomePage = (): string => {
                 <h1 class="title_bloc mt-2 !mb-1">GET IN TOUCH</h1>
                 <div id="div_request_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="request_list" class="h-full">  
-                        ${FriendRequestItem(fr1)}
-                        ${FriendRequestItem(fr2)}
+                    	<!-- Friend items will be dynamically loaded here -->
                     </ul>
                 </div>
             </div>
@@ -143,6 +139,9 @@ export const HomePage = (): string => {
   </section>
 `
 }
+
+
+
 
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
@@ -158,6 +157,8 @@ export function attachHomeEvents() {
 	if (!content) {
 		return
 	}
+
+	initHomePage()
 
 	// Create and store the click handler
 	clickHandler = async (e: Event) => {
@@ -220,30 +221,4 @@ export function detachHomeEvents() {
 	console.log('Home page events detached')
 }
 
-const fr1 = {
-	id: '5',
-	username: 'Anfichet',
-	avatar: '/assets/images/bear.png',
-	status: 'Online'
-}
 
-const fr2 = {
-	id: '2',
-	username: 'Mjuffard',
-	avatar: '/assets/images/bear.png',
-	status: 'Online'
-}
-
-const fr3 = {
-	id: '3',
-	username: 'Lrio',
-	avatar: '/assets/images/bear.png',
-	status: 'Offline'
-}
-
-const fr4 = {
-	id: '4',
-	username: 'Jdoe',
-	avatar: '/assets/images/img_default.png',
-	status: 'Offline'
-}
