@@ -1,9 +1,11 @@
+import { IApiResponse } from "../types/api.js";
+
 /**
  * Update username for current user
  * @param username - New username
  * @returns Promise with result containing data, error and status
  */
-export async function updateUsernameAPI(username: string) {
+export async function updateUsernameAPI(username: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/users/api/users/me', {
 			method: 'PATCH',
@@ -36,7 +38,7 @@ export async function updateUsernameAPI(username: string) {
  * @param avatarFile - Avatar file to upload
  * @returns Promise with result containing data, error and status
  */
-export async function updateAvatarAPI(avatarFile: File) {
+export async function updateAvatarAPI(avatarFile: File): Promise<IApiResponse> {
 	try {
 		const formData = new FormData()
 		formData.append('avatar', avatarFile)
@@ -75,7 +77,7 @@ export async function changePasswordAPI(
 	oldPassword: string,
 	newPassword: string,
 	twofaCode?: string
-) {
+): Promise<IApiResponse> {
 	try {
 		const body: {
 			old_password: string

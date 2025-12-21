@@ -27,7 +27,7 @@ export const ProfilePage = (): string => {
 	// const userProfile = await fetchUserProfile(userId)
 
 	return /*html*/ `
-  <section class="grid grid-cols-4 gap-10 h-full w-full">
+  <section class="grid grid-cols-4 gap-16 h-full w-full">
 
     <div class="col-4-span-flex">
       <h1 class="title_bloc">PLAYER OF THE MONTH</h1>
@@ -84,8 +84,8 @@ export const ProfilePage = (): string => {
 
 
     <div class="col-span-2 flex flex-col items-start min-h-0">
-      <h1 class="title_bloc w-full text-center">GAME HISTORY</h1>
-      <div id="div_history_table" class="w-[90%] mx-auto border-2 border-black flex-1 overflow-hidden flex flex-col">
+      <h1 class="title_bloc w-full">GAME HISTORY</h1>
+      <div id="div_history_table" class="w-[100%] mx-auto border-2 border-black flex-1 overflow-hidden flex flex-col">
         <table id="history_table" class="w-full table-fixed border-collapse flex flex-col h-full">
             <thead class="flex w-full">
                 <tr class="flex w-full">
