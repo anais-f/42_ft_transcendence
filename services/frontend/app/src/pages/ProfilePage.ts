@@ -1,7 +1,7 @@
 import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
 import { GameHistoryRow } from '../components/game/HistoryRow.js'
-import { initProfilePage } from '../events/profile/initProfilePageHandler.js'
+import { initAndRenderUserProfile } from '../events/profile/initProfilePageHandler.js'
 import { handleAddFriend, handleRemoveFriend } from '../events/profile/profilePageHandler.js'
 
 export const ProfilePage = (): string => {
@@ -44,7 +44,6 @@ export const ProfilePage = (): string => {
       <img src="/assets/images/cup.png" alt="Cup" class="img_style pb-0">
     </div>
 
-
     <div class="col-span-2 flex flex-col items-start min-h-0">
       <h1 class="title_bloc w-full">GAME HISTORY</h1>
       <div id="div_history_table" class="w-[100%] mx-auto border-2 border-black flex-1 overflow-hidden flex flex-col">
@@ -62,17 +61,18 @@ export const ProfilePage = (): string => {
             </tbody>
         </table>
       </div>    
-     
-
     </div>
-
 
   </section>
   `
 }
 
 let clickHandler: ((e: Event) => Promise<void>) | null = null
-let submitHandler: ((e: Event) => Promise<void>) | null = null
+// let submitHandler: ((e: Event) => Promise<void>) | null = null
+
+export async function initProfilePage(userId: number): Promise<void> {
+	await initAndRenderUserProfile(userId)
+}
 
 export async function attachProfileEvents(): void {
 	const urlParts = window.location.pathname.split('/')
@@ -109,16 +109,16 @@ export async function attachProfileEvents(): void {
 		}
 	}
 
-	submitHandler = async (e: Event) => {
-		const form = e.target as HTMLElement
-		e.preventDefault()
-		const formName = form.getAttribute('data-form')
-		console.log('e submitted form:', form)
-	}
+	// submitHandler = async (e: Event) => {
+	// 	const form = e.target as HTMLElement
+	// 	e.preventDefault()
+	// 	const formName = form.getAttribute('data-form')
+	// 	console.log('e submitted form:', form)
+	// }
 
 	// Attach the handler
 	content.addEventListener('click', clickHandler)
-	content.addEventListener('submit', submitHandler)
+	// content.addEventListener('submit', submitHandler)
 
 	console.log('Profile page events attached')
 }
@@ -127,10 +127,10 @@ export function detachProfileEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	if (submitHandler) {
-		content.removeEventListener('submit', submitHandler)
-		submitHandler = null
-	}
+	// if (submitHandler) {
+	// 	content.removeEventListener('submit', submitHandler)
+	// 	submitHandler = null
+	// }
 
 	if (clickHandler) {
 		content.removeEventListener('click', clickHandler)
