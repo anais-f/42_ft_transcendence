@@ -149,7 +149,7 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
  * Logs attachment status to the console.
  * @returns {void}
  */
-export function attachHomeEvents() {
+export async function attachHomeEvents() {
 	const content = document.getElementById('content')
 	if (!content) {
 		return
@@ -174,6 +174,8 @@ export function attachHomeEvents() {
 				if (id) {
 					window.navigate(`/profile/${id}`)
 				}
+			}
+			if (action === 'accept-friend') {
 			}
 		}
 	}

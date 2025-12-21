@@ -1,3 +1,5 @@
+import { Button } from '../Button.js'
+
 /**
  * Renders a friend request item.
  * @param props - The properties of the friend request item.
@@ -29,8 +31,22 @@ export const FriendRequestItem = (props: FriendRequestItemProps): string => {
             <p class="font-medium hover:font-bold">${username}</p>
           </a>
           <div id="request_buttons" class="flex gap-4">
-            <button id="accept_friend_btn_${id}" type="button" class="friend_btn">Accept</button>
-            <button id="decline_friend_btn_${id}" type="button" class="friend_btn">Decline</button>
+          	${Button({
+							id: 'accept_friend_btn',
+							text: 'Accept',
+							type: 'button',
+							action: 'accept-friend',
+							additionalClasses: 'friend_btn',
+							dataAttributes: `data-id="${id}"`
+						})}
+						${Button({
+							id: 'decline_friend_btn',
+							text: 'Decline',
+							type: 'button',
+							action: 'decline-friend',
+							additionalClasses: 'friend_btn',
+							dataAttributes: `data-id="${id}"`
+						})}
           </div>
         </div>
       </div>
