@@ -102,3 +102,5 @@ export function updateFriendButton(status: 'none' | 'pending' | 'friend') {
 		})
 	}
 }
+
+
