@@ -26,6 +26,8 @@ export enum GameState {
 }
 
 export const BALL_SPEED = 0.4
+export const SPEED_INCREASE_FACTOR = 1.05
+export const MAX_BALL_SPEED = BALL_SPEED * 3
 
 export interface PaddleInput {
 	isMoving: boolean
@@ -39,7 +41,8 @@ export class GameEngine {
 	private _dynamicBorderVelocities: Map<Segment, Vector2> = new Map()
 	private _ball: IBall = {
 		shape: new Circle(new Vector2(), 0.5),
-		velo: this.getRandomVelo()
+		velo: this.getRandomVelo(),
+		speed: BALL_SPEED
 	}
 	private readonly PAUSE_TICKS_AFTER_POINT = 120
 	private _pauseTicksRemaining: number = this.PAUSE_TICKS_AFTER_POINT
@@ -181,7 +184,7 @@ export class GameEngine {
 			normal: Vector2
 		}
 
-		const fullMovement = this._ball.velo.clone().multiply(BALL_SPEED)
+		const fullMovement = this._ball.velo.clone().multiply(this._ball.speed)
 		const ballMovement = fullMovement.clone().multiply(budget)
 		const startPos = this._ball.shape.pos.clone()
 		const radius = this._ball.shape.rad
@@ -244,6 +247,16 @@ export class GameEngine {
 		this._ball.shape.pos.add(moveToCollision)
 
 		this._ball.velo = Vector2.reflect(this._ball.velo, firstCollision.normal)
+
+		if (
+			!useStaticPaddles &&
+			this._dynamicBorders.includes(firstCollision.border)
+		) {
+			this._ball.speed = Math.min(
+				this._ball.speed * SPEED_INCREASE_FACTOR,
+				MAX_BALL_SPEED
+			)
+		}
 
 		return { scored: false, tUsed: safeT * budget }
 	}
@@ -339,12 +352,14 @@ export class GameEngine {
 			console.warn(`ball to far away: ${this._ball.shape.pos}`)
 			this._ball.shape.origin = new Vector2()
 			this._ball.velo = this.getRandomVelo()
+			this._ball.speed = BALL_SPEED
 		}
 
 		// process collisions paddle movement + sub-ticks if needed
 		if (this._processCollisions()) {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
+			this._ball.speed = BALL_SPEED
 			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
 			console.log(`[${this._live.p1} | ${this._live.p2}]`)
 		}
