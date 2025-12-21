@@ -2,41 +2,25 @@ import { Button } from '../components/Button.js'
 import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
 import { GameHistoryRow } from '../components/game/HistoryRow.js'
-import { currentUser } from '../usecases/userStore.js'
-import { IPublicProfileUser } from '@ft_transcendence/common'
-
-const userProfile: IPublicProfileUser = {
-	id: 1,
-	username: 'Mammoth',
-	avatar: '/public/assets/images/avatar.png',
-	status: 'Online',
-	last_seen: '05/12/2025 12:32am'
-}
-
-const statusColor =
-	userProfile.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
-
-const isFriend = false
+import { initProfilePage } from "../events/profilePageHandler.js";
 
 export const ProfilePage = (): string => {
-	// Récupérer l'ID depuis l'URL
-	//   const urlParts = window.location.pathname.split('/')
-	//   const userId = urlParts[2]  // /profile/:id → index 2
-
-	// Utiliser l'ID pour charger les données du profil
-	// const userProfile = await fetchUserProfile(userId)
+	// Valeurs par défaut (seront overridées par le fetch)
+	const isFriend = false
 
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-16 h-full w-full">
 
     <div class="col-4-span-flex">
       <h1 class="title_bloc">PLAYER OF THE MONTH</h1>
-      <img src="${userProfile.avatar}" alt="Avatar" class="avatar_style">
+      <img id="profile-avatar" src="/avatars/img_default.png" alt="Avatar" class="avatar_style">
       <div class="w-full my-4">
-        <h2 class="text-xl font-medium font-special pb-1">${userProfile.username}</h2>
+        <h2 id="profile-username" class="text-xl font-medium font-special pb-1">Loading...</h2>
         <p class="text-gray-500 flex items-center gap-2 pb-1">
-            <span class="w-3 h-3 rounded-full ${statusColor}"></span>${userProfile.status}</p>
-        <p class="font-medium">Last Seen : <span class="font-normal">${userProfile.last_seen}</span></p>
+            <span id="profile-status-color" class="w-3 h-3 rounded-full bg-gray-500"></span>
+						<span id="profile-status-text">Offlne</span>
+				</p>
+        <p class="font-medium">Last Seen : <span id="profile-last-seen" class="font-normal">...</span></p>
       </div>
       ${LoremSection({
 				title: 'Biography',
@@ -109,6 +93,66 @@ export const ProfilePage = (): string => {
   `
 }
 
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+
+export async function attachProfileEvents(): void {
+	await initProfilePage()
+
+	const content = document.getElementById('content')
+	if (!content) return
+
+	// Create and store the click handler
+	clickHandler = async (e: Event) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
+
+		if (actionButton) {
+			e.preventDefault()
+			const action = actionButton.getAttribute('data-action')
+			// if (action === 'add-friend') {
+			// 	await handleSearchUser('add', currentUser!.id)
+			// }
+			// if (action === 'remove-friend') {
+			// 	await handleSearchUser('remove', currentUser!.id)
+			// }
+		}
+	}
+
+	submitHandler = async (e: Event) => {
+		const form = e.target as HTMLElement
+		e.preventDefault()
+		const formName = form.getAttribute('data-form')
+		console.log('e submitted form:', form)
+	}
+
+	// Attach the handler
+	content.addEventListener('click', clickHandler)
+	content.addEventListener('submit', submitHandler)
+
+	console.log('Profile page events attached')
+}
+
+export function detachProfileEvents(): void {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	if (submitHandler) {
+		content.removeEventListener('submit', submitHandler)
+		submitHandler = null
+	}
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
+
+	console.log('Profile page events detached')
+}
+
+
+
+// Mock data for statistics and history
 const stats = {
 	games_played: 256,
 	wins: 198,

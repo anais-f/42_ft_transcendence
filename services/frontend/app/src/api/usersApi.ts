@@ -1,21 +1,32 @@
 import { IPublicProfileUser } from '@ft_transcendence/common'
+import { IApiResponse } from '../types/api.js'
 
 export async function fetchUserById(
 	userId: number
-): Promise<IPublicProfileUser | null> {
+): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/users/api/users/profile/${userId}`, {
 			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			},
 			credentials: 'include'
 		})
 
 		if (!response.ok) {
-			return null
+			const errorData = await response.json()
+			return {
+				data: null,
+				error: errorData.error || errorData.message || 'Failed to fetch user',
+				status: errorData.statusCode || response.status
+			}
 		}
-		return (await response.json()) as IPublicProfileUser
+
+		const data = await response.json()
+		return { data, error: null, status: response.status }
 	} catch (error) {
 		console.error('Failed to fetch user:', error)
-		return null
+		return { data: null, error: 'Network error', status: 0 }
 	}
 }
 
