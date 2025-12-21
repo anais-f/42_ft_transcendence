@@ -1,4 +1,7 @@
-import { requestFriendApi, removeFriendApi } from '../../api/friends/handleFriendsApi.js'
+import {
+	requestFriendApi,
+	removeFriendApi
+} from '../../api/friends/handleFriendsApi.js'
 import { updateFriendButton } from './initProfilePageHandler.js'
 
 /**

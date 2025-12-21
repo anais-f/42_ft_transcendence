@@ -14,15 +14,17 @@ export async function fetchMatchHistory(userId: number): Promise<IApiResponse> {
 			const errorData = await res.json()
 			return {
 				data: null,
-				error: errorData.error || errorData.message || 'Failed to fetch match history',
+				error:
+					errorData.error ||
+					errorData.message ||
+					'Failed to fetch match history',
 				status: errorData.statusCode || res.status
 			}
 		}
 
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch {
+	} catch {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }
@@ -41,15 +43,15 @@ export async function fetchStats(userId: number): Promise<IApiResponse> {
 			const errorData = await res.json()
 			return {
 				data: null,
-				error: errorData.error || errorData.message || 'Failed to fetch user stats',
+				error:
+					errorData.error || errorData.message || 'Failed to fetch user stats',
 				status: errorData.statusCode || res.status
 			}
 		}
 
 		const data = await res.json()
 		return { data, error: null, status: res.status }
-	}
-	catch (error) {
+	} catch (error) {
 		return { data: null, error: 'Network error', status: 0 }
 	}
 }

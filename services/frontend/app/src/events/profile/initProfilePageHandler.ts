@@ -2,6 +2,7 @@ import { fetchUserById } from '../../api/usersApi.js'
 import { IPublicProfileUser } from '@ft_transcendence/common'
 import { checkIsFriendApi } from '../../api/friends/getFriendsApi.js'
 import { Button } from '../../components/Button.js'
+import { currentUser } from '../../usecases/userStore.js'
 
 /**
  * Render the user profile data into the DOM
@@ -55,6 +56,12 @@ export async function initAndRenderUserProfile(userId: number) {
 		return
 	}
 
+	if (currentUser.user_id === userId) {
+		updateFriendButton('no_button')
+		renderProfile(responseUser.data)
+		return
+	}
+
 	const statusResponse = await checkIsFriendApi(userId)
 	if (statusResponse.error) {
 		console.error('Error checking friendship status: ', statusResponse.error)
@@ -62,19 +69,26 @@ export async function initAndRenderUserProfile(userId: number) {
 	}
 
 	const status = statusResponse.data?.status ?? -1
-	const buttonState = status === 1 ? 'friend' : status === 0 ? 'pending' : 'none'
+	const buttonState =
+		status === 1 ? 'friend' : status === 0 ? 'pending' : 'none'
 	updateFriendButton(buttonState)
-
 	renderProfile(responseUser.data)
 }
 
 /**
  * Update the friend button based on friendship status
- * @param status - The friendship status: 'none', 'pending', or 'friend'
+ * @param status - The friendship status: 'none', 'pending', 'friend', or 'no_button'
  */
-export function updateFriendButton(status: 'none' | 'pending' | 'friend') {
+export function updateFriendButton(
+	status: 'none' | 'pending' | 'friend' | 'no_button'
+) {
 	const buttonContainer = document.getElementById('friend-button-container')
 	if (!buttonContainer) return
+
+	if (status === 'no_button') {
+		buttonContainer.innerHTML = ''
+		return
+	}
 
 	if (status === 'friend') {
 		buttonContainer.innerHTML = Button({
@@ -102,5 +116,3 @@ export function updateFriendButton(status: 'none' | 'pending' | 'friend') {
 		})
 	}
 }
-
-
