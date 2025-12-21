@@ -1,8 +1,8 @@
-import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
 import { GameHistoryRow } from '../components/game/HistoryRow.js'
 import { initAndRenderUserProfile } from '../events/profile/initProfilePageHandler.js'
 import { handleAddFriend, handleRemoveFriend } from '../events/profile/profilePageHandler.js'
+import { fetchAndRenderStats, fetchAndRenderMatchHistory } from '../events/profile/initStatsHandler.js'
 
 export const ProfilePage = (): string => {
 	return /*html*/ `
@@ -31,12 +31,10 @@ export const ProfilePage = (): string => {
       ${LoremSection({
 				variant: 'short'
 			})}
-      <div class=" w-full my-4">
+      <div class="w-full my-4">
         <h1 class="title_bloc mb-4">STATISTICS</h1>
-        ${StatBox({ label: 'Games Played', value: stats.games_played, color: 'text-indigo-900' })}
-        ${StatBox({ label: 'Wins', value: stats.wins, color: 'text-emerald-900' })}
-        ${StatBox({ label: 'Losses', value: stats.losses, color: 'text-rose-900' })}
-        ${StatBox({ label: 'Win Rate', value: stats.winRate, color: 'text-yellow-800' })}
+        <div id="stats-boxes">
+        </div>
       </div>
       ${LoremSection({
 				variant: 'fill'
@@ -56,8 +54,8 @@ export const ProfilePage = (): string => {
                     <th class="table_header flex-1">Player 2</th>
                 </tr>
             </thead>
-            <tbody class="w-full overflow-y-auto flex-1">
-                ${history.map((game) => GameHistoryRow(game)).join('')}
+            <tbody id="match-history" class="w-full overflow-y-auto flex-1">
+            	<!-- ${history.map((game) => GameHistoryRow(game)).join('')} -->
             </tbody>
         </table>
       </div>    
@@ -68,10 +66,11 @@ export const ProfilePage = (): string => {
 }
 
 let clickHandler: ((e: Event) => Promise<void>) | null = null
-// let submitHandler: ((e: Event) => Promise<void>) | null = null
 
 export async function initProfilePage(userId: number): Promise<void> {
 	await initAndRenderUserProfile(userId)
+	await fetchAndRenderStats(userId)
+	await fetchAndRenderMatchHistory(userId)
 }
 
 export async function attachProfileEvents(): void {
@@ -94,7 +93,6 @@ export async function attachProfileEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// Create and store the click handler
 	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
@@ -109,16 +107,7 @@ export async function attachProfileEvents(): void {
 		}
 	}
 
-	// submitHandler = async (e: Event) => {
-	// 	const form = e.target as HTMLElement
-	// 	e.preventDefault()
-	// 	const formName = form.getAttribute('data-form')
-	// 	console.log('e submitted form:', form)
-	// }
-
-	// Attach the handler
 	content.addEventListener('click', clickHandler)
-	// content.addEventListener('submit', submitHandler)
 
 	console.log('Profile page events attached')
 }
@@ -127,11 +116,6 @@ export function detachProfileEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// if (submitHandler) {
-	// 	content.removeEventListener('submit', submitHandler)
-	// 	submitHandler = null
-	// }
-
 	if (clickHandler) {
 		content.removeEventListener('click', clickHandler)
 		clickHandler = null
@@ -139,70 +123,3 @@ export function detachProfileEvents(): void {
 
 	console.log('Profile page events detached')
 }
-
-// Mock data for statistics and history
-const stats = {
-	games_played: 256,
-	wins: 198,
-	losses: 58,
-	winRate: 10
-}
-
-const history = [
-	{
-		date: '2025-05-01',
-		player1: 'Mamth',
-		score1: 21,
-		score2: 15,
-		player2: 'Tiger',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-02',
-		player1: 'Mamjth',
-		score1: 18,
-		score2: 21,
-		player2: 'Eagutle',
-		result: 'Loss'
-	},
-	{
-		date: '2025-05-03',
-		player1: 'Math',
-		score1: 22,
-		score2: 20,
-		player2: 'Shark',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-04',
-		player1: 'Mammh',
-		score1: 19,
-		score2: 21,
-		player2: 'Lion',
-		result: 'Loss'
-	},
-	{
-		date: '2025-05-05',
-		player1: 'Mammoth',
-		score1: 23,
-		score2: 22,
-		player2: 'Wolf',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-03',
-		player1: 'Math',
-		score1: 22,
-		score2: 20,
-		player2: 'Shark',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-05',
-		player1: 'Mammoth',
-		score1: 3,
-		score2: 0,
-		player2: 'Wolf',
-		result: 'Win'
-	}
-]
