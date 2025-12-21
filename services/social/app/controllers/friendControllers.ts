@@ -136,7 +136,5 @@ export async function isFriendController(
 
 	const status = SocialRepository.getRelationStatus(userId, friendUserId)
 
-	const isFriend = status === RelationStatus.FRIENDS
-
-	reply.code(200).send({ isFriend })
+	reply.code(200).send({ status })
 }

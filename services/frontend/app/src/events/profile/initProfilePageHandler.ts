@@ -44,17 +44,9 @@ function renderProfile(user: IPublicProfileUser) {
 
 /**
  * Initialize the profile page by fetching user data and rendering it
- * based on the user ID in the URL.
+ * @param userId - The user ID to fetch profile for
  */
-export async function initProfilePage() {
-	const urlParts = window.location.pathname.split('/')
-	const userId = urlParts[2]
-
-	if (!userId) {
-		console.error('No user ID found in URL')
-		return
-	}
-
+export async function initProfilePage(userId: number) {
 	const responseUser = await fetchUserById(userId)
 	if (responseUser.error || !responseUser.data) {
 		console.error('User not found: ', responseUser.error)
@@ -63,33 +55,43 @@ export async function initProfilePage() {
 		return
 	}
 
-	const isFriendResponse = await checkIsFriendApi(Number(userId))
-	if (isFriendResponse.error) {
-		console.error('Error checking friendship status: ', isFriendResponse.error)
+	const statusResponse = await checkIsFriendApi(userId)
+	if (statusResponse.error) {
+		console.error('Error checking friendship status: ', statusResponse.error)
 		return
 	}
 
-	const isFriend = isFriendResponse.data?.isFriend || false
-	updateFriendButton(isFriend)
+	// Map status from API: -1 = none, 0 = pending, 1 = friend
+	const status = statusResponse.data?.status ?? -1
+	const buttonState = status === 1 ? 'friend' : status === 0 ? 'pending' : 'none'
+	updateFriendButton(buttonState)
 
 	renderProfile(responseUser.data)
 }
 
 /**
  * Update the friend button based on friendship status
- * @param isFriend
+ * @param status - The friendship status: 'none', 'pending', or 'friend'
  */
-function updateFriendButton(isFriend: boolean) {
+export function updateFriendButton(status: 'none' | 'pending' | 'friend') {
 	const buttonContainer = document.getElementById('friend-button-container')
 	if (!buttonContainer) return
 
-	if (isFriend) {
+	if (status === 'friend') {
 		buttonContainer.innerHTML = Button({
 			id: 'remove_friend_btn',
 			text: 'Remove Friend',
 			type: 'button',
 			action: 'remove-friend',
 			additionalClasses: 'mt-4 !mb-0'
+		})
+	} else if (status === 'pending') {
+		buttonContainer.innerHTML = Button({
+			id: 'pending_friend_btn',
+			text: 'Pending',
+			type: 'button',
+			action: '',
+			additionalClasses: 'mt-4 !mb-0 opacity-50 cursor-not-allowed'
 		})
 	} else {
 		buttonContainer.innerHTML = Button({

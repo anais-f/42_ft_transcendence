@@ -1,13 +1,10 @@
-import { Button } from '../components/Button.js'
 import { StatBox } from '../components/game/StatBox.js'
 import { LoremSection } from '../components/LoremIpsum.js'
 import { GameHistoryRow } from '../components/game/HistoryRow.js'
 import { initProfilePage } from '../events/profile/initProfilePageHandler.js'
+import { handleAddFriend, handleRemoveFriend } from '../events/profile/profilePageHandler.js'
 
 export const ProfilePage = (): string => {
-	// Valeurs par défaut (seront overridées par le fetch)
-	const isFriend = false
-
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-16 h-full w-full">
 
@@ -18,7 +15,7 @@ export const ProfilePage = (): string => {
         <h2 id="profile-username" class="text-xl font-medium font-special pb-1">Loading...</h2>
         <p class="text-gray-500 flex items-center gap-2 pb-1">
             <span id="profile-status-color" class="w-3 h-3 rounded-full bg-gray-500"></span>
-						<span id="profile-status-text">Offlne</span>
+						<span id="profile-status-text">Offline</span>
 				</p>
         <p class="font-medium">Last Seen : <span id="profile-last-seen" class="font-normal">...</span></p>
       </div>
@@ -26,8 +23,7 @@ export const ProfilePage = (): string => {
 				title: 'Biography',
 				variant: 'fill'
 			})}
-      <div id="friend-button-container" class="w-full">                                          
-    		<!-- Le bouton sera inséré dynamiquement -->                                        
+      <div id="friend-button-container" class="w-full">                                                                                 
   		</div> 
     </div>
 
@@ -79,7 +75,21 @@ let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 
 export async function attachProfileEvents(): void {
-	await initProfilePage()
+	const urlParts = window.location.pathname.split('/')
+	const userIdStr = urlParts[2]
+
+	if (!userIdStr) {
+		console.error('No user ID found in URL')
+		return
+	}
+
+	const userId = Number(userIdStr)
+	if (isNaN(userId)) {
+		console.error('Invalid user ID in URL')
+		return
+	}
+
+	await initProfilePage(userId)
 
 	const content = document.getElementById('content')
 	if (!content) return
@@ -92,12 +102,10 @@ export async function attachProfileEvents(): void {
 		if (actionButton) {
 			e.preventDefault()
 			const action = actionButton.getAttribute('data-action')
-			// if (action === 'add-friend') {
-			// 	await handleSearchUser('add', currentUser!.id)
-			// }
-			// if (action === 'remove-friend') {
-			// 	await handleSearchUser('remove', currentUser!.id)
-			// }
+			if (action === 'add-friend')
+				await handleAddFriend(userId)
+			if (action === 'remove-friend')
+				await handleRemoveFriend(userId)
 		}
 	}
 
