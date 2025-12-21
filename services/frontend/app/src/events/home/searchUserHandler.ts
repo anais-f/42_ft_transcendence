@@ -1,4 +1,4 @@
-import { fetchUserByUsername } from '../../api/usersService.js'
+import { fetchUserByUsername } from '../../api/usersApi.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { validateUsername } from '../../utils/userValidation.js'
 
