@@ -46,7 +46,7 @@ function renderProfile(user: IPublicProfileUser) {
  * Initialize the profile page by fetching user data and rendering it
  * @param userId - The user ID to fetch profile for
  */
-export async function initProfilePage(userId: number) {
+export async function initAndRenderUserProfile(userId: number) {
 	const responseUser = await fetchUserById(userId)
 	if (responseUser.error || !responseUser.data) {
 		console.error('User not found: ', responseUser.error)
@@ -61,7 +61,6 @@ export async function initProfilePage(userId: number) {
 		return
 	}
 
-	// Map status from API: -1 = none, 0 = pending, 1 = friend
 	const status = statusResponse.data?.status ?? -1
 	const buttonState = status === 1 ? 'friend' : status === 0 ? 'pending' : 'none'
 	updateFriendButton(buttonState)
