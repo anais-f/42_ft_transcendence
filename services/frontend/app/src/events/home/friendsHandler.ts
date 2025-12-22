@@ -5,16 +5,94 @@ import {
 import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
 import { FriendListItem } from '../../components/friends/FriendListItem.js'
 
-
-
-export async function renderFriendsList(friends: any[]): void {
-	const listFriends = document.getElementById('friends_list')
+/**
+ * Fetches the friends list and renders it into the friends list container.
+ */
+export async function fetchAndRenderFriendsList(): Promise<void> {
+	const listFriends = document.getElementById('friend_list')
 	if (!listFriends) return
+	console.log('Fetching Friends List')
 
-	console.log('hello from rednerFriendsList', friends)
+	const friendsResponse = await getFriendsListApi()
+	if (friendsResponse.error || !friendsResponse.data) {
+		console.error('Failed to fetch friends list:', friendsResponse.error)
+		return
+	}
+	console.log('friends : ', friendsResponse)
+	console.log('FIRENDSDATA : ', friendsResponse.data)
+
+	const friends = friendsResponse.data.friends
+
 	if (friends.length === 0) {
-		listFriends.innerHTML = '<li class="p-4 text-gray-500">No friends yet.</li>'
+		listFriends.innerHTML = `<p class="text-gray-500">You have no friends added.</p>`
 		return
 	}
 
+	const rowItems = friends.map((friend: any) =>
+		FriendListItem({
+			id: friend.user_id,
+			username: friend.username,
+			avatar: friend.avatar,
+			status: friend.status
+		})
+	)
+
+	console.log('FRIEND ROW ITEMS: ', rowItems)
+
+	listFriends.innerHTML = rowItems.join('')
+}
+
+/**
+ * Fetches the pending friend requests and renders them into the requests list container.
+ */
+export async function fetchAndRenderFriendRequests(): Promise<void> {
+	const listRequests = document.getElementById('request_list')
+	if (!listRequests) return
+	console.log('Fetching Friend Requests')
+
+	const requestsResponse = await getPendingRequestsApi()
+	if (requestsResponse.error || !requestsResponse.data) {
+		console.error(
+			'Failed to fetch friend requests:',
+			requestsResponse.error
+		)
+		return
+	}
+	console.log('requests : ', requestsResponse)
+	console.log('REQUESTSDATA : ', requestsResponse.data)
+
+	const requests = requestsResponse.data.pendingFriends
+
+	if (requests.length === 0) {
+		listRequests.innerHTML = `<span class="text-gray-500">You have no pending friend requests.</span>`
+		return
+	}
+
+	const rowItems = requests.map((request: any) =>
+		FriendRequestItem({
+			id: request.user_id,
+			username: request.username,
+			avatar: request.avatar
+		})
+	)
+
+	console.log('REQUEST ROW ITEMS: ', rowItems)
+
+	listRequests.innerHTML = rowItems.join('')
+}
+
+export async function acceptFriendRequest(requestId: number): Promise<void> {
+	// Implementation for accepting a friend request
+
+	console.log(`Accepted friend request from user ID: ${requestId}`)
+	// After accepting, refresh the lists
+	await fetchAndRenderFriendsList()
+	await fetchAndRenderFriendRequests()
+}
+
+export async function declineFriendRequest(requestId: number): Promise<void> {
+	// Implementation for declining a friend request
+	console.log(`Declined friend request from user ID: ${requestId}`)
+	// After declining, refresh the requests list
+	await fetchAndRenderFriendRequests()
 }
