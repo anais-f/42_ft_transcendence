@@ -16,6 +16,6 @@ export * from './interfaces/jwtModels.js'
 export * from './interfaces/tournamentModels.js'
 export * from './interfaces/websocketModels.js'
 export * from './interfaces/usersModels.js'
-export * from './interfaces/jwtModels.js'
+
 export * from './utils/secrets.js'
-export * from './interfaces/tournamentModels.js'
+export * from './utils/envValidation.js'
