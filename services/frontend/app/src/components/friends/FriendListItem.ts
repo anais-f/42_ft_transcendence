@@ -11,7 +11,7 @@ interface FriendListItemProps {
 	id: string
 	username: string
 	avatar: string
-	status: 'online' | 'offline'
+	status: number
 }
 
 /**
@@ -20,9 +20,11 @@ interface FriendListItemProps {
  * @constructor
  */
 export const FriendListItem = (props: FriendListItemProps): string => {
-	const { id, username, avatar, status = '' } = props
+	const { id, username, avatar, status } = props
 
-	const statusColor = status === 'online' ? 'bg-green-500' : 'bg-gray-500'
+	const isOnline = status === 1
+	const statusColor = isOnline ? 'bg-green-500' : 'bg-gray-500'
+	const statusText = isOnline ? 'Online' : 'Offline'
 
 	return /*html*/ `
     <li class="flex flex-row border-b border-black" id="friend_item_${id}">
@@ -34,7 +36,7 @@ export const FriendListItem = (props: FriendListItemProps): string => {
           </a>
           <p class="text-gray-500 flex items-center gap-2">
             <span class="w-3 h-3 rounded-full ${statusColor}"></span>
-            ${status}
+            ${statusText}
           </p>
         </div>
       </div>

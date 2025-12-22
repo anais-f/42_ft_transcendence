@@ -15,15 +15,12 @@ import { FriendListItem } from '../../components/friends/FriendListItem.js'
 export async function fetchAndRenderFriendsList(): Promise<void> {
 	const listFriends = document.getElementById('friend_list')
 	if (!listFriends) return
-	console.log('Fetching Friends List')
 
 	const friendsResponse = await getFriendsListApi()
 	if (friendsResponse.error || !friendsResponse.data) {
 		console.error('Failed to fetch friends list:', friendsResponse.error)
 		return
 	}
-	console.log('friends : ', friendsResponse)
-	console.log('FIRENDSDATA : ', friendsResponse.data)
 
 	const friends = friendsResponse.data.friends
 
@@ -41,8 +38,6 @@ export async function fetchAndRenderFriendsList(): Promise<void> {
 		})
 	)
 
-	console.log('FRIEND ROW ITEMS: ', rowItems)
-
 	listFriends.innerHTML = rowItems.join('')
 }
 
@@ -52,7 +47,6 @@ export async function fetchAndRenderFriendsList(): Promise<void> {
 export async function fetchAndRenderFriendRequests(): Promise<void> {
 	const listRequests = document.getElementById('request_list')
 	if (!listRequests) return
-	console.log('Fetching Friend Requests')
 
 	const requestsResponse = await getPendingRequestsApi()
 	if (requestsResponse.error || !requestsResponse.data) {
