@@ -2,17 +2,13 @@ import type { Database } from 'better-sqlite3'
 import { mkdirSync } from 'fs'
 import { dirname } from 'path'
 import BetterSqlite3 from 'better-sqlite3'
+import { env } from '../env/index.js'
 
 let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		const path = process.env.MATCHMAKING_DB_PATH
-		if (!path) {
-			throw new Error(
-				'MATCHMAKING_DB_PATH environment variable is required to connect to the database'
-			)
-		}
+		const path = env.MATCHMAKING_DB_PATH
 		// Ensure directory exists
 		mkdirSync(dirname(path), { recursive: true })
 		db = new BetterSqlite3(path)
