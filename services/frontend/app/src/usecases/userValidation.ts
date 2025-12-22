@@ -1,7 +1,7 @@
 import { UsernameSchema } from '@common/DTO/usersSchema.js'
 import { PasswordSchema } from '@common/DTO/authSchema.js'
-import { checkAuth } from '../usecases/userSession.js'
-import { setCurrentUser } from '../usecases/userStore.js'
+import { checkAuth } from './userSession.js'
+import { setCurrentUser } from './userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 
 export async function handleAuthSuccess(successMessage: string) {
