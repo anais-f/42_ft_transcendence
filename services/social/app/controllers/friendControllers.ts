@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
 import { IUserId, RelationStatus } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
-import { SocialRepository } from '@services/social/app/repositories/socialRepository.js'
+import { SocialRepository } from '../repositories/socialRepository.js'
 
 async function handleFriendAction(
 	req: FastifyRequest,

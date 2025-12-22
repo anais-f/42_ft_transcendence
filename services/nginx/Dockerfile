@@ -2,7 +2,7 @@
 FROM alpine:3.19.4
 
 WORKDIR /app
-RUN apk add --no-cache nginx
+RUN apk add --no-cache nginx wget
 RUN mkdir -p /usr/share/nginx/html/avatars
 
 COPY conf/default.conf /etc/nginx/http.d/default.conf
