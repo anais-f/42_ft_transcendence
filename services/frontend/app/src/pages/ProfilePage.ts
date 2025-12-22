@@ -1,5 +1,4 @@
 import { LoremSection } from '../components/LoremIpsum.js'
-import { GameHistoryRow } from '../components/game/HistoryRow.js'
 import { initAndRenderUserProfile } from '../events/profile/initProfilePageHandler.js'
 import {
 	handleAddFriend,
@@ -9,6 +8,7 @@ import {
 	fetchAndRenderStats,
 	fetchAndRenderMatchHistory
 } from '../events/profile/initStatsHandler.js'
+import { userIdFromUrl } from '../usecases/urlUtils.js'
 
 export const ProfilePage = (): string => {
 	return /*html*/ `
@@ -61,7 +61,6 @@ export const ProfilePage = (): string => {
                 </tr>
             </thead>
             <tbody id="match-history" class="w-full overflow-y-auto flex-1">
-            	<!-- ${history.map((game) => GameHistoryRow(game)).join('')} -->
             </tbody>
         </table>
       </div>    
@@ -73,33 +72,21 @@ export const ProfilePage = (): string => {
 
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 
-export async function initProfilePage(userId: number): Promise<void> {
+async function initProfilePage(userId: number): Promise<void> {
 	await initAndRenderUserProfile(userId)
 	await fetchAndRenderStats(userId)
 	await fetchAndRenderMatchHistory(userId)
 }
 
-export async function attachProfileEvents(): void {
-	const urlParts = window.location.pathname.split('/')
-	const userIdStr = urlParts[2]
-
-	if (!userIdStr) {
-		console.error('No user ID found in URL')
-		return
-	}
-
-	const userId = Number(userIdStr)
-	if (isNaN(userId)) {
-		console.error('Invalid user ID in URL')
-		return
-	}
+export async function attachProfileEvents(): Promise<void> {
+	const userId = await userIdFromUrl()
+	if (userId === null) return
 
 	await initProfilePage(userId)
 
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// Create and store the click handler
 	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
@@ -112,12 +99,17 @@ export async function attachProfileEvents(): void {
 		}
 	}
 
-	// Attach the handler
 	content.addEventListener('click', clickHandler)
 
 	console.log('Profile page events attached')
 }
 
+/**
+ * Detach event listeners for the profile page.
+ * Removes the click event handler from the content element.
+ * Logs detachment status to the console.
+ * @returns {void}
+ */
 export function detachProfileEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return
@@ -129,70 +121,3 @@ export function detachProfileEvents(): void {
 
 	console.log('Profile page events detached')
 }
-
-// Mock data for statistics and history
-const stats = {
-	games_played: 256,
-	wins: 198,
-	losses: 58,
-	winRate: 10
-}
-
-const history = [
-	{
-		date: '2025-05-01',
-		player1: 'Mamth',
-		score1: 21,
-		score2: 15,
-		player2: 'Tiger',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-02',
-		player1: 'Mamjth',
-		score1: 18,
-		score2: 21,
-		player2: 'Eagutle',
-		result: 'Loss'
-	},
-	{
-		date: '2025-05-03',
-		player1: 'Math',
-		score1: 22,
-		score2: 20,
-		player2: 'Shark',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-04',
-		player1: 'Mammh',
-		score1: 19,
-		score2: 21,
-		player2: 'Lion',
-		result: 'Loss'
-	},
-	{
-		date: '2025-05-05',
-		player1: 'Mammoth',
-		score1: 23,
-		score2: 22,
-		player2: 'Wolf',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-03',
-		player1: 'Math',
-		score1: 22,
-		score2: 20,
-		player2: 'Shark',
-		result: 'Win'
-	},
-	{
-		date: '2025-05-05',
-		player1: 'Mammoth',
-		score1: 3,
-		score2: 0,
-		player2: 'Wolf',
-		result: 'Win'
-	}
-]
