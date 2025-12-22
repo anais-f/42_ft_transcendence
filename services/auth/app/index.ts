@@ -16,9 +16,7 @@ import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
-import { checkEnv } from './env/checkEnv.js'
-
-export const env = checkEnv()
+import { env } from './env/index.js'
 
 const app = Fastify({
 	logger: true

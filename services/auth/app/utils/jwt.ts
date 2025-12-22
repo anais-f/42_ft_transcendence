@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
-import { env } from '../index.js'
+import { env } from '../env/index.js'
 
 function getJWTSecret(): string {
 	return env.JWT_SECRET

@@ -10,7 +10,7 @@ import {
 	validateAdminUsecase
 } from '../usecases/authUsecases.js'
 import createHttpError from 'http-errors'
-import { env } from '../index.js'
+import { env } from '../env/index.js'
 
 export async function registerController(
 	request: FastifyRequest,

@@ -6,7 +6,7 @@ import {
 } from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
-import { env } from '../index.js'
+import { env } from '../env/index.js'
 
 export async function registerUserUsecase(
 	login: string,

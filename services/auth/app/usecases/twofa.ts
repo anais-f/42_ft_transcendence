@@ -10,7 +10,7 @@ import {
 	Verify2FALoginResponseDTO,
 	Status2FAResponseDTO
 } from '@ft_transcendence/common'
-import { env } from '../index.js'
+import { env } from '../env/index.js'
 
 async function call2faService(
 	path: string,
