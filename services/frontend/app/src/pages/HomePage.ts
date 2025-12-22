@@ -1,14 +1,15 @@
 import { Button } from '../components/Button.js'
 import { Input } from '../components/Input.js'
 import { LoremSection } from '../components/LoremIpsum.js'
-import { FriendListItem } from '../components/friends/FriendListItem.js'
-import { FriendRequestItem } from '../components/friends/FriendRequestItem.js'
 import { currentUser } from '../usecases/userStore.js'
 import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { handleSearchUser } from '../events/home/searchUserHandler.js'
-import { initHomePage } from '../events/home/friendsHandler.js'
+import {
+	fetchAndRenderFriendRequests,
+	fetchAndRenderFriendsList
+} from '../events/home/friendsHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -116,8 +117,8 @@ export const HomePage = (): string => {
             <div id="relationship" class="w-full flex flex-col flex-[70%] min-h-0">
                 <h1 class="title_bloc mt-2 !mb-1">RELATIONSHIP</h1>
                 <div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
-                    <ul id="friend_list" class="h-full">  
-                    	<!-- Friend items will be dynamically loaded here -->
+                    <ul id="friend_list" class="h-full">
+                    	<span class="text-gray-500">Loading friends...</span>
                     </ul>
                 </div>
             </div>
@@ -127,7 +128,7 @@ export const HomePage = (): string => {
                 <h1 class="title_bloc mt-2 !mb-1">GET IN TOUCH</h1>
                 <div id="div_request_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
                     <ul id="request_list" class="h-full">  
-                    	<!-- Friend items will be dynamically loaded here -->
+                    	<span class="text-gray-500">Loading friend requests...</span>
                     </ul>
                 </div>
             </div>
@@ -148,12 +149,8 @@ export const HomePage = (): string => {
 async function initHomePage() {
 	try {
 		console.log('Initializing home page...')
-		const friendsData = getFriendsListApi()
-		if (friendsData.error) {
-			console.error('Error fetching friends list:', friendsData.error)
-		} else if (friendsData.data) {
-			renderFriendsList(friendsData.data.friends)
-		}
+		await fetchAndRenderFriendsList()
+		await fetchAndRenderFriendRequests()
 	} catch (error) {
 		console.error('Network error while fetching friends list:', error)
 	}
@@ -174,7 +171,7 @@ export async function attachHomeEvents() {
 		return
 	}
 
-	// await initHomePage()
+	await initHomePage()
 
 	// Create and store the click handler
 	clickHandler = async (e: Event) => {
