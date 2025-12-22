@@ -2,6 +2,10 @@ import {
 	getFriendsListApi,
 	getPendingRequestsApi
 } from '../../api/friends/getFriendsApi.js'
+import {
+	acceptFriendApi,
+	rejectFriendApi
+} from '../../api/friends/handleFriendsApi.js'
 import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
 import { FriendListItem } from '../../components/friends/FriendListItem.js'
 
@@ -52,14 +56,9 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
 
 	const requestsResponse = await getPendingRequestsApi()
 	if (requestsResponse.error || !requestsResponse.data) {
-		console.error(
-			'Failed to fetch friend requests:',
-			requestsResponse.error
-		)
+		console.error('Failed to fetch friend requests:', requestsResponse.error)
 		return
 	}
-	console.log('requests : ', requestsResponse)
-	console.log('REQUESTSDATA : ', requestsResponse.data)
 
 	const requests = requestsResponse.data.pendingFriends
 
@@ -76,23 +75,32 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
 		})
 	)
 
-	console.log('REQUEST ROW ITEMS: ', rowItems)
-
 	listRequests.innerHTML = rowItems.join('')
 }
 
+/**
+ * Accepts a friend request and updates the friends and requests lists.
+ * @param requestId
+ */
 export async function acceptFriendRequest(requestId: number): Promise<void> {
-	// Implementation for accepting a friend request
-
-	console.log(`Accepted friend request from user ID: ${requestId}`)
-	// After accepting, refresh the lists
+	const response = await acceptFriendApi(requestId)
+	if (response.error) {
+		console.error('Failed to accept friend request:', response.error)
+		return
+	}
 	await fetchAndRenderFriendsList()
 	await fetchAndRenderFriendRequests()
 }
 
+/**
+ * Declines a friend request and updates the requests list.
+ * @param requestId
+ */
 export async function declineFriendRequest(requestId: number): Promise<void> {
-	// Implementation for declining a friend request
-	console.log(`Declined friend request from user ID: ${requestId}`)
-	// After declining, refresh the requests list
+	const response = await rejectFriendApi(requestId)
+	if (response.error) {
+		console.error('Failed to decline friend request:', response.error)
+		return
+	}
 	await fetchAndRenderFriendRequests()
 }

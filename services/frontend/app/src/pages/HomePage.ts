@@ -7,6 +7,8 @@ import { handleCreateGame } from '../events/home/createGameHandler.js'
 import { handleJoinLobby } from '../events/home/joinLobbyHandler.js'
 import { handleSearchUser } from '../events/home/searchUserHandler.js'
 import {
+	acceptFriendRequest,
+	declineFriendRequest,
 	fetchAndRenderFriendRequests,
 	fetchAndRenderFriendsList
 } from '../events/home/friendsHandler.js'
@@ -141,6 +143,9 @@ export const HomePage = (): string => {
 `
 }
 
+let clickHandler: ((e: Event) => Promise<void>) | null = null
+let submitHandler: ((e: Event) => Promise<void>) | null = null
+
 /**
  * Initialize the home page by clearing existing friend and request lists.
  * This function prepares the home page for fresh content loading.
@@ -156,9 +161,6 @@ async function initHomePage() {
 	}
 }
 
-let clickHandler: ((e: Event) => Promise<void>) | null = null
-let submitHandler: ((e: Event) => Promise<void>) | null = null
-
 /**
  * Attach event listeners for the home page.
  * Sets up handlers for button clicks such as logout and navigation to settings.
@@ -173,7 +175,6 @@ export async function attachHomeEvents() {
 
 	await initHomePage()
 
-	// Create and store the click handler
 	clickHandler = async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
@@ -187,11 +188,15 @@ export async function attachHomeEvents() {
 			if (action === 'create-game') await handleCreateGame()
 			if (action === 'navigate-profile') {
 				const id = actionButton.getAttribute('data-id')
-				if (id) {
-					window.navigate(`/profile/${id}`)
-				}
+				if (id) window.navigate(`/profile/${id}`)
 			}
 			if (action === 'accept-friend') {
+				const id = actionButton.getAttribute('data-id')
+				if (id) await acceptFriendRequest(Number(id))
+			}
+			if (action === 'decline-friend') {
+				const id = actionButton.getAttribute('data-id')
+				if (id) await declineFriendRequest(Number(id))
 			}
 		}
 	}
@@ -206,7 +211,6 @@ export async function attachHomeEvents() {
 		if (formName === 'search-user-form') await handleSearchUser(e)
 	}
 
-	// Attach the handler
 	content.addEventListener('click', clickHandler)
 	content.addEventListener('submit', submitHandler)
 
