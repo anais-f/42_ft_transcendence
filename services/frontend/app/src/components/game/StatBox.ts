@@ -9,7 +9,7 @@
  */
 interface StatProps {
 	label: string
-	value: number
+	value: number | string
 	color: string
 }
 
