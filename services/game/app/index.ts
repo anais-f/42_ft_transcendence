@@ -1,7 +1,7 @@
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { checkEnv, IGameEnv } from './env/verifyEnv.js'
+import { checkEnv, IGameEnv } from './env/checkEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
