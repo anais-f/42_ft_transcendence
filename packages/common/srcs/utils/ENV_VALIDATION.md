@@ -9,10 +9,10 @@ import { z } from 'zod'
 import { validateEnv } from '@ft_transcendence/common'
 
 const envSchema = z.object({
-  HOST: z.string().min(1),
-  PORT: z.string().transform(Number),
-  JWT_SECRET: z.string().min(1),
-  AUTH_SERVICE_URL: z.string().min(1)
+	HOST: z.string().min(1),
+	PORT: z.string().transform(Number),
+	JWT_SECRET: z.string().min(1),
+	AUTH_SERVICE_URL: z.string().min(1)
 })
 
 const env = validateEnv(envSchema)
@@ -24,10 +24,10 @@ const env = validateEnv(envSchema)
 
 ```typescript
 const envSchema = z.object({
-  HOST: z.string().min(1),
-  PORT: z.string().transform(Number),
-  NODE_ENV: z.string().default('development'),  // optional with default
-  DEBUG: z.string().optional()  // optional without default
+	HOST: z.string().min(1),
+	PORT: z.string().transform(Number),
+	NODE_ENV: z.string().default('development'), // optional with default
+	DEBUG: z.string().optional() // optional without default
 })
 ```
 

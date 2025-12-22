@@ -1,8 +1,6 @@
 import { z } from 'zod'
 
-export function validateEnv<T extends z.ZodTypeAny>(
-	schema: T
-): z.infer<T> {
+export function validateEnv<T extends z.ZodTypeAny>(schema: T): z.infer<T> {
 	const result = schema.safeParse(process.env)
 
 	if (!result.success) {
