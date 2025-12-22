@@ -1,7 +1,8 @@
 import DatabaseConstructor from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
+import { env } from '../env/index.js'
 
-export const db: Database = new DatabaseConstructor(process.env.USERS_DB_PATH)
+export const db: Database = new DatabaseConstructor(env.USERS_DB_PATH)
 
 db.pragma('journal_mode = WAL')
 db.pragma('synchronous = NORMAL')

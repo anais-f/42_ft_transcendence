@@ -4,6 +4,7 @@ import {
 	PublicUserListAuthSchema
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
+import { env } from '../env/index.js'
 
 export class AuthApi {
 	/**
@@ -12,12 +13,8 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		const base = process.env.AUTH_SERVICE_URL
-		const secret = process.env.INTERNAL_API_SECRET
-		if (!base || !secret)
-			throw createHttpError.InternalServerError(
-				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
-			)
+		const base = env.AUTH_URL
+		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/users`
 		const headers = {
@@ -61,13 +58,8 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async get2FAStatus(userId: number): Promise<boolean> {
-		const base = process.env.AUTH_SERVICE_URL
-		const secret = process.env.INTERNAL_API_SECRET
-
-		if (!base || !secret)
-			throw createHttpError.InternalServerError(
-				'Missing AUTH_SERVICE_URL or INTERNAL_API_SECRET env'
-			)
+		const base = env.AUTH_URL
+		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/2fa/status/${userId}`
 		const headers = {
