@@ -4,16 +4,7 @@
  * Includes a clear method to reset the store.
  */
 class SocialStore {
-	private _sessionToken: string | null = null
 	private _socialSocket: WebSocket | null = null
-
-	get sessionToken(): string | null {
-		return this._sessionToken
-	}
-
-	set sessionToken(token: string | null) {
-		this._sessionToken = token
-	}
 
 	get socialSocket(): WebSocket | null {
 		return this._socialSocket
@@ -28,7 +19,6 @@ class SocialStore {
 			this._socialSocket.close()
 			this._socialSocket = null
 		}
-		this._sessionToken = null
 	}
 }
 
