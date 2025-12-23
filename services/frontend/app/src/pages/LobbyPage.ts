@@ -95,7 +95,7 @@ export const LobbyPage = (): string => {
 
 let clickHandler: ((e: Event) => void) | null = null
 
-export async function attachLobbyEvents() {
+export function attachLobbyEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
