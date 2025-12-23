@@ -2,6 +2,7 @@ import fetch from 'node-fetch'
 import { IUserId, IPublicProfileUser } from '@ft_transcendence/common'
 import { UserPublicProfileSchema } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
+import { env } from '../env/checkEnv.js'
 
 export class UsersApi {
 	/**
@@ -11,12 +12,8 @@ export class UsersApi {
 	 * @throws HttpError if the request fails (non-404 errors)
 	 */
 	static async userExists(user: IUserId): Promise<boolean> {
-		const base = process.env.USERS_SERVICE_URL
-		const secret = process.env.INTERNAL_API_SECRET
-		if (!base || !secret)
-			throw createHttpError.InternalServerError(
-				'Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env'
-			)
+		const base = env.USERS_SERVICE_URL
+		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/users/profile/${user.user_id}`
 		const headers = {
@@ -52,19 +49,9 @@ export class UsersApi {
 		return true
 	}
 
-	/**
-	 * @description Get user data by ID
-	 * @param user - User ID
-	 * @returns User data with username, avatar, status, last_connection
-	 * @throws HttpError if the request fails or data is invalid
-	 */
 	static async getUserData(user: IUserId): Promise<IPublicProfileUser> {
-		const base = process.env.USERS_SERVICE_URL
-		const secret = process.env.INTERNAL_API_SECRET
-		if (!base || !secret)
-			throw createHttpError.InternalServerError(
-				'Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env'
-			)
+		const base = env.USERS_SERVICE_URL
+		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/users/profile/${user.user_id}`
 		const headers = {
