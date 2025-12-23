@@ -1,6 +1,6 @@
 import DatabaseConstructor from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
-import { env } from '../env/index.js'
+import { env } from '../env/checkEnv.js'
 
 export const db: Database = new DatabaseConstructor(env.USERS_DB_PATH)
 

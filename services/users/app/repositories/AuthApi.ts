@@ -4,7 +4,7 @@ import {
 	PublicUserListAuthSchema
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
-import { env } from '../env/index.js'
+import { env } from '../env/checkEnv.js'
 
 export class AuthApi {
 	/**
@@ -13,7 +13,7 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async getAllUsers() {
-		const base = env.AUTH_URL
+		const base = env.AUTH_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/users`
@@ -58,7 +58,7 @@ export class AuthApi {
 	 * @throws Error if the request fails
 	 */
 	static async get2FAStatus(userId: number): Promise<boolean> {
-		const base = env.AUTH_URL
+		const base = env.AUTH_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
 
 		const url = `${base}/api/internal/2fa/status/${userId}`

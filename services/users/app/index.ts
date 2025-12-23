@@ -16,7 +16,7 @@ import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { setupErrorHandler } from '@ft_transcendence/common'
-import { env } from './env/index.js'
+import { env } from './env/checkEnv.js'
 
 function createApp(): FastifyInstance {
 	const app = Fastify({
