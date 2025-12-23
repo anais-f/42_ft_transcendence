@@ -2,23 +2,43 @@ import {
 	WSMessageType,
 	NotificationPayload
 } from '@common/interfaces/websocketModels.js'
-import { notyfGlobal as notyf } from '../../utils/notyf.js'
-import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
+import { notyfFriends as notyf } from '../../utils/notyf.js'
+import { ToastActionType } from '../../types/toast.js'
+import {
+	fetchAndRenderFriendRequests,
+	fetchAndRenderFriendsList
+} from './friendsHandler.js'
 
-export function handleSocialDispatcher(message: MessageEvent) {
+/**
+ * Handles incoming WebSocket messages related to social features
+ * @param message - The WebSocket message event
+ */
+export async function handleSocialDispatcher(message: MessageEvent) {
 	try {
 		const msg = JSON.parse(message.data)
 		console.log(msg)
 		if (msg.type === WSMessageType.CONNECTION_ESTABLISHED) {
 			console.log('Received connection established')
 		} else if (msg.type === WSMessageType.FRIEND_REQUEST) {
-			handleFriendRequest(msg as NotificationPayload)
+			await handleFriendRequest(msg as NotificationPayload)
 		} else if (msg.type === WSMessageType.FRIEND_ACCEPT) {
-			// Handle friend accep
+			await handleFriendNotification(
+				msg as NotificationPayload,
+				ToastActionType.FRIEND_ACCEPT,
+				true
+			)
 		} else if (msg.type === WSMessageType.FRIEND_REMOVE) {
-			// Handle friend remove
+			await handleFriendNotification(
+				msg as NotificationPayload,
+				ToastActionType.FRIEND_REMOVE,
+				true
+			)
 		} else if (msg.type === WSMessageType.FRIEND_REJECT) {
-			// Handle friend reject
+			await handleFriendNotification(
+				msg as NotificationPayload,
+				ToastActionType.FRIEND_REJECT,
+				false
+			)
 		} else if (msg.type === WSMessageType.USER_STATUS_CHANGE) {
 			const data = msg.data
 			updateFriendStatus(data.userId, data.status)
@@ -28,6 +48,11 @@ export function handleSocialDispatcher(message: MessageEvent) {
 	}
 }
 
+/**
+ * Updates the online status of a friend in the friends list UI
+ * @param userId - The ID of the user whose status has changed
+ * @param status - The new status (1 for online, 0 for offline)
+ */
 function updateFriendStatus(userId: number, status: number) {
 	const friendItemId = `friend_item_${userId}`
 	const friendItem = document.getElementById(friendItemId)
@@ -53,4 +78,60 @@ function updateFriendStatus(userId: number, status: number) {
 	console.log(
 		`Updated status for friend ID ${userId} to ${isOnline ? 'Online' : 'Offline'}.`
 	)
+}
+
+/**
+ * Handles incoming friend requests
+ * Displays a notification and refreshes the friend requests list
+ * @param payload
+ */
+async function handleFriendRequest(payload: NotificationPayload) {
+	const fromUsername = payload.data.from.username
+	const fromUserId = payload.data.from.userId
+	const message = payload.data.message
+
+	console.log('📩 Friend request received:', {
+		fromUsername,
+		fromUserId,
+		message
+	})
+
+	notyf.open({
+		type: ToastActionType.FRIEND_REQUEST,
+		message: message
+	})
+
+	await fetchAndRenderFriendRequests()
+	console.log('✅ Friend requests list updated')
+}
+
+/**
+ * Handles friend notifications (accept, remove, reject)
+ * Displays a notification and optionally refreshes the friend list
+ * @param payload
+ * @param notifType
+ * @param shouldRefreshFriendList
+ */
+async function handleFriendNotification(
+	payload: NotificationPayload,
+	notifType: ToastActionType,
+	shouldRefreshFriendList: boolean
+) {
+	const message = payload.data.message
+	const fromUsername = payload.data.from.username
+
+	console.log(`📩 Friend notification received: ${notifType}`, {
+		fromUsername,
+		message
+	})
+
+	notyf.open({
+		type: notifType,
+		message: message
+	})
+
+	if (shouldRefreshFriendList) {
+		await fetchAndRenderFriendsList()
+		console.log('✅ Friends list updated')
+	}
 }

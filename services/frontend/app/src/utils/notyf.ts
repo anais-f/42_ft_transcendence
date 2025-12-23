@@ -3,9 +3,6 @@ import 'notyf/notyf.min.css'
 import { ToastActionType } from '../types/toast.js'
 import '../../style.css'
 
-// pour les amities et validation / echec venant du back
-// gestion erreur inline avec html/tailwindcss
-
 export const notyfGlobal = new Notyf({
 	duration: 5000,
 	position: {
@@ -20,4 +17,17 @@ export const notyfGlobal = new Notyf({
 	]
 } as NotyfOptions)
 
-// Notyf Friends TODO
+export const notyfFriends = new Notyf({
+	duration: 10000,
+	position: {
+		x: 'left',
+		y: 'top'
+	},
+	dismissible: true,
+	types: [
+		{ type: ToastActionType.FRIEND_REQUEST, className: 'notyf_friend' },
+		{ type: ToastActionType.FRIEND_ACCEPT, className: 'notyf_friend' },
+		{ type: ToastActionType.FRIEND_REJECT, className: 'notyf_friend' },
+		{ type: ToastActionType.FRIEND_REMOVE, className: 'notyf_friend' }
+	]
+} as NotyfOptions)

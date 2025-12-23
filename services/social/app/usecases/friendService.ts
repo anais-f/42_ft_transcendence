@@ -48,7 +48,8 @@ async function sendNotification(
 
 		const isFriendshipUpdate =
 			notifyFn === friendAcceptedNotification ||
-			notifyFn === friendRemovedNotification
+			notifyFn === friendRemovedNotification ||
+			notifyFn === friendRequestNotification
 
 		const sent = await notifyFn(
 			userId.user_id,

@@ -14,16 +14,29 @@
 
 @layer components {
 	.notyf_success {
-		@apply bg-green-100 text-green-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+		@apply bg-green-100 text-green-900 rounded-lg shadow-md font-medium font-special px-4 py-2;
+        background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 	}
 	.notyf_error {
-		@apply bg-red-100 text-red-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+		@apply bg-red-100 text-red-900 rounded-lg font-special px-4 py-2;
+        background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 	}
 	.notyf_info {
-		@apply bg-blue-100 text-blue-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+		@apply bg-blue-100 text-blue-900 rounded-lg font-medium font-special px-4 py-2;
+        background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
+	}
+	.notyf_friend {
+		@apply text-black px-4 py-2 font-medium font-special;
+		background-color: #ecdabb;
+		background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+		border: 2px solid #000;
+		box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 	}
 	.img_style {
 		@apply w-full py-4 opacity-50 object-cover select-none;
