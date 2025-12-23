@@ -13,10 +13,7 @@ import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
 import Swagger from '@fastify/swagger'
-import { checkEnv, I2faEnv } from './env/verifEnv.js'
-
-// Initialize and validate environment variables
-export const env: I2faEnv = checkEnv()
+import { env } from './env/checkEnv.js'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
@@ -48,9 +45,7 @@ app.register(Swagger as any, {
 			title: 'API for 2FA Service',
 			version: '1.0.0'
 		},
-		servers: [
-			{ url: `http://localhost:8080/2fa`, description: 'Local server' }
-		],
+		servers: [{ url: `${env.HOST}/2fa`, description: 'Local server' }],
 		components: env.openAPISchema.components
 	},
 	transform: jsonSchemaTransform
