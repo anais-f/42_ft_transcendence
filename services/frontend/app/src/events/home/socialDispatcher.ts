@@ -1,29 +1,29 @@
-import { WSMessageType } from '@common/interfaces/websocketModels.js'
+import {
+	WSMessageType,
+	NotificationPayload
+} from '@common/interfaces/websocketModels.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
+import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
 
 export function handleSocialDispatcher(message: MessageEvent) {
 	try {
 		const msg = JSON.parse(message.data)
 		console.log(msg)
-		if (msg.type === WSMessageType.FRIEND_REQUEST) {
-			// Handle friend request
-		}
-		else if (msg.type === WSMessageType.FRIEND_ACCEPT) {
+		if (msg.type === WSMessageType.CONNECTION_ESTABLISHED) {
+			console.log('Received connection established')
+		} else if (msg.type === WSMessageType.FRIEND_REQUEST) {
+			handleFriendRequest(msg as NotificationPayload)
+		} else if (msg.type === WSMessageType.FRIEND_ACCEPT) {
 			// Handle friend accep
-		}
-		else if (msg.type === WSMessageType.FRIEND_REMOVE) {
+		} else if (msg.type === WSMessageType.FRIEND_REMOVE) {
 			// Handle friend remove
-		}
-		else if (msg.type === WSMessageType.FRIEND_REJECT) {
+		} else if (msg.type === WSMessageType.FRIEND_REJECT) {
 			// Handle friend reject
-		}
-		else if (msg.type === WSMessageType.USER_STATUS_CHANGE) {
+		} else if (msg.type === WSMessageType.USER_STATUS_CHANGE) {
 			const data = msg.data
 			updateFriendStatus(data.userId, data.status)
-		}
-		else
-			console.warn('Unknown social message type:', msg.type)
-	}
-	catch (error) {
+		} else console.warn('Unknown social message type:', msg.type)
+	} catch (error) {
 		console.error('Failed to parse social message:', error)
 	}
 }
@@ -40,17 +40,17 @@ function updateFriendStatus(userId: number, status: number) {
 	}
 
 	const isOnline = status === 1
-
 	if (isOnline) {
 		statusCircle.classList.remove('bg-gray-500')
 		statusCircle.classList.add('bg-green-500')
 		statusText.textContent = 'Online'
-	}
-	else {
+	} else {
 		statusCircle.classList.remove('bg-green-500')
 		statusCircle.classList.add('bg-gray-500')
 		statusText.textContent = 'Offline'
 	}
 
-	console.log(`Updated status for friend ID ${userId} to ${isOnline ? 'Online' : 'Offline'}.`)
+	console.log(
+		`Updated status for friend ID ${userId} to ${isOnline ? 'Online' : 'Offline'}.`
+	)
 }

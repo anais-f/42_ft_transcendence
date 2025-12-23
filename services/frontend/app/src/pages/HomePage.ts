@@ -151,7 +151,7 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
  * This function prepares the home page for fresh content loading.
  * @returns {Promise<void>} A promise that resolves when initialization is complete.
  */
-async function initHomePage() {
+async function initHomePage(): Promise<void> {
 	try {
 		console.log('Initializing home page...')
 		await fetchAndRenderFriendsList()
@@ -165,9 +165,9 @@ async function initHomePage() {
  * Attach event listeners for the home page.
  * Sets up handlers for button clicks such as logout and navigation to settings.
  * Logs attachment status to the console.
- * @returns {void}
+ * @returns {Promise<void>} A promise that resolves when event listeners are attached.
  */
-export async function attachHomeEvents() {
+export async function attachHomeEvents(): Promise<void> {
 	const content = document.getElementById('content')
 	if (!content) {
 		return
@@ -223,7 +223,7 @@ export async function attachHomeEvents() {
  * Logs detachment status to the console.
  * @returns {void}
  */
-export function detachHomeEvents() {
+export function detachHomeEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return
 

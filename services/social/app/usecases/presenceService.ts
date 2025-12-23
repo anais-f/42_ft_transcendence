@@ -73,7 +73,7 @@ export async function handleUserOnline(userId: number): Promise<void> {
 	try {
 		await notifyStatusChange(userId, UserStatus.ONLINE)
 		await broadcastStatusChangeToFriends(userId, UserStatus.ONLINE)
-		await broadcastPresenceToAll(userId, UserStatus.ONLINE)
+		// await broadcastPresenceToAll(userId, UserStatus.ONLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} online status:`, message)
@@ -90,7 +90,7 @@ export async function handleUserOffline(userId: number): Promise<void> {
 	try {
 		await notifyStatusChange(userId, UserStatus.OFFLINE)
 		await broadcastStatusChangeToFriends(userId, UserStatus.OFFLINE)
-		await broadcastPresenceToAll(userId, UserStatus.OFFLINE)
+		// await broadcastPresenceToAll(userId, UserStatus.OFFLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} offline status:`, message)

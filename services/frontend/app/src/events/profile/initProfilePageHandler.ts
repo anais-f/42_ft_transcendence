@@ -56,7 +56,7 @@ export async function initAndRenderUserProfile(userId: number) {
 		return
 	}
 
-	if (currentUser.user_id === userId) {
+	if (currentUser && currentUser.user_id === userId) {
 		updateFriendButton('no_button')
 		renderProfile(responseUser.data)
 		return
@@ -116,3 +116,4 @@ export function updateFriendButton(
 		})
 	}
 }
+
