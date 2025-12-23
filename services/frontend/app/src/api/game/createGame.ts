@@ -1,12 +1,10 @@
+import { IApiResponse } from '../../types/api.js'
+
 export interface NewGameResponse {
 	code: string
 }
 
-export async function createGameApi(): Promise<{
-	data: any
-	error: string | null
-	status: number
-}> {
+export async function createGameApi(): Promise<IApiResponse> {
 	try {
 		const response = await fetch('/game/api/game/new-game', {
 			method: 'POST',

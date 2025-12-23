@@ -1,11 +1,11 @@
+import { IApiResponse } from '../../types/api.js'
+
 export interface JoinGameResponse {
 	wsToken: string
 	expiresIn: number
 }
 
-export async function joinGameApi(
-	code: string
-): Promise<{ data: any; error: null | string; status: number }> {
+export async function joinGameApi(code: string): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/game/api/game/join-game/${code}`, {
 			method: 'POST',
