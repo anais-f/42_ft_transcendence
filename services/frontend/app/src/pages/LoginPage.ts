@@ -138,7 +138,7 @@ export const LoginPage = (): string => {
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 let clickHandler: ((e: Event) => void) | null = null
 
-export function attachLoginEvents() {
+export async function attachLoginEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
@@ -208,7 +208,7 @@ export async function initGoogleAuth() {
 						await loginWithGoogleCredential(response.credential)
 						const authResult = await checkAuth()
 						setCurrentUser(authResult)
-						await window.navigate('/', true)
+						window.navigate('/', true)
 					} catch (err) {
 						console.error('Google Login Error:', err)
 						notyf.error('Connection error with Google')
