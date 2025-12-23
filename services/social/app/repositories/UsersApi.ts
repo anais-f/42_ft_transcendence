@@ -49,6 +49,12 @@ export class UsersApi {
 		return true
 	}
 
+	/**
+	 * @description Get user data by ID
+	 * @param user - User ID
+	 * @returns User data with username, avatar, status, last_connection
+	 * @throws HttpError if the request fails or data is invalid
+	 */
 	static async getUserData(user: IUserId): Promise<IPublicProfileUser> {
 		const base = env.USERS_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
