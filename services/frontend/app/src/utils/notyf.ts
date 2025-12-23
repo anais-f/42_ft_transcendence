@@ -11,9 +11,18 @@ export const notyfGlobal = new Notyf({
 	},
 	dismissible: true,
 	types: [
-		{ type: ToastActionType.SUCCESS_ACTION, className: 'notyf_success' },
-		{ type: ToastActionType.ERROR_ACTION, className: 'notyf_error' },
-		{ type: ToastActionType.INFO_ACTION, className: 'notyf_info' }
+		{
+			type: ToastActionType.SUCCESS_ACTION,
+			className: 'notyf_success'
+		},
+		{
+			type: ToastActionType.ERROR_ACTION,
+			className: 'notyf_error'
+		},
+		{
+			type: ToastActionType.INFO_ACTION,
+			className: 'notyf_info'
+		}
 	]
 } as NotyfOptions)
 

@@ -212,6 +212,7 @@ export async function initGoogleAuth() {
 					} catch (err) {
 						console.error('Google Login Error:', err)
 						notyf.error('Connection error with Google')
+
 					}
 				}
 			})

@@ -24,16 +24,11 @@ class SocialStore {
 	}
 
 	clear() {
-		console.log('[socialStore] Clearing social store...')
 		if (this._socialSocket) {
-			console.log('[socialStore] Closing WebSocket')
 			this._socialSocket.close()
 			this._socialSocket = null
-		} else {
-			console.log('[socialStore] No WebSocket to close')
 		}
 		this._sessionToken = null
-		console.log('[socialStore] Store cleared')
 	}
 }
 

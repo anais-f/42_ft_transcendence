@@ -1,4 +1,4 @@
-import { routerMap, Route } from './routerMap.js'
+import { routerMap, Route, Pages } from './routerMap.js'
 import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
@@ -8,8 +8,6 @@ import {
 	createSocialWebSocketApi
 } from '../api/homeWsApi.js'
 import { handleSocialDispatcher } from '../events/home/socialDispatcher.js'
-
-console.log('[Router] Module loaded with socialStore support')
 
 export let routeParams: Record<string, string> = {}
 
@@ -159,30 +157,19 @@ export class Router {
 
 			// 2. --- SOCIAL WEBSOCKET MANAGEMENT ---
 			// Create WebSocket if user is authenticated and socket doesn't exist
-			console.log('[Router] CheckAuth result:', {
-				hasUser: !!user,
-				userId: user?.user_id,
-				hasSocket: !!socialStore.socialSocket,
-				socketState: socialStore.socialSocket?.readyState
-			})
-
 			if (user && !socialStore.socialSocket) {
-				console.log('[Router] Creating social WebSocket for user', user.user_id)
 				const token = await createSocialTokenApi()
 				if (token) {
 					const ws = createSocialWebSocketApi(token.data.wsToken)
 
 					socialStore.socialSocket = ws
 
-					ws.onopen = () => {
-						console.log('[Router] Social WS connected for user', user.user_id)
-					}
+					ws.onopen = () => {}
 					ws.onmessage = handleSocialDispatcher
 					ws.onerror = (error) => {
 						console.error('Social WS error:', error)
 					}
 					ws.onclose = () => {
-						console.log('[Router] Social WS closed for user', user.user_id)
 						socialStore.socialSocket = null
 					}
 				}

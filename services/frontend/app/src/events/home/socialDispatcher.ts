@@ -16,9 +16,8 @@ import {
 export async function handleSocialDispatcher(message: MessageEvent) {
 	try {
 		const msg = JSON.parse(message.data)
-		console.log(msg)
 		if (msg.type === WSMessageType.CONNECTION_ESTABLISHED) {
-			console.log('Received connection established')
+			// Connection established
 		} else if (msg.type === WSMessageType.FRIEND_REQUEST) {
 			await handleFriendRequest(msg as NotificationPayload)
 		} else if (msg.type === WSMessageType.FRIEND_ACCEPT) {
@@ -74,10 +73,6 @@ function updateFriendStatus(userId: number, status: number) {
 		statusCircle.classList.add('bg-gray-500')
 		statusText.textContent = 'Offline'
 	}
-
-	console.log(
-		`Updated status for friend ID ${userId} to ${isOnline ? 'Online' : 'Offline'}.`
-	)
 }
 
 /**
@@ -90,19 +85,12 @@ async function handleFriendRequest(payload: NotificationPayload) {
 	const fromUserId = payload.data.from.userId
 	const message = payload.data.message
 
-	console.log('📩 Friend request received:', {
-		fromUsername,
-		fromUserId,
-		message
-	})
-
 	notyf.open({
 		type: ToastActionType.FRIEND_REQUEST,
 		message: message
 	})
 
 	await fetchAndRenderFriendRequests()
-	console.log('✅ Friend requests list updated')
 }
 
 /**
@@ -120,11 +108,6 @@ async function handleFriendNotification(
 	const message = payload.data.message
 	const fromUsername = payload.data.from.username
 
-	console.log(`📩 Friend notification received: ${notifType}`, {
-		fromUsername,
-		message
-	})
-
 	notyf.open({
 		type: notifType,
 		message: message
@@ -132,6 +115,5 @@ async function handleFriendNotification(
 
 	if (shouldRefreshFriendList) {
 		await fetchAndRenderFriendsList()
-		console.log('✅ Friends list updated')
 	}
 }

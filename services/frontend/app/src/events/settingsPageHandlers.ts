@@ -10,6 +10,7 @@ import {
 	validateAvatarFile,
 	syncCurrentUser
 } from '../usecases/userValidation.js'
+import { ToastActionType } from '../types/toast.js'
 
 /**
  * Handler for changing username
@@ -21,13 +22,20 @@ export async function handleUsername(form: HTMLFormElement) {
 	const newUsername = formData.get('change_username') as string
 
 	if (!newUsername) {
-		notyf.error('Username cannot be empty')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Username cannot be empty'
+		})
 		return
 	}
 
 	const usernameResult = validateUsername(newUsername)
 	if (!usernameResult.success) {
-		notyf.error(usernameResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: usernameResult.error
+		})
+		// notyf.error(usernameResult.error)
 		return
 	}
 
@@ -47,7 +55,10 @@ export async function handleUsername(form: HTMLFormElement) {
 
 	if (!(await syncCurrentUser('Failed to update username'))) return
 
-	notyf.success('Username changed successfully!')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Username changed successfully!'
+	})
 	form.reset()
 }
 
