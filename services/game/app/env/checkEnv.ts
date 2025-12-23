@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { validateEnv, loadOpenAPISchema } from '@ft_transcendence/common'
 
-// TODO: Add stricter validation
 const envSchema = z
 	.object({
 		DTO_OPENAPI_FILE: z.string().min(1),
@@ -12,7 +11,7 @@ const envSchema = z
 		MATCHMAKING_DB_PATH: z.string().min(1)
 	})
 	.transform((env) => ({
-		HOST: `${env.HOST}/game`,
+		HOST: env.HOST,
 		PORT: env.PORT,
 		JWT_SECRET: env.JWT_SECRET,
 		JWT_SECRET_GAME: env.JWT_SECRET_GAME,
@@ -22,6 +21,4 @@ const envSchema = z
 
 export type IGameEnv = z.infer<typeof envSchema>
 
-export function checkEnv(): IGameEnv {
-	return validateEnv(envSchema)
-}
+export const env = validateEnv(envSchema)

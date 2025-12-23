@@ -1,7 +1,7 @@
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { env } from './env/index.js'
+import { env } from './env/checkEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
@@ -21,8 +21,8 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: env.HOST,
-						description: 'idk'
+						url: `${env.HOST}/game`,
+						description: 'Local server'
 					}
 				],
 				components: env.openAPISchema.components
