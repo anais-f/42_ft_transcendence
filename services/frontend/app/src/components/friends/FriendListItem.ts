@@ -35,8 +35,8 @@ export const FriendListItem = (props: FriendListItemProps): string => {
             <p class="font-medium hover:font-bold">${username}</p>
           </a>
           <p class="text-gray-500 flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full ${statusColor}"></span>
-            ${statusText}
+            <span id="status_circle_${id}" class="w-3 h-3 rounded-full ${statusColor}"></span>
+            <span id="status_text_${id}">${statusText}</span>
           </p>
         </div>
       </div>
