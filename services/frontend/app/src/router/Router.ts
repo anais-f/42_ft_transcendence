@@ -156,7 +156,6 @@ export class Router {
 			}
 
 			// 2. --- SOCIAL WEBSOCKET MANAGEMENT ---
-			// Create WebSocket if user is authenticated and socket doesn't exist
 			if (user && !socialStore.socialSocket) {
 				const token = await createSocialTokenApi()
 				if (token) {

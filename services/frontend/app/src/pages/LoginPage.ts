@@ -11,6 +11,7 @@ import { CredentialResponse } from '../types/google-type.js'
 import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser } from '../usecases/userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
+import { ToastActionType } from '../types/toast.js'
 
 export const LoginPage = (): string => {
 	return /*html*/ `
@@ -211,7 +212,10 @@ export async function initGoogleAuth() {
 						window.navigate('/', true)
 					} catch (err) {
 						console.error('Google Login Error:', err)
-						notyf.error('Connection error with Google')
+						notyf.open({
+							type: ToastActionType.ERROR_ACTION,
+							message: 'Connection error with Google'
+						})
 					}
 				}
 			})

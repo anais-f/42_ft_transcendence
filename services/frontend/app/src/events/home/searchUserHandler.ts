@@ -1,6 +1,7 @@
 import { fetchUserByUsername } from '../../api/usersApi.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { validateUsername } from '../../usecases/userValidation.js'
+import { ToastActionType } from '../../types/toast.js'
 
 export async function handleSearchUser(e: Event): Promise<void> {
 	e.preventDefault()
@@ -8,13 +9,19 @@ export async function handleSearchUser(e: Event): Promise<void> {
 
 	const username = validateUsername(input?.value)
 	if (!username.success) {
-		notyf.error(username.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: username.error
+		})
 		return
 	}
 
 	const user = await fetchUserByUsername(username.data)
 	if (!user) {
-		notyf.error('User not found')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not found'
+		})
 		return
 	}
 

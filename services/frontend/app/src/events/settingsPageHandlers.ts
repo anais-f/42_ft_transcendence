@@ -35,7 +35,6 @@ export async function handleUsername(form: HTMLFormElement) {
 			type: ToastActionType.ERROR_ACTION,
 			message: usernameResult.error
 		})
-		// notyf.error(usernameResult.error)
 		return
 	}
 
@@ -44,10 +43,16 @@ export async function handleUsername(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection username')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection username'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		form.reset()
 		return
@@ -73,7 +78,10 @@ export async function handlerAvatar(form: HTMLFormElement) {
 
 	const avatarResult = validateAvatarFile(avatarFile)
 	if (!avatarResult.success) {
-		notyf.error(avatarResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: avatarResult.error
+		})
 		return
 	}
 
@@ -82,10 +90,16 @@ export async function handlerAvatar(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection avatr')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection avatr'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		form.reset()
 		return
@@ -93,7 +107,10 @@ export async function handlerAvatar(form: HTMLFormElement) {
 
 	if (!(await syncCurrentUser('Failed to update avatar'))) return
 
-	notyf.success('Avatar changed successfully!')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Avatar changed successfully!'
+	})
 	form.reset()
 }
 
@@ -110,29 +127,44 @@ export async function handleChangePassword(form: HTMLFormElement) {
 	const twofaCode = formData.get('password_2fa_code') as string | null
 
 	if (!oldPassword || !newPassword || !confirmNewPassword) {
-		notyf.error('Please fill in all password fields')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Please fill in all password fields'
+		})
 		return
 	}
 
 	if (newPassword !== confirmNewPassword) {
-		notyf.error('New password and confirmation do not match')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'New password and confirmation do not match'
+		})
 		return
 	}
 
 	if (oldPassword === newPassword) {
-		notyf.error('New password must be different from the old password')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'New password must be different from the old password'
+		})
 		return
 	}
 
 	const oldPasswordResult = validatePassword(oldPassword)
 	if (!oldPasswordResult.success) {
-		notyf.error('Invalid old password: ' + oldPasswordResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Invalid old password: ' + oldPasswordResult.error
+		})
 		return
 	}
 
 	const newPasswordResult = validatePassword(newPassword)
 	if (!newPasswordResult.success) {
-		notyf.error('Invalid new password: ' + newPasswordResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Invalid new password: ' + newPasswordResult.error
+		})
 		return
 	}
 
@@ -145,15 +177,24 @@ export async function handleChangePassword(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection mot de passe')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection mot de passe'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		form.reset()
 		return
 	}
 
-	notyf.success('Password changed successfully!')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Password changed successfully!'
+	})
 	form.reset()
 }
