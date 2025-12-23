@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
-import { IUserId, IPrivateUser } from '@ft_transcendence/common'
-import { UserPrivateProfileSchema } from '@ft_transcendence/common'
+import { IUserId, IPublicProfileUser } from '@ft_transcendence/common'
+import { UserPublicProfileSchema } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 
 export class UsersApi {
@@ -58,7 +58,7 @@ export class UsersApi {
 	 * @returns User data with username, avatar, status, last_connection
 	 * @throws HttpError if the request fails or data is invalid
 	 */
-	static async getUserData(user: IUserId): Promise<IPrivateUser> {
+	static async getUserData(user: IUserId): Promise<IPublicProfileUser> {
 		const base = process.env.USERS_SERVICE_URL
 		const secret = process.env.INTERNAL_API_SECRET
 		if (!base || !secret)
@@ -96,11 +96,11 @@ export class UsersApi {
 		}
 
 		const data = await response.json()
-		const parsed = UserPrivateProfileSchema.safeParse(data)
+		const parsed = UserPublicProfileSchema.safeParse(data)
 
 		if (!parsed.success)
 			throw createHttpError.BadGateway('Invalid user data from users service')
 
-		return parsed.data as IPrivateUser
+		return parsed.data as IPublicProfileUser
 	}
 }

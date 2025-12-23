@@ -5,6 +5,7 @@
  * type: button type - default is 'button', 'submit' is used for forms
  * action: optional data-action attribute
  * additionalClasses: optional additional classes for the button
+ * dataAttributes: optional additional data attributes as string
  */
 interface ButtonProps {
 	text: string
@@ -12,6 +13,7 @@ interface ButtonProps {
 	type: 'button' | 'submit'
 	action?: string
 	additionalClasses?: string
+	dataAttributes?: string
 }
 
 /**
@@ -20,7 +22,14 @@ interface ButtonProps {
  * @constructor
  */
 export const Button = (props: ButtonProps): string => {
-	const { text, id, type, action, additionalClasses = '' } = props
+	const {
+		text,
+		id,
+		type,
+		action,
+		additionalClasses = '',
+		dataAttributes = ''
+	} = props
 
 	// base classes CSS for the button
 	const baseClasses =
@@ -33,7 +42,7 @@ export const Button = (props: ButtonProps): string => {
 	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
 	return /*html*/ `
-    <button id="${id}" type="${type}" class="${classes}" ${dataActionAttr}>
+    <button id="${id}" type="${type}" class="${classes}" ${dataActionAttr} ${dataAttributes}>
       ${text}
     </button>
   `

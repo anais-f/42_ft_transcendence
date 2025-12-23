@@ -9,7 +9,7 @@ import {
 	validatePassword,
 	validateAvatarFile,
 	syncCurrentUser
-} from '../utils/userValidation.js'
+} from '../usecases/userValidation.js'
 
 /**
  * Handler for changing username

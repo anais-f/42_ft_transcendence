@@ -38,14 +38,13 @@
 		@apply col-span-1 flex flex-col items-start min-h-0;
 	}
 	.friend_btn {
-		@apply border border-black hover:bg-black hover:text-white w-full py-1 transition-colors text-xs w-20;
+		@apply border border-black hover:bg-black hover:text-white transition-colors text-xs w-24 px-2 py-0.5;
 	}
 	.table_header {
 		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;
 	}
-
-	.generic_btn {
-		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
+	.cursor_pointer {
+		@apply cursor-pointer;
 	}
 }
 

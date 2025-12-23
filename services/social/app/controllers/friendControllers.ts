@@ -1,7 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
-import { IUserId } from '@ft_transcendence/common'
+import { IUserId, RelationStatus } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
+import { SocialRepository } from '../repositories/socialRepository.js'
 
 async function handleFriendAction(
 	req: FastifyRequest,
@@ -119,4 +120,21 @@ export async function getPendingSentRequestsController(
 	const pendingRequests = await FriendService.getPendingSentRequests(userId)
 
 	reply.code(200).send(pendingRequests)
+}
+
+export async function isFriendController(
+	req: FastifyRequest,
+	reply: FastifyReply
+): Promise<void> {
+	if (!req.user) throw createHttpError.Unauthorized('Unauthorized')
+
+	const userIdValue = (req.user as { user_id: number }).user_id
+	const userId: IUserId = { user_id: userIdValue }
+
+	const friendId = (req.params as { user_id: number }).user_id
+	const friendUserId: IUserId = { user_id: friendId }
+
+	const status = SocialRepository.getRelationStatus(userId, friendUserId)
+
+	reply.code(200).send({ status })
 }

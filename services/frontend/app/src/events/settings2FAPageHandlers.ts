@@ -6,7 +6,7 @@ import {
 	disable2FAAPI
 } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { syncCurrentUser } from '../utils/userValidation.js'
+import { syncCurrentUser } from '../usecases/userValidation.js'
 
 /**
  * Verify the current user's password using JWT

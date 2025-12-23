@@ -4,11 +4,6 @@ import {
 	GamePage
 } from '../pages/GamePage.js'
 import {
-	HomePage,
-	attachHomeEvents,
-	detachHomeEvents
-} from '../pages/oldhome.js'
-import {
 	LoginPage,
 	attachLoginEvents,
 	detachLoginEvents,
@@ -19,8 +14,16 @@ import {
 	attachSettingsEvents,
 	detachSettingsEvents
 } from '../pages/SettingsPage.js'
-import { HomeBisPage } from '../pages/HomePage.js'
-import { ProfilePage } from '../pages/ProfilePage.js'
+import {
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
+} from '../pages/HomePage.js'
+import {
+	ProfilePage,
+	attachProfileEvents,
+	detachProfileEvents
+} from '../pages/ProfilePage.js'
 import {
 	LobbyPage,
 	attachLobbyEvents,
@@ -81,8 +84,10 @@ export const routerMap: Record<Pages, Route> = {
 
 	profile: {
 		id: 'profile',
-		url: '/profile',
-		page: ProfilePage
+		url: '/profile/:id',
+		page: ProfilePage,
+		binds: [attachProfileEvents],
+		unbinds: [detachProfileEvents]
 	},
 
 	settings: {
@@ -96,7 +101,7 @@ export const routerMap: Record<Pages, Route> = {
 	test: {
 		id: 'test',
 		url: '/test',
-		page: HomeBisPage,
+		page: HomePage,
 		binds: [],
 		unbinds: [],
 		public: true

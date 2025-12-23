@@ -1,9 +1,11 @@
+import { IApiResponse } from '../types/api.js'
+
 /**
  * Verify 2FA code during login
  * @param code - 6-digit 2FA code
  * @returns Promise with result containing data, error and status
  */
-export async function verify2FALoginAPI(code: string) {
+export async function verify2FALoginAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/2fa/verify-login', {
 			method: 'POST',
@@ -35,7 +37,9 @@ export async function verify2FALoginAPI(code: string) {
  * @param password - User's password
  * @returns Promise with result containing data, error and status
  */
-export async function verifyMyPasswordAPI(password: string) {
+export async function verifyMyPasswordAPI(
+	password: string
+): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/verify-my-password', {
 			method: 'POST',
@@ -65,7 +69,7 @@ export async function verifyMyPasswordAPI(password: string) {
  * Generate 2FA QR code for setup
  * @returns Promise with result containing data (qr_base64, otpauth_url), error and status
  */
-export async function setup2FAAPI() {
+export async function setup2FAAPI(): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/2fa/setup', {
 			method: 'POST',
@@ -94,7 +98,7 @@ export async function setup2FAAPI() {
  * @param code - 6-digit 2FA code
  * @returns Promise with result containing data, error and status
  */
-export async function verifySetup2FAAPI(code: string) {
+export async function verifySetup2FAAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/2fa/verify-setup', {
 			method: 'POST',
@@ -125,7 +129,7 @@ export async function verifySetup2FAAPI(code: string) {
  * @param code - 6-digit 2FA code
  * @returns Promise with result containing data, error and status
  */
-export async function disable2FAAPI(code: string) {
+export async function disable2FAAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/2fa/disable', {
 			method: 'DELETE',

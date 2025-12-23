@@ -1,7 +1,7 @@
 import { SocialRepository } from '../repositories/socialRepository.js'
 import {
 	IUserId,
-	IPrivateUser,
+	IPublicProfileUser,
 	PendingFriendsListDTO,
 	RelationStatus
 } from '@ft_transcendence/common'
@@ -227,9 +227,9 @@ export class FriendService {
 	/**
 	 * Get the friends list for a user
 	 * @param userId
-	 * @return IPrivateUser[]
+	 * @return IPublicProfileUser[]
 	 */
-	static async getFriendsList(userId: IUserId): Promise<IPrivateUser[]> {
+	static async getFriendsList(userId: IUserId): Promise<IPublicProfileUser[]> {
 		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
 

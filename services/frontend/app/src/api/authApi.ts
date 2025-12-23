@@ -1,10 +1,15 @@
+import { IApiResponse } from '../types/api.js'
+
 /**
  * Login with username and password
  * @param username - User's username
  * @param password - User's password
  * @returns Promise with result containing data, error and status
  */
-export async function loginAPI(username: string, password: string) {
+export async function loginAPI(
+	username: string,
+	password: string
+): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/login', {
 			method: 'POST',
@@ -37,7 +42,10 @@ export async function loginAPI(username: string, password: string) {
  * @param password - User's password
  * @returns Promise with result containing data, error and status
  */
-export async function registerAPI(username: string, password: string) {
+export async function registerAPI(
+	username: string,
+	password: string
+): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/register', {
 			method: 'POST',
@@ -68,7 +76,7 @@ export async function registerAPI(username: string, password: string) {
  * Logout API call
  * @returns Promise with result containing data, error and status
  */
-export async function logoutAPI() {
+export async function logoutAPI(): Promise<IApiResponse> {
 	try {
 		const res = await fetch('/auth/api/logout', {
 			method: 'POST',
@@ -95,7 +103,9 @@ export async function logoutAPI() {
  * @param credential - Google credential token
  * @returns Promise with result containing data, error and status
  */
-export const loginWithGoogleCredential = async (credential: string) => {
+export const loginWithGoogleCredential = async (
+	credential: string
+): Promise<IApiResponse> => {
 	try {
 		const res = await fetch('/auth/api/login-google', {
 			method: 'POST',
