@@ -5,7 +5,7 @@ import {
 	changeUserPassword
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
-import { env } from '../env/index.js'
+import { env } from '../env/checkEnv.js'
 
 /**
  * Verify a 2FA code by calling the 2FA service

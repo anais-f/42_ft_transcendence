@@ -16,7 +16,7 @@ import { registerAdminUser } from './usecases/register.js'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
-import { env } from './env/index.js'
+import { env } from './env/checkEnv.js'
 
 const app = Fastify({
 	logger: true
@@ -51,9 +51,7 @@ async function runServer() {
 				title: 'API for Auth Service',
 				version: '1.0.0'
 			},
-			servers: [
-				{ url: 'http://localhost:8080/auth', description: 'Local server' }
-			],
+			servers: [{ url: `${env.HOST}/auth`, description: 'Local server' }],
 			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform

@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { LoginResponseDTO } from '@ft_transcendence/common'
 import { googleLoginUsecase } from '../usecases/oauthUsecases.js'
-import { env } from '../env/index.js'
+import { env } from '../env/checkEnv.js'
 
 export async function googleLoginController(
 	request: FastifyRequest,

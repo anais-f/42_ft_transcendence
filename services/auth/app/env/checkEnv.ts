@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { validateEnv, loadOpenAPISchema } from '@ft_transcendence/common'
 
-// TODO: Add stricter validation
 const envSchema = z
 	.object({
 		DTO_OPENAPI_FILE: z.string().min(1),
@@ -36,6 +35,4 @@ const envSchema = z
 
 export type IAuthEnv = z.infer<typeof envSchema>
 
-export function checkEnv(): IAuthEnv {
-	return validateEnv(envSchema)
-}
+export const env = validateEnv(envSchema)
