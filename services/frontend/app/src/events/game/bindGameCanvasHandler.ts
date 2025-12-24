@@ -1,5 +1,6 @@
 import { gameStore } from '../../usecases/gameStore.js'
 import { gameEngine } from '../../game/core/GameEngine.js'
+import { C02RequestScore } from '@pong-shared/index.js'
 
 export function handleBindGameCanvas() {
 	gameStore.navigatingToGame = false
@@ -15,6 +16,9 @@ export function handleBindGameCanvas() {
 
 	if (canvas) {
 		gameEngine.bindAll(canvas, ws)
+
+		const requestScore = new C02RequestScore()
+		ws.send(requestScore.serialize())
 
 		ws.onclose = () => {
 			console.log('Game WS closed - redirecting to home')

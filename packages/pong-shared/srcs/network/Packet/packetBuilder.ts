@@ -1,7 +1,7 @@
 import { padDirection } from '../../engine/PongPad.js'
 import { Segment } from '../../math/Segment.js'
 import { Vector2 } from '../../math/Vector2.js'
-import { C01Move as C01 } from './Client/CPackets.js'
+import { C01Move as C01, C02RequestScore as C02 } from './Client/CPackets.js'
 import { CPacketsType, SPacketsType } from './packetTypes.js'
 import { S02SegmentUpdate } from './Server/S02.js'
 import { S09DynamicSegments } from './Server/S09.js'
@@ -19,7 +19,7 @@ import {
 export class packetBuilder {
 	private constructor() {}
 
-	public static deserializeC(buff: ArrayBuffer): C01 | null {
+	public static deserializeC(buff: ArrayBuffer): C01 | C02 | null {
 		const view = new DataView(buff)
 
 		try {
@@ -33,6 +33,8 @@ export class packetBuilder {
 					const state = !!(data & 0b10)
 					const dir = data & 0b01 ? padDirection.UP : padDirection.DOWN
 					return new C01(state, dir)
+				case CPacketsType.C02:
+					return new C02()
 				default:
 					break
 			}
