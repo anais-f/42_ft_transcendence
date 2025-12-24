@@ -1,5 +1,5 @@
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
-import { env } from '../index.js'
+import { env } from '../env/checkEnv.js'
 
 export function encryptSecret(secret: string): string {
 	const KEY = env.TOTP_ENC_KEY

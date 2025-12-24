@@ -3,13 +3,9 @@ import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 import metricPlugin from 'fastify-metrics'
 
 import { socialRoutes } from './routes/socialRoutes.js'
-import { loadOpenAPISchema } from '@ft_transcendence/common'
 import { createWsApp } from '@ft_transcendence/security'
 import { startHeartbeat } from './usecases/heartbeatService.js'
-
-const HOST = process.env.HOST || 'http://localhost:8080'
-
-const openapiSwagger = loadOpenAPISchema(process.env.DTO_OPENAPI_FILE as string)
+import { env } from './env/checkEnv.js'
 
 export async function start(): Promise<void> {
 	const app = createWsApp(
@@ -20,14 +16,14 @@ export async function start(): Promise<void> {
 					title: 'API for Social Service',
 					version: '1.0.0'
 				},
-				servers: [{ url: `${HOST}/social`, description: 'Local server' }],
-				components: openapiSwagger.components
+				servers: [{ url: `${env.HOST}/social`, description: 'Local server' }],
+				components: env.openAPISchema.components
 			},
 			transform: jsonSchemaTransform
 		},
 		{
-			main: process.env.JWT_SECRET as string,
-			service: process.env.JWT_SECRET_SOCIAL as string
+			main: env.JWT_SECRET,
+			service: env.JWT_SECRET_SOCIAL
 		}
 	)
 
@@ -35,11 +31,11 @@ export async function start(): Promise<void> {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
-			port: parseInt(process.env.PORT as string),
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		console.log('Listening on port ', process.env.PORT)
-		console.log(`Swagger UI available at ${HOST}/social/docs`)
+		console.log('Listening on port ', env.PORT)
+		console.log(`Swagger UI available at ${env.HOST}/social/docs`)
 
 		startHeartbeat()
 		console.log('WebSocket heartbeat monitoring started')

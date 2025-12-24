@@ -14,7 +14,7 @@ import {
 	disable2FA,
 	status2FA
 } from '../usecases/twofa.js'
-import { env } from '../index.js'
+import { env } from '../env/checkEnv.js'
 
 export async function enable2faController(
 	req: FastifyRequest,

@@ -3,6 +3,7 @@ import {
 	broadcastStatusChangeToFriends,
 	broadcastPresenceToAll
 } from './broadcasterService.js'
+import { env } from '../env/checkEnv.js'
 
 /**
  * Notify users service about status change
@@ -13,12 +14,8 @@ async function notifyStatusChange(
 	userId: number,
 	status: UserStatus
 ): Promise<void> {
-	const base = process.env.USERS_SERVICE_URL
-	const secret = process.env.INTERNAL_API_SECRET
-	if (!base || !secret) {
-		console.error('Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env')
-		return
-	}
+	const base = env.USERS_SERVICE_URL
+	const secret = env.INTERNAL_API_SECRET
 
 	const body: { status: UserStatus; lastConnection?: string } = {
 		status: status

@@ -5,9 +5,7 @@ import {
 	changeUserPassword
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
-
-const TWOFA_URL = process.env.TWOFA_SERVICE_URL
-const INTERNAL_API_SECRET = process.env.INTERNAL_API_SECRET
+import { env } from '../env/checkEnv.js'
 
 /**
  * Verify a 2FA code by calling the 2FA service
@@ -19,16 +17,12 @@ async function verify2FACode(
 	userId: number,
 	twofaCode: string
 ): Promise<boolean> {
-	if (!TWOFA_URL || !INTERNAL_API_SECRET) {
-		throw createHttpError.InternalServerError('Server configuration error')
-	}
-
 	try {
-		const res = await fetch(`${TWOFA_URL}/api/2fa/verify`, {
+		const res = await fetch(`${env.TWOFA_SERVICE_URL}/api/2fa/verify`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
-				authorization: INTERNAL_API_SECRET
+				authorization: env.INTERNAL_API_SECRET
 			},
 			body: JSON.stringify({
 				user_id: userId,

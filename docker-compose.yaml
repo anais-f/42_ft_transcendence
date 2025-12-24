@@ -64,7 +64,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - 'true'
+        - node -e "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
       interval: 5s
       timeout: 3s
       retries: 12
