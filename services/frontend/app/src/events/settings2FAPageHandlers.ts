@@ -79,7 +79,7 @@ export async function handleGenerateQRCode() {
 		qrContainer.innerHTML = `
 			<div class="flex flex-col gap-2 items-center w-full">
 				<p class="text-sm">Scan this QR code with Google Authenticator:</p>
-				<img src="${data.qr_base64}" alt="QR Code" class="w-64 h-64 border-2 border-black">
+				<img src="${data.qr_base64}" alt="QR Code" class="w-64 aspect-square border-2 border-black">
 				<p class="text-xs mt-2">Or copy this URL:</p>
 				<input
 					type="text"
