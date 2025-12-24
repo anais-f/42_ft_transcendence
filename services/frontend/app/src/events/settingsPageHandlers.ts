@@ -92,7 +92,7 @@ export async function handlerAvatar(form: HTMLFormElement) {
 			case 0:
 				notyf.open({
 					type: ToastActionType.ERROR_ACTION,
-					message: 'Network error, check your connection avatr'
+					message: 'Network error, check your connection avatar'
 				})
 				break
 			default:
