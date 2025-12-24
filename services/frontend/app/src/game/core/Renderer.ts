@@ -33,6 +33,7 @@ class Renderer {
 	setCanvas(canvas: HTMLCanvasElement): void {
 		this.canvas = canvas
 		this.ctx = canvas.getContext('2d')
+		this.gameResult = null
 		this.startAnimation()
 	}
 

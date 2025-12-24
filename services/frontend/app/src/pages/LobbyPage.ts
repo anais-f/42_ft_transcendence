@@ -134,11 +134,11 @@ export function attachLobbyEvents() {
 		}
 
 		ws.onclose = () => {
-			window.navigate('/home')
+			window.navigate('/')
 			console.log('WS closed')
 		}
 	} else {
-		window.navigate('/home')
+		window.navigate('/')
 	}
 
 	console.log('Lobby page events attached')
@@ -161,6 +161,7 @@ export function detachLobbyEvents() {
 	if (!gameStore.navigatingToGame) {
 		const ws = gameStore.gameSocket
 		if (ws) {
+			ws.onclose = null
 			ws.close()
 			gameStore.gameSocket = null
 		}
