@@ -1,4 +1,5 @@
 import { Button } from '../Button.js'
+import { UserLink } from '../UserLink.js'
 
 /**
  * Renders a friend request item.
@@ -27,9 +28,7 @@ export const FriendRequestItem = (props: FriendRequestItemProps): string => {
       <div class="flex gap-4 py-2 px-4">
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div id="username_and_buttons" class="flex-1">
-          <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
-            <p class="font-medium hover:font-bold">${username}</p>
-          </a>
+		  ${UserLink({ id, username })}
           <div id="request_buttons" class="flex gap-4">
           	${Button({
 							id: 'accept_friend_btn',

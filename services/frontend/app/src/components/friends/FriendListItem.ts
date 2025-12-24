@@ -1,3 +1,6 @@
+import { UserLink } from '../UserLink.js'
+import { StatusCircle } from './StatusCircle.js'
+
 /**
  * Renders a friend list item.
  * @param props - The properties of the friend list item.
@@ -23,23 +26,22 @@ export const FriendListItem = (props: FriendListItemProps): string => {
 	const { id, username, avatar, status } = props
 
 	const isOnline = status === 1
-	const statusColor = isOnline ? 'bg-green-500' : 'bg-gray-500'
 	const statusText = isOnline ? 'Online' : 'Offline'
 
 	return /*html*/ `
     <li class="flex flex-row border-b border-black" id="friend_item_${id}">
       <div class="flex gap-4 py-2 px-4">
+        <!-- User's avatar -->
         <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
         <div>
-          <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
-            <p class="font-medium hover:font-bold">${username}</p>
-          </a>
+          <!-- User's link -->
+          ${UserLink({ id, username })}
           <p class="text-gray-500 flex items-center gap-2">
-            <span id="status_circle_${id}" class="w-3 h-3 rounded-full ${statusColor}"></span>
+            ${StatusCircle({ isOnline })}
             <span id="status_text_${id}">${statusText}</span>
           </p>
         </div>
       </div>
     </li>
-    `
+  `
 }

@@ -60,9 +60,11 @@ export async function fetchAndRenderMatchHistory(
 				date: new Date(match.played_at).toLocaleDateString(),
 				result: match.winner_id === userId ? 'Win' : 'Loss',
 				player1: player1Name,
+				player1Id: match.player1_id,
 				score1: match.player1_score,
 				score2: match.player2_score,
-				player2: player2Name
+				player2: player2Name,
+				player2Id: match.player2_id
 			})
 		)
 	}

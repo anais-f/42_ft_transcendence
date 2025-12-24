@@ -10,6 +10,7 @@ import {
 } from '../events/profile/initStatsHandler.js'
 import { userIdFromUrl } from '../usecases/urlUtils.js'
 
+// TODO: use StatusCircle comp
 export const ProfilePage = (): string => {
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-16 h-full w-full">
@@ -96,6 +97,10 @@ export async function attachProfileEvents(): Promise<void> {
 			const action = actionButton.getAttribute('data-action')
 			if (action === 'add-friend') await handleAddFriend(userId)
 			if (action === 'remove-friend') await handleRemoveFriend(userId)
+			if (action === 'navigate-profile') {
+				const id = actionButton.getAttribute('data-id')
+				if (id) window.navigate(`/profile/${id}`)
+			}
 		}
 	}
 
