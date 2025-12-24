@@ -10,6 +10,7 @@ import {
 } from '../events/profile/initStatsHandler.js'
 import { userIdFromUrl } from '../usecases/urlUtils.js'
 
+// TODO: use StatusCircle comp
 export const ProfilePage = (): string => {
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-16 h-full w-full">

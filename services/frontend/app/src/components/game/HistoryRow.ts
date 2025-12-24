@@ -31,7 +31,16 @@ interface GameHistoryProps {
  * @constructor
  */
 export const GameHistoryRow = (props: GameHistoryProps): string => {
-	const { date, player1, player1Id, score1, score2, player2, player2Id, result } = props
+	const {
+		date,
+		player1,
+		player1Id,
+		score1,
+		score2,
+		player2,
+		player2Id,
+		result
+	} = props
 	const resultColor = result === 'Win' ? 'text-emerald-900' : 'text-rose-900'
 
 	const baseClass = 'border-b border-black py-2 text-center'
