@@ -1,6 +1,10 @@
-import { packetBuilder } from '@ft_transcendence/pong-shared/network/Packet/packetBuilder.js'
-import { C01Move } from '@ft_transcendence/pong-shared/network/Packet/Client/C01.js'
 import { TPlayerSlot, games } from '../managers/gameData.js'
+import {
+	C01Move,
+	C02RequestScore,
+	packetBuilder,
+	S07Score
+} from '@ft_transcendence/pong-shared'
 
 export function handleGamePacket(
 	data: Buffer,
@@ -19,6 +23,8 @@ export function handleGamePacket(
 
 	if (packet instanceof C01Move) {
 		handleMove(packet, gameCode, playerSlot)
+	} else if (packet instanceof C02RequestScore) {
+		handleRequestScore(gameCode, playerSlot)
 	}
 }
 
@@ -28,7 +34,9 @@ function handleMove(
 	playerSlot: TPlayerSlot
 ): void {
 	const gameData = games.get(gameCode)
-	if (!gameData?.gameInstance) return
+	if (!gameData?.gameInstance) {
+		return
+	}
 
 	const movement =
 		playerSlot === 'p1'
@@ -37,4 +45,22 @@ function handleMove(
 
 	movement.isMoving = packet.state
 	movement.direction = packet.dir
+}
+
+function handleRequestScore(gameCode: string, playerSlot: TPlayerSlot): void {
+	const gameData = games.get(gameCode)
+	if (!gameData?.gameInstance) {
+		return
+	}
+
+	const ws = playerSlot === 'p1' ? gameData.p1.ws : gameData.p2?.ws
+	if (!ws) {
+		return
+	}
+
+	const score = gameData.gameInstance.GE.lives
+	const maxLives = gameData.gameInstance.GE.maxLives
+	const scorePacket = new S07Score(score.p1, score.p2, maxLives)
+
+	ws.send(scorePacket.serialize())
 }

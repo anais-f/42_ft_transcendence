@@ -1,7 +1,6 @@
-import { C01Move } from '@ft_transcendence/pong-shared/network/Packet/Client/C01.js'
-import { padDirection } from '@ft_transcendence/pong-shared/engine/PongPad.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import { UP_KEYS, DOWN_KEYS } from '../constants.js'
+import { C01Move, padDirection } from '@pong-shared/index.js'
 
 const pressedKeys = new Set<string>()
 

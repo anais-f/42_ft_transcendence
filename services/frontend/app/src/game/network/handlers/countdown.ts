@@ -1,4 +1,4 @@
-import { S08Countdown } from '@ft_transcendence/pong-shared/network/Packet/Server/S08.js'
+import { S08Countdown } from '@pong-shared/index.js'
 import { renderer } from '../../core/Renderer.js'
 
 export function countdownHandler(packet: S08Countdown) {
