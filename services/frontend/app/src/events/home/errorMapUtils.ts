@@ -1,4 +1,5 @@
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
+import { ToastActionType } from '../../types/toast.js'
 
 const remapError: Record<string, string> = {
 	'player is already in a game': 'You are already in a game!',
@@ -9,10 +10,16 @@ const remapError: Record<string, string> = {
 
 export function sendGameError(error: string, status: number) {
 	if (status === 400) {
-		notyf.error('Invalid game code!')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Invalid game code!'
+		})
 	} else {
 		console.log(error)
 		const errorMessage = remapError[error] || error
-		notyf.error(errorMessage)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: errorMessage
+		})
 	}
 }

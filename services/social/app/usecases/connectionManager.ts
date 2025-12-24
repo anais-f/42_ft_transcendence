@@ -58,8 +58,9 @@ export async function addConnection(
 	const existingConn = wsConnections.get(userId)
 	const isFirstConnection = !existingConn
 
+	cancelPendingDisconnect(userId)
+
 	if (!isFirstConnection) {
-		cancelPendingDisconnect(userId)
 		try {
 			if (existingConn && existingConn.ws.readyState === WebSocket.OPEN) {
 				existingConn.ws.close(1000, 'New connection from another tab')

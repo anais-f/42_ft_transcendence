@@ -211,7 +211,7 @@ export const SettingsPage = (): string => {
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 
-export function attachSettingsEvents() {
+export async function attachSettingsEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 

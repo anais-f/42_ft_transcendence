@@ -2,9 +2,19 @@ import { routerMap, Route, Pages } from './routerMap.js'
 import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
+import { socialStore } from '../usecases/socialStore.js'
+import {
+	createSocialTokenApi,
+	createSocialWebSocketApi
+} from '../api/homeWsApi.js'
+import { handleSocialDispatcher } from '../events/home/socialDispatcher.js'
 
 export let routeParams: Record<string, string> = {}
 
+/**
+ * Router class to manage client-side routing,
+ * including authentication checks and page rendering.
+ */
 export class Router {
 	private isNavigating = false
 	private currentRoute: Route | null = null
@@ -16,6 +26,11 @@ export class Router {
 		this.initEventListeners()
 	}
 
+	/**
+	 * Get the route object for a given URL
+	 * @param url
+	 * @private
+	 */
 	private getRoute(url: string): Route {
 		routeParams = {}
 
@@ -37,7 +52,12 @@ export class Router {
 		return this.HOME_ROUTE
 	}
 
-	// match a route pattern against a URL and extract params
+	/**
+	 * Match dynamic route patterns like /user/:id
+	 * @param pattern
+	 * @param url
+	 * @private
+	 */
 	private matchDynamicRoute(
 		pattern: string,
 		url: string
@@ -65,7 +85,12 @@ export class Router {
 		return params
 	}
 
-	// Render the page content and manage binds/unbinds
+	/**
+	 * Render the page for a given route
+	 * and manage binds/unbinds
+	 * @param route
+	 * @private
+	 */
 	private renderPage(route: Route): void {
 		const contentDiv = document.getElementById(this.rootElementId)
 		if (!contentDiv) return
@@ -82,7 +107,6 @@ export class Router {
 		}
 
 		// render new page
-
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
 
@@ -103,8 +127,12 @@ export class Router {
 		}
 	}
 
-	// Main navigation handler
-	// manages auth checks and redirects
+	/**
+	 * Handle navigation logic
+	 * manages authentication checks, WebSocket setup, and page rendering
+	 * @param skipAuth
+	 * @private
+	 */
 	private async handleNav(skipAuth: boolean = false): Promise<void> {
 		if (this.isNavigating) {
 			console.log('Navigation already in progress, skipping')
@@ -116,7 +144,7 @@ export class Router {
 		const route = this.getRoute(url)
 
 		try {
-			let user: IPrivateUser | null = currentUser // Start with current user from store
+			let user: IPrivateUser | null = currentUser
 
 			// 1. --- AUTHENTICATION CHECK API ---
 			if (!skipAuth) {
@@ -125,6 +153,25 @@ export class Router {
 				user = authCheckResult
 			} else {
 				user = currentUser
+			}
+
+			// 2. --- SOCIAL WEBSOCKET MANAGEMENT ---
+			if (user && !socialStore.socialSocket) {
+				const token = await createSocialTokenApi()
+				if (token) {
+					const ws = createSocialWebSocketApi(token.data.wsToken)
+
+					socialStore.socialSocket = ws
+
+					ws.onopen = () => {}
+					ws.onmessage = handleSocialDispatcher
+					ws.onerror = (error) => {
+						console.error('Social WS error:', error)
+					}
+					ws.onclose = () => {
+						socialStore.socialSocket = null
+					}
+				}
 			}
 
 			// --- REDIRECTION GUARDS ---
@@ -148,7 +195,6 @@ export class Router {
 			// 3. RENDER PAGE
 			this.renderPage(route)
 		} catch (e: unknown) {
-			// ... (Error handlering)
 			console.error('Error during navigation:', e)
 			if (!route.public) {
 				this.isNavigating = false // to new navigation
@@ -165,6 +211,11 @@ export class Router {
 
 	// Public method to navigate to a URL
 	// updates browser history and triggers navigation handling
+	/**
+	 * Navigate to a given URL
+	 * @param url
+	 * @param skipAuth
+	 */
 	public navigate = async (
 		url: string,
 		skipAuth: boolean = false

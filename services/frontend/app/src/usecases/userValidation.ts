@@ -3,18 +3,25 @@ import { PasswordSchema } from '@common/DTO/authSchema.js'
 import { checkAuth } from './userSession.js'
 import { setCurrentUser } from './userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
+import { ToastActionType } from '../types/toast.js'
 
 export async function handleAuthSuccess(successMessage: string) {
 	const authResult = await checkAuth()
 	setCurrentUser(authResult)
-	notyf.success(successMessage)
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: successMessage
+	})
 	await window.navigate('/', true)
 }
 
 export async function syncCurrentUser(errorMessage?: string): Promise<boolean> {
 	const updatedUser = await checkAuth()
 	if (!updatedUser) {
-		notyf.error(errorMessage || 'Failed to fetch updated user data')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: errorMessage || 'Failed to fetch updated user data'
+		})
 		return false
 	}
 	setCurrentUser(updatedUser)

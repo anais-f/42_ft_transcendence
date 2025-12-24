@@ -7,6 +7,7 @@ import {
 } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 import { syncCurrentUser } from '../usecases/userValidation.js'
+import { ToastActionType } from '../types/toast.js'
 
 /**
  * Verify the current user's password using JWT
@@ -21,10 +22,16 @@ export async function verifyCurrentUserPassword(
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection password')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection password'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		return false
 	}
@@ -38,7 +45,10 @@ export async function verifyCurrentUserPassword(
  */
 export async function handleGenerateQRCode() {
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
@@ -47,10 +57,16 @@ export async function handleGenerateQRCode() {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection qrcode')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection qrcode'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		return
 	}
@@ -93,7 +109,10 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	const password = formData.get('password') as string
 
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
@@ -109,10 +128,16 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection enable')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection enable'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		form.reset()
 		return
@@ -124,7 +149,10 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	}
 
 	window.navigate('/settings')
-	notyf.success('Two-Factor Authentication enabled successfully!')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Two-Factor Authentication enabled successfully!'
+	})
 }
 
 /**
@@ -139,7 +167,10 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	const password = formData.get('password') as string
 
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
@@ -155,10 +186,16 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection disable')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection disable'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		form.reset()
 		return
@@ -170,5 +207,8 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	}
 
 	window.navigate('/settings')
-	notyf.success('Two-Factor Authentication disable successfully!')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Two-Factor Authentication disable successfully!'
+	})
 }
