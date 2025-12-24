@@ -96,6 +96,10 @@ export async function attachProfileEvents(): Promise<void> {
 			const action = actionButton.getAttribute('data-action')
 			if (action === 'add-friend') await handleAddFriend(userId)
 			if (action === 'remove-friend') await handleRemoveFriend(userId)
+			if (action === 'navigate-profile') {
+				const id = actionButton.getAttribute('data-id')
+				if (id) window.navigate(`/profile/${id}`)
+			}
 		}
 	}
 
