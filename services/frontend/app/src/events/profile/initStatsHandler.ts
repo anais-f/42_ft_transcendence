@@ -24,7 +24,7 @@ export async function fetchAndRenderStats(userId: number): Promise<void> {
 		${StatBox({ label: 'Games Played', value: stats.totalGames, color: 'text-indigo-900' })}
 		${StatBox({ label: 'Wins', value: stats.totalWins, color: 'text-emerald-900' })}
 		${StatBox({ label: 'Losses', value: stats.totalLosses, color: 'text-rose-900' })}
-		${StatBox({ label: 'Win Rate', value: stats.winRate + '%', color: 'text-yellow-800' })}
+		${StatBox({ label: 'Win Rate', value: stats.winRate?.toFixed(2) + '%', color: 'text-yellow-800' })}
 	`
 }
 
