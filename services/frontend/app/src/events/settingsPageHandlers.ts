@@ -179,7 +179,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
 			case 0:
 				notyf.open({
 					type: ToastActionType.ERROR_ACTION,
-					message: 'Network error, check your connection mot de passe'
+					message: 'Network error, check your connection password'
 				})
 				break
 			default:
