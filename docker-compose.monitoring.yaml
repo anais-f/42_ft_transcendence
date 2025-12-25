@@ -11,8 +11,6 @@ services:
         condition: service_healthy
       auth:
         condition: service_healthy
-      auth_google:
-        condition: service_healthy
       users:
         condition: service_healthy
       2fa:
@@ -34,8 +32,6 @@ services:
       auth:
         condition: service_healthy
       users:
-        condition: service_healthy
-      auth_google:
         condition: service_healthy
     volumes:
       - prometheus_data:/prometheus
