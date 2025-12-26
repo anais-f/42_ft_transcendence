@@ -20,6 +20,11 @@ const defaultAvatar: string = '/avatars/img_default.png'
  * @class UsersRepository
  */
 export class UsersRepository {
+	/**
+	 * @description Check if a user exists by id
+	 * @param user - The id of the user to check
+	 * @returns A Result indicating whether the user exists or an error occurred
+	 */
 	static existsById(user: IUserId): boolean {
 		const selectStmt = db.prepare('SELECT 1 FROM users WHERE user_id = ?')
 		const row = selectStmt.get(user.user_id)
