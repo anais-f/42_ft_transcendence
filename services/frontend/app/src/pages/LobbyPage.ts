@@ -116,27 +116,31 @@ export function attachLobbyEvents() {
 
 	gameStore.setOnOpponentJoin(oppenentJoinHandler)
 
-	// TODO: move this
 	const token = gameStore.sessionToken
 	if (token) {
-		const ws = createGameWebSocket(token)
-		ws.binaryType = 'arraybuffer'
-		gameStore.gameSocket = ws
+		createGameWebSocket(token)
+			.then((ws: WebSocket) => {
+				console.log('WS connected')
+				ws.binaryType = 'arraybuffer'
+				gameStore.gameSocket = ws
 
-		ws.onopen = () => {
-			console.log('WS connected')
-		}
+				ws.onmessage = dispatcher
 
-		ws.onmessage = dispatcher
+				ws.onerror = (error) => {
+					console.error('WS error:', error)
+				}
 
-		ws.onerror = (error) => {
-			console.error('WS error:', error)
-		}
-
-		ws.onclose = () => {
-			window.navigate('/')
-			console.log('WS closed')
-		}
+				ws.onclose = () => {
+					if (!gameStore.navigatingToGame) {
+						window.navigate('/')
+					}
+					console.log('WS closed')
+				}
+			})
+			.catch((error: any) => {
+				console.error('WS connection failed:', error)
+				window.navigate('/')
+			})
 	} else {
 		window.navigate('/')
 	}
