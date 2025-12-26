@@ -41,7 +41,6 @@ export function leaveGame(code: string) {
 
 function forfeit(gameData: GameData): ITournamentMatchResult | null {
 	if (!gameData.p2) {
-		// open game, nobody joined
 		return null
 	}
 
