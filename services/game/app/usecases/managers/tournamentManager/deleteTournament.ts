@@ -1,4 +1,5 @@
 import { tournaments, usersInTournaments } from '../gameData.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function deleteTournament(tournamentCode: string) {
 	const tournament = tournaments.get(tournamentCode)
@@ -9,4 +10,6 @@ export function deleteTournament(tournamentCode: string) {
 		usersInTournaments.delete(userId)
 	})
 	tournaments.delete(tournamentCode)
+
+	updateGameMetrics()
 }
