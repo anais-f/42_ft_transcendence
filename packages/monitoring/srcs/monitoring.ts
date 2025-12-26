@@ -3,7 +3,6 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify'
 
 export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 	app.decorateRequest('startTime', null)
-	collectDefaultMetrics()
 
 	app.addHook(
 		'onRequest',
