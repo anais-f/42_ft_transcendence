@@ -15,7 +15,7 @@ export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 	app.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply) => {
 		httpRequestCounter.inc({
 			method: request.method,
-			route: request.routeOptions.url,
+			route: request.routeOptions?.url || request.url,
 			status_code: reply.statusCode
 		})
 		const startTime = request.startTime
@@ -25,7 +25,7 @@ export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 			responseTimeHistogram.observe(
 				{
 					method: request.method,
-					route: request.routeOptions.url,
+					route: request.routeOptions?.url || request.url,
 					status_code: reply.statusCode
 				},
 				responseTimeInSeconds
