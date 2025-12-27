@@ -35,7 +35,7 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-      - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules:ro
+      - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
