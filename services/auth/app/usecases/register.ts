@@ -7,6 +7,10 @@ import {
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
+import {
+	failedLoginAttemptsCounter,
+	successfulLoginCounter
+} from '@ft_transcendence/monitoring'
 
 export async function registerAdminUser(login: string, password: string) {
 	const hashed = await hashPassword(password)
@@ -27,7 +31,11 @@ export async function loginUser(login: string, password: string) {
 	const user = findUserByLogin(login)
 	if (!user || !user.password) return null
 	const ok = await verifyPassword(user.password, password)
-	if (!ok) return null
+	if (!ok) {
+		failedLoginAttemptsCounter.inc({ username: login })
+		return null
+	}
+	successfulLoginCounter.inc()
 	const isAdmin = Boolean(user.is_admin)
 	if (!isUser2FAEnabled(user.user_id)) {
 		return {
