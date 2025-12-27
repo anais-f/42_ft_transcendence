@@ -143,7 +143,7 @@ export async function attachLoginEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	submitHandler = async (e: Event) => {
+	submitHandler ??= async (e: Event) => {
 		e.preventDefault()
 
 		const form = (e.target as HTMLElement).closest('form[data-form]')
@@ -155,7 +155,7 @@ export async function attachLoginEvents() {
 		if (formName === '2fa') await handle2FASubmit(form as HTMLFormElement)
 	}
 
-	clickHandler = (e: Event) => {
+	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 		if (actionButton) {

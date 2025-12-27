@@ -215,7 +215,7 @@ export async function attachSettingsEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	submitHandler = async (e: Event) => {
+	submitHandler ??= async (e: Event) => {
 		e.preventDefault()
 		const form = (e.target as HTMLElement).closest('form[data-form]')
 		if (!form) return
@@ -233,7 +233,7 @@ export async function attachSettingsEvents() {
 			await handleDisable2FA(form as HTMLFormElement)
 	}
 
-	clickHandler = async (e: Event) => {
+	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
 		if (target?.id === 'generate_qr_btn') {
 			e.preventDefault()

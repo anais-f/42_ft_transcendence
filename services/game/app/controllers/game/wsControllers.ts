@@ -10,6 +10,7 @@ export async function handleGameWsConnection(
 	request: FastifyRequest<IWsJwtTokenQuery>,
 	fastify: FastifyInstance
 ): Promise<void> {
+	console.log('[WS] Connection attempt received')
 	const payload = await handleWsConnection(socket, request, fastify)
 	if (!payload) {
 		return

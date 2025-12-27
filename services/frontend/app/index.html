@@ -18,7 +18,15 @@
 			class="border-t-2 border-b-2 border-gray-800 p-4 mb-4 justify-between flex items-center text-sm"
 		>
 			<h4 class="flex-1 mr-4">Page 1</h4>
-			<a href="/" title="Return Home" class="no-underline">
+			<a
+				href="#"
+				title="Return Home"
+				class="no-underline cursor-pointer"
+				onclick="
+					navigate('/')
+					return false
+				"
+			>
 				<h1 class="title_font">FT-TRANSCENDENCE</h1>
 			</a>
 			<h4 id="date" class="flex flex-1 justify-end ml-4"></h4>

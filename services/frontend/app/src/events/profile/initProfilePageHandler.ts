@@ -3,6 +3,7 @@ import { IPublicProfileUser } from '@ft_transcendence/common'
 import { checkIsFriendApi } from '../../api/friends/getFriendsApi.js'
 import { Button } from '../../components/Button.js'
 import { currentUser } from '../../usecases/userStore.js'
+import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
 
 /**
  * Render the user profile data into the DOM
@@ -19,21 +20,14 @@ function renderProfile(user: IPublicProfileUser) {
 	) as HTMLInputElement
 	if (usernameElem) usernameElem.textContent = user.username
 
-	const statusColorElem = document.getElementById(
-		'profile-status-color'
-	) as HTMLInputElement
+	const isOnline = user.status === 1
+	updateStatusCircle('profile-status-circle', isOnline)
+
 	const statusTextElem = document.getElementById(
 		'profile-status-text'
 	) as HTMLInputElement
-
-	if (statusColorElem && statusTextElem) {
-		if (user.status === 1) {
-			statusColorElem.className = 'w-3 h-3 rounded-full bg-green-500'
-			statusTextElem.textContent = 'Online'
-		} else {
-			statusColorElem.className = 'w-3 h-3 rounded-full bg-gray-500'
-			statusTextElem.textContent = 'Offline'
-		}
+	if (statusTextElem) {
+		statusTextElem.textContent = isOnline ? 'Online' : 'Offline'
 	}
 
 	const lastSeenElem = document.getElementById(
