@@ -101,7 +101,7 @@ export function attachLobbyEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	clickHandler = async (e: Event) => {
+	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
