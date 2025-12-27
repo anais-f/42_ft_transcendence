@@ -24,4 +24,7 @@ export function quitTournament(request: FastifyRequest): void {
 	}
 	tournament.participants.splice(participantIndex, 1)
 	usersInTournaments.delete(userId)
+	if (tournament.participants.length === 0) {
+		tournaments.delete(tournamentCode.code)
+	}
 }
