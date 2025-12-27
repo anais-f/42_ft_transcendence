@@ -1025,7 +1025,7 @@
 				{
 					"editorMode": "code",
 					"expr": "nginx_connections_active",
-					"legendFormat": "nginx_connections_active",
+					"legendFormat": "active",
 					"range": true,
 					"refId": "A"
 				},
@@ -1038,7 +1038,7 @@
 					"expr": "nginx_connections_reading",
 					"hide": false,
 					"instant": false,
-					"legendFormat": "nginx_connections_reading",
+					"legendFormat": "reading",
 					"range": true,
 					"refId": "B"
 				},
@@ -1051,7 +1051,7 @@
 					"expr": "nginx_connections_waiting",
 					"hide": false,
 					"instant": false,
-					"legendFormat": "nginx_connections_waiting",
+					"legendFormat": "waiting",
 					"range": true,
 					"refId": "C"
 				},
@@ -1064,7 +1064,7 @@
 					"expr": "nginx_connections_writing",
 					"hide": false,
 					"instant": false,
-					"legendFormat": "nginx_connections_writing",
+					"legendFormat": "writing",
 					"range": true,
 					"refId": "D"
 				}
@@ -2400,16 +2400,20 @@
 								"value": 0
 							},
 							{
+								"color": "green",
+								"value": -20
+							},
+							{
 								"color": "#EAB839",
-								"value": 70
+								"value": 0
 							},
 							{
 								"color": "orange",
-								"value": 85
+								"value": 10
 							},
 							{
 								"color": "red",
-								"value": 95
+								"value": 30
 							}
 						]
 					},
@@ -2441,13 +2445,13 @@
 			"targets": [
 				{
 					"editorMode": "code",
-					"expr": "round((\n  nodejs_heap_size_used_bytes\n/\n  nodejs_heap_size_total_bytes\n) * 100, 0.01)\n",
+					"expr": "(delta(nodejs_heap_size_used_bytes[10m]) / nodejs_heap_size_used_bytes) * 100",
 					"legendFormat": "{{job}}",
 					"range": true,
 					"refId": "A"
 				}
 			],
-			"title": "Heap Usage",
+			"title": "Heap Growth (10min %)",
 			"type": "timeseries"
 		}
 	],
@@ -2466,5 +2470,5 @@
 	"timezone": "browser",
 	"title": "ft_transcendence",
 	"uid": "95f33aac-d176-4e8b-a8fa-e2ee3e6af631",
-	"version": 14
+	"version": 17
 }
