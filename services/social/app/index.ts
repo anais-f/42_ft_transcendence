@@ -6,6 +6,7 @@ import { socialRoutes } from './routes/socialRoutes.js'
 import { createWsApp } from '@ft_transcendence/security'
 import { startHeartbeat } from './usecases/heartbeatService.js'
 import { env } from './env/checkEnv.js'
+import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 
 export async function start(): Promise<void> {
 	const app = createWsApp(
@@ -26,7 +27,7 @@ export async function start(): Promise<void> {
 			service: env.JWT_SECRET_SOCIAL
 		}
 	)
-
+	setupFastifyMonitoringHooks(app)
 	try {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()

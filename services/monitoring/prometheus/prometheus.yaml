@@ -13,20 +13,29 @@ scrape_configs:
     static_configs:
       - targets: ['users:3000']
 
-  - job_name: 'auth_google'
+  - job_name: '2fa'
     metrics_path: /metrics
     static_configs:
-      - targets: ['auth_google:3000']
+      - targets: ['2fa:3000']
+
+  - job_name: 'game'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['game:3000']
+
+  - job_name: 'social'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['social:3000']
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
 
   - job_name: 'prometheus'
     metrics_path: /prometheus/metrics
     static_configs:
       - targets: ['localhost:9090']
-
-  - job_name: 'mtail'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['mtail:3903']
 
 rule_files:
   - '/etc/prometheus/rules.yml'

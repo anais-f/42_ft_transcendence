@@ -7,6 +7,7 @@ import {
 import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
+import { successfulLoginCounter } from '@ft_transcendence/monitoring'
 
 export async function registerUserUsecase(
 	login: string,
@@ -57,6 +58,7 @@ export async function registerUserUsecase(
 		},
 		'1h'
 	)
+	successfulLoginCounter.inc()
 
 	return { publicUser, token }
 }

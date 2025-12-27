@@ -32,7 +32,7 @@ export class UsersRepository {
 	}
 
 	static existsByUsername(username: IUsername): boolean {
-		const selectStmt = db.prepare('SELECT 1 FROM users WHERE username = ?')
+		const selectStmt = db.prepare('SELECT 1 FROM users WHERE username = ? ')
 		const row = selectStmt.get(username.username)
 		return !!row
 	}
@@ -43,14 +43,12 @@ export class UsersRepository {
 	 * @returns A unique username
 	 */
 	private static generateUniqueUsername(baseUsername: string): string {
-		if (!this.existsByUsername({ username: baseUsername })) {
-			return baseUsername
-		}
-
+		let username = baseUsername
 		let counter = 1
 		let candidateUsername = `${baseUsername}${counter}`
 
-		while (this.existsByUsername({ username: candidateUsername })) {
+		while (this.existsByUsername({ username })) {
+			username = `${baseUsername}${counter}`
 			counter++
 			candidateUsername = `${baseUsername}${counter}`
 
@@ -61,7 +59,7 @@ export class UsersRepository {
 			}
 		}
 
-		return candidateUsername
+		return username
 	}
 
 	/**
@@ -91,7 +89,7 @@ export class UsersRepository {
 
 	static updateLastConnection(user: IUserConnection): void {
 		const updateStmt = db.prepare(
-			'UPDATE users SET last_connection = ? WHERE user_id = ?'
+			'UPDATE users SET last_connection = ? WHERE user_id = ? '
 		)
 		const now = new Date().toISOString()
 		updateStmt.run(now, user.user_id)
@@ -141,7 +139,7 @@ export class UsersRepository {
 			}
 		} else {
 			const updateStmt = db.prepare(
-				'UPDATE users SET status = ? WHERE user_id = ?'
+				'UPDATE users SET status = ?  WHERE user_id = ?'
 			)
 			const info = updateStmt.run(status, user.user_id)
 			if (info.changes === 0) throw createHttpError.NotFound('User not found')
@@ -153,7 +151,7 @@ export class UsersRepository {
 	 */
 	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ?'
+			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ? '
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
 	}
@@ -215,5 +213,11 @@ export class UsersRepository {
 			| UserSearchResultDTO
 			| undefined
 		return row || null
+	}
+
+	static getTotalUsersCount(): number {
+		const selectStmt = db.prepare('SELECT COUNT(*) as count FROM users')
+		const row = selectStmt.get() as { count: number }
+		return row.count
 	}
 }

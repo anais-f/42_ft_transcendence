@@ -42,7 +42,6 @@ debug:
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
-	@docker volume rm ft_transcendence_nginx_logs || true
 
 .PHONY: sh-%
 sh-%:

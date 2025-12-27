@@ -2,6 +2,7 @@ import { createInviteCode } from '../../../utils/createCode.js'
 import { games, playerToGame } from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 import { ITournamentMatchData } from '../gameData.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 /*
  * Creates a new game and returns the game code.
@@ -14,6 +15,7 @@ import { ITournamentMatchData } from '../gameData.js'
  * error:
  * 	- throw 'a player is already in a game'
  */
+
 export function requestGame(
 	pID1: number,
 	pID2: number | undefined = undefined,
@@ -44,6 +46,8 @@ export function requestGame(
 			// This can happen with normal use
 		}
 	}
+
+	updateGameMetrics()
 
 	return newCode
 }

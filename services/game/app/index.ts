@@ -6,6 +6,8 @@ import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
 import { initializeTournamentId } from './usecases/managers/tournamentManager/createTournament.js'
+import metricPlugin from 'fastify-metrics'
+
 // Run migrations first, then initialize tournament ID
 runMigrations()
 initializeTournamentId()
@@ -38,6 +40,7 @@ async function start(): Promise<void> {
 	await registerRoutes(app)
 
 	try {
+		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
 			port: env.PORT,

@@ -1,44 +1,113 @@
 groups:
-  - name: High_Request_Rate_Alerts
-    rules:
-      - alert: HighRequestRate
-        expr: sum by(route) (rate(http_requests_total[1m])) > 500
-        for: 0s
-        labels:
-          severity: critical
-        annotations:
-          summary: 'High rate of HTTP requests on route {{ $labels.route }}'
-          description: 'The rate of HTTP requests has exceeded 500 requests per minute on route {{ $labels.route }}.'
-
   - name: service_availability
     rules:
-      - alert: Service_Down
-        expr: up == 0
-        for: 0m
+      - alert: ServiceDown
+        expr: up{job!="prometheus"} == 0
+        for: 1m
         labels:
           severity: critical
         annotations:
           summary: 'Service {{ $labels.job }} is down'
-          description: 'The service {{ $labels.job }} has not responded to Prometheus scrapes.'
+          description: 'The service {{ $labels.job }} has not responded to Prometheus scrapes for 1 minute.'
 
-  - name: new_nginx_5xx_errors
+  - name: http_requests
     rules:
-      - alert: Nginx_5xx_Errors
-        expr: increase(nginx_http_requests_total{code=~"5.."}[1m]) > 0
+      - alert: HighRequestRate
+        expr: sum by(job) (rate(http_requests_total[1m])) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High request rate on {{ $labels.job }}'
+          description: '{{ $labels.job }} is receiving {{ $value | humanize }} req/s.'
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, sum by (job, le) (rate(http_response_time_seconds_bucket[5m]))) * 1000 > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High P95 response time on {{ $labels.job }}'
+          description: 'P95 response time is {{ $value | humanize }}ms on {{ $labels.job }}.'
+
+  - name: nginx_alerts
+    rules:
+      - alert: Nginx5xxError
+        expr: rate(nginx_http_requests_total{code=~"5.."}[1m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'HTTP 5xx errors on Nginx'
+          description: 'Nginx is returning {{ $value | humanize }} errors/s.'
+
+      - alert: NginxConnectionsHigh
+        expr: nginx_connections_active > 150
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Nginx connections high'
+          description: 'Active connections: {{ $value }}.'
+
+  - name: nodejs_performance
+    rules:
+      - alert: EventLoopLagHigh
+        expr: nodejs_eventloop_lag_mean_seconds * 1000 > 50
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High event loop lag on {{ $labels.job }}'
+          description: 'Event loop lag is {{ $value | humanize }}ms on {{ $labels.job }}.'
+
+      - alert: NodeJSHeapGrowing
+        expr: (delta(nodejs_heap_size_used_bytes[10m]) / nodejs_heap_size_used_bytes) * 100 > 20
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'NodeJS heap growing on {{ $labels.job }}'
+          description: 'Heap increased by {{ $value | humanize }}% in 10min on {{ $labels.job }}. Possible memory leak.'
+
+  - name: resource_utilization
+    rules:
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[1m]) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High CPU usage on {{ $labels.job }}'
+          description: '{{ $labels.job }} is using {{ $value | humanize }}% CPU.'
+
+  - name: security
+    rules:
+      - alert: HighFailedLoginAttempts
+        expr: sum(increase(failed_login_attempts_total[5m])) > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Brute force attack detected'
+          description: '{{ $value }} failed login attempts in the last 5 minutes.'
+
+      - alert: AdminFailedLoginAttempts
+        expr: increase(failed_login_attempts_total{role="admin"}[5m]) > 1
         for: 0m
         labels:
           severity: critical
         annotations:
-          summary: 'Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}'
-          description: '{{$labels.code}} error occurred on Nginx in the last minute for route {{ $labels.method }} {{ $labels.route }}.'
+          summary: 'Failed admin login attempts'
+          description: 'Admin account has {{ $value }} failed login attempts in the last 5 minutes. Possible breach attempt.'
 
-  - name: first_nginx_5xx_errors
+  - name: business_metrics
     rules:
-      - alert: Nginx_First_5xx_Error
-        expr: nginx_http_requests_total{code=~"5.."} > 0
-        for: 0m
+      - alert: NoActiveGames
+        expr: sum(active_games{status="active"}) == 0
+        for: 30m
         labels:
-          severity: critical
+          severity: info
         annotations:
-          summary: 'Error {{$labels.code}} detected on Nginx for route {{ $labels.method }} {{ $labels.route }}'
-          description: '{{$labels.code}} error occurred on Nginx for route {{ $labels.method }} {{ $labels.route }}.'
+          summary: 'No active games'
+          description: 'No games have been active for 30 minutes.'

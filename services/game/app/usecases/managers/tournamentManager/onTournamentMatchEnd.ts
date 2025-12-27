@@ -3,6 +3,7 @@ import createHttpError from 'http-errors'
 import { tournaments, usersInTournaments } from '../gameData.js'
 import { getTournamentCodeById } from '../tournamentManager/tournamentUsecases.js'
 import { requestGame } from '../gameManager/requestGame.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function onTournamentMatchEnd(
 	tournamentData: ITournamentMatchResult
@@ -36,13 +37,15 @@ export function onTournamentMatchEnd(
 	if (tournamentMatchData.round === 1) {
 		tournament.status = 'completed'
 		console.log(
-			`Tournament ${tournamentMatchData.tournamentId} completed! Winner: ${tournamentData.winnerId}`
+			`Tournament ${tournamentMatchData.tournamentId} completed!  Winner: ${tournamentData.winnerId}`
 		)
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
 			usersInTournaments.delete(userId)
 		})
+
+		updateGameMetrics()
 		return
 	}
 
@@ -81,7 +84,7 @@ export function onTournamentMatchEnd(
 		// Both players ready, start the match!
 		nextRoundMatch.status = 'ongoing'
 		console.log(
-			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+			`Starting next round match:  ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
 		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id, {
 			tournamentId: tournament.id,
