@@ -72,6 +72,17 @@ export const totalRegisteredUsersGauge = new Gauge({
 	help: 'Total number of registered users in the database'
 })
 
+export const successfulLoginCounter = new Counter({
+	name: 'successful_login_attempts_total',
+	help: 'Total number of successful login attempts'
+})
+
+export const failedLoginAttemptsCounter = new Counter({
+	name: 'failed_login_attempts_total',
+	help: 'Total number of failed login attempts',
+	labelNames: ['username']
+})
+
 export const dbQueryDurationGauge = new Gauge({
 	name: 'db_query_duration_seconds',
 	help: 'Duration of database queries in seconds'
