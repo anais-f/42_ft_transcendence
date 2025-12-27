@@ -54,11 +54,31 @@ groups:
           summary: 'High CPU usage'
           description: 'CPU usage exceeds 90% for the last minute.'
 
-      - alert: HighHeapUsage
-        expr: (nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes) * 100 > 90
-        for: 1m
+      - alert: NodeJSHeapGrowing
+        expr: (nodejs_heap_size_used_bytes - nodejs_heap_size_used_bytes offset 10m) / nodejs_heap_size_total_bytes * 100 > 10
+        for: 5m
         labels:
           severity: warning
         annotations:
-          summary: 'High NodeJS heap usage'
-          description: 'Heap usage exceeds 90% for {{ $labels.job }}.'
+          summary: 'NodeJS heap is growing'
+          description: 'Heap usage increased by more than 10% over the last 10 minutes for {{ $labels.job }}. Possible memory leak.'
+
+  - name: failed_login_attempts
+    rules:
+      - alert: HighFailedLoginAttempts
+        expr: increase(failed_login_attempts_total[5m]) > 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High number of failed login attempts'
+          description: 'More than 20 failed login attempts in the last 5 minutes.'
+
+      - alert: AdminFailedLoginAttempts
+        expr: increase(failed_login_attempts_total{role="admin"}[5m]) > 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'High number of failed admin login attempts'
+          description: 'A failed admin login attempts in the last 5 minutes.'
