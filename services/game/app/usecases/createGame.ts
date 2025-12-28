@@ -115,16 +115,57 @@ function createDiamondObstacles(): Segment[] {
 	]
 }
 
+function createHexagonObstacles(): Segment[] {
+	// Top hexagon (centered at y=6)
+	const h1Left = new Vector2(-6, 6)
+	const h1TopLeft = new Vector2(-4, 7)
+	const h1TopRight = new Vector2(4, 7)
+	const h1Right = new Vector2(6, 6)
+	const h1BottomRight = new Vector2(4, 5)
+	const h1BottomLeft = new Vector2(-4, 5)
+
+	// Bottom hexagon (centered at y=-6)
+	const h2Left = new Vector2(-6, -6)
+	const h2TopLeft = new Vector2(-4, -5)
+	const h2TopRight = new Vector2(4, -5)
+	const h2Right = new Vector2(6, -6)
+	const h2BottomRight = new Vector2(4, -7)
+	const h2BottomLeft = new Vector2(-4, -7)
+
+	return [
+		// Top hexagon
+		new Segment(h1Left, h1TopLeft),
+		new Segment(h1TopLeft, h1TopRight),
+		new Segment(h1TopRight, h1Right),
+		new Segment(h1Right, h1BottomRight),
+		new Segment(h1BottomRight, h1BottomLeft),
+		new Segment(h1BottomLeft, h1Left),
+		// Bottom hexagon
+		new Segment(h2Left, h2TopLeft),
+		new Segment(h2TopLeft, h2TopRight),
+		new Segment(h2TopRight, h2Right),
+		new Segment(h2Right, h2BottomRight),
+		new Segment(h2BottomRight, h2BottomLeft),
+		new Segment(h2BottomLeft, h2Left)
+	]
+}
+
 export function createGame(maxScore: number, options: MapOptions): IGameData {
 	const { borderDown, borderUp, borderL, borderR } = createArenaBorders()
 
-	const paddleData =
-		options.paddleShape === PaddleShape.V
-			? createVPaddles(borderDown, borderUp)
-			: createClassicPaddles(borderDown, borderUp)
+	const paddleCreators = {
+		[PaddleShape.Classic]: () => createClassicPaddles(borderDown, borderUp),
+		[PaddleShape.V]: () => createVPaddles(borderDown, borderUp)
+	}
 
-	const obstacles =
-		options.obstacle === ObstacleType.Diamonds ? createDiamondObstacles() : []
+	const obstacleCreators: Record<ObstacleType, () => Segment[]> = {
+		[ObstacleType.None]: () => [],
+		[ObstacleType.Diamonds]: createDiamondObstacles,
+		[ObstacleType.Hexagons]: createHexagonObstacles
+	}
+
+	const paddleData = paddleCreators[options.paddleShape]()
+	const obstacles = obstacleCreators[options.obstacle]()
 
 	const staticSegments = [borderDown, borderUp, borderL, borderR, ...obstacles]
 

@@ -5,7 +5,8 @@ export enum PaddleShape {
 
 export enum ObstacleType {
 	None = 'none',
-	Diamonds = 'diamonds'
+	Diamonds = 'diamonds',
+	Hexagons = 'hexagons'
 }
 
 export interface MapOptions {

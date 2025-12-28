@@ -1,8 +1,9 @@
 import { IApiResponse } from '../../types/api.js'
+import { PaddleShape, ObstacleType } from '@ft_transcendence/pong-shared'
 
 export interface MapOptions {
-	paddleShape?: 'classic' | 'v'
-	obstacle?: 'none' | 'diamonds'
+	paddleShape?: PaddleShape
+	obstacle?: ObstacleType
 }
 
 export interface NewGameResponse {

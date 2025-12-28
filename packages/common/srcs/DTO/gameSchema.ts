@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const MapOptionsSchema = z
 	.object({
 		paddleShape: z.enum(['classic', 'v']).default('classic'),
-		obstacle: z.enum(['none', 'diamonds']).default('none')
+		obstacle: z.enum(['none', 'diamonds', 'hexagons']).default('none')
 	})
 	.strict()
 
