@@ -6,6 +6,7 @@ import { createTournamentMatchResult } from '../tournamentManager/tournamentUsec
 import { ITournamentMatchResult } from '../gameData.js'
 import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
 import { createEogMessage } from './eogMessage.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -33,6 +34,8 @@ export function leaveGame(code: string) {
 		busyPlayers.delete(gameData.p2.id)
 	}
 	games.delete(code)
+
+	updateGameMetrics()
 
 	// Call tournament callback after cleanup
 	if (tournamentCpy) {

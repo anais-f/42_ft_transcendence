@@ -17,6 +17,7 @@ import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { setupErrorHandler } from '@ft_transcendence/common'
 import { env } from './env/checkEnv.js'
+import { updateUserMetrics } from './usecases/metricsService.js'
 
 function createApp(): FastifyInstance {
 	const app = Fastify({
@@ -79,6 +80,7 @@ async function initializeUsers(): Promise<void> {
 		console.log('Initializing users from auth service...')
 		await UsersServices.syncAllUsersFromAuth()
 		console.log('User initialization complete.')
+		updateUserMetrics()
 	} catch (error) {
 		console.error('Error initializing users:', error)
 		throw error
