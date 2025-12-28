@@ -5,26 +5,18 @@ import {
 	S09DynamicSegments,
 	S02SegmentUpdate,
 	S06BallSync,
-	AS03BaseBall
+	AS03BaseBall,
+	MAX_LIVES,
+	PAD_SPEED,
+	DEFAULT_TPS
 } from '@ft_transcendence/pong-shared'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
-import {
-	createDiamondMap,
-	createGame,
-	DEFAULT_TPS,
-	IGameData
-} from '../../createGame.js'
+import { createDiamondMap, createGame, IGameData } from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
-
-export const MAX_LIVES = 10
-export const PAD_SPEED = 0.3
-export const PAUSE_TICKS = 180
-export const COUNTDOWN_STEPS = 3
-export const TICKS_PER_STEP = PAUSE_TICKS / (COUNTDOWN_STEPS + 1)
 
 export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_LIVES)

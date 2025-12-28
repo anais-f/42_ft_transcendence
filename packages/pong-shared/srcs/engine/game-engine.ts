@@ -7,6 +7,13 @@ import { ILives } from './IScore.js'
 import { IWinZone } from './IWinZone.js'
 import { EPSILON } from '../define.js'
 import { PongPad, padDirection } from './PongPad.js'
+import {
+	BALL_SPEED,
+	SPEED_INCREASE_FACTOR,
+	MAX_BALL_SPEED,
+	BALL_RADIUS,
+	PAUSE_TICKS_AFTER_POINT
+} from '../config.js'
 
 export class TPS_MANAGER {
 	public tickCount: number = 0
@@ -25,10 +32,6 @@ export enum GameState {
 	Started
 }
 
-export const BALL_SPEED = 0.4
-export const SPEED_INCREASE_FACTOR = 1.05
-export const MAX_BALL_SPEED = BALL_SPEED * 3
-
 export interface PaddleInput {
 	isMoving: boolean
 	direction: padDirection
@@ -40,12 +43,11 @@ export class GameEngine {
 	private _TPS_DATA: TPS_MANAGER
 	private _dynamicBorderVelocities: Map<Segment, Vector2> = new Map()
 	private _ball: IBall = {
-		shape: new Circle(new Vector2(), 0.5),
+		shape: new Circle(new Vector2(), BALL_RADIUS),
 		velo: this.getRandomVelo(),
 		speed: BALL_SPEED
 	}
-	private readonly PAUSE_TICKS_AFTER_POINT = 120
-	private _pauseTicksRemaining: number = this.PAUSE_TICKS_AFTER_POINT
+	private _pauseTicksRemaining: number = PAUSE_TICKS_AFTER_POINT
 	public startTime
 
 	private _paddles: PongPad[] = []
@@ -360,7 +362,7 @@ export class GameEngine {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()
 			this._ball.speed = BALL_SPEED
-			this._pauseTicksRemaining = this.PAUSE_TICKS_AFTER_POINT
+			this._pauseTicksRemaining = PAUSE_TICKS_AFTER_POINT
 			console.log(`[${this._live.p1} | ${this._live.p2}]`)
 		}
 

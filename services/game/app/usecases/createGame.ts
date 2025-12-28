@@ -3,11 +3,10 @@ import {
 	PongPad,
 	Segment,
 	Vector2,
-	padDirection
+	padDirection,
+	DEFAULT_TPS
 } from '@ft_transcendence/pong-shared'
 import { createScore } from '@ft_transcendence/pong-shared/engine/IScore.js'
-
-export const DEFAULT_TPS = 60
 
 export interface PlayerMovement {
 	isMoving: boolean

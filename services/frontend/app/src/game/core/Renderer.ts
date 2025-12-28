@@ -1,4 +1,9 @@
-import { Segment, Vector2 } from '@pong-shared/index.js'
+import {
+	GAME_SPACE_HEIGHT,
+	GAME_SPACE_WIDTH,
+	Segment,
+	Vector2
+} from '@pong-shared/index.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import {
 	SEGMENT_LINE_WIDTH_SCALE,
@@ -7,8 +12,6 @@ import {
 	BALL_RADIUS_SCALE,
 	COUNTDOWN_FONT,
 	COUNTDOWN_COLOR,
-	GAME_SPACE_WIDTH,
-	GAME_SPACE_HEIGHT,
 	COUNTDOWN_FONT_SCALE,
 	OVERLAY_FONT,
 	OVERLAY_FONT_SCALE,

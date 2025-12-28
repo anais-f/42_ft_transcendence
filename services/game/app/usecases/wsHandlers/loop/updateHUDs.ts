@@ -1,8 +1,10 @@
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
+import {
+	TICKS_PER_STEP,
+	S08Countdown,
+	S07Score
+} from '@ft_transcendence/pong-shared'
 import { GameData } from '../../managers/gameData.js'
-import { S07Score } from '@ft_transcendence/pong-shared/network/Packet/Server/S07.js'
-import { S08Countdown } from '@ft_transcendence/pong-shared/network/Packet/Server/S08.js'
-import { TICKS_PER_STEP } from './startGame.js'
 import { PacketSender } from '../PacketSender.js'
 
 export function updateHUDs(
