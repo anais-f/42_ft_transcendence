@@ -8,6 +8,7 @@ import {
 	fetchAndRenderFriendRequests,
 	fetchAndRenderFriendsList
 } from './friendsHandler.js'
+import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
 
 /**
  * Handles incoming WebSocket messages related to social features
@@ -48,30 +49,30 @@ export async function handleSocialDispatcher(message: MessageEvent) {
 }
 
 /**
- * Updates the online status of a friend in the friends list UI
+ * Updates the online status of a friend in the friends list UI and profile page
  * @param userId - The ID of the user whose status has changed
  * @param status - The new status (1 for online, 0 for offline)
  */
 function updateFriendStatus(userId: number, status: number) {
-	const friendItemId = `friend_item_${userId}`
-	const friendItem = document.getElementById(friendItemId)
-	const statusCircle = document.getElementById(`status_circle_${userId}`)
-	const statusText = document.getElementById(`status_text_${userId}`)
+	const isOnline = status === 1
+	const statusText = isOnline ? 'Online' : 'Offline'
 
-	if (!friendItem || !statusCircle || !statusText) {
-		console.warn(`Friend item with ID ${friendItemId} not found.`)
-		return
+	const friendStatusCircle = document.getElementById(`status_circle_${userId}`)
+	const friendStatusText = document.getElementById(`status_text_${userId}`)
+	if (friendStatusCircle) {
+		updateStatusCircle(`status_circle_${userId}`, isOnline)
+	}
+	if (friendStatusText) {
+		friendStatusText.textContent = statusText
 	}
 
-	const isOnline = status === 1
-	if (isOnline) {
-		statusCircle.classList.remove('bg-gray-500')
-		statusCircle.classList.add('bg-green-500')
-		statusText.textContent = 'Online'
-	} else {
-		statusCircle.classList.remove('bg-green-500')
-		statusCircle.classList.add('bg-gray-500')
-		statusText.textContent = 'Offline'
+	const profilePath = window.location.pathname
+	if (profilePath === `/profile/${userId}`) {
+		updateStatusCircle('profile-status-circle', isOnline)
+		const profileStatusText = document.getElementById('profile-status-text')
+		if (profileStatusText) {
+			profileStatusText.textContent = statusText
+		}
 	}
 }
 
