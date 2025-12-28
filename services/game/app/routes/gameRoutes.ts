@@ -11,6 +11,7 @@ import {
 import { handleGameWsConnection } from '../controllers/game/wsControllers.js'
 import { createNewGameController } from '../controllers/game/newGameController.js'
 import { joinGameController } from '../controllers/game/joinGameController.js'
+import { getAssignedGameController } from '../controllers/game/getAssignedGameController.js'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -38,6 +39,18 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			}
 		},
 		handler: createNewGameController
+	})
+
+	server.route({
+		method: 'GET',
+		url: '/api/game/assigned',
+		preHandler: jwtAuthMiddleware,
+		schema: {
+			response: {
+				200: CodeParamSchema
+			}
+		},
+		handler: getAssignedGameController
 	})
 
 	server.register(async (fastify) => {
