@@ -39,6 +39,8 @@ export const GameConfigModal = (): string => {
 	return Modal({
 		id: GAME_CONFIG_MODAL_ID,
 		title: 'Game Options',
+		subtitle: 'The Pong',
+		subtitleClass: 'font-bold',
 		content
 	})
 }
