@@ -13,13 +13,13 @@ import {
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
 import { GameData } from '../../managers/gameData.js'
-import { createDiamondMap, createGame, IGameData } from '../../createGame.js'
+import { createGame, IGameData } from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
 export function startGame(gameData: GameData, gameCode: string): void {
-	const gameInstance = createGame(MAX_LIVES)
+	const gameInstance = createGame(MAX_LIVES, gameData.mapOptions)
 	gameData.gameInstance = gameInstance
 
 	// Register paddles with the game engine for synchronized updates

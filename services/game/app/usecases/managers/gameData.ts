@@ -1,10 +1,10 @@
 import { IGameData } from '../createGame.js'
 import { Tournament } from '@ft_transcendence/common'
+import { MapOptions } from '@ft_transcendence/pong-shared'
+import WebSocket from 'ws'
 
 export type GameStatus = 'waiting' | 'active' | 'ended'
 export type TPlayerSlot = 'p1' | 'p2'
-
-import WebSocket from 'ws'
 
 export interface ITournamentMatchData {
 	tournamentId: number
@@ -32,6 +32,7 @@ export interface GameData {
 	createdAt: number
 	timeoutId: ReturnType<typeof setTimeout> | null
 	tournamentMatchData?: ITournamentMatchData
+	mapOptions: MapOptions
 }
 
 // individial game

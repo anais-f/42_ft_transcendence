@@ -1,3 +1,18 @@
+export enum PaddleShape {
+	Classic = 'classic',
+	V = 'v'
+}
+
+export enum ObstacleType {
+	None = 'none',
+	Diamonds = 'diamonds'
+}
+
+export interface MapOptions {
+	paddleShape: PaddleShape
+	obstacle: ObstacleType
+}
+
 export const GameConfig = {
 	ball: {
 		speed: 0.4,
