@@ -18,7 +18,7 @@ jobs:
 
       - name: Generate SSL certificates
         run: |
-          mkdir -p secret
+          mkdir -p .secret
           openssl req -x509 -newkey rsa:4096 \
             -keyout .secret/key.pem \
             -out .secret/cert.pem \
