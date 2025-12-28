@@ -3,6 +3,7 @@ import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
 import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
 import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
+import { createEogMessage } from './eogMessage.js'
 import { updateGameMetrics } from '../metricsService.js'
 
 export function endGame(code: string) {
@@ -28,8 +29,13 @@ export function endGame(code: string) {
 	)
 
 	const p1Won = score.p1 > score.p2
-	const reason = p1Won ? 'p1 won' : 'p2 won'
-	const eogMessage = JSON.stringify({ type: 'EOG', data: { reason } })
+	const eogMessage = createEogMessage(
+		p1Won ? gameData.p1.id : gameData.p2.id,
+		p1Won ? gameData.p2.id : gameData.p1.id,
+		score.p1,
+		score.p2,
+		'score'
+	)
 
 	gameData.p1.ws?.send(eogMessage)
 	gameData.p2.ws?.send(eogMessage)
