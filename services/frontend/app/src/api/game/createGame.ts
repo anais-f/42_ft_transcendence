@@ -26,6 +26,6 @@ export async function createGameApi(): Promise<IApiResponse> {
 }
 
 export function createGameWebSocket(token: string): WebSocket {
-	const wsUrl = `ws://${window.location.host}/game/api/game/ws?token=${token}`
+	const wsUrl = `wss://${window.location.host}/game/api/game/ws?token=${token}`
 	return new WebSocket(wsUrl)
 }
