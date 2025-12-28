@@ -1,4 +1,5 @@
 import { LoremSection } from '../components/LoremIpsum.js'
+import { StatusCircle } from '../components/friends/StatusCircle.js'
 import { initAndRenderUserProfile } from '../events/profile/initProfilePageHandler.js'
 import {
 	handleAddFriend,
@@ -10,7 +11,6 @@ import {
 } from '../events/profile/initStatsHandler.js'
 import { userIdFromUrl } from '../usecases/urlUtils.js'
 
-// TODO: use StatusCircle comp
 export const ProfilePage = (): string => {
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-16 h-full w-full">
@@ -21,9 +21,9 @@ export const ProfilePage = (): string => {
       <div class="w-full my-4">
         <h2 id="profile-username" class="text-xl font-medium font-special pb-1">Loading...</h2>
         <p class="text-gray-500 flex items-center gap-2 pb-1">
-            <span id="profile-status-color" class="w-3 h-3 rounded-full bg-gray-500"></span>
-						<span id="profile-status-text">Offline</span>
-				</p>
+            ${StatusCircle({ isOnline: false, id: 'profile-status-circle', additionalClasses: 'ml-1' })}
+			<span id="profile-status-text">Offline</span>
+		</p>
         <p class="font-medium">Last Seen : <span id="profile-last-seen" class="font-normal">...</span></p>
       </div>
       ${LoremSection({
@@ -88,7 +88,7 @@ export async function attachProfileEvents(): Promise<void> {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	clickHandler = async (e: Event) => {
+	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 

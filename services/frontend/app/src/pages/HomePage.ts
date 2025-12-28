@@ -175,7 +175,7 @@ export async function attachHomeEvents(): Promise<void> {
 
 	await initHomePage()
 
-	clickHandler = async (e: Event) => {
+	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]')
 
@@ -201,7 +201,7 @@ export async function attachHomeEvents(): Promise<void> {
 		}
 	}
 
-	submitHandler = async (e: Event) => {
+	submitHandler ??= async (e: Event) => {
 		const form = e.target as HTMLElement
 		e.preventDefault()
 		const formName = form.getAttribute('data-form')
