@@ -9,7 +9,7 @@ import {
 	PaddleShape,
 	ObstacleType,
 	GAME_SPACE_WIDTH,
-	GAME_SPACE_HEIGHT,
+	GAME_SPACE_HEIGHT
 } from '@ft_transcendence/pong-shared'
 import { createScore } from '@ft_transcendence/pong-shared/engine/IScore.js'
 
