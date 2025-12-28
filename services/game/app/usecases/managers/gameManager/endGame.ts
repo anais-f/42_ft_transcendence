@@ -2,8 +2,8 @@ import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
 import { games, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
 import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
-import { ITournamentMatchResult } from '../gameData.js'
 import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -49,6 +49,8 @@ export function endGame(code: string) {
 	busyPlayers.delete(gameData.p1.id)
 	busyPlayers.delete(gameData.p2.id)
 	games.delete(code)
+
+	updateGameMetrics()
 
 	// Call tournament callback after cleanup
 	if (tournamentData) {
