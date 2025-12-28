@@ -52,3 +52,6 @@ export const TICKS_PER_STEP = PAUSE_TICKS_AFTER_POINT / COUNTDOWN_STEPS
 
 export const GAME_SPACE_WIDTH = GameConfig.arena.width
 export const GAME_SPACE_HEIGHT = GameConfig.arena.height
+
+// 100 = 2 decimal precision, range -327.68 to 327.67
+export const NETWORK_PRECISION = 100

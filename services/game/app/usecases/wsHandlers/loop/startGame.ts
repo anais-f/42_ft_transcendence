@@ -1,6 +1,7 @@
 import {
 	GameState,
 	Vector2,
+	Segment,
 	S05BallPos,
 	S09DynamicSegments,
 	S02SegmentUpdate,
@@ -18,6 +19,23 @@ import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
 
+function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
+	if (prev.length !== current.length) return true
+	for (let i = 0; i < prev.length; i++) {
+		if (
+			!prev[i].p1.equals(current[i].p1) ||
+			!prev[i].p2.equals(current[i].p2)
+		) {
+			return true
+		}
+	}
+	return false
+}
+
+function cloneSegments(segs: Segment[]): Segment[] {
+	return segs.map((s) => s.clone())
+}
+
 export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_LIVES, gameData.mapOptions)
 	gameData.gameInstance = gameInstance
@@ -32,6 +50,12 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	const staticBuffer = staticPacket.serialize()
 	gameData.p1.ws?.send(staticBuffer)
 	gameData.p2?.ws?.send(staticBuffer)
+
+	// Send initial dynamic segments immediately
+	const dynamicPacket = new S09DynamicSegments(gameInstance.GE.dynamicBorders)
+	const dynamicBuffer = dynamicPacket.serialize()
+	gameData.p1.ws?.send(dynamicBuffer)
+	gameData.p2?.ws?.send(dynamicBuffer)
 
 	const packetSender = new PacketSender(gameData)
 	packetSender.start()
@@ -76,6 +100,10 @@ async function startGameLoop(
 		lastCountdown: -1
 	}
 
+	let lastDynamicSegs: Segment[] = cloneSegments(
+		gameData.gameInstance!.GE.dynamicBorders
+	)
+
 	while (
 		gameData.gameInstance?.GE.state === GameState.Started &&
 		gameData.status === 'active'
@@ -89,10 +117,12 @@ async function startGameLoop(
 
 			gameData.gameInstance!.GE.playTick()
 
-			const dynamicPacket = new S09DynamicSegments(
-				gameData.gameInstance!.GE.dynamicBorders
-			)
-			packetSender.push(SPacketsType.S09, dynamicPacket)
+			const currentSegs = gameData.gameInstance!.GE.dynamicBorders
+			if (segmentsChanged(lastDynamicSegs, currentSegs)) {
+				const dynamicPacket = new S09DynamicSegments(currentSegs)
+				packetSender.push(SPacketsType.S09, dynamicPacket)
+				lastDynamicSegs = cloneSegments(currentSegs)
+			}
 
 			const ball = gameData.gameInstance!.GE.ball
 			if (ball.velo.equals(ballState.velo)) {
