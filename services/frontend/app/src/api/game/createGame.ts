@@ -1,14 +1,25 @@
 import { IApiResponse } from '../../types/api.js'
 
+export interface MapOptions {
+	paddleShape?: 'classic' | 'v'
+	obstacle?: 'none' | 'diamonds'
+}
+
 export interface NewGameResponse {
 	code: string
 }
 
-export async function createGameApi(): Promise<IApiResponse> {
+export async function createGameApi(
+	mapOptions?: MapOptions
+): Promise<IApiResponse> {
 	try {
 		const response = await fetch('/game/api/game/new-game', {
 			method: 'POST',
-			credentials: 'include'
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(mapOptions ? { mapOptions } : {})
 		})
 
 		const payload = await response.json()

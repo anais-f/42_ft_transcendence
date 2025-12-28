@@ -6,6 +6,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import {
 	CodeParamSchema,
 	createTokenSchema,
+	CreateGameSchema,
 	IWsJwtTokenQuery
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/game/wsControllers.js'
@@ -34,6 +35,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/game/new-game',
 		preHandler: jwtAuthMiddleware,
 		schema: {
+			body: CreateGameSchema,
 			response: {
 				201: CodeParamSchema
 			}
