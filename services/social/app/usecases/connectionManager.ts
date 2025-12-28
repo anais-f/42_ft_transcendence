@@ -1,6 +1,7 @@
 import { handlePong } from './heartbeatService.js'
 import { handleUserOnline, handleUserOffline } from './presenceService.js'
 import WebSocket from 'ws'
+import { connectedUsersGauge } from '@ft_transcendence/monitoring'
 
 interface UserConnection {
 	ws: WebSocket
@@ -10,6 +11,15 @@ interface UserConnection {
 export const wsConnections = new Map<number, UserConnection>()
 const pendingDisconnectTimers = new Map<number, NodeJS.Timeout>()
 const DISCONNECT_DELAY_MS = 2000
+
+/**
+ * Update the Prometheus metric for connected users
+ */
+function updateConnectedUsersMetric(): void {
+	const count = wsConnections.size
+	connectedUsersGauge.set(count)
+	console.log(`[Metrics] Updated websocket_connected_users = ${count}`)
+}
 
 /**
  * Setup event handlers for a WebSocket connection
@@ -78,6 +88,8 @@ export async function addConnection(
 
 	wsConnections.set(userId, { ws, lastHeartbeat: new Date() })
 
+	updateConnectedUsersMetric()
+
 	if (isFirstConnection) {
 		try {
 			await handleUserOnline(userId)
@@ -104,6 +116,8 @@ export function removeConnection(userId: number, ws: WebSocket): boolean {
 	}
 
 	wsConnections.delete(userId)
+
+	updateConnectedUsersMetric()
 
 	cancelPendingDisconnect(userId)
 	const timer = setTimeout(async () => {

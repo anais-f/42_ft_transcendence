@@ -18,6 +18,7 @@ import { createGame, IGameData } from '../../createGame.js'
 import { PacketSender } from '../PacketSender.js'
 import { updateHUDs } from './updateHUDs.js'
 import { endGame } from '../../managers/gameManager/endGame.js'
+import { updateGameMetrics } from '../../managers/metricsService.js'
 
 function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
 	if (prev.length !== current.length) return true
@@ -38,6 +39,8 @@ function cloneSegments(segs: Segment[]): Segment[] {
 
 export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_LIVES, gameData.mapOptions)
+	updateGameMetrics()
+
 	gameData.gameInstance = gameInstance
 
 	// Register paddles with the game engine for synchronized updates
