@@ -1,5 +1,6 @@
 import WebSocket from 'ws'
 import { createWsError } from '@ft_transcendence/common'
+import { GameWSCloseCodes } from '@ft_transcendence/pong-shared'
 import { WsTokenPayload } from '@ft_transcendence/security'
 import {
 	TPlayerSlot,
@@ -24,10 +25,22 @@ export function initGameWsConnection(
 	const user = payload
 
 	const gameCode = playerToGame.get(user.user_id)
-	if (!gameCode) throw createWsError(socket, 4000, 'player have no active game')
+	if (!gameCode) {
+		throw createWsError(
+			socket,
+			GameWSCloseCodes.NO_ACTIVE_GAME,
+			'player have no active game'
+		)
+	}
 
 	const gameData = games.get(gameCode)
-	if (!gameData) throw createWsError(socket, 4001, 'game not found')
+	if (!gameData) {
+		throw createWsError(
+			socket,
+			GameWSCloseCodes.GAME_NOT_FOUND,
+			'game not found'
+		)
+	}
 
 	const playerSlot: TPlayerSlot = gameData.p1.id === user.user_id ? 'p1' : 'p2'
 
