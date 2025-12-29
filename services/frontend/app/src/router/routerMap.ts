@@ -30,14 +30,7 @@ import {
 	detachLobbyEvents
 } from '../pages/LobbyPage.js'
 
-export type Pages =
-	| 'home'
-	| 'game'
-	| 'lobby'
-	| 'login'
-	| 'profile'
-	| 'settings'
-	| 'test'
+export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
 
 export type Route = {
 	id: string
@@ -46,6 +39,7 @@ export type Route = {
 	binds?: Array<() => void>
 	unbinds?: Array<() => void>
 	public?: boolean
+	index: number
 }
 
 export const routerMap: Record<Pages, Route> = {
@@ -54,7 +48,8 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/',
 		page: HomePage,
 		binds: [attachHomeEvents],
-		unbinds: [detachHomeEvents]
+		unbinds: [detachHomeEvents],
+		index: 2
 	},
 
 	game: {
@@ -62,7 +57,8 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/play',
 		page: GamePage,
 		binds: [attachGameEvents],
-		unbinds: [detachGameEvents]
+		unbinds: [detachGameEvents],
+		index: 6
 	},
 
 	lobby: {
@@ -70,7 +66,8 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/lobby/:code',
 		page: LobbyPage,
 		binds: [attachLobbyEvents],
-		unbinds: [detachLobbyEvents]
+		unbinds: [detachLobbyEvents],
+		index: 5
 	},
 
 	login: {
@@ -79,7 +76,8 @@ export const routerMap: Record<Pages, Route> = {
 		page: LoginPage,
 		binds: [attachLoginEvents],
 		unbinds: [detachLoginEvents, cleanupGoogleAuth],
-		public: true
+		public: true,
+		index: 1
 	},
 
 	profile: {
@@ -87,7 +85,8 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/profile/:id',
 		page: ProfilePage,
 		binds: [attachProfileEvents],
-		unbinds: [detachProfileEvents]
+		unbinds: [detachProfileEvents],
+		index: 3
 	},
 
 	settings: {
@@ -95,15 +94,7 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/settings',
 		page: SettingsPage,
 		binds: [attachSettingsEvents],
-		unbinds: [detachSettingsEvents]
-	},
-
-	test: {
-		id: 'test',
-		url: '/test',
-		page: HomePage,
-		binds: [],
-		unbinds: [],
-		public: true
+		unbinds: [detachSettingsEvents],
+		index: 4
 	}
 }

@@ -17,10 +17,10 @@
 }
 
 @layer components {
-    .img_style {
-        /* mix-blend-multiply fait disparaître le fond blanc/clair */
-        @apply w-full py-4 opacity-50 object-cover select-none mix-blend-multiply rounded-3xl;
-    }
+	.img_style {
+		/* mix-blend-multiply fait disparaître le fond blanc/clair */
+		@apply w-full py-4 opacity-50 object-cover select-none mix-blend-multiply rounded-3xl;
+	}
 	.avatar_style {
 		@apply w-4/5 m-auto aspect-square object-cover border-2 border-black saturate-[75%];
 	}
@@ -31,7 +31,7 @@
 		@apply col-span-1 flex flex-col items-start min-h-0;
 	}
 	.friend_btn {
-		@apply !border !transition-colors !text-xs !w-24 !px-2 !py-0.5
+		@apply !border !transition-colors !text-xs !w-24 !px-2 !py-0.5;
 	}
 	.table_header {
 		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;

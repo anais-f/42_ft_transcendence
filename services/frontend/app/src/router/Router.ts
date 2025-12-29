@@ -86,6 +86,18 @@ export class Router {
 	}
 
 	/**
+	 * Update the page number in the header
+	 * @param route
+	 * @private
+	 */
+	private updatePageNumber(route: Route): void {
+		const pageNumberElement = document.getElementById('page-number')
+		if (pageNumberElement) {
+			pageNumberElement.textContent = `Page ${route.index}`
+		}
+	}
+
+	/**
 	 * Render the page for a given route
 	 * and manage binds/unbinds
 	 * @param route
@@ -109,6 +121,7 @@ export class Router {
 		// render new page
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
+		this.updatePageNumber(route)
 
 		// setup new page (bind)
 		if (route.binds) {
