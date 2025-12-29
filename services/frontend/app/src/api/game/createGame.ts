@@ -1,14 +1,26 @@
 import { IApiResponse } from '../../types/api.js'
+import { PaddleShape, ObstacleType } from '@ft_transcendence/pong-shared'
+
+export interface MapOptions {
+	paddleShape?: PaddleShape
+	obstacle?: ObstacleType
+}
 
 export interface NewGameResponse {
 	code: string
 }
 
-export async function createGameApi(): Promise<IApiResponse> {
+export async function createGameApi(
+	mapOptions?: MapOptions
+): Promise<IApiResponse> {
 	try {
 		const response = await fetch('/game/api/game/new-game', {
 			method: 'POST',
-			credentials: 'include'
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(mapOptions ? { mapOptions } : {})
 		})
 
 		const payload = await response.json()

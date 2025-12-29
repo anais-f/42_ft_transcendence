@@ -2,11 +2,6 @@
 export const UP_KEYS = ['w', 'W', 'k', 'K', 'ArrowUp']
 export const DOWN_KEYS = ['s', 'S', 'j', 'J', 'ArrowDown']
 
-// Game space dimensions (in game units)
-// Canvas will be rendered based on actual element dimensions
-export const GAME_SPACE_WIDTH = 40
-export const GAME_SPACE_HEIGHT = 20
-
 // Rendering constants
 export const SEGMENT_LINE_WIDTH_SCALE = 0.25
 export const SEGMENT_COLOR = 'black'
@@ -23,4 +18,3 @@ export const OVERLAY_FONT = 'HoldMoney'
 export const OVERLAY_FONT_SCALE = 0.15
 export const OVERLAY_WIN_COLOR = 'rgba(0, 200, 0, 0.9)'
 export const OVERLAY_LOSE_COLOR = 'rgba(200, 0, 0, 0.9)'
-export const OVERLAY_BACKGROUND = 'rgba(0, 0, 0, 0.2)'

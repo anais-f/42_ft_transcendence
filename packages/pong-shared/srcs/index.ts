@@ -1,3 +1,6 @@
+// Config
+export * from './config.js'
+
 // Math obj:
 export * from './math/Vector2.js'
 export * from './math/Segment.js'

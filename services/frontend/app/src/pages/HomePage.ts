@@ -1,6 +1,12 @@
 import { Button } from '../components/Button.js'
 import { Input } from '../components/Input.js'
 import { LoremSection } from '../components/LoremIpsum.js'
+import { showModal, hideModal } from '../components/Modal.js'
+import { handleToggleClick, getToggleValue } from '../components/ToggleGroup.js'
+import {
+	GameConfigModal,
+	GAME_CONFIG_MODAL_ID
+} from '../events/home/GameConfigModal.js'
 import { currentUser } from '../usecases/userStore.js'
 import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
@@ -12,6 +18,8 @@ import {
 	fetchAndRenderFriendRequests,
 	fetchAndRenderFriendsList
 } from '../events/home/friendsHandler.js'
+import { MapOptions } from '../api/game/createGame.js'
+import { ObstacleType, PaddleShape } from '@pong-shared'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -140,6 +148,7 @@ export const HomePage = (): string => {
     </div>
 
   </section>
+  ${GameConfigModal()}
 `
 }
 
@@ -177,7 +186,7 @@ export async function attachHomeEvents(): Promise<void> {
 
 	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
-		const actionButton = target.closest('[data-action]')
+		const actionButton = target.closest('[data-action]') as HTMLElement
 
 		if (actionButton) {
 			e.preventDefault()
@@ -185,7 +194,22 @@ export async function attachHomeEvents(): Promise<void> {
 
 			if (action === 'logout') await logout()
 			if (action === 'navigate-settings') window.navigate('/settings')
-			if (action === 'create-game') await handleCreateGame()
+			if (action === 'create-game') showModal(GAME_CONFIG_MODAL_ID)
+			if (action === 'close-modal') hideModal(GAME_CONFIG_MODAL_ID)
+			if (action === 'close-modal-overlay' && target === actionButton)
+				hideModal(GAME_CONFIG_MODAL_ID)
+			if (action === 'toggle-option') handleToggleClick(actionButton)
+			if (action === 'submit-game-config') {
+				const mapOptions: MapOptions = {
+					paddleShape:
+						(getToggleValue('paddleShape') as PaddleShape) ||
+						PaddleShape.Classic,
+					obstacle:
+						(getToggleValue('obstacle') as ObstacleType) || ObstacleType.None
+				}
+				hideModal(GAME_CONFIG_MODAL_ID)
+				await handleCreateGame(mapOptions)
+			}
 			if (action === 'navigate-profile') {
 				const id = actionButton.getAttribute('data-id')
 				if (id) window.navigate(`/profile/${id}`)

@@ -1,5 +1,6 @@
 import { Segment } from '../../../math/Segment'
 import { Vector2 } from '../../../math/Vector2'
+import { NETWORK_PRECISION } from '../../../config.js'
 import { packetBuilder } from '../packetBuilder.js'
 import { SPacketsType } from '../packetTypes.js'
 import { S09DynamicSegments as S09, S09DynamicSegments } from './S09.js'
@@ -19,14 +20,17 @@ describe('S09', () => {
 
 	const tab = [padSegL1, padSegL2, padSegR1, padSegR2]
 
+	// Int16 format: 8 bytes per segment (4 × int16)
+	const SEG_SIZE = 8
+	const HEADER_SIZE = 2
+
 	test('serialize returns correct buffer', () => {
 		const buff = new S09(tab).serialize()
 		const view = new DataView(buff)
-		const HEADER_SIZE = 1 + 1
-		const SEG_SIZE = 32
 
 		expect(view.getUint8(0)).toBe(SPacketsType.S09)
 		expect(view.getUint8(1)).toBe(tab.length)
+		expect(buff.byteLength).toBe(HEADER_SIZE + SEG_SIZE * tab.length)
 
 		const pairs = [
 			[p1, p2],
@@ -39,15 +43,15 @@ describe('S09', () => {
 			const [pa, pb] = pairs[i]
 			const offset = HEADER_SIZE + i * SEG_SIZE
 
-			const x1 = view.getFloat64(offset + 0, true)
-			const y1 = view.getFloat64(offset + 8, true)
-			const x2 = view.getFloat64(offset + 16, true)
-			const y2 = view.getFloat64(offset + 24, true)
+			const x1 = view.getInt16(offset + 0, true) / NETWORK_PRECISION
+			const y1 = view.getInt16(offset + 2, true) / NETWORK_PRECISION
+			const x2 = view.getInt16(offset + 4, true) / NETWORK_PRECISION
+			const y2 = view.getInt16(offset + 6, true) / NETWORK_PRECISION
 
-			expect(x1).toBeCloseTo(pa.x, 6)
-			expect(y1).toBeCloseTo(pa.y, 6)
-			expect(x2).toBeCloseTo(pb.x, 6)
-			expect(y2).toBeCloseTo(pb.y, 6)
+			expect(x1).toBeCloseTo(pa.x, 2)
+			expect(y1).toBeCloseTo(pa.y, 2)
+			expect(x2).toBeCloseTo(pb.x, 2)
+			expect(y2).toBeCloseTo(pb.y, 2)
 		}
 	})
 
@@ -73,7 +77,7 @@ describe('S09', () => {
 		const buff = S09Empty.serialize()
 		const view = new DataView(buff)
 
-		expect(buff.byteLength).toBe(2)
+		expect(buff.byteLength).toBe(HEADER_SIZE)
 		expect(view.getUint8(0)).toBe(SPacketsType.S09)
 		expect(view.getUint8(1)).toBe(0)
 	})
@@ -83,13 +87,27 @@ describe('S09', () => {
 		const S09Single = new S09(singleSeg)
 		const buff = S09Single.serialize()
 
-		expect(buff.byteLength).toBe(2 + 32)
+		expect(buff.byteLength).toBe(HEADER_SIZE + SEG_SIZE)
 
 		const NO9 = packetBuilder.deserializeS(buff) as S09DynamicSegments
 		expect(NO9.segs.length).toBe(1)
-		expect(NO9.segs[0].p1.x).toBeCloseTo(1, 6)
-		expect(NO9.segs[0].p1.y).toBeCloseTo(2, 6)
-		expect(NO9.segs[0].p2.x).toBeCloseTo(3, 6)
-		expect(NO9.segs[0].p2.y).toBeCloseTo(4, 6)
+		expect(NO9.segs[0].p1.x).toBeCloseTo(1, 2)
+		expect(NO9.segs[0].p1.y).toBeCloseTo(2, 2)
+		expect(NO9.segs[0].p2.x).toBeCloseTo(3, 2)
+		expect(NO9.segs[0].p2.y).toBeCloseTo(4, 2)
+	})
+
+	test('precision is maintained within NETWORK_PRECISION bounds', () => {
+		const precisionSeg = [
+			new Segment(new Vector2(1.23, -4.56), new Vector2(7.89, -0.12))
+		]
+		const S09Precision = new S09(precisionSeg)
+		const buff = S09Precision.serialize()
+
+		const NO9 = packetBuilder.deserializeS(buff) as S09DynamicSegments
+		expect(NO9.segs[0].p1.x).toBeCloseTo(1.23, 2)
+		expect(NO9.segs[0].p1.y).toBeCloseTo(-4.56, 2)
+		expect(NO9.segs[0].p2.x).toBeCloseTo(7.89, 2)
+		expect(NO9.segs[0].p2.y).toBeCloseTo(-0.12, 2)
 	})
 })

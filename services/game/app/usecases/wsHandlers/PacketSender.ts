@@ -1,8 +1,8 @@
 import Bottleneck from 'bottleneck'
 import { IS00PongBase } from '@ft_transcendence/pong-shared/network/Packet/Server/S00.js'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
+import { DEFAULT_TPS } from '@ft_transcendence/pong-shared'
 import { GameData } from '../managers/gameData.js'
-import { DEFAULT_TPS } from '../createGame.js'
 
 export class PacketSender {
 	private queue: Map<SPacketsType, IS00PongBase> = new Map()

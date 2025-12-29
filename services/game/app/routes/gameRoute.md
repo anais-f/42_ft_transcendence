@@ -45,7 +45,25 @@ that the requester still needs to join the game using the code returned.
 
 ---
 
-### 3. WebSocket Connection
+### 3. Get Assigned Game
+
+- **URL**: `/api/game/assigned`
+- **Method**: `GET`
+- **Authentication**: Requires JWT authentication via `jwtAuthMiddleware`.
+- **Response**:
+  - **200**: returns the game code `{ code: "G-XXXXX" }`.
+  - **404**: no game assigned to the player.
+
+#### Description
+
+This endpoint returns the game code for a game the player is already assigned to
+(via `playerToGame`). This is useful for tournament matches where games are
+created automatically for players. After getting the code, use `join-game/:code`
+to obtain the WebSocket token.
+
+---
+
+### 4. WebSocket Connection
 
 - **URL**: `/api/game/ws`
 - **Method**: `GET`
