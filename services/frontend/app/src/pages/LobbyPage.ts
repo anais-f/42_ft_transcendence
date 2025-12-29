@@ -83,7 +83,7 @@ export const LobbyPage = (): string => {
 			})}
       <div class="flex flex-col justify-between w-full mb-4">
         <h1 class="lobby_font">OPPONENT - <span id="opponent-username">Waiting...</span></h1>
-        <img id="opponent-avatar" src="" alt="Opponent" class="avatar_style">
+        <img id="opponent-avatar" src="/assets/images/loading.png" alt="Opponent" class="avatar_style">
       </div>
       ${LoremSection({
 				title: 'Get ready to play !',

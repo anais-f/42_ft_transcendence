@@ -17,9 +17,10 @@
 }
 
 @layer components {
-	.img_style {
-		@apply w-full py-4 opacity-50 object-cover select-none;
-	}
+    .img_style {
+        /* mix-blend-multiply fait disparaître le fond blanc/clair */
+        @apply w-full py-4 opacity-50 object-cover select-none mix-blend-multiply rounded-3xl;
+    }
 	.avatar_style {
 		@apply w-4/5 m-auto aspect-square object-cover border-2 border-black saturate-[75%];
 	}
