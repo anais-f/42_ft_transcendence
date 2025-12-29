@@ -25,7 +25,7 @@ export async function fetchAndRenderFriendsList(): Promise<void> {
 	const friends = friendsResponse.data.friends
 
 	if (friends.length === 0) {
-		listFriends.innerHTML = `<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special text-center">No friends added yet.</li>`
+		listFriends.innerHTML = `<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special text-center select-none">No friends added yet.</li>`
 		return
 	}
 
@@ -57,7 +57,7 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
 	const requests = requestsResponse.data.pendingFriends
 
 	if (requests.length === 0) {
-		listRequests.innerHTML = `<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special text-center">No pending requests.</li>`
+		listRequests.innerHTML = `<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special text-center select-none">No pending requests.</li>`
 		return
 	}
 

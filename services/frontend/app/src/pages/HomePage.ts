@@ -128,7 +128,7 @@ export const HomePage = (): string => {
 				<h1 class="title_bloc mt-2 !mb-1">RELATIONSHIP</h1>
 				<div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
 					<ul id="friend_list" class="h-full">
-						<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special">Loading...</li>
+						<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special select-none">Loading...</li>
 					</ul>
 				</div>
 			</div>
@@ -138,7 +138,7 @@ export const HomePage = (): string => {
 				<h1 class="title_bloc mt-2 !mb-1">GET IN TOUCH</h1>
 				<div id="div_request_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
 					<ul id="request_list" class="h-full">
-						<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special">Loading...</li>
+						<li class="flex items-center justify-center h-full p-4 text-gray-500 italic font-special select-none">Loading...</li>
 					</ul>
 				</div>
 			</div>
