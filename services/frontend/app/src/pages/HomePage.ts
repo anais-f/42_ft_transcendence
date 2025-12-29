@@ -7,6 +7,10 @@ import {
 	GameConfigModal,
 	GAME_CONFIG_MODAL_ID
 } from '../events/home/GameConfigModal.js'
+import {
+	UsernameInfoModal,
+	USERNAME_INFO_MODAL_ID
+} from '../components/UsernameInfoModal.js'
 import { currentUser } from '../usecases/userStore.js'
 import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
@@ -156,6 +160,13 @@ export const HomePage = (): string => {
 `
 }
 
+async function checkUsernameAvailability(username: string): Promise<boolean> {
+	// Simulate an API call to check username availability
+	// In a real application, replace this with an actual API request
+	const takenUsernames = ['user1', 'admin', 'test']
+	return !takenUsernames.includes(username.toLowerCase())
+}
+
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 
@@ -188,6 +199,18 @@ export async function attachHomeEvents(): Promise<void> {
 
 	await initHomePage()
 
+	const registerLogin = sessionStorage.getItem('register_login')
+	if (registerLogin && currentUser) {
+		const modalContainer = document.createElement('div')
+		modalContainer.innerHTML = UsernameInfoModal({
+			login: registerLogin,
+			username: currentUser.username
+		})
+		content.appendChild(modalContainer.firstElementChild!)
+
+		showModal(USERNAME_INFO_MODAL_ID)
+	}
+
 	clickHandler ??= async (e: Event) => {
 		const target = e.target as HTMLElement
 		const actionButton = target.closest('[data-action]') as HTMLElement
@@ -199,9 +222,16 @@ export async function attachHomeEvents(): Promise<void> {
 			if (action === 'logout') await logout()
 			if (action === 'navigate-settings') window.navigate('/settings')
 			if (action === 'create-game') showModal(GAME_CONFIG_MODAL_ID)
-			if (action === 'close-modal') hideModal(GAME_CONFIG_MODAL_ID)
-			if (action === 'close-modal-overlay' && target === actionButton)
+			if (action === 'close-modal') {
 				hideModal(GAME_CONFIG_MODAL_ID)
+				hideModal(USERNAME_INFO_MODAL_ID)
+				sessionStorage.removeItem('register_login')
+			}
+			if (action === 'close-modal-overlay' && target === actionButton) {
+				hideModal(GAME_CONFIG_MODAL_ID)
+				hideModal(USERNAME_INFO_MODAL_ID)
+				sessionStorage.removeItem('register_login')
+			}
 			if (action === 'toggle-option') handleToggleClick(actionButton)
 			if (action === 'submit-game-config') {
 				const mapOptions: MapOptions = {

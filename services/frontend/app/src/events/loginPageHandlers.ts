@@ -8,6 +8,8 @@ import {
 	handleAuthSuccess
 } from '../usecases/userValidation.js'
 import { ToastActionType } from '../types/toast.js'
+import { jwtDecode } from 'jwt-decode'
+import { IJwtPayload } from '@ft_transcendence/common'
 
 /**
  * Handler for the registration form
@@ -72,6 +74,17 @@ export async function handleRegister(form: HTMLFormElement) {
 		}
 		form.reset()
 		return
+	}
+
+	if (data?.token) {
+		try {
+			const payload = jwtDecode<IJwtPayload>(data.token)
+			if (payload.login) {
+				sessionStorage.setItem('register_login', payload.login)
+			}
+		} catch (error) {
+			console.error('Failed to decode JWT:', error)
+		}
 	}
 
 	await handleAuthSuccess('Account created successfully!')

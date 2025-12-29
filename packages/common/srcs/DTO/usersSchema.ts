@@ -35,6 +35,24 @@ export const UsernameSchema = z
 		'Username can only contain letters, numbers, underscores, and hyphens'
 	)
 
+export const AvatarUrlSchema = z
+	.string()
+	.min(1, 'Avatar URL cannot be empty')
+	.max(2048, 'Avatar URL too long')
+	.regex(AVATAR_URL_REGEX, 'Avatar must be HTTP(S) URL or /path')
+	.refine(
+		(url) => {
+			const lower = url.toLowerCase()
+			return !(
+				lower.startsWith('javascript:') ||
+				lower.startsWith('data:') ||
+				lower.startsWith('file:') ||
+				lower.startsWith('vbscript:')
+			)
+		},
+		{ message: 'Blocked dangerous protocols' }
+	)
+
 export const UserIdSchema = z
 	.object({
 		user_id: z.number().int().positive()
@@ -133,24 +151,6 @@ export const UserSearchResultSchema = z
 		avatar: z.string()
 	})
 	.meta({ description: 'Simple user search result schema' })
-
-export const AvatarUrlSchema = z
-	.string()
-	.min(1, 'Avatar URL cannot be empty')
-	.max(2048, 'Avatar URL too long')
-	.regex(AVATAR_URL_REGEX, 'Avatar must be HTTP(S) URL or /path')
-	.refine(
-		(url) => {
-			const lower = url.toLowerCase()
-			return !(
-				lower.startsWith('javascript:') ||
-				lower.startsWith('data:') ||
-				lower.startsWith('file:') ||
-				lower.startsWith('vbscript:')
-			)
-		},
-		{ message: 'Blocked dangerous protocols' }
-	)
 
 export const UserCreatedWebhookSchema = PublicUserAuthSchema
 
