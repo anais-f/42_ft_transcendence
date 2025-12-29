@@ -61,56 +61,56 @@ export const HomePage = (): string => {
 				})}
     </div>
 
-    <div class="col-4-span-flex">
-        ${LoremSection({
-					title: 'Welcome Home',
-					variant: 'medium'
-				})}
-        <h1 class="title_bloc mt-4">ARE YOU READY ?</h1>
-        ${Button({
-					id: 'create_game_btn',
-					text: 'Create game',
-					type: 'button',
-					action: 'create-game'
-				})}
-	      ${Button({
-					id: 'tournament_btn',
-					text: 'Create tournament',
-					type: 'button',
-					action: 'create-tournament',
-					additionalClasses: 'mb-4'
-				})}
-        ${LoremSection({
-					variant: 'fill'
-				})}
-    </div>
+	<div class="col-4-span-flex">
+		${LoremSection({
+			title: 'Welcome Home',
+			variant: 'medium'
+		})}
+		<h1 class="title_bloc mt-4">ARE YOU READY ?</h1>
+		${Button({
+			id: 'create_game_btn',
+			text: 'Create game',
+			type: 'button',
+			action: 'create-game'
+		})}
+		  ${Button({
+				id: 'tournament_btn',
+				text: 'Create tournament',
+				type: 'button',
+				action: 'create-tournament',
+				additionalClasses: 'mb-4'
+			})}
+		${LoremSection({
+			variant: 'fill'
+		})}
+	</div>
 
-    <div class="col-4-span-flex">
-        ${LoremSection({
-					variant: 'short'
-				})}
-        <h1 class="title_bloc mt-4">FEELING LONELY ?</h1>
-        <p class="font-special text-sm mb-4">You can join a game by entering the lobby code below</p>
-        <form id="join_lobby_form" data-form="join-lobby" class="form_style">
-          ${Input({
-						id: 'join_lobby',
-						name: 'join_lobby',
-						placeholder: 'Game code',
-						type: 'text',
-						required: true
-					})}
-          ${Button({
-						id: 'join_btn',
-						text: 'Join',
-						type: 'submit',
-						additionalClasses: 'mb-4'
-					})}
-        </form>
-        ${LoremSection({
-					variant: 'fill'
-				})}
-        <img src="/assets/images/screamer_boy.png" alt="screamer boy" class="img_style pb-0">
-    </div>
+	<div class="col-4-span-flex">
+		${LoremSection({
+			variant: 'short'
+		})}
+		<h1 class="title_bloc mt-4">FEELING LONELY ?</h1>
+		<p class="font-special text-sm mb-4">You can join a game by entering the lobby code below</p>
+		<form id="join_lobby_form" data-form="join-lobby" class="form_style">
+		  ${Input({
+				id: 'join_lobby',
+				name: 'join_lobby',
+				placeholder: 'Game code',
+				type: 'text',
+				required: true
+			})}
+		  ${Button({
+				id: 'join_btn',
+				text: 'Join',
+				type: 'submit',
+				additionalClasses: 'mb-4'
+			})}
+		</form>
+		${LoremSection({
+			variant: 'fill'
+		})}
+		<img src="/assets/images/screamer_boy.png" alt="screamer boy" class="img_style pb-0">
+	</div>
 
     <div class="col-4-span-flex">
         <h1 class="title_bloc">SEARCH A FRIEND ?</h1>
