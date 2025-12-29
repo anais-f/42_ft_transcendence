@@ -1,3 +1,5 @@
+import { escapeHtml } from '../usecases/sanitize.js'
+
 /**
  * Renders a clickable link to a user's profile with hover effect.
  * @param props - The properties of the user link.
@@ -30,9 +32,12 @@ export const UserLink = (props: UserLinkProps): string => {
 	const { id, username, fontSize = 'base', additionalClasses = '' } = props
 	const fontClass = fontSizeClasses[fontSize]
 
+	// Sanitize username for safe display in attributes
+	const safeUsername = escapeHtml(username)
+
 	return /*html*/ `
-    <a data-action="navigate-profile" data-username="${username}" data-id="${id}" class="cursor_pointer">
-      <p class="font-medium hover:font-bold truncate min-w-0 ${fontClass} ${additionalClasses}">${username}</p>
+    <a data-action="navigate-profile" data-username="${safeUsername}" data-id="${id}" class="cursor_pointer">
+      <p class="font-medium hover:font-bold truncate min-w-0 ${fontClass} ${additionalClasses}">${safeUsername}</p>
     </a>
   `
 }

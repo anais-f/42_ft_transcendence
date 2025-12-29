@@ -9,10 +9,16 @@ import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 import { oppenentJoinHandler } from '../events/lobby/opponentJoinHandler.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 import { ToastActionType } from '../types/toast.js'
+import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
 
 export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
 	const player = currentUser
+
+	// Sanitize user avatar
+	const safeAvatar = sanitizeAvatarUrl(
+		player?.avatar ?? '/avatars/img_default.png'
+	)
 
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
@@ -50,7 +56,7 @@ export const LobbyPage = (): string => {
 			})}
       <div class="flex flex-col justify-between w-full mb-4">
         <h1 class="lobby_font">YOU - <span>${player?.username ?? ''}</span></h1>
-        <img id="you_avatar" src="${player?.avatar ?? ''}" alt="You" class="avatar_style">
+        <img id="you_avatar" src="${safeAvatar}" alt="You" class="avatar_style">
       </div>
       ${LoremSection({
 				title: 'Get ready to play !',

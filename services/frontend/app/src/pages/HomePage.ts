@@ -20,6 +20,7 @@ import {
 } from '../events/home/friendsHandler.js'
 import { MapOptions } from '../api/game/createGame.js'
 import { ObstacleType, PaddleShape } from '@pong-shared'
+import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -27,12 +28,15 @@ export const HomePage = (): string => {
 		avatar: '/avatars/img_default.png'
 	}
 
+	// Sanitize user avatar
+	const safeAvatar = sanitizeAvatarUrl(user.avatar)
+
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
 
     <div class="col-4-span-flex">
         <h1 class="title_bloc">PROFILE</h1>
-        <img src="${user.avatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">        
+        <img src="${safeAvatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">
         <h1 class="username_style">${user.username}</h1>
         ${LoremSection({
 					variant: 'fill'
@@ -105,7 +109,7 @@ export const HomePage = (): string => {
     </div>
 
     <div class="col-4-span-flex">
-        <h1 class="title_bloc">WANTED</h1>
+        <h1 class="title_bloc">SEARCH A FRIEND ?</h1>
         <form id="search_user_form" data-form="search-user-form" class="form_style">
             ${Input({
 							id: 'search-user',
