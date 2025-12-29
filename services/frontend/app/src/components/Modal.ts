@@ -27,7 +27,8 @@ export const Modal = (props: ModalProps): string => {
 	const containerClasses =
 		'relative border-2 border-black bg-[#fffefc] shadow-[6px_6px_0_rgba(0,0,0,0.2)]'
 
-	const subtitleBaseClasses = 'text-[10px] tracking-[0.3em] uppercase text-black/50 font-special'
+	const subtitleBaseClasses =
+		'text-[10px] tracking-[0.3em] uppercase text-black/50 font-special'
 	const subtitleHtml = subtitle
 		? `<span class="${subtitleBaseClasses} ${subtitleClass ?? ''}">${subtitle}</span>`
 		: ''
