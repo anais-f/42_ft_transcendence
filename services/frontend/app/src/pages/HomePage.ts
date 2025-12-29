@@ -160,13 +160,6 @@ export const HomePage = (): string => {
 `
 }
 
-async function checkUsernameAvailability(username: string): Promise<boolean> {
-	// Simulate an API call to check username availability
-	// In a real application, replace this with an actual API request
-	const takenUsernames = ['user1', 'admin', 'test']
-	return !takenUsernames.includes(username.toLowerCase())
-}
-
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 
