@@ -1,5 +1,6 @@
 import { UserLink } from '../UserLink.js'
 import { StatusCircle } from './StatusCircle.js'
+import { escapeHtml, sanitizeAvatarUrl } from '../../usecases/sanitize.js'
 
 /**
  * Renders a friend list item.
@@ -28,11 +29,15 @@ export const FriendListItem = (props: FriendListItemProps): string => {
 	const isOnline = status === 1
 	const statusText = isOnline ? 'Online' : 'Offline'
 
+	// Sanitize user inputs
+	const safeAvatar = sanitizeAvatarUrl(avatar)
+	const safeUsername = escapeHtml(username)
+
 	return /*html*/ `
     <li class="flex flex-row border-b border-black" id="friend_item_${id}">
       <div class="flex gap-4 py-2 px-4">
         <!-- User's avatar -->
-        <img src="${avatar}" alt="${username}'s avatar" class="w-12 h-12 object-cover border-black">
+        <img src="${safeAvatar}" alt="${safeUsername}'s avatar" class="w-12 h-12 object-cover border-black">
         <div>
           <!-- User's link -->
           ${UserLink({ id, username })}

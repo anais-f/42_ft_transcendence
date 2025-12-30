@@ -3,6 +3,7 @@ import { UserStatus } from '../interfaces/usersModels.js'
 
 const LOGIN_REGEX = /^[\w-]{4,32}$/
 const USERNAME_REGEX = /^[\w-]{4,32}$/
+const AVATAR_URL_REGEX = /^(https?:\/\/[^\s<>"']+|\/[^\s<>"']+)$/
 
 export const RegisterLoginSchema = z
 	.string()
@@ -32,6 +33,24 @@ export const UsernameSchema = z
 	.regex(
 		USERNAME_REGEX,
 		'Username can only contain letters, numbers, underscores, and hyphens'
+	)
+
+export const AvatarUrlSchema = z
+	.string()
+	.min(1, 'Avatar URL cannot be empty')
+	.max(2048, 'Avatar URL too long')
+	.regex(AVATAR_URL_REGEX, 'Avatar must be HTTP(S) URL or /path')
+	.refine(
+		(url) => {
+			const lower = url.toLowerCase()
+			return !(
+				lower.startsWith('javascript:') ||
+				lower.startsWith('data:') ||
+				lower.startsWith('file:') ||
+				lower.startsWith('vbscript:')
+			)
+		},
+		{ message: 'Blocked dangerous protocols' }
 	)
 
 export const UserIdSchema = z
@@ -98,7 +117,7 @@ export const UserProfileUpdateUsernameSchema = z
 
 export const UserProfileUpdateAvatarSchema = z
 	.object({
-		avatar: z.string()
+		avatar: AvatarUrlSchema
 	})
 	.strict()
 	.meta({ description: 'Update avatars schema' })
@@ -106,7 +125,7 @@ export const UserProfileUpdateAvatarSchema = z
 export const UserProfileUpdateSchema = z
 	.object({
 		username: UsernameSchema.optional(),
-		avatar: z.string().optional()
+		avatar: AvatarUrlSchema.optional()
 	})
 	.strict()
 	.meta({ description: 'Update private user profile schema' })
