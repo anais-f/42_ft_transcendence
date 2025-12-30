@@ -30,7 +30,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - wget -qS --spider http://127.0.0.1:443 --no-check-certificate 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+        - wget -qS --spider http://127.0.0.1:${PORT:-8080} --no-check-certificate 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
       interval: 30s
       timeout: 3s
       retries: 5
