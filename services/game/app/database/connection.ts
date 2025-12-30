@@ -29,8 +29,6 @@ export function runMigrations() {
 			id_match INTEGER PRIMARY KEY AUTOINCREMENT,
 			winner_id INTEGER NOT NULL,
 			played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			round INTEGER DEFAULT -1,
-			match_number INTEGER DEFAULT -1,
 			tournament_code TEXT DEFAULT NULL
 		);
 

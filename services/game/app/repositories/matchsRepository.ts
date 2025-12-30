@@ -21,16 +21,11 @@ export function saveMatchToHistory(
 	const matchResult = db
 		.prepare(
 			`
-		INSERT INTO match_history (winner_id, tournament_code, round, match_number)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO match_history (winner_id, tournament_code)
+		VALUES (?, ?)
 	`
 		)
-		.run(
-			winnerId,
-			tournamentMatchData?.tournamentCode ?? null,
-			tournamentMatchData?.round ?? -1,
-			tournamentMatchData?.matchNumber ?? -1
-		)
+		.run(winnerId, tournamentMatchData?.tournamentCode ?? null)
 
 	const matchId = matchResult.lastInsertRowid as number
 
@@ -63,8 +58,6 @@ export function getMatchHistoryByPlayerId(
 			mh.winner_id,
 			mh.played_at,
 			mh.tournament_code,
-			mh.round,
-			mh.match_number,
 			mp1.player_id as player1_id,
 			mp1.score as player1_score,
 			mp2.player_id as player2_id,
