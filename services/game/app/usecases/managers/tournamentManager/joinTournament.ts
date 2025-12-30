@@ -12,32 +12,25 @@ import { startTournament } from './startTournament.js'
 
 export function joinTournament(request: FastifyRequest): TournamentDTO {
 	const tournamentCode = CodeParamSchema.parse(request.params)
+
 	const userId = request.user.user_id
-	if (userId === undefined) {
-		throw createHttpError.Unauthorized()
-	}
-	if (usersInTournaments.has(userId)) {
+	if (userId === undefined) throw createHttpError.Unauthorized()
+
+	if (usersInTournaments.has(userId))
 		throw createHttpError.Conflict('User is already in another tournament')
-	}
-	if (playerToGame.has(userId)) {
+	if (playerToGame.has(userId))
 		throw createHttpError.Conflict('User is already in a match')
-	}
-	if (busyPlayers.has(userId)) {
-		throw createHttpError.Conflict('User is busy')
-	}
+	if (busyPlayers.has(userId)) throw createHttpError.Conflict('User is busy')
+
 	const tournament = tournaments.get(tournamentCode.code)
-	if (!tournament) {
-		throw createHttpError.NotFound()
-	}
-	if (tournament.participants.length >= tournament.maxParticipants) {
+	if (!tournament) throw createHttpError.NotFound()
+
+	if (tournament.participants.length >= tournament.maxParticipants)
 		throw createHttpError.Conflict('Tournament is full')
-	}
-	if (tournament.participants.includes(userId)) {
-		throw createHttpError.Conflict('User already joined the tournament')
-	}
+
 	tournament.participants.push(userId)
-	if (tournament.participants.length === tournament.maxParticipants) {
+	if (tournament.participants.length === tournament.maxParticipants)
 		startTournament(tournamentCode.code, tournament)
-	}
+
 	return tournament
 }
