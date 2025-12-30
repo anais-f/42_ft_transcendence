@@ -81,7 +81,7 @@ export async function verify2faLoginController(
 	reply.setCookie('auth_token', result.auth_token, {
 		httpOnly: true,
 		sameSite: 'strict',
-		secure: env.NODE_ENV === 'production',
+		secure: true,
 		path: '/',
 		maxAge: 60 * 15
 	})

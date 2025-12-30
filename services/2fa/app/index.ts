@@ -54,16 +54,14 @@ app.register(Swagger as any, {
 const start = async () => {
 	try {
 		await app.listen({
-			port: env.PORT,
+			port: 3000,
 			host: '0.0.0.0'
 		})
-		app.log.info(`2FA Service listening on http://localhost:${env.PORT}`)
+		app.log.info(`2FA Service listening on http://localhost:3000`)
 	} catch (err) {
 		app.log.error(err)
 		process.exit(1)
 	}
 }
 
-if (env.NODE_ENV !== 'test') {
-	start()
-}
+start()

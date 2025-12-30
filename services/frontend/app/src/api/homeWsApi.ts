@@ -22,6 +22,6 @@ export async function createSocialTokenApi(): Promise<IApiResponse> {
 }
 
 export function createSocialWebSocketApi(token: string): WebSocket {
-	const wsUrl = `ws://${window.location.host}/social/api/social/ws?token=${token}`
+	const wsUrl = `wss://${window.location.host}/social/api/social/ws?token=${token}`
 	return new WebSocket(wsUrl)
 }

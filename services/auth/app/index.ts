@@ -75,10 +75,10 @@ async function runServer() {
 
 	await registerRoutes(app)
 	await app.listen({
-		port: env.PORT,
-		host: env.HOST
+		port: 3000,
+		host: '0.0.0.0'
 	})
-	console.log('Auth service running on http://localhost:', env.PORT)
+	console.log('Auth service running on http://localhost:', 3000)
 }
 
 runServer().catch((err) => {
