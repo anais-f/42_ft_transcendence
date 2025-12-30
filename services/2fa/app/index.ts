@@ -64,6 +64,5 @@ const start = async () => {
 	}
 }
 
-if (env.NODE_ENV !== 'test') {
-	start()
-}
+
+start()

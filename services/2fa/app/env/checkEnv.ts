@@ -15,7 +15,6 @@ const envSchema = z
 			.refine((buffer) => buffer.length === 32, {
 				message: 'TOTP_ENC_KEY must decode to 32 bytes (AES-256)'
 			}),
-		NODE_ENV: z.string().default('development')
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
@@ -23,7 +22,6 @@ const envSchema = z
 		JWT_SECRET: env.JWT_SECRET,
 		TWOFA_DB_PATH: env.TWOFA_DB_PATH,
 		TOTP_ENC_KEY: env.TOTP_ENC_KEY,
-		NODE_ENV: env.NODE_ENV,
 		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE)
 	}))
 
