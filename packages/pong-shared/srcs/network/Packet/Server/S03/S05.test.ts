@@ -1,65 +1,71 @@
 import { Vector2 } from '../../../../math/Vector2.js'
+import { NETWORK_PRECISION } from '../../../../config.js'
 import { packetBuilder } from '../../packetBuilder.js'
+import { SPacketsType } from '../../packetTypes.js'
 import { AS03BaseBall } from './S03.js'
 import { S05BallPos } from './S05.js'
 
 describe('S05', () => {
+	// Use realistic game values (ball position in arena -20 to 20)
 	test('serialize returns correct buffer', () => {
-		const velo = new Vector2(497.34, -232)
+		const pos = new Vector2(12.34, -8.5)
 		const S03 = AS03BaseBall.createS03()
-		const S04 = new S05BallPos(S03, velo)
-		const buff = S04.serialize()
+		const S05 = new S05BallPos(S03, pos)
+		const buff = S05.serialize()
+
+		expect(buff.byteLength).toBe(5)
 
 		const view = new DataView(buff)
+		const type = view.getUint8(0)
+		const x = view.getInt16(1, true) / NETWORK_PRECISION
+		const y = view.getInt16(3, true) / NETWORK_PRECISION
 
-		const ts = view.getFloat64(0, true)
-		const type = view.getUint8(8)
-		const x = view.getFloat64(9, true)
-		const y = view.getFloat64(17, true)
-
-		expect(typeof ts).toBe('number')
-		expect(ts).toBeCloseTo(S03.time)
-		expect(ts).toBeCloseTo(S04.time)
-		expect(type).toBe(0b10101)
-		expect(x).toBeCloseTo(velo.getX())
-		expect(y).toBeCloseTo(velo.getY())
+		expect(type).toBe(SPacketsType.S05)
+		expect(x).toBeCloseTo(pos.x, 2)
+		expect(y).toBeCloseTo(pos.y, 2)
 	})
 
 	test('deserialize', () => {
-		const buff = new ArrayBuffer(25)
+		const buff = new ArrayBuffer(5)
 		const view = new DataView(buff)
-		const timestamp = 123456.789
-		const type = 0b10101
-		const pos = new Vector2(324.32, -42)
+		const pos = new Vector2(15.55, -7.23)
 
-		view.setFloat64(0, timestamp, true)
-		view.setUint8(8, type)
-		view.setFloat64(9, pos.getX(), true)
-		view.setFloat64(17, pos.getY(), true)
+		view.setUint8(0, SPacketsType.S05)
+		view.setInt16(1, Math.round(pos.x * NETWORK_PRECISION), true)
+		view.setInt16(3, Math.round(pos.y * NETWORK_PRECISION), true)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(S05BallPos)
-		expect(p?.time).toBeCloseTo(timestamp)
 		if (p instanceof S05BallPos) {
-			expect(p.getPos().equals(pos)).toBe(true)
+			expect(p.pos.equals(pos)).toBe(true)
 		} else {
 			throw new Error('Packet is not S05BallPos')
 		}
 	})
 
 	test('serialize + deserialize', () => {
-		const v = new Vector2(23, -2)
+		const v = new Vector2(5.67, -2.89)
 		const S03 = AS03BaseBall.createS03()
 		const S05 = new S05BallPos(S03, v)
 		const buff = S05.serialize()
 		const S05Back = packetBuilder.deserializeS(buff)
 
-		expect(S05Back?.time).toEqual(S03.time)
 		expect(S05Back).toBeInstanceOf(S05BallPos)
 		if (S05Back instanceof S05BallPos) {
-			expect(S05Back.getPos().equals(S05.getPos())).toBe(true)
+			expect(S05Back.pos.equals(S05.pos)).toBe(true)
 		} else {
 			throw new Error('Packet is not S05BallPos')
 		}
+	})
+
+	test('precision is maintained', () => {
+		const pos = new Vector2(-18.99, 9.01)
+		const S03 = AS03BaseBall.createS03()
+		const S05 = new S05BallPos(S03, pos)
+		const buff = S05.serialize()
+		const S05Back = packetBuilder.deserializeS(buff) as S05BallPos
+
+		expect(S05Back.pos.x).toBeCloseTo(pos.x, 2)
+		expect(S05Back.pos.y).toBeCloseTo(pos.y, 2)
 	})
 })

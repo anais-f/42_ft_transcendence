@@ -8,16 +8,19 @@ WORKDIR /build
 COPY package.json package-lock.json ./
 COPY services/frontend/app/package.json ./services/frontend/app/package.json
 COPY packages/common/package.json ./packages/common/
+COPY packages/pong-shared/package.json ./packages/pong-shared/
 
 RUN npm ci
 
 COPY tsconfig.json ./
 COPY services/frontend/app ./services/frontend/app
 COPY packages/common ./packages/common
+COPY packages/pong-shared ./packages/pong-shared
 
 
 # Compile TypeScript + Build Vite + Tailwind
 RUN npm run build --workspace=packages/common
+RUN npm run build --workspace=packages/pong-shared
 RUN npm run build --workspace=frontend
 
 # ============================================

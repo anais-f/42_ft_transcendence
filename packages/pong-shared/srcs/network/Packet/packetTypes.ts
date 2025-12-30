@@ -1,6 +1,7 @@
 export enum CPacketsType {
 	C00 = 0b00000001,
-	C01 = 0b00000011
+	C01 = 0b00000011,
+	C02 = 0b00000101
 }
 
 export enum SPacketsType {
@@ -10,5 +11,8 @@ export enum SPacketsType {
 	S03 = 0b00000101,
 	S04 = 0b00001101,
 	S05 = 0b00010101,
-	S06 = 0b00011101
+	S06 = 0b00011101,
+	S07 = 0b00000111,
+	S08 = 0b00001001,
+	S09 = 0b00001011
 }

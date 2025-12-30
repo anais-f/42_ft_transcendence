@@ -1,60 +1,54 @@
 import { Vector2 } from '@packages/pong-shared/srcs/math/Vector2.js'
+import { NETWORK_PRECISION } from '../../../../config.js'
 import { IS00PongBase } from '../S00.js'
 import { SPacketsType } from '../../packetTypes.js'
 import { AS03BaseBall } from './S03.js'
-import { S05BallPos } from './S05.js'
-import { S04BallVeloChange } from './S04.js'
 
 export class S06BallSync extends AS03BaseBall implements IS00PongBase {
-	private S05: S05BallPos
-	private S04: S04BallVeloChange
+	private _pos: Vector2
+	private _velo: Vector2
+	private _factor: number
 
-	constructor(
-		pos: Vector2,
-		factor: number,
-		velo: Vector2,
-		ts: number | null = null
-	) {
-		const S03 = ts === null ? AS03BaseBall.createS03() : new AS03BaseBall(ts)
-
-		super(S03.getTime())
-		this.S04 = new S04BallVeloChange(S03, velo, factor)
-		this.S05 = new S05BallPos(S03, pos)
+	constructor(pos: Vector2, factor: number, velo: Vector2) {
+		super()
+		this._pos = pos
+		this._velo = velo
+		this._factor = factor
 	}
 
-	getPos(): Vector2 {
-		return this.S05.getPos()
+	get pos(): Vector2 {
+		return this._pos
 	}
 
-	getVelo(): Vector2 {
-		return this.S04.getVelo()
+	get velo(): Vector2 {
+		return this._velo
 	}
 
-	getTime(): number {
-		return this.S04.getTime()
+	get factor(): number {
+		return this._factor
 	}
 
-	getFactor(): number {
-		return this.S04.getFactor()
-	}
-
+	/*
+	 * trame
+	 *
+	 * type 1o (uint8)
+	 * velo.x 2o (int16 * NETWORK_PRECISION)
+	 * velo.y 2o (int16 * NETWORK_PRECISION)
+	 * factor 2o (int16 * NETWORK_PRECISION)
+	 * pos.x 2o (int16 * NETWORK_PRECISION)
+	 * pos.y 2o (int16 * NETWORK_PRECISION)
+	 * total: 11o
+	 */
 	serialize(): ArrayBuffer {
-		const fake = this.fserialize()
-		const buff = new ArrayBuffer(49)
-
-		const fakeUint8 = new Uint8Array(fake)
-		const buffUint8 = new Uint8Array(buff)
-
-		buffUint8.set(fakeUint8)
-
-		buffUint8[8] |= SPacketsType.S06
-
+		const buff = new ArrayBuffer(11)
 		const view = new DataView(buff)
-		view.setFloat64(9, this.getVelo().getX(), true)
-		view.setFloat64(17, this.getVelo().getY(), true)
-		view.setFloat64(25, this.getFactor(), true)
-		view.setFloat64(33, this.getPos().getX(), true)
-		view.setFloat64(41, this.getPos().getY(), true)
+
+		view.setUint8(0, SPacketsType.S06)
+		view.setInt16(1, Math.round(this._velo.x * NETWORK_PRECISION), true)
+		view.setInt16(3, Math.round(this._velo.y * NETWORK_PRECISION), true)
+		view.setInt16(5, Math.round(this._factor * NETWORK_PRECISION), true)
+		view.setInt16(7, Math.round(this._pos.x * NETWORK_PRECISION), true)
+		view.setInt16(9, Math.round(this._pos.y * NETWORK_PRECISION), true)
 
 		return buff
 	}

@@ -9,7 +9,7 @@ import { signToken } from '../utils/jwt.js'
 import { generateUsername } from './register.js'
 import createHttpError from 'http-errors'
 import { OAuth2Client } from 'google-auth-library'
-import { env } from '../index.js'
+import { env } from '../env/checkEnv.js'
 
 const getGoogleClient = () => {
 	return new OAuth2Client(env.GOOGLE_CLIENT_ID || undefined)

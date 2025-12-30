@@ -8,27 +8,20 @@ describe('S03', () => {
 		const buff = S03.fserialize()
 		const view = new DataView(buff)
 
-		const ts = view.getFloat64(0, true)
-		expect(typeof ts).toBe('number')
-		expect(ts).toBeCloseTo(S03.time)
-
-		const type = view.getUint8(8)
+		const type = view.getUint8(0)
 		expect(type).toBe(0b101)
 	})
 
 	test('deserialize', () => {
-		const buff = new ArrayBuffer(9)
+		const buff = new ArrayBuffer(1)
 		const view = new DataView(buff)
 
-		const timestamp = 123456.789
 		const type = 0b101
 
-		view.setFloat64(0, timestamp, true)
-		view.setUint8(8, type)
+		view.setUint8(0, type)
 
 		const p = packetBuilder.deserializeS(buff)
 		expect(p).toBeInstanceOf(AS03BaseBall)
-		expect(p?.time).toBeCloseTo(timestamp)
 	})
 
 	test('serialize + deserialize', () => {
@@ -37,6 +30,6 @@ describe('S03', () => {
 		const buff = S03.fserialize()
 		const SBack = packetBuilder.deserializeS(buff)
 
-		expect(SBack?.getTime()).toBe(S03.time)
+		expect(SBack).toBeInstanceOf(AS03BaseBall)
 	})
 })

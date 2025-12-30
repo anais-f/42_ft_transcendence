@@ -15,9 +15,9 @@ import { usersRoutes } from './routes/usersRoutes.js'
 import { UsersServices } from './usecases/usersServices.js'
 import metricPlugin from 'fastify-metrics'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
-import { setupErrorHandler, loadOpenAPISchema } from '@ft_transcendence/common'
-
-const HOST = process.env.HOST || 'http://localhost:8080'
+import { setupErrorHandler } from '@ft_transcendence/common'
+import { env } from './env/checkEnv.js'
+import { updateUserMetrics } from './usecases/metricsService.js'
 
 function createApp(): FastifyInstance {
 	const app = Fastify({
@@ -33,12 +33,8 @@ function createApp(): FastifyInstance {
 
 	app.register(fastifyCookie)
 
-	const jwtSecret = process.env.JWT_SECRET
-	if (!jwtSecret) {
-		throw new Error('JWT_SECRET environment variable is required')
-	}
 	app.register(fastifyJwt, {
-		secret: jwtSecret,
+		secret: env.JWT_SECRET,
 		cookie: {
 			cookieName: 'auth_token',
 			signed: false
@@ -59,18 +55,14 @@ function createApp(): FastifyInstance {
 		}
 	)
 
-	const openapiSwagger = loadOpenAPISchema(
-		process.env.DTO_OPENAPI_FILE as string
-	)
-
 	app.register(Swagger as any, {
 		openapi: {
 			info: {
 				title: 'API for Users Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${HOST}/users`, description: 'Local server' }],
-			components: openapiSwagger.components
+			servers: [{ url: `${env.HOST}/users`, description: 'Local server' }],
+			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform
 	})
@@ -88,6 +80,7 @@ async function initializeUsers(): Promise<void> {
 		console.log('Initializing users from auth service...')
 		await UsersServices.syncAllUsersFromAuth()
 		console.log('User initialization complete.')
+		updateUserMetrics()
 	} catch (error) {
 		console.error('Error initializing users:', error)
 		throw error
@@ -101,11 +94,11 @@ export async function start(): Promise<void> {
 		await app.ready()
 		await initializeUsers()
 		await app.listen({
-			port: parseInt(process.env.PORT as string),
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		console.log('Listening on port ', process.env.PORT)
-		console.log(`Swagger UI available at ${HOST}/users/docs`)
+		console.log('Listening on port ', env.PORT)
+		console.log(`Swagger UI available at ${env.HOST}/users/docs`)
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

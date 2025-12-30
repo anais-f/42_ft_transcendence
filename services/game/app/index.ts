@@ -1,17 +1,18 @@
-//import { GameState } from '@ft_transcendence/pong-shared'
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
-//import { createGame } from './utils/createGame.js'
 import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
-import { checkEnv, IGameEnv } from './env/verifyEnv.js'
+import { env } from './env/checkEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { runMigrations } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
+import { initializeTournamentId } from './usecases/managers/tournamentManager/createTournament.js'
+import metricPlugin from 'fastify-metrics'
 
+// Run migrations first, then initialize tournament ID
 runMigrations()
+initializeTournamentId()
 
 async function start(): Promise<void> {
-	const env: IGameEnv = checkEnv() // throw on error
 	const app = createWsApp(
 		gameRoutes,
 		{
@@ -22,8 +23,8 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: env.HOST,
-						description: 'idk'
+						url: `${env.HOST}/game`,
+						description: 'Local server'
 					}
 				],
 				components: env.openAPISchema.components
@@ -39,6 +40,7 @@ async function start(): Promise<void> {
 	await registerRoutes(app)
 
 	try {
+		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
 			port: env.PORT,

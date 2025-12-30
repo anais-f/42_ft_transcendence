@@ -6,7 +6,8 @@ import {
 	disable2FAAPI
 } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { syncCurrentUser } from '../utils/userValidation.js'
+import { syncCurrentUser } from '../usecases/userValidation.js'
+import { ToastActionType } from '../types/toast.js'
 
 /**
  * Verify the current user's password using JWT
@@ -21,12 +22,18 @@ export async function verifyCurrentUserPassword(
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection password')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection password'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
-		return
+		return false
 	}
 
 	return true
@@ -38,7 +45,10 @@ export async function verifyCurrentUserPassword(
  */
 export async function handleGenerateQRCode() {
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
@@ -47,25 +57,29 @@ export async function handleGenerateQRCode() {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection qrcode')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection qrcode'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 		return
 	}
 
-	// Display the QR code and otpauth_url in the UI
-	const qrContainer = document.getElementById('qr_code_container')
-	const generateStep = document.getElementById('generate_qr_step')
+	const generateBtn = document.getElementById('generate_qr_btn')
 	const verifyStep = document.getElementById('verify_2fa_step')
+	const qrContainer = document.getElementById('qr_code_container')
 
-	if (qrContainer && generateStep && verifyStep) {
-		// Insert QR code and URL into the container
+	if (generateBtn && qrContainer && verifyStep) {
 		qrContainer.innerHTML = `
 			<div class="flex flex-col gap-2 items-center w-full">
 				<p class="text-sm">Scan this QR code with Google Authenticator:</p>
-				<img src="${data.qr_base64}" alt="QR Code" class="w-64 h-64 border-2 border-black">
+				<img src="${data.qr_base64}" alt="QR Code" class="w-64 aspect-square border-2 border-black">
 				<p class="text-xs mt-2">Or copy this URL:</p>
 				<input
 					type="text"
@@ -78,9 +92,8 @@ export async function handleGenerateQRCode() {
 			</div>
 		`
 
-		// Hide the button step, show the verification step
-		generateStep.style.display = 'none'
-		verifyStep.style.display = 'block'
+		generateBtn.classList.add('hidden')
+		verifyStep.classList.remove('hidden')
 	}
 }
 
@@ -96,12 +109,16 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	const password = formData.get('password') as string
 
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
 	// STEP 1: Verify password
 	if (!(await verifyCurrentUserPassword(password))) {
+		form.reset()
 		return
 	}
 
@@ -111,18 +128,31 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection enable')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection enable'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
+		form.reset()
 		return
 	}
 
-	if (!(await syncCurrentUser('Failed to update 2FA user data'))) return
+	if (!(await syncCurrentUser('Failed to update 2FA user data'))) {
+		form.reset()
+		return
+	}
 
-	notyf.success('Two-Factor Authentication enabled successfully!')
-	window.location.reload()
+	window.navigate('/settings')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Two-Factor Authentication enabled successfully!'
+	})
 }
 
 /**
@@ -137,12 +167,16 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	const password = formData.get('password') as string
 
 	if (!currentUser) {
-		notyf.error('User not authenticated')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'User not authenticated'
+		})
 		return
 	}
 
 	// STEP 1: Verify password
 	if (!(await verifyCurrentUserPassword(password))) {
+		form.reset()
 		return
 	}
 
@@ -152,16 +186,29 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection disbable')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection disable'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
+		form.reset()
 		return
 	}
 
-	if (!(await syncCurrentUser('Failed to update 2FA user data'))) return
+	if (!(await syncCurrentUser('Failed to update 2FA user data'))) {
+		form.reset()
+		return
+	}
 
-	notyf.success('Two-Factor Authentication disabled successfully!')
-	window.location.reload()
+	window.navigate('/settings')
+	notyf.open({
+		type: ToastActionType.SUCCESS_ACTION,
+		message: 'Two-Factor Authentication disable successfully!'
+	})
 }

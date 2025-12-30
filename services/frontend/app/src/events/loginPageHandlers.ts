@@ -1,12 +1,15 @@
 import { loginAPI, registerAPI } from '../api/authApi.js'
 import { verify2FALoginAPI } from '../api/twoFAApi.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { switchTo2FAForm } from '../pages/oldlogin.js'
+import { switchTo2FAForm } from '../pages/LoginPage.js'
 import {
 	validateUsername,
 	validatePassword,
 	handleAuthSuccess
-} from '../utils/userValidation.js'
+} from '../usecases/userValidation.js'
+import { ToastActionType } from '../types/toast.js'
+import { jwtDecode } from 'jwt-decode'
+import { IJwtPayload } from '@ft_transcendence/common'
 
 /**
  * Handler for the registration form
@@ -15,7 +18,7 @@ import {
  */
 export async function handleRegister(form: HTMLFormElement) {
 	const formData = new FormData(form)
-	const username = formData.get('register_username')
+	const username = formData.get('register_login')
 	const password = formData.get('register_password')
 	const confPassword = formData.get('register_conf_password')
 
@@ -25,19 +28,28 @@ export async function handleRegister(form: HTMLFormElement) {
 	}
 
 	if (password !== confPassword) {
-		notyf.error("Passwords don't match")
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: "Passwords don't match"
+		})
 		return
 	}
 
 	const usernameResult = validateUsername(username)
 	if (!usernameResult.success) {
-		notyf.error(usernameResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: usernameResult.error
+		})
 		return
 	}
 
 	const passwordResult = validatePassword(password)
 	if (!passwordResult.success) {
-		notyf.error(passwordResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: passwordResult.error
+		})
 		return
 	}
 
@@ -49,12 +61,30 @@ export async function handleRegister(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
+		form.reset()
 		return
+	}
+
+	if (data?.token) {
+		try {
+			const payload = jwtDecode<IJwtPayload>(data.token)
+			if (payload.login) {
+				sessionStorage.setItem('register_login', payload.login)
+			}
+		} catch (error) {
+			console.error('Failed to decode JWT:', error)
+		}
 	}
 
 	await handleAuthSuccess('Account created successfully!')
@@ -67,7 +97,7 @@ export async function handleRegister(form: HTMLFormElement) {
  */
 export async function handleLogin(form: HTMLFormElement) {
 	const formData = new FormData(form)
-	const username = formData.get('login_username')
+	const username = formData.get('login_login')
 	const password = formData.get('login_password')
 
 	if (!password || !username) {
@@ -77,13 +107,19 @@ export async function handleLogin(form: HTMLFormElement) {
 
 	const usernameResult = validateUsername(username)
 	if (!usernameResult.success) {
-		notyf.error(usernameResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: usernameResult.error
+		})
 		return
 	}
 
 	const passwordResult = validatePassword(password)
 	if (!passwordResult.success) {
-		notyf.error(passwordResult.error)
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: passwordResult.error
+		})
 		return
 	}
 
@@ -95,11 +131,18 @@ export async function handleLogin(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
+		form.reset()
 		return
 	}
 
@@ -122,7 +165,10 @@ export async function handle2FASubmit(form: HTMLFormElement) {
 	const code = formData.get('2fa_code')
 
 	if (!code || code.toString().length !== 6) {
-		notyf.error('Please enter a valid 6-digit code')
+		notyf.open({
+			type: ToastActionType.ERROR_ACTION,
+			message: 'Please enter a valid 6-digit code'
+		})
 		return
 	}
 
@@ -131,10 +177,16 @@ export async function handle2FASubmit(form: HTMLFormElement) {
 	if (error) {
 		switch (status) {
 			case 0:
-				notyf.error('Network error, check your connection')
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: 'Network error, check your connection'
+				})
 				break
 			default:
-				notyf.error(error)
+				notyf.open({
+					type: ToastActionType.ERROR_ACTION,
+					message: error
+				})
 		}
 
 		const codeInput = document.getElementById('2fa_code') as HTMLInputElement

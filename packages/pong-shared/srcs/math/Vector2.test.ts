@@ -3,14 +3,14 @@ import { Vector2 } from './Vector2.js'
 describe('Vector2', () => {
 	test('create a vector with x and y coord', () => {
 		const vec = new Vector2(4, 2)
-		expect(vec.getX()).toBe(4)
-		expect(vec.getY()).toBe(2)
+		expect(vec.x).toBe(4)
+		expect(vec.y).toBe(2)
 	})
 
 	test('create a vector with nefative x and y coord', () => {
 		const vec = new Vector2(-4, -2)
-		expect(vec.getX()).toBe(-4)
-		expect(vec.getY()).toBe(-2)
+		expect(vec.x).toBe(-4)
+		expect(vec.y).toBe(-2)
 	})
 
 	test('subtract vector', () => {
@@ -54,52 +54,52 @@ describe('Vector2', () => {
 	test('normalize', () => {
 		const v = new Vector2(0, 3)
 		const normalized = Vector2.normalize(v)
-		expect(normalized.getX()).toBeCloseTo(0)
-		expect(normalized.getY()).toBeCloseTo(1)
+		expect(normalized.x).toBeCloseTo(0)
+		expect(normalized.y).toBeCloseTo(1)
 		v.normalize()
-		expect(v.getX()).toBeCloseTo(0)
-		expect(v.getY()).toBeCloseTo(1)
+		expect(v.x).toBeCloseTo(0)
+		expect(v.y).toBeCloseTo(1)
 	})
 
 	test('normalize zero vector returns (0,0)', () => {
 		const v = new Vector2(0, 0)
 		const normalized = Vector2.normalize(v)
-		expect(normalized.getX()).toBe(0)
-		expect(normalized.getY()).toBe(0)
+		expect(normalized.x).toBe(0)
+		expect(normalized.y).toBe(0)
 		v.normalize()
-		expect(v.getX()).toBe(0)
-		expect(v.getY()).toBe(0)
+		expect(v.x).toBe(0)
+		expect(v.y).toBe(0)
 	})
 
 	test('negate', () => {
 		const v = new Vector2(3, -2)
 		const negated = Vector2.negate(v)
-		expect(negated.getX()).toBe(-3)
-		expect(negated.getY()).toBe(2)
+		expect(negated.x).toBe(-3)
+		expect(negated.y).toBe(2)
 		v.negate()
-		expect(v.getX()).toBe(-3)
-		expect(v.getY()).toBe(2)
+		expect(v.x).toBe(-3)
+		expect(v.y).toBe(2)
 	})
 
 	test('multiply by scalar', () => {
 		const v = new Vector2(2, -5)
 		const res = Vector2.multiply(v, 3)
-		expect(res.getX()).toBe(6)
-		expect(res.getY()).toBe(-15)
+		expect(res.x).toBe(6)
+		expect(res.y).toBe(-15)
 		v.multiply(-2)
-		expect(v.getX()).toBe(-4)
-		expect(v.getY()).toBe(10)
+		expect(v.x).toBe(-4)
+		expect(v.y).toBe(10)
 	})
 
 	test('setters', () => {
 		const v = new Vector2()
-		v.setX(7)
-		v.setY(-8)
-		expect(v.getX()).toBe(7)
-		expect(v.getY()).toBe(-8)
+		v.x = 7
+		v.y = -8
+		expect(v.x).toBe(7)
+		expect(v.y).toBe(-8)
 		v.setXY(1, 2)
-		expect(v.getX()).toBe(1)
-		expect(v.getY()).toBe(2)
+		expect(v.x).toBe(1)
+		expect(v.y).toBe(2)
 	})
 
 	describe('equals', () => {
@@ -182,10 +182,10 @@ describe('Vector2', () => {
 			const v = new Vector2(1, 1)
 			const normal = new Vector2(1, 1).normalize()
 			const expected = new Vector2(-1, -1)
-			expect(Vector2.reflect(v, normal).getX()).toBeCloseTo(expected.getX())
-			expect(Vector2.reflect(v, normal).getY()).toBeCloseTo(expected.getY())
-			expect(v.reflect(normal).getX()).toBeCloseTo(expected.getX())
-			expect(v.reflect(normal).getY()).toBeCloseTo(expected.getY())
+			expect(Vector2.reflect(v, normal).x).toBeCloseTo(expected.x)
+			expect(Vector2.reflect(v, normal).y).toBeCloseTo(expected.y)
+			expect(v.reflect(normal).x).toBeCloseTo(expected.x)
+			expect(v.reflect(normal).y).toBeCloseTo(expected.y)
 		})
 
 		test('reflect vector across a normal vector pointing down', () => {

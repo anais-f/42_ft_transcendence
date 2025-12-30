@@ -2,7 +2,7 @@ import BetterSqlite3 from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
 import { mkdirSync } from 'fs'
 import { dirname } from 'path'
-import { env } from '../index.js'
+import { env } from '../env/checkEnv.js'
 
 let db: Database
 

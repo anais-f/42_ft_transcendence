@@ -8,6 +8,7 @@ import {
 	UserSearchResultDTO
 } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
+import { updateUserMetrics } from './metricsService.js'
 
 export class UsersServices {
 	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
@@ -16,11 +17,13 @@ export class UsersServices {
 			return
 		}
 
-		await UsersRepository.insertUser({
+		UsersRepository.insertUser({
 			user_id: newUser.user_id,
 			login: newUser.login
 		})
 		console.log(`User ${newUser.user_id} ${newUser.login} created`)
+
+		updateUserMetrics()
 	}
 
 	static async syncAllUsersFromAuth(): Promise<void> {
@@ -28,17 +31,19 @@ export class UsersServices {
 
 		for (const authUser of authUsers) {
 			if (!UsersRepository.existsById({ user_id: authUser.user_id }))
-				await UsersRepository.insertUser({
+				UsersRepository.insertUser({
 					user_id: authUser.user_id,
 					login: authUser.login
 				})
 		}
+
+		updateUserMetrics()
 	}
 
 	static async getPublicUserProfile(
 		user: IUserId
 	): Promise<UserPublicProfileDTO> {
-		if (!user?.user_id || user.user_id <= 0)
+		if (!user.user_id || user.user_id <= 0)
 			throw createHttpError.BadRequest('Invalid user ID')
 
 		const localUser = await UsersRepository.getUserById({

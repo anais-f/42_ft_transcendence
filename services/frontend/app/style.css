@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--paper-texture: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+
 @layer base {
 	@font-face {
 		font-family: 'HoldMoney';
@@ -13,23 +17,29 @@
 }
 
 @layer components {
-	.submission_btn {
-		@apply bg-green-500 border border-green-600 p-3 hover:bg-green-600;
+	.body {
+		@apply flex flex-col h-dvh px-6 py-4 gap-4 bg-[#fffefc] bg-[image:var(--paper-texture)];
 	}
-	.generic_btn {
-		@apply border-2 border-black hover:bg-black hover:text-white w-full py-2 transition-colors;
+	.img_style {
+		@apply w-full py-4 opacity-50 object-cover select-none mix-blend-multiply;
 	}
-	.notyf_success {
-		@apply bg-green-100 text-green-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+	.avatar_style {
+		@apply w-4/5 m-auto aspect-square object-cover border-2 border-black saturate-[75%];
 	}
-	.notyf_error {
-		@apply bg-red-100 text-red-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+	.form_style {
+		@apply flex flex-col gap-2 w-full;
 	}
-	.notyf_info {
-		@apply bg-blue-100 text-blue-900 rounded-lg shadow-md px-4 py-2;
-		border: 1px solid rgba(0, 0, 0, 0.06);
+	.col-4-span-flex {
+		@apply col-span-1 flex flex-col items-start min-h-0;
+	}
+	.friend_btn {
+		@apply !border !transition-colors !text-xs !w-24 !px-2 !py-0.5;
+	}
+	.table_header {
+		@apply border-b-2 border-black py-2 font-semibold text-lg font-rye;
+	}
+	.cursor_pointer {
+		@apply cursor-pointer;
 	}
 	.tournament-cell {
 		@apply pr-2 pl-2 w-full flex justify-between items-center border-black;
@@ -38,15 +48,67 @@
 
 @layer utilities {
 	.title_font {
-		@apply font-[HoldMoney] text-5xl;
+		@apply font-HoldMoney text-5xl;
+	}
+	.title_bloc {
+		@apply mb-4 text-2xl font-semibold;
 	}
 	.news_paragraph {
-		@apply text-black opacity-15 select-none text-justify;
+		@apply text-black opacity-20 select-none text-justify;
+	}
+	.form_button {
+		@apply mb-4 mt-2;
+	}
+	.username_style {
+		@apply text-2xl font-medium py-4;
+	}
+	.lobby_font {
+		@apply text-2xl font-special mt-4 mx-auto mb-4 truncate;
+	}
+
+	/* Line clamp utilities */
+	.line-clamp-2,
+	.line-clamp-4,
+	.line-clamp-8,
+	.line-clamp-12,
+	.line-clamp-20 {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.line-clamp-2 {
+		-webkit-line-clamp: 2;
+	}
+	.line-clamp-4 {
+		-webkit-line-clamp: 4;
+	}
+	.line-clamp-8 {
+		-webkit-line-clamp: 8;
+	}
+	.line-clamp-12 {
+		-webkit-line-clamp: 12;
+	}
+	.line-clamp-20 {
+		-webkit-line-clamp: 20;
 	}
 }
 
-body {
-	background-color: #ecdabb;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
-	/* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+/* Notyf custom styles - Force texture and borders */
+.notyf__toast--success,
+.notyf__toast.notyf_success {
+	@apply text-black px-4 py-2 font-medium font-special bg-[#d4edda] bg-[image:var(--paper-texture)] border-2 border-[#2d5016] shadow-[3px_3px_0_rgba(0,0,0,0.15)];
+}
+
+.notyf__toast--error,
+.notyf__toast.notyf_error {
+	@apply text-black px-4 py-2 font-medium font-special bg-[#f4d6d6] bg-[image:var(--paper-texture)] border-2 border-[#8b1e1e] shadow-[3px_3px_0_rgba(0,0,0,0.15)];
+}
+
+.notyf__toast.notyf_info {
+	@apply text-black px-4 py-2 font-medium font-special bg-[#f3f7fd] bg-[image:var(--paper-texture)] border-2 border-[#8b1e1e] shadow-[3px_3px_0_rgba(0,0,0,0.15)];
+}
+
+.notyf__toast.notyf_friend {
+	@apply text-black px-4 py-2 font-medium font-special bg-[#ecdabb] bg-[image:var(--paper-texture)] border-2 border-[#000000] shadow-[3px_3px_0_rgba(0,0,0,0.15)];
 }

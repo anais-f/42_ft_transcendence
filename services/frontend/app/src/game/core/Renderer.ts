@@ -1,0 +1,212 @@
+import {
+	GAME_SPACE_HEIGHT,
+	GAME_SPACE_WIDTH,
+	Segment,
+	Vector2,
+	TICKS_PER_STEP,
+	DEFAULT_TPS
+} from '@pong-shared/index.js'
+import { gameStore } from '../../usecases/gameStore.js'
+import {
+	SEGMENT_LINE_WIDTH_SCALE,
+	SEGMENT_COLOR,
+	BALL_COLOR,
+	BALL_RADIUS_SCALE,
+	COUNTDOWN_FONT,
+	COUNTDOWN_COLOR,
+	COUNTDOWN_FONT_SCALE,
+	OVERLAY_FONT,
+	OVERLAY_FONT_SCALE,
+	OVERLAY_WIN_COLOR,
+	OVERLAY_LOSE_COLOR
+} from '../constants.js'
+
+const OVERLAY_ANIMATION_MS = (TICKS_PER_STEP / DEFAULT_TPS) * 1000
+
+class Renderer {
+	private staticSegments: Segment[] = []
+	private dynamicSegments: Segment[] = []
+	private ballPos: Vector2 = new Vector2(0, 0)
+	private ballVelo: Vector2 = new Vector2(0, 0)
+	private ballFactor: number = 1
+	private lastBallUpdate: number = 0
+	private canvas: HTMLCanvasElement | null = null
+	private ctx: CanvasRenderingContext2D | null = null
+	private animationId: number | null = null
+	private countdown: number | null = null
+	private gameResult: 'win' | 'lose' | null = null
+	private gameResultTime: number = 0
+
+	setCanvas(canvas: HTMLCanvasElement): void {
+		this.canvas = canvas
+		this.ctx = canvas.getContext('2d')
+		this.gameResult = null
+		this.startAnimation()
+	}
+
+	setStaticSegments(segments: Segment[]): void {
+		this.staticSegments = segments
+	}
+
+	setDynamicSegments(segments: Segment[]): void {
+		this.dynamicSegments = segments
+	}
+
+	setBallPos(pos: Vector2): void {
+		this.ballPos = pos
+		this.lastBallUpdate = performance.now()
+	}
+
+	setBallState(pos: Vector2, velo: Vector2, factor: number): void {
+		this.ballPos = pos
+		this.ballVelo = velo
+		this.ballFactor = factor
+		this.lastBallUpdate = performance.now()
+	}
+
+	setCountdown(value: number | null): void {
+		this.countdown = value
+	}
+
+	setGameResult(result: 'win' | 'lose' | null): void {
+		this.setBallState(new Vector2(), new Vector2(), 0)
+		this.gameResult = result
+		this.gameResultTime = performance.now()
+	}
+
+	private startAnimation(): void {
+		if (this.animationId !== null) return
+
+		const animate = () => {
+			this.render()
+			this.animationId = requestAnimationFrame(animate)
+		}
+		this.animationId = requestAnimationFrame(animate)
+	}
+
+	private stopAnimation(): void {
+		if (this.animationId !== null) {
+			cancelAnimationFrame(this.animationId)
+			this.animationId = null
+		}
+	}
+
+	private getPredictedBallPos(): Vector2 {
+		if (this.gameResult) {
+			return this.ballPos
+		}
+		const now = performance.now()
+		const dt = (now - this.lastBallUpdate) / 1000
+		return new Vector2(
+			this.ballPos.x + this.ballVelo.x * this.ballFactor * dt,
+			this.ballPos.y + this.ballVelo.y * this.ballFactor * dt
+		)
+	}
+
+	private render(): void {
+		if (!this.canvas || !this.ctx) return
+
+		const ctx = this.ctx
+		const width = this.canvas.width
+		const height = this.canvas.height
+		const scaleX = width / GAME_SPACE_WIDTH
+		const scaleY = height / GAME_SPACE_HEIGHT
+		const offsetX = width / 2
+		const offsetY = height / 2
+		const flipX = gameStore.playerSlot === 'p2' ? -1 : 1
+		const toCanvasX = (x: number) => offsetX + x * flipX * scaleX
+		const toCanvasY = (y: number) => offsetY - y * scaleY
+
+		ctx.globalCompositeOperation = 'source-over'
+		ctx.clearRect(0, 0, width, height)
+		ctx.strokeStyle = SEGMENT_COLOR
+		ctx.lineWidth = SEGMENT_LINE_WIDTH_SCALE * scaleX
+		const allSegments = [...this.staticSegments, ...this.dynamicSegments]
+		for (const seg of allSegments) {
+			const p1 = seg.p1
+			const p2 = seg.p2
+			ctx.beginPath()
+			ctx.moveTo(toCanvasX(p1.x), toCanvasY(p1.y))
+			ctx.lineTo(toCanvasX(p2.x), toCanvasY(p2.y))
+			ctx.stroke()
+		}
+
+		const predictedPos = this.getPredictedBallPos()
+		ctx.fillStyle = BALL_COLOR
+		ctx.beginPath()
+		ctx.arc(
+			toCanvasX(predictedPos.x),
+			toCanvasY(predictedPos.y),
+			BALL_RADIUS_SCALE * scaleX,
+			0,
+			Math.PI * 2
+		)
+		ctx.fill()
+		ctx.closePath()
+
+		if (
+			this.countdown !== null &&
+			this.countdown > 0 &&
+			this.gameResult === null
+		) {
+			const x = width / 2
+			const y = height / 2
+			const fontSize = height * COUNTDOWN_FONT_SCALE
+			const string = this.countdown.toString()
+
+			ctx.font = `bold ${fontSize}px ${COUNTDOWN_FONT}`
+			ctx.textAlign = 'center'
+			ctx.textBaseline = 'middle'
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'destination-out'
+			ctx.fillText(string, x, y)
+			ctx.restore()
+
+			ctx.save()
+			ctx.globalCompositeOperation = 'source-over'
+			ctx.strokeStyle = COUNTDOWN_COLOR
+			ctx.strokeText(string, x, y)
+			ctx.restore()
+		}
+
+		if (this.gameResult !== null) {
+			const elapsed = performance.now() - this.gameResultTime
+			const t = Math.min(elapsed / OVERLAY_ANIMATION_MS, 1)
+			const easeOut = 1 - Math.pow(1 - t, 3)
+
+			// fade in background
+			ctx.fillStyle = `rgba(0, 0, 0, ${0.4 * easeOut})`
+			ctx.fillRect(0, 0, width, height)
+
+			// scale in text
+			const text = this.gameResult === 'win' ? 'VICTORY' : 'DEFEAT'
+			const color =
+				this.gameResult === 'win' ? OVERLAY_WIN_COLOR : OVERLAY_LOSE_COLOR
+			const fontSize = height * OVERLAY_FONT_SCALE * easeOut
+
+			ctx.font = `bold ${fontSize}px ${OVERLAY_FONT}`
+			ctx.textAlign = 'center'
+			ctx.textBaseline = 'middle'
+			ctx.fillStyle = color
+			ctx.fillText(text, width / 2, height / 2)
+		}
+	}
+
+	clear(): void {
+		this.stopAnimation()
+		this.staticSegments = []
+		this.dynamicSegments = []
+		this.ballPos = new Vector2(0, 0)
+		this.ballVelo = new Vector2(0, 0)
+		this.ballFactor = 1
+		this.lastBallUpdate = 0
+		this.canvas = null
+		this.ctx = null
+		this.countdown = null
+		this.gameResult = null
+		this.gameResultTime = 0
+	}
+}
+
+export const renderer = new Renderer()

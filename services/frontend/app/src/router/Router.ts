@@ -2,7 +2,19 @@ import { routerMap, Route, Pages } from './routerMap.js'
 import { checkAuth } from '../usecases/userSession.js'
 import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
+import { socialStore } from '../usecases/socialStore.js'
+import {
+	createSocialTokenApi,
+	createSocialWebSocketApi
+} from '../api/homeWsApi.js'
+import { handleSocialDispatcher } from '../events/home/socialDispatcher.js'
 
+export let routeParams: Record<string, string> = {}
+
+/**
+ * Router class to manage client-side routing,
+ * including authentication checks and page rendering.
+ */
 export class Router {
 	private isNavigating = false
 	private currentRoute: Route | null = null
@@ -14,15 +26,83 @@ export class Router {
 		this.initEventListeners()
 	}
 
-	// Find route by URL
+	/**
+	 * Get the route object for a given URL
+	 * @param url
+	 * @private
+	 */
 	private getRoute(url: string): Route {
-		return (
-			Object.values(routerMap).find((route) => route.url === url) ||
-			this.HOME_ROUTE
+		routeParams = {}
+
+		// exact match first
+		const exactMatch = Object.values(routerMap).find(
+			(route) => route.url === url
 		)
+		if (exactMatch) return exactMatch
+
+		// dynamic match
+		for (const route of Object.values(routerMap)) {
+			const match = this.matchDynamicRoute(route.url, url)
+			if (match) {
+				routeParams = match
+				return route
+			}
+		}
+
+		return this.HOME_ROUTE
 	}
 
-	// Render the page content and manage binds/unbinds
+	/**
+	 * Match dynamic route patterns like /user/:id
+	 * @param pattern
+	 * @param url
+	 * @private
+	 */
+	private matchDynamicRoute(
+		pattern: string,
+		url: string
+	): Record<string, string> | null {
+		const patternParts = pattern.split('/')
+		const urlParts = url.split('/')
+
+		if (patternParts.length !== urlParts.length) return null
+
+		const params: Record<string, string> = {}
+
+		for (let i = 0; i < patternParts.length; i++) {
+			const patternPart = patternParts[i]
+			const urlPart = urlParts[i]
+
+			if (patternPart.startsWith(':')) {
+				// dynamic segment
+				params[patternPart.slice(1)] = urlPart
+			} else if (patternPart !== urlPart) {
+				// static segment doesn't match
+				return null
+			}
+		}
+
+		return params
+	}
+
+	/**
+	 * Update the page number in the header
+	 * @param route
+	 * @private
+	 */
+	private updatePageNumber(route: Route): void {
+		const pageNumberElement = document.getElementById('page-number')
+		if (pageNumberElement) {
+			pageNumberElement.textContent = `Page ${route.index}`
+		}
+	}
+
+	/**
+	 * Render the page for a given route
+	 * and manage binds/unbinds
+	 * @param route
+	 * @private
+	 */
 	private renderPage(route: Route): void {
 		const contentDiv = document.getElementById(this.rootElementId)
 		if (!contentDiv) return
@@ -39,9 +119,9 @@ export class Router {
 		}
 
 		// render new page
-
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
+		this.updatePageNumber(route)
 
 		// setup new page (bind)
 		if (route.binds) {
@@ -60,8 +140,12 @@ export class Router {
 		}
 	}
 
-	// Main navigation handler
-	// manages auth checks and redirects
+	/**
+	 * Handle navigation logic
+	 * manages authentication checks, WebSocket setup, and page rendering
+	 * @param skipAuth
+	 * @private
+	 */
 	private async handleNav(skipAuth: boolean = false): Promise<void> {
 		if (this.isNavigating) {
 			console.log('Navigation already in progress, skipping')
@@ -73,24 +157,34 @@ export class Router {
 		const route = this.getRoute(url)
 
 		try {
-			let user: IPrivateUser | null = currentUser // Start with current user from store
+			let user: IPrivateUser | null = currentUser
 
 			// 1. --- AUTHENTICATION CHECK API ---
-			console.log('🔍 Navigation:', {
-				url,
-				skipAuth,
-				'route.public': route.public,
-				currentUser: currentUser?.username || null
-			})
-
 			if (!skipAuth) {
-				console.log('Calling checkAuth()...')
 				const authCheckResult = await checkAuth()
 				setCurrentUser(authCheckResult)
 				user = authCheckResult
 			} else {
-				console.log('Skipping checkAuth()')
 				user = currentUser
+			}
+
+			// 2. --- SOCIAL WEBSOCKET MANAGEMENT ---
+			if (user && !socialStore.socialSocket) {
+				const token = await createSocialTokenApi()
+				if (token) {
+					const ws = createSocialWebSocketApi(token.data.wsToken)
+
+					socialStore.socialSocket = ws
+
+					ws.onopen = () => {}
+					ws.onmessage = handleSocialDispatcher
+					ws.onerror = (error) => {
+						console.error('Social WS error:', error)
+					}
+					ws.onclose = () => {
+						socialStore.socialSocket = null
+					}
+				}
 			}
 
 			// --- REDIRECTION GUARDS ---
@@ -98,7 +192,6 @@ export class Router {
 			// GUARD 1: Authenticated on /login
 			// skipAuth=true because we just checked and user is authenticated
 			if (url === '/login' && user !== null) {
-				console.log('Authenticated, redirecting from /login to /')
 				this.isNavigating = false
 				await this.navigate('/', true)
 				return
@@ -107,17 +200,15 @@ export class Router {
 			// GUARD 2: Non-authenticated on protected route
 			// skipAuth=true because we just checked and user is not authenticated
 			if (!route.public && !user) {
-				console.log('Not authenticated, redirecting to /login')
 				this.isNavigating = false
 				await this.navigate('/login', true)
 				return
 			}
 
 			// 3. RENDER PAGE
-			if (user) console.log('Authenticated as: ', user.username)
 			this.renderPage(route)
 		} catch (e: unknown) {
-			// ... (Error handlering)
+			console.error('Error during navigation:', e)
 			if (!route.public) {
 				this.isNavigating = false // to new navigation
 				await this.navigate('/login', true)
@@ -133,14 +224,15 @@ export class Router {
 
 	// Public method to navigate to a URL
 	// updates browser history and triggers navigation handling
+	/**
+	 * Navigate to a given URL
+	 * @param url
+	 * @param skipAuth
+	 */
 	public navigate = async (
 		url: string,
 		skipAuth: boolean = false
 	): Promise<void> => {
-		if (window.location.pathname === url) {
-			console.log('Already at', url)
-			return
-		}
 		history.pushState(null, '', url)
 		await this.handleNav(skipAuth)
 	}

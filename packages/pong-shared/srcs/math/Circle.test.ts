@@ -5,16 +5,16 @@ import { Segment } from './Segment.js'
 describe('Circle', () => {
 	test('create a circle', () => {
 		const c = new Circle(new Vector2(5, 7), 5)
-		expect(c.getPos()).toEqual(new Vector2(5, 7))
-		expect(c.getRad()).toBeCloseTo(5)
+		expect(c.pos).toEqual(new Vector2(5, 7))
+		expect(c.rad).toBeCloseTo(5)
 	})
 
 	test('circle setter', () => {
 		const c = new Circle(new Vector2(), 1)
-		c.setOrigin(new Vector2(5, 6))
-		c.setRad(5)
-		expect(c.getPos()).toEqual(new Vector2(5, 6))
-		expect(c.getRad()).toBe(5)
+		c.origin = new Vector2(5, 6)
+		c.rad = 5
+		expect(c.pos).toEqual(new Vector2(5, 6))
+		expect(c.rad).toBe(5)
 	})
 
 	test('circle with zero radius', () => {
@@ -91,7 +91,7 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.getX()) || isNaN(e.getY()))).toBe(false)
+			expect(res?.some((e) => isNaN(e.x) || isNaN(e.y))).toBe(false)
 		})
 		test('intersect circle with other fully inside 2', () => {
 			const v1 = new Vector2(5, 7)
@@ -100,7 +100,7 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.getX()) || isNaN(e.getY()))).toBe(false)
+			expect(res?.some((e) => isNaN(e.x) || isNaN(e.y))).toBe(false)
 		})
 
 		test('intersect circle with other fully inside 3', () => {
@@ -109,7 +109,7 @@ describe('Circle', () => {
 			const res = c1.intersect(c2)
 
 			expect(res).toBeInstanceOf(Array)
-			expect(res?.some((e) => isNaN(e.getX()) || isNaN(e.getY()))).toBe(false)
+			expect(res?.some((e) => isNaN(e.x) || isNaN(e.y))).toBe(false)
 		})
 
 		test('intersect circle with other inside', () => {
@@ -183,14 +183,14 @@ describe('Circle', () => {
 			const c1: Circle = new Circle(new Vector2(), 5)
 			const c2 = c1.clone()
 
-			c1.setRad(6)
-			c1.setOrigin(new Vector2(-1, -1))
+			c1.rad = 6
+			c1.origin = new Vector2(-1, -1)
 
 			expect(c1).not.toBe(c2)
-			expect(c1.getPos()).not.toEqual(c2.getPos())
-			expect(c1.getRad()).not.toEqual(c2.getRad())
-			expect(c1.getPos()).toEqual(new Vector2(-1, -1))
-			expect(c1.getRad()).toEqual(6)
+			expect(c1.pos).not.toEqual(c2.pos)
+			expect(c1.rad).not.toEqual(c2.rad)
+			expect(c1.pos).toEqual(new Vector2(-1, -1))
+			expect(c1.rad).toEqual(6)
 		})
 	})
 

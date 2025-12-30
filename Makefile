@@ -42,7 +42,6 @@ debug:
 .PHONY: down
 down:
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
-	@docker volume rm ft_transcendence_nginx_logs || true
 
 .PHONY: sh-%
 sh-%:
@@ -71,7 +70,7 @@ dev-up: verif-env
 	
 .PHONY: reset-db
 reset-db: down
-	docker volume rm $(docker volume ls -q)
+	docker volume rm $$(docker volume ls -q)
 
 .PHONY: verif-env
 verif-env:

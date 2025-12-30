@@ -1,30 +1,40 @@
-import { HomePage, attachHomeEvents, detachHomeEvents } from '../pages/oldhome'
-import { GamePage } from '../pages/oldgame'
-import { LobbyPage } from '../pages/oldlobby'
+import {
+	attachGameEvents,
+	detachGameEvents,
+	GamePage
+} from '../pages/GamePage.js'
 import {
 	LoginPage,
 	attachLoginEvents,
 	detachLoginEvents,
 	cleanupGoogleAuth
-} from '../pages/oldlogin'
-import { ProfilePage } from '../pages/oldprofile'
+} from '../pages/LoginPage.js'
 import {
 	SettingsPage,
 	attachSettingsEvents,
 	detachSettingsEvents
-} from '../pages/oldsettings'
-import { TestPage } from '../pages/LoginPage'
-import { TournamentPage } from '../pages/TournamentPage'
+} from '../pages/SettingsPage.js'
+import {
+	HomePage,
+	attachHomeEvents,
+	detachHomeEvents
+} from '../pages/HomePage.js'
+import {
+	ProfilePage,
+	attachProfileEvents,
+	detachProfileEvents
+} from '../pages/ProfilePage.js'
+import {
+	TournamentPage,
+} from '../pages/TournamentPage.js'
 
-export type Pages =
-	| 'home'
-	| 'game'
-	| 'lobby'
-	| 'login'
-	| 'profile'
-	| 'settings'
-	| 'test'
-	| 'tournament'
+import {
+	LobbyPage,
+	attachLobbyEvents,
+	detachLobbyEvents
+} from '../pages/LobbyPage.js'
+
+export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings' | 'tournament'
 
 export type Route = {
 	id: string
@@ -33,6 +43,7 @@ export type Route = {
 	binds?: Array<() => void>
 	unbinds?: Array<() => void>
 	public?: boolean
+	index: number
 }
 
 export const routerMap: Record<Pages, Route> = {
@@ -41,19 +52,26 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/',
 		page: HomePage,
 		binds: [attachHomeEvents],
-		unbinds: [detachHomeEvents]
+		unbinds: [detachHomeEvents],
+		index: 2
 	},
 
 	game: {
 		id: 'game',
-		url: '/game',
-		page: GamePage
+		url: '/play',
+		page: GamePage,
+		binds: [attachGameEvents],
+		unbinds: [detachGameEvents],
+		index: 6
 	},
 
 	lobby: {
 		id: 'lobby',
-		url: '/lobby',
-		page: LobbyPage
+		url: '/lobby/:code',
+		page: LobbyPage,
+		binds: [attachLobbyEvents],
+		unbinds: [detachLobbyEvents],
+		index: 5
 	},
 
 	login: {
@@ -62,13 +80,17 @@ export const routerMap: Record<Pages, Route> = {
 		page: LoginPage,
 		binds: [attachLoginEvents],
 		unbinds: [detachLoginEvents, cleanupGoogleAuth],
-		public: true
+		public: true,
+		index: 1
 	},
 
 	profile: {
 		id: 'profile',
-		url: '/profile',
-		page: ProfilePage
+		url: '/profile/:id',
+		page: ProfilePage,
+		binds: [attachProfileEvents],
+		unbinds: [detachProfileEvents],
+		index: 3
 	},
 
 	settings: {
@@ -76,20 +98,13 @@ export const routerMap: Record<Pages, Route> = {
 		url: '/settings',
 		page: SettingsPage,
 		binds: [attachSettingsEvents],
-		unbinds: [detachSettingsEvents]
+		unbinds: [detachSettingsEvents],
+		index: 4
 	},
-
-	test: {
-		id: 'test',
-		url: '/test',
-		page: TestPage,
-		public: true
-	},
-
 	tournament: {
 		id: 'tournament',
 		url: '/tournament',
 		page: TournamentPage,
-		public: true
+		index: 5
 	}
 }

@@ -2,49 +2,50 @@ import { EPSILON } from '../define.js'
 
 export class Vector2 {
 	// init class fields
-	private x: number
-	private y: number
+	private _x: number
+	private _y: number
 
 	constructor(x: number = 0, y: number = 0) {
-		this.x = x
-		this.y = y
+		this._x = x
+		this._y = y
 	}
 
 	// getters
-	public getX(): number {
-		return this.x
+	get x(): number {
+		return this._x
 	}
-	public getY(): number {
-		return this.y
+	get y(): number {
+		return this._y
 	}
 
-	// setter
-	public setX(newX: number) {
-		this.x = newX
+	// setters
+	set x(newX: number) {
+		this._x = newX
 	}
-	public setY(newY: number) {
-		this.y = newY
+	set y(newY: number) {
+		this._y = newY
 	}
-	public setXY(newX: number, newY: number) {
-		this.x = newX
-		this.y = newY
+
+	setXY(newX: number, newY: number) {
+		this._x = newX
+		this._y = newY
 	}
 
 	// operator
 	public static subtract(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(v1.getX() - v2.getX(), v1.getY() - v2.getY())
+		return new Vector2(v1.x - v2.x, v1.y - v2.y)
 	}
 
 	public static add(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(v1.getX() + v2.getX(), v1.getY() + v2.getY())
+		return new Vector2(v1.x + v2.x, v1.y + v2.y)
 	}
 
 	public static dot(v1: Vector2, v2: Vector2): number {
-		return v1.getX() * v2.getX() + v1.getY() * v2.getY()
+		return v1.x * v2.x + v1.y * v2.y
 	}
 
 	public static cross(v1: Vector2, v2: Vector2): number {
-		return v1.getX() * v2.getY() - v1.getY() * v2.getX()
+		return v1.x * v2.y - v1.y * v2.x
 	}
 
 	public static magnitude(v: Vector2): number {
@@ -58,19 +59,19 @@ export class Vector2 {
 			return new Vector2()
 		}
 
-		return new Vector2(v.getX() / length, v.getY() / length)
+		return new Vector2(v.x / length, v.y / length)
 	}
 
 	public static negate(v: Vector2): Vector2 {
-		return new Vector2(-v.getX(), -v.getY())
+		return new Vector2(-v.x, -v.y)
 	}
 
 	public static multiply(v: Vector2, scalar: number): Vector2 {
-		return new Vector2(v.getX() * scalar, v.getY() * scalar)
+		return new Vector2(v.x * scalar, v.y * scalar)
 	}
 
 	public static squaredDist(v1: Vector2, v2: Vector2): number {
-		return (v1.getX() - v2.getX()) ** 2 + (v1.getY() - v2.getY()) ** 2
+		return (v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2
 	}
 
 	public static dist(v1: Vector2, v2: Vector2): number {
@@ -95,15 +96,15 @@ export class Vector2 {
 
 	public add(v2: Vector2): Vector2 {
 		const result = Vector2.add(this, v2)
-		this.x = result.getX()
-		this.y = result.getY()
+		this.x = result.x
+		this.y = result.y
 		return this
 	}
 
 	public subtract(v2: Vector2): Vector2 {
 		const result = Vector2.subtract(this, v2)
-		this.x = result.getX()
-		this.y = result.getY()
+		this.x = result.x
+		this.y = result.y
 		return this
 	}
 
@@ -117,15 +118,15 @@ export class Vector2 {
 
 	public normalize(): Vector2 {
 		const result = Vector2.normalize(this)
-		this.x = result.getX()
-		this.y = result.getY()
+		this.x = result.x
+		this.y = result.y
 		return this
 	}
 
 	public negate(): Vector2 {
 		const result = Vector2.negate(this)
-		this.x = result.getX()
-		this.y = result.getY()
+		this.x = result.x
+		this.y = result.y
 		return this
 	}
 
@@ -135,17 +136,14 @@ export class Vector2 {
 
 	public multiply(scalar: number) {
 		const result = Vector2.multiply(this, scalar)
-		this.x = result.getX()
-		this.y = result.getY()
+		this.x = result.x
+		this.y = result.y
 		return this
 	}
 
 	public static reflect(v: Vector2, normal: Vector2): Vector2 {
 		const dot = this.dot(v, normal)
-		return new Vector2(
-			v.getX() - 2 * dot * normal.getX(),
-			v.getY() - 2 * dot * normal.getY()
-		)
+		return new Vector2(v.x - 2 * dot * normal.x, v.y - 2 * dot * normal.y)
 	}
 
 	public reflect(normal: Vector2): Vector2 {
@@ -157,24 +155,15 @@ export class Vector2 {
 	}
 
 	public static equals(v1: Vector2, v2: Vector2): boolean {
-		return (
-			Math.abs(v1.getX() - v2.getX()) < EPSILON &&
-			Math.abs(v1.getY() - v2.getY()) < EPSILON
-		)
+		return Math.abs(v1.x - v2.x) < EPSILON && Math.abs(v1.y - v2.y) < EPSILON
 	}
 
 	public static min(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(
-			Math.min(v1.getX(), v2.getX()),
-			Math.min(v1.getY(), v2.getY())
-		)
+		return new Vector2(Math.min(v1.x, v2.x), Math.min(v1.y, v2.y))
 	}
 
 	public static max(v1: Vector2, v2: Vector2): Vector2 {
-		return new Vector2(
-			Math.max(v1.getX(), v2.getX()),
-			Math.max(v1.getY(), v2.getY())
-		)
+		return new Vector2(Math.max(v1.x, v2.x), Math.max(v1.y, v2.y))
 	}
 
 	public serialize(): ArrayBuffer {

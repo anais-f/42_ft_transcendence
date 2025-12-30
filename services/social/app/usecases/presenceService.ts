@@ -3,6 +3,7 @@ import {
 	broadcastStatusChangeToFriends,
 	broadcastPresenceToAll
 } from './broadcasterService.js'
+import { env } from '../env/checkEnv.js'
 
 /**
  * Notify users service about status change
@@ -13,12 +14,8 @@ async function notifyStatusChange(
 	userId: number,
 	status: UserStatus
 ): Promise<void> {
-	const base = process.env.USERS_SERVICE_URL
-	const secret = process.env.INTERNAL_API_SECRET
-	if (!base || !secret) {
-		console.error('Missing USERS_SERVICE_URL or INTERNAL_API_SECRET env')
-		return
-	}
+	const base = env.USERS_SERVICE_URL
+	const secret = env.INTERNAL_API_SECRET
 
 	const body: { status: UserStatus; lastConnection?: string } = {
 		status: status
@@ -73,7 +70,7 @@ export async function handleUserOnline(userId: number): Promise<void> {
 	try {
 		await notifyStatusChange(userId, UserStatus.ONLINE)
 		await broadcastStatusChangeToFriends(userId, UserStatus.ONLINE)
-		await broadcastPresenceToAll(userId, UserStatus.ONLINE)
+		// await broadcastPresenceToAll(userId, UserStatus.ONLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} online status:`, message)
@@ -90,7 +87,7 @@ export async function handleUserOffline(userId: number): Promise<void> {
 	try {
 		await notifyStatusChange(userId, UserStatus.OFFLINE)
 		await broadcastStatusChangeToFriends(userId, UserStatus.OFFLINE)
-		await broadcastPresenceToAll(userId, UserStatus.OFFLINE)
+		// await broadcastPresenceToAll(userId, UserStatus.OFFLINE)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 		console.error(`Failed to notify user ${userId} offline status:`, message)

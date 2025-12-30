@@ -1,29 +1,36 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<link
 			rel="stylesheet"
 			type="text/css"
-			href="https://fonts.googleapis.com/css2?family=Birthstone&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Rye&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Birthstone&family=Newsreader&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Rye&family=Special+Elite&display=swap"
 		/>
 		<link rel="stylesheet" type="text/css" href="/style.css" />
 		<link rel="icon" href="/assets/favicon/favicon.ico" />
 		<title>Ft Transcendence</title>
 	</head>
 
-	<body class="flex flex-col h-dvh px-6 py-4 gap-4">
+	<body class="body">
 		<header
-			class="border-t-2 border-b-2 border-gray-800 p-4 justify-between flex items-center text-sm"
+			class="border-t-2 border-b-2 border-gray-800 p-4 mb-4 justify-between flex items-center text-sm"
 		>
-			<h4 class="flex-1 mr-4">Page 1</h4>
-			<a href="/" title="Return Home" class="no-underline">
+			<h4 id="page-number" class="flex-1 mr-4">Page 1</h4>
+			<a
+				title="Return Home"
+				class="no-underline cursor-pointer"
+				onclick="
+					navigate('/')
+					return false
+				"
+			>
 				<h1 class="title_font">FT-TRANSCENDENCE</h1>
 			</a>
 			<h4 id="date" class="flex flex-1 justify-end ml-4"></h4>
 		</header>
-		<div id="content" class="flex-1 font-[Newsreader] overflow-hidden"></div>
+		<div id="content" class="flex-1 font-newsreader overflow-hidden"></div>
 		<script src="/src/index.ts" type="module"></script>
 	</body>
 </html>

@@ -6,7 +6,8 @@ import {
 } from '../repositories/userRepository.js'
 import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
-import { env } from '../index.js'
+import { env } from '../env/checkEnv.js'
+import { successfulLoginCounter } from '@ft_transcendence/monitoring'
 
 export async function registerUserUsecase(
 	login: string,
@@ -39,6 +40,10 @@ export async function registerUserUsecase(
 	if (response.status === 401) {
 		deleteUserById(publicUser.user_id)
 		throw createHttpError.BadGateway('Failed to sync user with users service')
+	}
+	if (response.status === 422) {
+		deleteUserById(publicUser.user_id)
+		throw createHttpError.UnprocessableEntity()
 	} else if (!response.ok) {
 		deleteUserById(publicUser.user_id)
 		throw createHttpError.ServiceUnavailable('Users service unavailable')
@@ -53,6 +58,7 @@ export async function registerUserUsecase(
 		},
 		'1h'
 	)
+	successfulLoginCounter.inc()
 
 	return { publicUser, token }
 }
