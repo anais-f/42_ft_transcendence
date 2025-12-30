@@ -1,4 +1,11 @@
-import { Segment, Vector2 } from '@pong-shared/index.js'
+import {
+	GAME_SPACE_HEIGHT,
+	GAME_SPACE_WIDTH,
+	Segment,
+	Vector2,
+	TICKS_PER_STEP,
+	DEFAULT_TPS
+} from '@pong-shared/index.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import {
 	SEGMENT_LINE_WIDTH_SCALE,
@@ -7,15 +14,14 @@ import {
 	BALL_RADIUS_SCALE,
 	COUNTDOWN_FONT,
 	COUNTDOWN_COLOR,
-	GAME_SPACE_WIDTH,
-	GAME_SPACE_HEIGHT,
 	COUNTDOWN_FONT_SCALE,
 	OVERLAY_FONT,
 	OVERLAY_FONT_SCALE,
 	OVERLAY_WIN_COLOR,
-	OVERLAY_LOSE_COLOR,
-	OVERLAY_BACKGROUND
+	OVERLAY_LOSE_COLOR
 } from '../constants.js'
+
+const OVERLAY_ANIMATION_MS = (TICKS_PER_STEP / DEFAULT_TPS) * 1000
 
 class Renderer {
 	private staticSegments: Segment[] = []
@@ -29,6 +35,7 @@ class Renderer {
 	private animationId: number | null = null
 	private countdown: number | null = null
 	private gameResult: 'win' | 'lose' | null = null
+	private gameResultTime: number = 0
 
 	setCanvas(canvas: HTMLCanvasElement): void {
 		this.canvas = canvas
@@ -64,6 +71,7 @@ class Renderer {
 	setGameResult(result: 'win' | 'lose' | null): void {
 		this.setBallState(new Vector2(), new Vector2(), 0)
 		this.gameResult = result
+		this.gameResultTime = performance.now()
 	}
 
 	private startAnimation(): void {
@@ -163,13 +171,19 @@ class Renderer {
 		}
 
 		if (this.gameResult !== null) {
-			ctx.fillStyle = OVERLAY_BACKGROUND
+			const elapsed = performance.now() - this.gameResultTime
+			const t = Math.min(elapsed / OVERLAY_ANIMATION_MS, 1)
+			const easeOut = 1 - Math.pow(1 - t, 3)
+
+			// fade in background
+			ctx.fillStyle = `rgba(0, 0, 0, ${0.4 * easeOut})`
 			ctx.fillRect(0, 0, width, height)
 
+			// scale in text
 			const text = this.gameResult === 'win' ? 'VICTORY' : 'DEFEAT'
 			const color =
 				this.gameResult === 'win' ? OVERLAY_WIN_COLOR : OVERLAY_LOSE_COLOR
-			const fontSize = height * OVERLAY_FONT_SCALE
+			const fontSize = height * OVERLAY_FONT_SCALE * easeOut
 
 			ctx.font = `bold ${fontSize}px ${OVERLAY_FONT}`
 			ctx.textAlign = 'center'
@@ -191,6 +205,7 @@ class Renderer {
 		this.ctx = null
 		this.countdown = null
 		this.gameResult = null
+		this.gameResultTime = 0
 	}
 }
 

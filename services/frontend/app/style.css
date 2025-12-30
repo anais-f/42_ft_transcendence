@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--paper-texture: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+
 @layer base {
 	@font-face {
 		font-family: 'HoldMoney';
@@ -86,7 +90,7 @@
 
 body {
 	background-color: #fffefc;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	background-image: var(--paper-texture);
 }
 
 /* Notyf custom styles - Force texture and borders */
@@ -94,7 +98,7 @@ body {
 .notyf__toast.notyf_success {
 	@apply text-black px-4 py-2 font-medium font-special;
 	background-color: #d4edda;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	background-image: var(--paper-texture);
 	border: 2px solid #2d5016;
 	box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -103,7 +107,7 @@ body {
 .notyf__toast.notyf_error {
 	@apply text-black px-4 py-2 font-medium font-special;
 	background-color: #f4d6d6;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	background-image: var(--paper-texture);
 	border: 2px solid #8b1e1e;
 	box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -111,7 +115,7 @@ body {
 .notyf__toast.notyf_info {
 	@apply text-black px-4 py-2 font-medium font-special;
 	background-color: #f3f7fd;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	background-image: var(--paper-texture);
 	border: 2px solid #8b1e1e;
 	box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -119,7 +123,7 @@ body {
 .notyf__toast.notyf_friend {
 	@apply text-black px-4 py-2 font-medium font-special;
 	background-color: #ecdabb;
-	background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+	background-image: var(--paper-texture);
 	border: 2px solid #000;
 	box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
 }

@@ -1,6 +1,5 @@
 import { FastifyRequest } from 'fastify'
 import {
-	CodeParamSchema,
 	CreateTournamentSchema,
 	TournamentDTO,
 	CreateTournamentResponseDTO
@@ -14,6 +13,7 @@ import {
 import { createInviteCode } from '../../../utils/createCode.js'
 import createHttpError from 'http-errors'
 import { getNextTournamentId } from '../../../repositories/matchsRepository.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function initializeTournamentId(): void {
 	nextTournamentId = getNextTournamentId()
@@ -51,5 +51,8 @@ export function createTournament(
 		matchs: []
 	}
 	tournaments.set(invitCode, tournament)
+
+	updateGameMetrics()
+
 	return { code: invitCode, tournament }
 }

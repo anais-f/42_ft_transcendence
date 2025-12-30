@@ -1,10 +1,10 @@
 import { gameStore } from '../../usecases/gameStore.js'
-import { createGameApi } from '../../api/game/createGame.js'
+import { createGameApi, MapOptions } from '../../api/game/createGame.js'
 import { joinGameApi } from '../../api/game/joinGame.js'
 import { sendGameError } from './errorMapUtils.js'
 
-export async function handleCreateGame() {
-	const { data, error, status } = await createGameApi()
+export async function handleCreateGame(mapOptions?: MapOptions) {
+	const { data, error, status } = await createGameApi(mapOptions)
 
 	if (error) {
 		sendGameError(error, status)

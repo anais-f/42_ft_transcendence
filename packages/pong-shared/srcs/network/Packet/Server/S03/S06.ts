@@ -1,51 +1,54 @@
 import { Vector2 } from '@packages/pong-shared/srcs/math/Vector2.js'
+import { NETWORK_PRECISION } from '../../../../config.js'
 import { IS00PongBase } from '../S00.js'
 import { SPacketsType } from '../../packetTypes.js'
 import { AS03BaseBall } from './S03.js'
-import { S05BallPos } from './S05.js'
-import { S04BallVeloChange } from './S04.js'
 
 export class S06BallSync extends AS03BaseBall implements IS00PongBase {
-	private _S05: S05BallPos
-	private _S04: S04BallVeloChange
+	private _pos: Vector2
+	private _velo: Vector2
+	private _factor: number
 
 	constructor(pos: Vector2, factor: number, velo: Vector2) {
-		const S03 = AS03BaseBall.createS03()
-
 		super()
-		this._S04 = new S04BallVeloChange(S03, velo, factor)
-		this._S05 = new S05BallPos(S03, pos)
+		this._pos = pos
+		this._velo = velo
+		this._factor = factor
 	}
 
 	get pos(): Vector2 {
-		return this._S05.pos
+		return this._pos
 	}
 
 	get velo(): Vector2 {
-		return this._S04.velo
+		return this._velo
 	}
 
 	get factor(): number {
-		return this._S04.factor
+		return this._factor
 	}
 
+	/*
+	 * trame
+	 *
+	 * type 1o (uint8)
+	 * velo.x 2o (int16 * NETWORK_PRECISION)
+	 * velo.y 2o (int16 * NETWORK_PRECISION)
+	 * factor 2o (int16 * NETWORK_PRECISION)
+	 * pos.x 2o (int16 * NETWORK_PRECISION)
+	 * pos.y 2o (int16 * NETWORK_PRECISION)
+	 * total: 11o
+	 */
 	serialize(): ArrayBuffer {
-		const fake = this.fserialize()
-		const buff = new ArrayBuffer(41)
-
-		const fakeUint8 = new Uint8Array(fake)
-		const buffUint8 = new Uint8Array(buff)
-
-		buffUint8.set(fakeUint8)
-
-		buffUint8[0] |= SPacketsType.S06
-
+		const buff = new ArrayBuffer(11)
 		const view = new DataView(buff)
-		view.setFloat64(1, this.velo.x, true)
-		view.setFloat64(9, this.velo.y, true)
-		view.setFloat64(17, this.factor, true)
-		view.setFloat64(25, this.pos.x, true)
-		view.setFloat64(33, this.pos.y, true)
+
+		view.setUint8(0, SPacketsType.S06)
+		view.setInt16(1, Math.round(this._velo.x * NETWORK_PRECISION), true)
+		view.setInt16(3, Math.round(this._velo.y * NETWORK_PRECISION), true)
+		view.setInt16(5, Math.round(this._factor * NETWORK_PRECISION), true)
+		view.setInt16(7, Math.round(this._pos.x * NETWORK_PRECISION), true)
+		view.setInt16(9, Math.round(this._pos.y * NETWORK_PRECISION), true)
 
 		return buff
 	}

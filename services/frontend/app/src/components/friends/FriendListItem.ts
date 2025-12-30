@@ -37,7 +37,7 @@ export const FriendListItem = (props: FriendListItemProps): string => {
           <!-- User's link -->
           ${UserLink({ id, username })}
           <p class="text-gray-500 flex items-center gap-2">
-            ${StatusCircle({ isOnline })}
+            ${StatusCircle({ isOnline, id: `status_circle_${id}` })}
             <span id="status_text_${id}">${statusText}</span>
           </p>
         </div>

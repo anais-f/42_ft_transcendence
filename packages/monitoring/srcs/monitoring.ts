@@ -1,11 +1,4 @@
-import {
-	Counter,
-	Gauge,
-	Histogram,
-	collectDefaultMetrics,
-	register,
-	Registry
-} from 'prom-client'
+import { Counter, Gauge, Histogram, collectDefaultMetrics } from 'prom-client'
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify'
 
 export function setupFastifyMonitoringHooks(app: FastifyInstance) {
@@ -22,7 +15,7 @@ export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 	app.addHook('onResponse', (request: FastifyRequest, reply: FastifyReply) => {
 		httpRequestCounter.inc({
 			method: request.method,
-			route: request.url,
+			route: request.routeOptions?.url || request.url,
 			status_code: reply.statusCode
 		})
 		const startTime = request.startTime
@@ -32,7 +25,7 @@ export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 			responseTimeHistogram.observe(
 				{
 					method: request.method,
-					route: request.url,
+					route: request.routeOptions?.url || request.url,
 					status_code: reply.statusCode
 				},
 				responseTimeInSeconds
@@ -41,23 +34,61 @@ export function setupFastifyMonitoringHooks(app: FastifyInstance) {
 	})
 }
 
-const httpRequestCounter = new Counter({
+export const httpRequestCounter = new Counter({
 	name: 'http_requests_total',
 	help: 'Total number of HTTP requests',
 	labelNames: ['method', 'route', 'status_code'] as const
 })
 
-const activeUsersGauge = new Gauge({
+export const activeUsersGauge = new Gauge({
 	name: 'active_users',
 	help: 'Number of active users currently online'
 })
 
-const dbQueryDurationGauge = new Gauge({
+export const connectedUsersGauge = new Gauge({
+	name: 'websocket_connected_users',
+	help: 'Number of users currently connected via WebSocket'
+})
+
+export const activeGamesGauge = new Gauge({
+	name: 'active_games',
+	help: 'Number of active games',
+	labelNames: ['status'] as const
+})
+
+export const activeTournamentsGauge = new Gauge({
+	name: 'active_tournaments',
+	help: 'Number of tournaments',
+	labelNames: ['status'] as const
+})
+
+export const playersInTournamentsGauge = new Gauge({
+	name: 'players_in_tournaments',
+	help: 'Number of players currently in tournaments'
+})
+
+export const totalRegisteredUsersGauge = new Gauge({
+	name: 'total_registered_users',
+	help: 'Total number of registered users in the database'
+})
+
+export const successfulLoginCounter = new Counter({
+	name: 'successful_login_attempts_total',
+	help: 'Total number of successful login attempts'
+})
+
+export const failedLoginAttemptsCounter = new Counter({
+	name: 'failed_login_attempts_total',
+	help: 'Total number of failed login attempts',
+	labelNames: ['username']
+})
+
+export const dbQueryDurationGauge = new Gauge({
 	name: 'db_query_duration_seconds',
 	help: 'Duration of database queries in seconds'
 })
 
-const responseTimeHistogram = new Histogram({
+export const responseTimeHistogram = new Histogram({
 	name: 'http_response_time_seconds',
 	help: 'Histogram of HTTP response times in seconds',
 	labelNames: ['method', 'route', 'status_code'] as const,

@@ -1,12 +1,15 @@
 import { Tournament } from '@ft_transcendence/common'
 import { requestGame } from '../gameManager/requestGame.js'
 import { createTournamentTree } from './createTournamentTree.js'
+import { updateGameMetrics } from '../metricsService.js'
 
 export function startTournament(tournament: Tournament) {
 	tournament.status = 'ongoing'
 	createTournamentTree(tournament)
 	// Only start the first round (highest round number)
 	startFirstRound(tournament)
+
+	updateGameMetrics()
 }
 
 function startFirstRound(tournament: Tournament) {

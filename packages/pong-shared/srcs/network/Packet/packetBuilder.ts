@@ -1,6 +1,7 @@
 import { padDirection } from '../../engine/PongPad.js'
 import { Segment } from '../../math/Segment.js'
 import { Vector2 } from '../../math/Vector2.js'
+import { NETWORK_PRECISION } from '../../config.js'
 import { C01Move as C01, C02RequestScore as C02 } from './Client/CPackets.js'
 import { CPacketsType, SPacketsType } from './packetTypes.js'
 import { S02SegmentUpdate } from './Server/S02.js'
@@ -65,16 +66,16 @@ export class packetBuilder {
 					const nbseg = view.getUint8(1)
 					const tab: Segment[] = []
 					for (let i = 0; i < nbseg; ++i) {
-						const offset = 2 + i * 32
+						const offset = 2 + i * 8
 						tab.push(
 							new Segment(
 								new Vector2(
-									view.getFloat64(offset, true),
-									view.getFloat64(offset + 8, true)
+									view.getInt16(offset, true) / NETWORK_PRECISION,
+									view.getInt16(offset + 2, true) / NETWORK_PRECISION
 								),
 								new Vector2(
-									view.getFloat64(offset + 16, true),
-									view.getFloat64(offset + 24, true)
+									view.getInt16(offset + 4, true) / NETWORK_PRECISION,
+									view.getInt16(offset + 6, true) / NETWORK_PRECISION
 								)
 							)
 						)
@@ -87,14 +88,20 @@ export class packetBuilder {
 					factor = view.getFloat64(17, true)
 					return new S04(new S03(), velo, factor)
 				case SPacketsType.S05:
-					pos = new Vector2(view.getFloat64(1, true), view.getFloat64(9, true))
+					pos = new Vector2(
+						view.getInt16(1, true) / NETWORK_PRECISION,
+						view.getInt16(3, true) / NETWORK_PRECISION
+					)
 					return new S05(new S03(), pos)
 				case SPacketsType.S06:
-					velo = new Vector2(view.getFloat64(1, true), view.getFloat64(9, true))
-					factor = view.getFloat64(17, true)
+					velo = new Vector2(
+						view.getInt16(1, true) / NETWORK_PRECISION,
+						view.getInt16(3, true) / NETWORK_PRECISION
+					)
+					factor = view.getInt16(5, true) / NETWORK_PRECISION
 					pos = new Vector2(
-						view.getFloat64(25, true),
-						view.getFloat64(33, true)
+						view.getInt16(7, true) / NETWORK_PRECISION,
+						view.getInt16(9, true) / NETWORK_PRECISION
 					)
 					return new S06(pos, factor, velo)
 				case SPacketsType.S07:
@@ -109,16 +116,16 @@ export class packetBuilder {
 					const nbsegDyn = view.getUint8(1)
 					const tabDyn: Segment[] = []
 					for (let i = 0; i < nbsegDyn; ++i) {
-						const offset = 2 + i * 32
+						const offset = 2 + i * 8
 						tabDyn.push(
 							new Segment(
 								new Vector2(
-									view.getFloat64(offset, true),
-									view.getFloat64(offset + 8, true)
+									view.getInt16(offset, true) / NETWORK_PRECISION,
+									view.getInt16(offset + 2, true) / NETWORK_PRECISION
 								),
 								new Vector2(
-									view.getFloat64(offset + 16, true),
-									view.getFloat64(offset + 24, true)
+									view.getInt16(offset + 4, true) / NETWORK_PRECISION,
+									view.getInt16(offset + 6, true) / NETWORK_PRECISION
 								)
 							)
 						)
