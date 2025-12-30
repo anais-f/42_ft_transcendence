@@ -1,6 +1,8 @@
 // TODO : components for buttons and inputs
 // TODO : component lorem ipsum
-// TODO : refactor HTML and CSS
+
+import { PlayerCard } from '../components/PlayerCard.js'
+import { TournamentCell } from '../components/TournamentCell.js'
 
 export const TournamentPage = (): string => {
 	return /*html*/ `
@@ -23,68 +25,38 @@ export const TournamentPage = (): string => {
       </div>
       <div class="flex flex-col gap-10">
         <div class="grid grid-cols-4 gap-10">
-          <div class="flex flex-col items-center justify-center">
-            <p class="truncate w-full text-center">Player 1</p>
-            <img src="/avatars/img_default.png" alt="Player 1" class="w-32 h-32 object-cover">
-          </div>
-          <div class="flex flex-col items-center justify-center">
-            <p class="truncate w-full text-center">Player 2</p>
-            <img src="/avatars/img_default.png" alt="Player 2" class="w-32 h-32 object-cover">
-          </div>
-          <div class="flex flex-col items-center justify-center">
-            <p class="truncate w-full text-center">Player 3</p>
-            <img src="/avatars/img_default.png" alt="Player 3" class="w-32 h-32 object-cover">
-          </div>
-          <div class="flex flex-col items-center justify-center">
-            <p class="truncate w-full text-center">Player 4</p>
-            <img src="/avatars/img_default.png" alt="Player 4" class="w-32 h-32 object-cover">
-          </div>
+          ${PlayerCard({ name: 'Player 1', id: 'player_card_1' })}
+          ${PlayerCard({ name: 'Player 2', id: 'player_card_2' })}
+          ${PlayerCard({ name: 'Player 3', id: 'player_card_3' })}
+          ${PlayerCard({ name: 'Player 4', id: 'player_card_4' })}
         </div>
-        <div class="flex-1"> 
-          <div class="grid grid-cols-3 grid-rows-9">
-            <div class="border-b-2 tournament-cell">
-              <span class="truncate">PLAYER 1</span>
-              <span>10</span>
-            </div>
+        <div class="flex-1">
+          <div class="w-full grid grid-cols-3 grid-rows-9">
+            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER 1', score: 5, additionalClasses: 'border-b-2' })}
             <div></div>
             <div></div>
-            <div class="border-r-2 tournament-cell"></div>
-            <div class="border-b-2 tournament-cell">
-              <span class="truncate">PLAYER 1</span>
-              <span>10</span>
-            </div>
+            <div class="border-r-2 border-black"></div>
+            ${TournamentCell({ id: 'semi1-winner', name: 'PLAYER 1', score: 5, additionalClasses: 'border-b-2' })}
             <div></div>
-            <div class="border-r-2 border-b-2 tournament-cell">
-              <span class="truncate">PLAYER 3</span>
-              <span>2</span>
-            </div>
-            <div class="border-r-2 tournament-cell"></div> 
+            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER 3', score: 2, additionalClasses: 'border-b-2 border-r-2' })}
+            <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
-            <div class="border-r-2 tournament-cell"></div>
+            <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
-            <div class="border-r-2 tournament-cell"></div>
-            <div class="border-b-2 tournament-cell truncate">PLAYER 1</div>
+            <div class="border-r-2 border-black"></div>
+            ${TournamentCell({ id: 'final-winner', name: 'PLAYER 1', additionalClasses: 'border-b-2' })}
             <div></div>
-            <div class="border-r-2 tournament-cell"></div>
+            <div class="border-r-2 border-black"></div>
             <div></div>
-            <div class="border-b-2 tournament-cell">
-              <span class="truncate">PLAYER 2</span>
-              <span>7</span>
-            </div>
-            <div class="border-r-2 tournament-cell"></div>
+            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER 2', score: 5, additionalClasses: 'border-b-2' })}
+            <div class="border-r-2 border-black"></div>
             <div></div>
-            <div class="border-r-2 tournament-cell"></div>
-            <div class="border-b-2 border-r-2 tournament-cell">
-              <span class="truncate">PLAYER 4</span>
-              <span>6</span>
-            </div>
+            <div class="border-r-2 border-black"></div>
+            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER 4', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
             <div></div>
-            <div class="border-b-2 border-r-2 tournament-cell">
-              <span class="truncate">PLAYER 4</span>
-              <span>10</span>
-            </div>
+            ${TournamentCell({ id: 'semi2-winner', name: 'PLAYER 4', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
           </div>
         </div>  
       </div>
