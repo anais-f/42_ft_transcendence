@@ -54,7 +54,11 @@ export async function authRoutes(app: FastifyInstance) {
 		},
 		googleLoginController
 	)
-	app.get('/api/admin/validate', validateAdminController)
+	app.get(
+		'/api/admin/validate',
+		{ preHandler: jwtAuthMiddleware },
+		validateAdminController
+	)
 	app.post('/api/logout', { preHandler: jwtAuthMiddleware }, logoutController)
 	app.get(
 		'/api/config',

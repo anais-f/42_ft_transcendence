@@ -19,7 +19,7 @@ import { apiKeyMiddleware } from '@ft_transcendence/security'
 
 export async function registerRoutes(app: FastifyInstance) {
 	app.post(
-		'/api/2fa/setup',
+		'/api/internal/2fa/setup',
 		{
 			schema: {
 				body: setup2FASchema,
@@ -32,7 +32,7 @@ export async function registerRoutes(app: FastifyInstance) {
 		setup2FAController
 	)
 	app.post(
-		'/api/2fa/verify',
+		'/api/internal/2fa/verify',
 		{
 			schema: {
 				body: verify2FASchema,
@@ -45,7 +45,7 @@ export async function registerRoutes(app: FastifyInstance) {
 		verify2FAController
 	)
 	app.post(
-		'/api/2fa/disable',
+		'/api/internal/2fa/disable',
 		{
 			schema: {
 				body: disable2FASchema,
@@ -58,7 +58,7 @@ export async function registerRoutes(app: FastifyInstance) {
 		disable2FAController
 	)
 	app.post(
-		'/api/2fa/status',
+		'/api/internal/2fa/status',
 		{
 			schema: {
 				body: status2FASchema,
