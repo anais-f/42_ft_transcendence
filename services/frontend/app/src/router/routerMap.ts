@@ -24,9 +24,7 @@ import {
 	attachProfileEvents,
 	detachProfileEvents
 } from '../pages/ProfilePage.js'
-import {
-	TournamentPage,
-} from '../pages/TournamentPage.js'
+import { TournamentPage } from '../pages/TournamentPage.js'
 
 import {
 	LobbyPage,
@@ -34,7 +32,14 @@ import {
 	detachLobbyEvents
 } from '../pages/LobbyPage.js'
 
-export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings' | 'tournament'
+export type Pages =
+	| 'home'
+	| 'game'
+	| 'lobby'
+	| 'login'
+	| 'profile'
+	| 'settings'
+	| 'tournament'
 
 export type Route = {
 	id: string

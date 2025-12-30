@@ -1,5 +1,4 @@
 export type Tournament = {
-	id: number
 	status: 'pending' | 'ongoing' | 'completed'
 	maxParticipants: number
 	participants: number[]

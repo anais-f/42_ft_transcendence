@@ -25,7 +25,6 @@ export const MatchTournamentSchema = z.object({
 })
 
 export const TournamentSchema = z.object({
-	id: z.number(),
 	status: TournamentStatusSchema,
 	maxParticipants: z.number(),
 	participants: z.array(z.number()),

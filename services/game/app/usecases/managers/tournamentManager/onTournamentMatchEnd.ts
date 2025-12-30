@@ -1,7 +1,6 @@
 import { ITournamentMatchResult } from '../gameData.js'
 import createHttpError from 'http-errors'
 import { tournaments, usersInTournaments } from '../gameData.js'
-import { getTournamentCodeById } from '../tournamentManager/tournamentUsecases.js'
 import { requestGame } from '../gameManager/requestGame.js'
 import { updateGameMetrics } from '../metricsService.js'
 
@@ -9,10 +8,7 @@ export function onTournamentMatchEnd(
 	tournamentData: ITournamentMatchResult
 ): void {
 	const tournamentMatchData = tournamentData.tournamentMatchData
-	const tournamentCode = getTournamentCodeById(tournamentMatchData.tournamentId)
-	if (!tournamentCode) {
-		throw createHttpError.NotFound('Tournament code not found')
-	}
+	const tournamentCode = tournamentMatchData.tournamentCode
 	const tournament = tournaments.get(tournamentCode)
 	if (!tournament) {
 		throw createHttpError.NotFound('Tournament not found')
@@ -37,7 +33,7 @@ export function onTournamentMatchEnd(
 	if (tournamentMatchData.round === 1) {
 		tournament.status = 'completed'
 		console.log(
-			`Tournament ${tournamentMatchData.tournamentId} completed!  Winner: ${tournamentData.winnerId}`
+			`Tournament ${tournamentCode} completed!  Winner: ${tournamentData.winnerId}`
 		)
 
 		// Clean up participants from tracking
@@ -87,7 +83,7 @@ export function onTournamentMatchEnd(
 			`Starting next round match:  ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
 		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id, {
-			tournamentId: tournament.id,
+			tournamentCode: tournamentCode,
 			round: nextRoundMatch.round,
 			matchNumber: nextRoundMatch.matchNumber
 		})

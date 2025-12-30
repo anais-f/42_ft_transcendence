@@ -37,7 +37,7 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 	}
 	tournament.participants.push(userId)
 	if (tournament.participants.length === tournament.maxParticipants) {
-		startTournament(tournament)
+		startTournament(tournamentCode.code, tournament)
 	}
 	return tournament
 }

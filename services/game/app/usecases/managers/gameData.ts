@@ -7,7 +7,7 @@ export type GameStatus = 'waiting' | 'active' | 'ended'
 export type TPlayerSlot = 'p1' | 'p2'
 
 export interface ITournamentMatchData {
-	tournamentId: number
+	tournamentCode: string
 	round: number
 	matchNumber: number
 }

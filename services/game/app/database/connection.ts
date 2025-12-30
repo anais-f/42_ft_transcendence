@@ -31,7 +31,7 @@ export function runMigrations() {
 			played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			round INTEGER DEFAULT -1,
 			match_number INTEGER DEFAULT -1,
-			id_tournament INTEGER DEFAULT -1
+			tournament_code TEXT DEFAULT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS match_player (
