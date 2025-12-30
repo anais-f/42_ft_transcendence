@@ -3,9 +3,10 @@ services:
     restart: on-failure
     build: services/nginx/
     container_name: nginx
+    env_file:
+      - .env
     ports:
-      - '443:443'
-      - '80:80'
+      - "${PORT:-8080}:${PORT:-8080}"
     networks:
       - backend
     volumes:
