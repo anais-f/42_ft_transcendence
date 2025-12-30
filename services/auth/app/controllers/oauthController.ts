@@ -15,7 +15,7 @@ export async function googleLoginController(
 		reply.setCookie('twofa_token', pre2faToken, {
 			httpOnly: true,
 			sameSite: 'strict',
-			secure: true,
+			secure: env.NODE_ENV === 'production',
 			path: '/',
 			maxAge: 60 * 5
 		})
@@ -24,7 +24,7 @@ export async function googleLoginController(
 		reply.setCookie('auth_token', token, {
 			httpOnly: true,
 			sameSite: 'strict',
-			secure: true,
+			secure: env.NODE_ENV === 'production',
 			path: '/',
 			maxAge: 60 * 60
 		})

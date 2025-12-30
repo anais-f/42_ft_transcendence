@@ -3,17 +3,12 @@ services:
     restart: on-failure
     build: services/nginx/
     container_name: nginx
-    env_file:
-      - .env
     ports:
-      - '${PORT:-8080}:${PORT:-8080}'
+      - '8080:8080'
     networks:
       - backend
     volumes:
       - avatars_data:/usr/share/nginx/html/avatars:ro
-    secrets:
-      - ssl_cert
-      - rsa_private_key
     depends_on:
       frontend:
         condition: service_healthy
@@ -30,7 +25,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - wget -qS --spider http://127.0.0.1:${PORT:-8080} --no-check-certificate 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+        - wget -qS --spider http://127.0.0.1:8080 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
       interval: 30s
       timeout: 3s
       retries: 5
@@ -193,9 +188,3 @@ volumes:
   db_2fa_data:
   db_game_data:
   avatars_data:
-
-secrets:
-  ssl_cert:
-    file: ./.secret/cert.pem
-  rsa_private_key:
-    file: ./.secret/key.pem

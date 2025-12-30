@@ -43,10 +43,10 @@ async function start(): Promise<void> {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
-			port: 3000,
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		console.log(`listening on port: 3000`)
+		console.log(`listening on port: ${env.PORT}`)
 	} catch (err) {
 		console.error('Error starting server:', err)
 		process.exit(1)

@@ -32,10 +32,10 @@ export async function start(): Promise<void> {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
-			port: 3000,
+			port: env.PORT,
 			host: '0.0.0.0'
 		})
-		console.log('Listening on port ', 3000)
+		console.log('Listening on port ', env.PORT)
 		console.log(`Swagger UI available at ${env.HOST}/social/docs`)
 
 		startHeartbeat()
