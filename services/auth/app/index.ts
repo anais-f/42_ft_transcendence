@@ -51,7 +51,9 @@ async function runServer() {
 				title: 'API for Auth Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${env.HOST}/auth`, description: 'Local server' }],
+			servers: [
+				{ url: `http://localhost:3000/auth`, description: 'Local server' }
+			],
 			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform

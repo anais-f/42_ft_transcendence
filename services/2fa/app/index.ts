@@ -45,7 +45,9 @@ app.register(Swagger as any, {
 			title: 'API for 2FA Service',
 			version: '1.0.0'
 		},
-		servers: [{ url: `${env.HOST}/2fa`, description: 'Local server' }],
+		servers: [
+			{ url: `http://localhost:3000/2fa`, description: 'Local server' }
+		],
 		components: env.openAPISchema.components
 	},
 	transform: jsonSchemaTransform

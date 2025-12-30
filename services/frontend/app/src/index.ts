@@ -21,17 +21,3 @@ window.addEventListener('DOMContentLoaded', () => {
 	// Start the router to handle navigation and rendering
 	appRouter.start()
 })
-
-/* TODO FRONTEND IMPROVEMENTS LIST
- *
- *
- * - review QRcode and sanitization data before innerHTML
- * - sanitize HTML before rendering user-controlled data
- * - review all alert() usage and replace with better UX (toasts/modals) -> see Notyf
- * - review error handling and add more specific messages
- * - review form validation and improve user feedback
- * - remove inline event handlers to comply with CSP -> see to replace onclick with addEventListener ?
- * - centralize event attachment/detachment to reduce duplication
- * - centralize error handling logic
- * - validation data in front before sending to backend
- */
