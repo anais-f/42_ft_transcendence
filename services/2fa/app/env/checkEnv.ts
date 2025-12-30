@@ -14,7 +14,7 @@ const envSchema = z
 			.transform((key) => Buffer.from(key, 'base64'))
 			.refine((buffer) => buffer.length === 32, {
 				message: 'TOTP_ENC_KEY must decode to 32 bytes (AES-256)'
-			}),
+			})
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
