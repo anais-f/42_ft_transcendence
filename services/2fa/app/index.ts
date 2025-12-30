@@ -46,7 +46,10 @@ app.register(Swagger as any, {
 			version: '1.0.0'
 		},
 		servers: [
-			{ url: `http://localhost:3000/2fa`, description: 'Local server' }
+			{
+				url: `http://localhost:8080/2fa`,
+				description: 'Local server'
+			}
 		],
 		components: env.openAPISchema.components
 	},

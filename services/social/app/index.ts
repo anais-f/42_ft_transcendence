@@ -18,7 +18,10 @@ export async function start(): Promise<void> {
 					version: '1.0.0'
 				},
 				servers: [
-					{ url: `http://localhost:3000/social`, description: 'Local server' }
+					{
+						url: `http://localhost:8080/social`,
+						description: 'Local server'
+					}
 				],
 				components: env.openAPISchema.components
 			},

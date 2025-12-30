@@ -21,7 +21,7 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: `http://localhost:3000/game`,
+						url: `http://localhost:8080/game`,
 						description: 'Local server'
 					}
 				],

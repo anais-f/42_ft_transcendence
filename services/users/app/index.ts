@@ -62,7 +62,7 @@ function createApp(): FastifyInstance {
 				version: '1.0.0'
 			},
 			servers: [
-				{ url: `http://localhost:3000/users`, description: 'Local server' }
+				{ url: `http://localhost:8080/users`, description: 'Local server' }
 			],
 
 			components: env.openAPISchema.components

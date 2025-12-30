@@ -52,7 +52,10 @@ async function runServer() {
 				version: '1.0.0'
 			},
 			servers: [
-				{ url: `http://localhost:3000/auth`, description: 'Local server' }
+				{
+					url: `http://localhost:8080/auth`,
+					description: 'Local server'
+				}
 			],
 			components: env.openAPISchema.components
 		},
