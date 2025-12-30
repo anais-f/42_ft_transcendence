@@ -18,7 +18,7 @@ async function verify2FACode(
 	twofaCode: string
 ): Promise<boolean> {
 	try {
-		const res = await fetch(`${env.TWOFA_SERVICE_URL}/api/2fa/verify`, {
+		const res = await fetch(`${env.TWOFA_SERVICE_URL}/api/internal/2fa/verify`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
