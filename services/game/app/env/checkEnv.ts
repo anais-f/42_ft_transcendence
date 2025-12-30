@@ -8,7 +8,8 @@ const envSchema = z
 		PORT: z.coerce.number().min(1).max(65535),
 		JWT_SECRET: z.string().min(1),
 		JWT_SECRET_GAME: z.string().min(1),
-		MATCHMAKING_DB_PATH: z.string().min(1)
+		MATCHMAKING_DB_PATH: z.string().min(1),
+		SWAGGER_HOST: z.string().min(1).default('http://localhost')
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
@@ -16,9 +17,10 @@ const envSchema = z
 		JWT_SECRET: env.JWT_SECRET,
 		JWT_SECRET_GAME: env.JWT_SECRET_GAME,
 		MATCHMAKING_DB_PATH: env.MATCHMAKING_DB_PATH,
-		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE)
+		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE),
+		SWAGGER_HOST: env.SWAGGER_HOST
 	}))
 
-export type IGameEnv = z.infer<typeof envSchema>
+export type IAuthEnv = z.infer<typeof envSchema>
 
 export const env = validateEnv(envSchema)

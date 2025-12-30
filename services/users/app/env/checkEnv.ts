@@ -9,7 +9,8 @@ const envSchema = z
 		JWT_SECRET: z.string().min(1),
 		AUTH_SERVICE_URL: z.string().min(1),
 		INTERNAL_API_SECRET: z.string().min(1),
-		USERS_DB_PATH: z.string().min(1)
+		USERS_DB_PATH: z.string().min(1),
+		SWAGGER_HOST: z.string().min(1).default('http://localhost')
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
@@ -18,9 +19,10 @@ const envSchema = z
 		INTERNAL_API_SECRET: env.INTERNAL_API_SECRET,
 		AUTH_SERVICE_URL: env.AUTH_SERVICE_URL,
 		USERS_DB_PATH: env.USERS_DB_PATH,
-		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE)
+		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE),
+		SWAGGER_HOST: env.SWAGGER_HOST
 	}))
 
-export type IUserEnv = z.infer<typeof envSchema>
+export type IAuthEnv = z.infer<typeof envSchema>
 
 export const env = validateEnv(envSchema)
