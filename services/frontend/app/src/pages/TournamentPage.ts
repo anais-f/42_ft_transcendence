@@ -2,7 +2,9 @@
 // TODO : component lorem ipsum
 
 import { PlayerCard } from '../components/PlayerCard.js'
-import { TournamentCell } from '../components/TournamentCell.js'
+import { TournamentCell } from '../components/game/TournamentCell.js'
+import { Button } from '../components/Button.js'
+import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 
 export const TournamentPage = (): string => {
 	return /*html*/ `
@@ -13,13 +15,16 @@ export const TournamentPage = (): string => {
         <div class="pt-10 pb-5 w-full">
           <h1 class="text-2xl text-center w-full flex flex-wrap justify-center items-center gap-2">
             <span class="select-none truncate">TOURNAMENT CODE:</span>
-            <span class="whitespace-nowrap">T-XXXXX</span>
+            <span id="tournament-code" class="whitespace-nowrap">T-XXXXX</span>
           </h1>
         </div>
         <div class="flex flex-col items-center w-full pb-5">
-          <button id="btn-copy" class="generic_btn mb-2 truncate">
-            Copy Lobby Code
-          </button>
+        ${Button({
+					id: 'btn-copy',
+					text: 'Copy Tournament Code',
+					type: 'button',
+					action: 'copy-tournament-code'
+				})}
         </div>
 
       </div>
@@ -63,4 +68,40 @@ export const TournamentPage = (): string => {
     </section>
   </section>
 `
+}
+
+let clickHandler: ((e: Event) => void) | null = null
+
+export function attachTournamentEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	clickHandler ??= (e: Event) => {
+		const target = e.target as HTMLElement
+		const actionButton = target.closest('[data-action]')
+
+		if (actionButton) {
+			const action = actionButton.getAttribute('data-action')
+
+			if (action === 'copy-tournament-code') {
+				handleCopyCode(
+					actionButton as HTMLElement,
+					'tournament-code',
+					'Copy Tournament Code'
+				)
+			}
+		}
+	}
+
+	content.addEventListener('click', clickHandler)
+}
+
+export function detachTournamentEvents() {
+	const content = document.getElementById('content')
+	if (!content) return
+
+	if (clickHandler) {
+		content.removeEventListener('click', clickHandler)
+		clickHandler = null
+	}
 }

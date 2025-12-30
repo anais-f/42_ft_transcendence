@@ -115,7 +115,11 @@ export function attachLobbyEvents() {
 			const action = actionButton.getAttribute('data-action')
 
 			if (action === 'copy-code') {
-				handleCopyCode(actionButton as HTMLElement)
+				handleCopyCode(
+					actionButton as HTMLElement,
+					'lobby-code',
+					'Copy Lobby Code'
+				)
 			}
 		}
 	}

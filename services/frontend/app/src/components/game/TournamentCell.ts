@@ -1,5 +1,5 @@
-import { escapeHtml } from '../usecases/sanitize.js'
-import { LivesComp, updateLives } from './game/Lives.js'
+import { escapeHtml } from '../../usecases/sanitize.js'
+import { LivesComp, updateLives } from '../game/Lives.js'
 
 interface TournamentCellProps {
 	id: string
