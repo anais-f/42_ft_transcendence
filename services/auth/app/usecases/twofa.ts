@@ -64,10 +64,13 @@ export async function verify2FASetup(
 	userId: number,
 	twofaCode: string
 ): Promise<void> {
-	const { ok, status, data } = await call2faService('/api/internal/2fa/verify', {
-		user_id: userId,
-		twofa_code: twofaCode
-	})
+	const { ok, status, data } = await call2faService(
+		'/api/internal/2fa/verify',
+		{
+			user_id: userId,
+			twofa_code: twofaCode
+		}
+	)
 
 	if (!ok) {
 		throw createHttpError(status, data.error || '2FA service error')
@@ -82,10 +85,13 @@ export async function verify2FALogin(
 	isAdmin: boolean | undefined,
 	twofaCode: string
 ): Promise<Verify2FALoginResponseDTO> {
-	const { ok, status, data } = await call2faService('/api/internal/2fa/verify', {
-		user_id: userId,
-		twofa_code: twofaCode
-	})
+	const { ok, status, data } = await call2faService(
+		'/api/internal/2fa/verify',
+		{
+			user_id: userId,
+			twofa_code: twofaCode
+		}
+	)
 
 	if (!ok) {
 		throw createHttpError(status, data.error || '2FA service error')
@@ -122,9 +128,12 @@ export async function disable2FA(
 		)
 	}
 
-	const { ok, status, data } = await call2faService('/api/internal/2fa/disable', {
-		user_id: userId
-	})
+	const { ok, status, data } = await call2faService(
+		'/api/internal/2fa/disable',
+		{
+			user_id: userId
+		}
+	)
 
 	if (!ok) {
 		throw createHttpError(status, data.error || '2FA service error')

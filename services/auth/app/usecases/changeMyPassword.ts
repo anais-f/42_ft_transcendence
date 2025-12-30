@@ -18,18 +18,21 @@ async function verify2FACode(
 	twofaCode: string
 ): Promise<boolean> {
 	try {
-		const res = await fetch(`${env.TWOFA_SERVICE_URL}/api/internal/2fa/verify`, {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-				authorization: env.INTERNAL_API_SECRET
-			},
-			body: JSON.stringify({
-				user_id: userId,
-				twofa_code: twofaCode
-			}),
-			signal: AbortSignal.timeout(5000)
-		})
+		const res = await fetch(
+			`${env.TWOFA_SERVICE_URL}/api/internal/2fa/verify`,
+			{
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json',
+					authorization: env.INTERNAL_API_SECRET
+				},
+				body: JSON.stringify({
+					user_id: userId,
+					twofa_code: twofaCode
+				}),
+				signal: AbortSignal.timeout(5000)
+			}
+		)
 
 		if (!res.ok) {
 			const data = await res.json().catch(() => ({}))
