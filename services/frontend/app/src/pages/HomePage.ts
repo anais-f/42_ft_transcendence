@@ -1,7 +1,7 @@
 import { Button } from '../components/Button.js'
 import { Input } from '../components/Input.js'
 import { LoremSection } from '../components/LoremIpsum.js'
-import { showModal, hideModal } from '../components/Modal.js'
+import { showModal, hideModal } from '../components/modals/Modal.js'
 import { handleToggleClick, getToggleValue } from '../components/ToggleGroup.js'
 import {
 	GameConfigModal,
@@ -10,7 +10,7 @@ import {
 import {
 	UsernameInfoModal,
 	USERNAME_INFO_MODAL_ID
-} from '../components/UsernameInfoModal.js'
+} from '../components/modals/UsernameInfoModal.js'
 import { currentUser } from '../usecases/userStore.js'
 import { logout } from '../usecases/userSession.js'
 import { handleCreateGame } from '../events/home/createGameHandler.js'
@@ -25,6 +25,7 @@ import {
 import { MapOptions } from '../api/game/createGame.js'
 import { ObstacleType, PaddleShape } from '@pong-shared'
 import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
+import { handleCreateTournament } from '../events/home/createTournamentHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -215,6 +216,7 @@ export async function attachHomeEvents(): Promise<void> {
 			if (action === 'logout') await logout()
 			if (action === 'navigate-settings') window.navigate('/settings')
 			if (action === 'create-game') showModal(GAME_CONFIG_MODAL_ID)
+			if (action === 'create-tournament') await handleCreateTournament()
 			if (action === 'close-modal') {
 				hideModal(GAME_CONFIG_MODAL_ID)
 				hideModal(USERNAME_INFO_MODAL_ID)

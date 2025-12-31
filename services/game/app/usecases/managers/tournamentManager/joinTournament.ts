@@ -29,6 +29,7 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 		throw createHttpError.Conflict('Tournament is full')
 
 	tournament.participants.push(userId)
+	usersInTournaments.add(userId)
 	if (tournament.participants.length === tournament.maxParticipants)
 		startTournament(tournamentCode.code, tournament)
 

@@ -1,5 +1,5 @@
 import { Button } from '../Button.js'
-import { UserLink } from '../UserLink.js'
+import { UserLink } from './UserLink.js'
 import { escapeHtml, sanitizeAvatarUrl } from '../../usecases/sanitize.js'
 
 /**

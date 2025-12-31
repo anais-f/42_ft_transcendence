@@ -39,6 +39,7 @@ export function createTournament(
 		matchs: []
 	}
 	tournaments.set(invitCode, tournament)
+	usersInTournaments.add(userId)
 
 	updateGameMetrics()
 

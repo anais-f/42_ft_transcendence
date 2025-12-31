@@ -1,4 +1,4 @@
-import { IApiResponse } from '../../types/api.js'
+import { IApiResponse } from '../types/api.js'
 
 export async function fetchCreateTournament(): Promise<IApiResponse> {
 	try {

@@ -29,7 +29,6 @@ import {
 	attachTournamentEvents,
 	detachTournamentEvents
 } from '../pages/TournamentPage.js'
-
 import {
 	LobbyPage,
 	attachLobbyEvents,
@@ -110,9 +109,10 @@ export const routerMap: Record<Pages, Route> = {
 		unbinds: [detachSettingsEvents],
 		index: 4
 	},
+
 	tournament: {
 		id: 'tournament',
-		url: '/tournament',
+		url: '/tournament/:code',
 		page: TournamentPage,
 		binds: [attachTournamentEvents],
 		unbinds: [detachTournamentEvents],

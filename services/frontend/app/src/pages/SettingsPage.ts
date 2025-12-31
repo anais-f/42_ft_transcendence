@@ -6,12 +6,12 @@ import {
 	handleUsername,
 	handleChangePassword,
 	handlerAvatar
-} from '../events/settingsPageHandlers.js'
+} from '../events/settings/settingsPageHandlers.js'
 import {
 	handleGenerateQRCode,
 	handleEnable2FA,
 	handleDisable2FA
-} from '../events/settings2FAPageHandlers.js'
+} from '../events/settings/settings2FAPageHandlers.js'
 
 export const SettingsPage = (): string => {
 	const is2FAEnabled = currentUser?.two_fa_enabled || false

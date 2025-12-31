@@ -2,15 +2,15 @@ import {
 	updateUsernameAPI,
 	updateAvatarAPI,
 	changePasswordAPI
-} from '../api/settingsApi.js'
-import { notyfGlobal as notyf } from '../utils/notyf.js'
+} from '../../api/settingsApi.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import {
 	validateUsername,
 	validatePassword,
 	validateAvatarFile,
 	syncCurrentUser
-} from '../usecases/userValidation.js'
-import { ToastActionType } from '../types/toast.js'
+} from '../../usecases/userValidation.js'
+import { ToastActionType } from '../../types/toast.js'
 
 /**
  * Handler for changing username

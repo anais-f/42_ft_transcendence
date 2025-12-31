@@ -1,4 +1,4 @@
-import { Modal } from '../../components/Modal.js'
+import { Modal } from '../../components/modals/Modal.js'
 import { ToggleGroup } from '../../components/ToggleGroup.js'
 import { Button } from '../../components/Button.js'
 import { PaddleShape, ObstacleType } from '@ft_transcendence/pong-shared'

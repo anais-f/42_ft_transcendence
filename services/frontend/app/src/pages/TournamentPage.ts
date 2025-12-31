@@ -1,12 +1,17 @@
 // TODO : components for buttons and inputs
 // TODO : component lorem ipsum
 
-import { PlayerCard } from '../components/PlayerCard.js'
+import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
+import { routeParams } from '../router/Router.js'
+import { gameStore } from '../usecases/gameStore.js'
+import { tournamentStore } from '../usecases/tournamentStore.js'
 
 export const TournamentPage = (): string => {
+	const code = tournamentStore.tournamentCode || 'T-XXXXX'
+
 	return /*html*/ `
   <section class="h-screen">
     <h1>Tournament Page</h1>
@@ -15,7 +20,7 @@ export const TournamentPage = (): string => {
         <div class="pt-10 pb-5 w-full">
           <h1 class="text-2xl text-center w-full flex flex-wrap justify-center items-center gap-2">
             <span class="select-none truncate">TOURNAMENT CODE:</span>
-            <span id="tournament-code" class="whitespace-nowrap">T-XXXXX</span>
+            <span id="tournament-code" class="whitespace-nowrap">${code}</span>
           </h1>
         </div>
         <div class="flex flex-col items-center w-full pb-5">

@@ -1,4 +1,4 @@
-import { escapeHtml } from '../usecases/sanitize.js'
+import { escapeHtml } from '../../usecases/sanitize.js'
 
 interface PlayerCardProps {
 	id?: string
