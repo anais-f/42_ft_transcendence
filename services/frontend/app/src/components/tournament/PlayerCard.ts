@@ -17,3 +17,17 @@ export const PlayerCard = (props: PlayerCardProps): string => {
     </div>
   `
 }
+
+export const updatePlayerCard = (
+	id: string,
+	name: string,
+	avatar: string
+): void => {
+	const card = document.getElementById(id)
+	if (card) {
+		card.innerHTML = `
+      <p class="truncate w-full text-center">${name}</p>
+    	<img src="${avatar}" alt="${name}" class="w-32 aspect-square object-cover">
+    `
+	}
+}

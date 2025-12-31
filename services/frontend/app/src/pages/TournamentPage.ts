@@ -1,13 +1,15 @@
-// TODO : components for buttons and inputs
-// TODO : component lorem ipsum
-
-import { PlayerCard } from '../components/tournament/PlayerCard.js'
+import {
+	PlayerCard,
+	updatePlayerCard
+} from '../components/tournament/PlayerCard.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 import { routeParams } from '../router/Router.js'
 import { gameStore } from '../usecases/gameStore.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
+import { currentUser } from '../usecases/userStore.js'
+import { updatePlayerCard } from '../components/tournament/PlayerCard.js'
 
 export const TournamentPage = (): string => {
 	const code = tournamentStore.tournamentCode || 'T-XXXXX'
@@ -35,10 +37,10 @@ export const TournamentPage = (): string => {
       </div>
       <div class="flex flex-col gap-10">
         <div class="grid grid-cols-4 gap-10">
-          ${PlayerCard({ name: 'Player 1', id: 'player_card_1' })}
-          ${PlayerCard({ name: 'Player 2', id: 'player_card_2' })}
-          ${PlayerCard({ name: 'Player 3', id: 'player_card_3' })}
-          ${PlayerCard({ name: 'Player 4', id: 'player_card_4' })}
+          ${PlayerCard({ name: 'Waiting...', id: 'player_card_0' })}
+          ${PlayerCard({ name: 'Waiting...', id: 'player_card_1' })}
+          ${PlayerCard({ name: 'Waiting...', id: 'player_card_2' })}
+          ${PlayerCard({ name: 'Waiting...', id: 'player_card_3' })}
         </div>
         <div class="flex-1">
           <div class="w-full grid grid-cols-3 grid-rows-9">
@@ -77,9 +79,18 @@ export const TournamentPage = (): string => {
 
 let clickHandler: ((e: Event) => void) | null = null
 
+function initTournamentData() {
+	const name = currentUser?.username ?? 'you'
+	const avatar = currentUser?.avatar ?? '/avatars/img_default.png'
+
+	updatePlayerCard('player_card_0', name, avatar)
+}
+
 export function attachTournamentEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
+
+	initTournamentData()
 
 	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
