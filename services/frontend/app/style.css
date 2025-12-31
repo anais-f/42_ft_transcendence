@@ -41,9 +41,6 @@
 	.cursor_pointer {
 		@apply cursor-pointer;
 	}
-	.tournament-cell {
-		@apply pr-2 pl-2 w-full flex justify-between items-center border-black;
-	}
 }
 
 @layer utilities {
