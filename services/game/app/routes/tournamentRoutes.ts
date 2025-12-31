@@ -16,7 +16,7 @@ import {
 
 export function tournamentRoutes(app: FastifyInstance) {
 	app.post(
-		'/api/createTournament',
+		'/api/game/createTournament',
 		{
 			schema: {
 				body: CreateTournamentSchema,
@@ -29,7 +29,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		createTournamentController
 	)
 	app.post(
-		'/api/joinTournament/:code',
+		'/api/game/joinTournament/:code',
 		{
 			schema: {
 				params: CodeParamSchema,
@@ -42,7 +42,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		joinTournamentController
 	)
 	app.get(
-		'/api/tournament/:code',
+		'/api/game/tournament/:code',
 		{
 			schema: {
 				params: CodeParamSchema,
@@ -55,7 +55,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		getTournamentController
 	)
 	app.delete(
-		'/api/quitTournament/:code',
+		'/api/game/quitTournament/:code',
 		{
 			schema: {
 				params: CodeParamSchema
