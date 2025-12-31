@@ -1,14 +1,19 @@
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { ToastActionType } from '../../types/toast.js'
 
-export function handleCopyCode(actionButton: HTMLElement) {
-	const codeSpan = document.getElementById('lobby-code')
+export function handleCopyCode(
+	actionButton: HTMLElement,
+	codeElementId: string,
+	defaultText: string
+) {
+	const codeSpan = document.getElementById(codeElementId)
 	if (codeSpan) {
 		if (!navigator?.clipboard?.writeText) {
 			notyf.open({
 				type: ToastActionType.ERROR_ACTION,
-				message: "Can't copy game code"
+				message: "Can't copy code"
 			})
+			return
 		}
 
 		navigator.clipboard.writeText(codeSpan.textContent || '')
@@ -18,7 +23,7 @@ export function handleCopyCode(actionButton: HTMLElement) {
 			message: 'Copied!'
 		})
 		setTimeout(() => {
-			actionButton.textContent = 'Copy Lobby Code'
+			actionButton.textContent = defaultText
 		}, 2000)
 	}
 }
