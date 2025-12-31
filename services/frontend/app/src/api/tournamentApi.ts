@@ -1,6 +1,6 @@
 import { IApiResponse } from '../types/api.js'
 
-export async function fetchCreateTournament(): Promise<IApiResponse> {
+export async function CreateTournamentAPI(): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/game/api/game/createTournament`, {
 			method: 'POST',
@@ -28,13 +28,10 @@ export async function fetchCreateTournament(): Promise<IApiResponse> {
 	}
 }
 
-export async function fetchJoinTournament(code: string): Promise<IApiResponse> {
+export async function JoinTournamentAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/game/api/game/joinTournament/${code}`, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
 			credentials: 'include'
 		})
 
@@ -55,7 +52,7 @@ export async function fetchJoinTournament(code: string): Promise<IApiResponse> {
 	}
 }
 
-export async function fetchGetTournament(code: string): Promise<IApiResponse> {
+export async function getTournamentAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/game/api/game/tournament/${code}`, {
 			method: 'GET',
@@ -82,7 +79,7 @@ export async function fetchGetTournament(code: string): Promise<IApiResponse> {
 	}
 }
 
-export async function fetchQuitTournament(code: string): Promise<IApiResponse> {
+export async function QuitTournamentAPI(code: string): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/game/api/game/quitTournament/${code}`, {
 			method: 'DELETE',

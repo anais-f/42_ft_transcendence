@@ -1,9 +1,20 @@
 import { PlayerData } from '../types/game.js'
+import { UserByIdAPI } from "../api/usersApi.js";
+import { currentUser } from "./userStore.js"
 
 class TournamentStore {
 	private _tournamentCode: string | null = null
 	private _players: (PlayerData | null)[] = []
 	private _currentSlot: number = 0
+  private _status : 'pending' | 'ongoing' | 'completed' = 'pending';
+
+  get status(): 'pending' | 'ongoing' | 'completed' {
+    return this._status;
+  }
+
+  set status(newStatus: 'pending' | 'ongoing' | 'completed') {
+    this._status = newStatus;
+  }
 
 	get tournamentCode(): string | null {
 		return this._tournamentCode
@@ -33,6 +44,19 @@ class TournamentStore {
 		}
 		this._players[index] = playerData
 	}
+
+  async addplayer(id: number) {
+    if (this._players.find(player => player?.id === currentUser?.user_id)) {
+      return
+    }
+    const newPlayer = await UserByIdAPI(id)
+    if (newPlayer.error || !newPlayer.data) {
+      console.error('Failed to fetch player data')
+      return
+    }
+    const playerData = { id: newPlayer.data.id, username: newPlayer.data.username, avatar: newPlayer.data.avatar }
+    this.nextSlot = playerData
+  }
 
 	clear() {
 		this._tournamentCode = null
