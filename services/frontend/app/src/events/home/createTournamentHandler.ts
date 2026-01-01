@@ -16,6 +16,7 @@ export async function handleCreateTournament() {
 
 	const code = data.code
 	tournamentStore.tournamentCode = code
+	tournamentStore.status = 'pending' // Un nouveau tournoi est toujours pending
 
 	window.navigate(`/tournament/${code}`)
 }

@@ -5,15 +5,13 @@ import {
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
-import { routeParams } from '../router/Router.js'
-import { gameStore } from '../usecases/gameStore.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
+import { getTournamentAPI, quitTournamentAPI } from '../api/tournamentApi.js'
+import { routeParams } from '../router/Router.js'
 import { currentUser } from '../usecases/userStore.js'
-import { updatePlayerCard } from '../components/tournament/PlayerCard.js'
-import { getTournamentAPI } from '../api/tournamentApi.js'
 
 export const TournamentPage = (): string => {
-	const code = tournamentStore.tournamentCode || 'T-XXXXX'
+	const code = routeParams.code || 'T-XXXXX'
 
 	return /*html*/ `
   <section class="h-screen">
@@ -108,7 +106,17 @@ async function pollingTournament() {
 
 		const tournamentData = result.data
 		console.log('tournamentData', tournamentData)
-		tournamentStore.status = tournamentData.status
+
+		const isParticipant = tournamentData.tournament.participants.includes(
+			currentUser?.user_id
+		)
+		if (!isParticipant) {
+			console.log('Not a participant, redirecting...')
+			window.navigate('/')
+			return
+		}
+
+		tournamentStore.status = tournamentData.tournament.status
 		if (tournamentStore.status === 'completed') {
 			console.log('Tournament completed, stopping polling.')
 			return
@@ -128,6 +136,15 @@ async function pollingTournament() {
 export async function attachTournamentEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
+
+	const code = routeParams.code
+	if (!code) {
+		console.error('No tournament code in URL')
+		window.navigate('/')
+		return
+	}
+
+	tournamentStore.tournamentCode = code
 
 	setTimeout(() => {
 		pollingTournament()
@@ -166,4 +183,12 @@ export function detachTournamentEvents() {
 		clearTimeout(pollingInterval)
 		pollingInterval = null
 	}
+
+	if (tournamentStore.tournamentCode) {
+		quitTournamentAPI(tournamentStore.tournamentCode)
+	}
+
+	tournamentStore.clear()
+
+	console.log('Detached tournament events')
 }

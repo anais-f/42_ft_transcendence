@@ -50,5 +50,8 @@ export async function handleJoinTournament(code: string) {
 		return
 	}
 
+	// Mettre à jour le status depuis la réponse de l'API
+	tournamentStore.status = data?.status || 'pending'
+
 	window.navigate(`/tournament/${code}`)
 }
