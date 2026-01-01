@@ -1,20 +1,19 @@
 import { PlayerData } from '../types/game.js'
-import { UserByIdAPI } from "../api/usersApi.js";
-import { currentUser } from "./userStore.js"
+import { UserByIdAPI } from '../api/usersApi.js'
+import { currentUser } from './userStore.js'
 
 class TournamentStore {
 	private _tournamentCode: string | null = null
 	private _players: (PlayerData | null)[] = []
-	private _currentSlot: number = 0
-  private _status : 'pending' | 'ongoing' | 'completed' = 'pending';
+	private _status: 'pending' | 'ongoing' | 'completed' = 'pending'
 
-  get status(): 'pending' | 'ongoing' | 'completed' {
-    return this._status;
-  }
+	get status(): 'pending' | 'ongoing' | 'completed' {
+		return this._status
+	}
 
-  set status(newStatus: 'pending' | 'ongoing' | 'completed') {
-    this._status = newStatus;
-  }
+	set status(newStatus: 'pending' | 'ongoing' | 'completed') {
+		this._status = newStatus
+	}
 
 	get tournamentCode(): string | null {
 		return this._tournamentCode
@@ -28,39 +27,36 @@ class TournamentStore {
 		return this._players
 	}
 
-	get currentSlot(): number {
-		return this._currentSlot
-	}
+	async syncPlayers(participantIds: number[]) {
+		const newPlayers: (PlayerData | null)[] = []
 
-	set nextSlot(playerData: PlayerData) {
-		this._setPlayer(this._currentSlot, playerData)
-		this._currentSlot += 1
-	}
-
-	private _setPlayer(index: number, playerData: PlayerData | null) {
-		if (index < 0 || index > 3) {
-			console.error('Player index must be between 0 and 3')
-			return
+		for (const id of participantIds) {
+			const existingPlayer = this._players.find((p) => p?.id === id)
+			if (existingPlayer) {
+				newPlayers.push(existingPlayer)
+			} else {
+				const result = await UserByIdAPI(id)
+				if (!result.error && result.data) {
+					newPlayers.push({
+						id: result.data.user_id,
+						username: result.data.username,
+						avatar: result.data.avatar
+					})
+				}
+			}
 		}
-		this._players[index] = playerData
-	}
 
-  async addplayer(id: number) {
-    if (this._players.find(player => player?.id === currentUser?.user_id)) {
-      return
-    }
-    const newPlayer = await UserByIdAPI(id)
-    if (newPlayer.error || !newPlayer.data) {
-      console.error('Failed to fetch player data')
-      return
-    }
-    const playerData = { id: newPlayer.data.id, username: newPlayer.data.username, avatar: newPlayer.data.avatar }
-    this.nextSlot = playerData
-  }
+		while (newPlayers.length < 4) {
+			newPlayers.push(null)
+		}
+
+		this._players = newPlayers
+	}
 
 	clear() {
 		this._tournamentCode = null
 		this._players = []
+		this._status = 'pending'
 	}
 }
 

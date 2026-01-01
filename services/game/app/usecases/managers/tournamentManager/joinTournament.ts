@@ -16,14 +16,19 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 	const userId = request.user.user_id
 	if (userId === undefined) throw createHttpError.Unauthorized()
 
+	const tournament = tournaments.get(tournamentCode.code)
+	if (!tournament) throw createHttpError.NotFound()
+
+	// if user is already in THIS tournament, he can join again
+	if (tournament.participants.includes(userId)) {
+		return tournament
+	}
+
 	if (usersInTournaments.has(userId))
 		throw createHttpError.Conflict('User is already in another tournament')
 	if (playerToGame.has(userId))
 		throw createHttpError.Conflict('User is already in a match')
 	if (busyPlayers.has(userId)) throw createHttpError.Conflict('User is busy')
-
-	const tournament = tournaments.get(tournamentCode.code)
-	if (!tournament) throw createHttpError.NotFound()
 
 	if (tournament.participants.length >= tournament.maxParticipants)
 		throw createHttpError.Conflict('Tournament is full')

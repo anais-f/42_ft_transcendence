@@ -10,7 +10,7 @@ import { gameStore } from '../usecases/gameStore.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
 import { currentUser } from '../usecases/userStore.js'
 import { updatePlayerCard } from '../components/tournament/PlayerCard.js'
-import {getTournamentAPI} from "../api/tournamentApi.js";
+import { getTournamentAPI } from '../api/tournamentApi.js'
 
 export const TournamentPage = (): string => {
 	const code = tournamentStore.tournamentCode || 'T-XXXXX'
@@ -81,77 +81,57 @@ export const TournamentPage = (): string => {
 let clickHandler: ((e: Event) => void) | null = null
 let pollingInterval: number | null = null
 
-// function initTournamentData() {
-// 	const name = currentUser?.username ?? 'you'
-// 	const avatar = currentUser?.avatar ?? '/avatars/img_default.png'
-//
-// 	updatePlayerCard('player_card_0', name, avatar)
-// }
-
-// a revoir
 function updateAllPlayerCards() {
-  const players = tournamentStore.players  // Max 4 joueurs
+	const players = tournamentStore.players
 
-  // Mettre à jour chaque carte avec les infos du joueur
-  for (let i = 0; i < 4; i++) {
-    const player = players[i]
-    const cardId = `player_card_${i}`
+	console.log('PLAYERS : ', players)
+	for (let i = 0; i < 4; i++) {
+		const player = players[i]
+		const cardId = `player_card_${i}`
 
-    if (player) {
-      // Joueur présent → afficher ses infos
-      updatePlayerCard(cardId, player.username, player.avatar)
-    } else {
-      // Slot vide → afficher "Waiting..."
-      updatePlayerCard(cardId, 'Waiting...', '/avatars/img_default.png')
-    }
-  }
+		if (player) {
+			updatePlayerCard(cardId, player.username, player.avatar)
+		} else {
+			updatePlayerCard(cardId, 'Waiting...', '/avatars/img_default.png')
+		}
+	}
 }
 
-
-// a reprenmdre
 async function pollingTournament() {
-  try {
-    if (!tournamentStore.tournamentCode)
-      return
-    const result = await getTournamentAPI(tournamentStore.tournamentCode)
-    if (result.error) {
-      console.error('Error fetching tournament data:', result.error)
-      return
-    }
+	try {
+		if (!tournamentStore.tournamentCode) return
+		const result = await getTournamentAPI(tournamentStore.tournamentCode)
+		if (result.error) {
+			console.error('Error fetching tournament data:', result.error)
+			return
+		}
 
-    const tournamentData = result.data
-    console.log('tournamentData', tournamentData)
-    tournamentStore.status = tournamentData.status
-    if (tournamentStore.status === 'completed') {
-      console.log('Tournament completed, stopping polling.')
-      return
-    }
+		const tournamentData = result.data
+		console.log('tournamentData', tournamentData)
+		tournamentStore.status = tournamentData.status
+		if (tournamentStore.status === 'completed') {
+			console.log('Tournament completed, stopping polling.')
+			return
+		}
 
-    for (const participant of tournamentData.tournament.participants) {
-      await tournamentStore.addplayer(participant)
-    }
+		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
-    // a reprendre
-    // updatePlayerCard(tournamentData?.participants)
-    updateAllPlayerCards()
+		updateAllPlayerCards()
 
-    pollingInterval = setTimeout(pollingTournament, 2000)
-  }
-  catch (error) {
-    console.error('Error fetching tournament data:', error)
-    pollingInterval = setTimeout(pollingTournament, 5000)
-  }
+		pollingInterval = setTimeout(pollingTournament, 2000)
+	} catch (error) {
+		console.error('Error fetching tournament data:', error)
+		pollingInterval = setTimeout(pollingTournament, 5000)
+	}
 }
 
 export async function attachTournamentEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
 
-	// initTournamentData()
-
-  setTimeout (() => {
-    pollingTournament()
-  }, 1000);
+	setTimeout(() => {
+		pollingTournament()
+	}, 1000)
 
 	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
@@ -182,8 +162,8 @@ export function detachTournamentEvents() {
 		clickHandler = null
 	}
 
-  if (pollingInterval) {
-    clearTimeout(pollingInterval)
-    pollingInterval = null
-  }
+	if (pollingInterval) {
+		clearTimeout(pollingInterval)
+		pollingInterval = null
+	}
 }

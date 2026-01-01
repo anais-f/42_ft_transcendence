@@ -1,9 +1,9 @@
-import {GameWSCloseCodes} from '@ft_transcendence/pong-shared'
-import {gameStore} from '../../../usecases/gameStore.js'
-import {currentUser} from '../../../usecases/userStore.js'
-import {renderer} from '../../core/Renderer.js'
-import {notyfGlobal as notfy} from '../../../utils/notyf.js'
-import {ToastActionType} from "../../../types/toast.js";
+import { GameWSCloseCodes } from '@ft_transcendence/pong-shared'
+import { gameStore } from '../../../usecases/gameStore.js'
+import { currentUser } from '../../../usecases/userStore.js'
+import { renderer } from '../../core/Renderer.js'
+import { notyfGlobal as notfy } from '../../../utils/notyf.js'
+import { ToastActionType } from '../../../types/toast.js'
 
 interface EogData {
 	winnerId: number
@@ -23,7 +23,12 @@ export function eogHandler(data: unknown) {
 	let message = buildNotification(didWin, eogData)
 
 	console.log(message)
-	notfy.open({ type: didWin ? ToastActionType.SUCCESS_ACTION : ToastActionType.ERROR_ACTION, message })
+	notfy.open({
+		type: didWin
+			? ToastActionType.SUCCESS_ACTION
+			: ToastActionType.ERROR_ACTION,
+		message
+	})
 	renderer.setGameResult(didWin ? 'win' : 'lose')
 
 	const ws = gameStore.gameSocket

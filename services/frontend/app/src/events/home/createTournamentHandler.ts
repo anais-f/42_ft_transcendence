@@ -2,7 +2,6 @@ import { CreateTournamentAPI } from '../../api/tournamentApi.js'
 import { tournamentStore } from '../../usecases/tournamentStore.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { ToastActionType } from '../../types/toast.js'
-import { currentUser } from '../../usecases/userStore.js'
 
 export async function handleCreateTournament() {
 	const { data, error, status } = await CreateTournamentAPI()
@@ -17,10 +16,6 @@ export async function handleCreateTournament() {
 
 	const code = data.code
 	tournamentStore.tournamentCode = code
-	const player = {
-		username: currentUser?.username ?? 'you',
-		avatar: currentUser?.avatar ?? '/avatars/img_default.png'
-	}
-	tournamentStore.nextSlot = player
+
 	window.navigate(`/tournament/${code}`)
 }
