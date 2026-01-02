@@ -31,98 +31,7 @@ export async function pollingTournament() {
 
 		tournamentStore.status = tournamentData.tournament.status
 
-		if (tournamentStore.status === 'ongoing') {
-			// console.log('ON GOING : ', tournamentData)
-			const p1 = tournamentStore.playersMap.get(
-				tournamentData.tournament.matchs[0].player1Id
-			)
-			updateTournamentCellName('match1-p1', p1?.username || waitingPlayer)
-			const p2 = tournamentStore.playersMap.get(
-				tournamentData.tournament.matchs[0].player2Id
-			)
-			updateTournamentCellName('match1-p2', p2?.username || waitingPlayer)
-			if (
-				tournamentData.tournament.matchs[0].scorePlayer1 !== undefined &&
-				tournamentData.tournament.matchs[0].scorePlayer2 !== undefined
-			) {
-				updateTournamentCellScore(
-					'match1-p1',
-					tournamentData.tournament.matchs[0].scorePlayer1,
-					5
-				)
-				updateTournamentCellScore(
-					'match1-p2',
-					tournamentData.tournament.matchs[0].scorePlayer2,
-					5
-				)
-			}
-
-			const p3 = tournamentStore.playersMap.get(
-				tournamentData.tournament.matchs[1].player1Id
-			)
-			updateTournamentCellName('match2-p1', p3?.username || waitingPlayer)
-			const p4 = tournamentStore.playersMap.get(
-				tournamentData.tournament.matchs[1].player2Id
-			)
-			updateTournamentCellName('match2-p2', p4?.username || waitingPlayer)
-			if (
-				tournamentData.tournament.matchs[1].scorePlayer1 !== undefined &&
-				tournamentData.tournament.matchs[1].scorePlayer2 !== undefined
-			) {
-				updateTournamentCellScore(
-					'match2-p1',
-					tournamentData.tournament.matchs[1].scorePlayer1,
-					5
-				)
-				updateTournamentCellScore(
-					'match2-p2',
-					tournamentData.tournament.matchs[1].scorePlayer2,
-					5
-				)
-			}
-
-			const final = tournamentData.tournament.matchs[2]
-			if (final.player1Id) {
-				const finalP1 = tournamentStore.playersMap.get(
-					tournamentData.tournament.matchs[2].player1Id
-				)
-				updateTournamentCellName('final-p1', finalP1?.username || waitingPlayer)
-			}
-			if (final.player2Id) {
-				const finalP2 = tournamentStore.playersMap.get(
-					tournamentData.tournament.matchs[2].player2Id
-				)
-				updateTournamentCellName('final-p2', finalP2?.username || waitingPlayer)
-			}
-		}
-
-		if (tournamentStore.status === 'completed') {
-			const final = tournamentData.tournament.matchs[2]
-			if (final.winnerId) {
-				const winner = tournamentStore.playersMap.get(
-					tournamentData.tournament.matchs[2].winnerId
-				)
-				updateTournamentCellName(
-					'final-winner',
-					winner?.username || waitingPlayer
-				)
-				if (
-					tournamentData.tournament.matchs[2].scorePlayer1 !== undefined &&
-					tournamentData.tournament.matchs[2].scorePlayer2 !== undefined
-				) {
-					updateTournamentCellScore(
-						'final-p1',
-						tournamentData.tournament.matchs[2].scorePlayer1,
-						5
-					)
-					updateTournamentCellScore(
-						'final-p2',
-						tournamentData.tournament.matchs[2].scorePlayer2,
-						5
-					)
-				}
-			}
-		}
+		updateMatches('match', tournamentData)
 
 		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
@@ -155,4 +64,44 @@ function errorGetTournament(result: IApiResponse): boolean {
 		return true
 	}
 	return false
+}
+
+// TODO: type ALL tournamentData
+function updateMatches(id: string, tournamentData: any) {
+	const tournament = tournamentData.tournament
+	if (
+		!tournament ||
+		!['completed', 'ongoing'].includes(tournamentStore.status)
+	) {
+		return
+	}
+
+	for (let matchIndex = 0; matchIndex < 3; ++matchIndex) {
+		for (let playerIndex = 0; playerIndex < 2; ++playerIndex) {
+			// update Name
+			const p = tournamentStore.playersMap.get(
+				tournament.matchs[matchIndex][`player${playerIndex + 1}Id`]
+			)
+			updateTournamentCellName(
+				`${id}${matchIndex}-p${playerIndex + 1}`,
+				p?.username || waitingPlayer
+			)
+
+			// update Score
+			const score =
+				tournament.matchs[matchIndex][`scorePlayer${playerIndex + 1}`]
+			if (score !== undefined) {
+				const scoreId = `${id}${matchIndex}-p${playerIndex + 1}`
+				updateTournamentCellScore(scoreId, score, 5)
+			}
+		}
+	}
+
+	const winnderId = tournament.matchs[2]?.winnerId
+	if (!winnderId) {
+		return
+	}
+
+	const winner = tournamentStore.playersMap.get(winnderId)
+	updateTournamentCellName('final-winner', winner?.username || waitingPlayer)
 }

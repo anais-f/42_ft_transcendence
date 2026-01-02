@@ -45,13 +45,13 @@ export const TournamentPage = (): string => {
         </div>
         <div class="flex-1">
           <div class="w-full grid grid-cols-3 grid-rows-9">
-            ${TournamentCell({ id: 'match1-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match0-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'final-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match2-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
-            ${TournamentCell({ id: 'match1-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'match0-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
@@ -63,13 +63,13 @@ export const TournamentPage = (): string => {
             <div></div>
             <div class="border-r-2 border-black"></div>
             <div></div>
-            ${TournamentCell({ id: 'match2-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match1-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'final-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
-            <div></div>
             ${TournamentCell({ id: 'match2-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
+            <div></div>
+            ${TournamentCell({ id: 'match1-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
           </div>
         </div>  
       </div>

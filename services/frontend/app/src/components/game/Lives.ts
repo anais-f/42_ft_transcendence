@@ -47,8 +47,11 @@ export function updateLives(
 	max: number,
 	size: 3 | 4 | 5 | 6
 ): void {
+	console.log(`update Live: [id: ${livesID}, live: ${current}/${max}]`)
 	const livesEl = document.getElementById(livesID)
 	if (livesEl) {
 		livesEl.innerHTML = generateHearts(max, current, size)
+	} else {
+		console.warn(`'${livesID}' not found!`, livesEl)
 	}
 }
