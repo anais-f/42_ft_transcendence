@@ -22,7 +22,11 @@ export const MatchTournamentSchema = z.object({
 	winnerId: z.number().optional(),
 	status: MatchStatusSchema,
 	scorePlayer1: z.number().optional(),
-	scorePlayer2: z.number().optional()
+	scorePlayer2: z.number().optional(),
+	gameCode: z
+		.string()
+		.regex(/^G-[A-Z0-9]{5}$/, 'Invalid game code')
+		.optional()
 })
 
 export const TournamentSchema = z.object({

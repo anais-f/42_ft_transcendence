@@ -10,6 +10,7 @@ import {
 	updateTournamentCellScore
 } from '../components/game/TournamentCell.js'
 import { waitingPlayer } from '../pages/TournamentPage.js'
+import { GetTournamentResponseDTO } from '@ft_transcendence/common'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 
@@ -26,10 +27,23 @@ export async function pollingTournament() {
 		// console.log(result)
 		if (errorGetTournament(result)) return
 
-		const tournamentData = result.data
+		const tournamentData: GetTournamentResponseDTO = result.data
 		console.log('tournamentData', tournamentData)
 
 		tournamentStore.status = tournamentData.tournament.status
+		// for (let i = 0; i < 2; ++i) {
+		// 	if (
+		// 		tournamentData.tournament.matchs[i].gameCode &&
+		// 		(tournamentData.tournament.matchs[i].player1Id ===
+		// 			currentUser?.user_id ||
+		// 			tournamentData.tournament.matchs[i].player2Id ===
+		// 				currentUser?.user_id)
+		// 	) {
+		// 		tournamentStore[`gameCode${i + 1}`] = tournamentData.tournament.matchs[i].gameCode
+		// 		console.log('game code:', tournamentStore[`gameCode${i + 1}`])
+		// 		break
+		// 	}
+		// }
 
 		updateMatches('match', tournamentData)
 
@@ -67,13 +81,27 @@ function errorGetTournament(result: IApiResponse): boolean {
 }
 
 // TODO: type ALL tournamentData
-function updateMatches(id: string, tournamentData: any) {
+function updateMatches(id: string, tournamentData: GetTournamentResponseDTO) {
 	const tournament = tournamentData.tournament
 	if (
 		!tournament ||
 		!['completed', 'ongoing'].includes(tournamentStore.status)
 	) {
 		return
+	}
+
+	for (let i = 0; i < 2; ++i) {
+		if (
+				tournamentData.tournament.matchs[i].gameCode &&
+				(tournamentData.tournament.matchs[i].player1Id ===
+						currentUser?.user_id ||
+						tournamentData.tournament.matchs[i].player2Id ===
+						currentUser?.user_id)
+		) {
+			tournamentStore[`gameCode${i + 1}`] = tournamentData.tournament.matchs[i].gameCode
+			console.log('game code:', tournamentStore[`gameCode${i + 1}`])
+			break
+		}
 	}
 
 	for (let matchIndex = 0; matchIndex < 3; ++matchIndex) {

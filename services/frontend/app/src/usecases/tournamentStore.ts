@@ -7,6 +7,24 @@ class TournamentStore {
 	private _players: (PlayerData | null)[] = []
 	private _status: 'pending' | 'ongoing' | 'completed' = 'pending'
 	private _playersMap = new Map<number, PlayerData>()
+	private _gameCode1: string | undefined = undefined
+	private _gameCode2: string | undefined = undefined
+
+	get gameCode1(): string | undefined {
+		return this._gameCode1
+	}
+
+	get gameCode2(): string | undefined {
+		return this._gameCode2
+	}
+
+	set gameCode2(value: string | undefined) {
+		this._gameCode2 = value
+	}
+
+	set gameCode1(value: string | undefined) {
+		this._gameCode1 = value
+	}
 
 	get status(): 'pending' | 'ongoing' | 'completed' {
 		return this._status
@@ -63,6 +81,8 @@ class TournamentStore {
 		this._tournamentCode = null
 		this._players = []
 		this._status = 'pending'
+		this._gameCode1 = undefined
+		this._gameCode2 = undefined
 	}
 }
 

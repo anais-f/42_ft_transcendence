@@ -24,10 +24,11 @@ function startFirstRound(code: string, tournament: Tournament) {
 			return
 		}
 		match.status = 'ongoing'
-		requestGame(match.player1Id, match.player2Id, {
+		const gameCode = requestGame(match.player1Id, match.player2Id, {
 			tournamentCode: code,
 			round: match.round,
 			matchNumber: match.matchNumber
 		})
+		match.gameCode = gameCode
 	})
 }

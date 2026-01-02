@@ -83,10 +83,15 @@ export function onTournamentMatchEnd(
 		console.log(
 			`Starting next round match:  ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
-		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id, {
-			tournamentCode: tournamentCode,
-			round: nextRoundMatch.round,
-			matchNumber: nextRoundMatch.matchNumber
-		})
+		const gameCode = requestGame(
+			nextRoundMatch.player1Id,
+			nextRoundMatch.player2Id,
+			{
+				tournamentCode: tournamentCode,
+				round: nextRoundMatch.round,
+				matchNumber: nextRoundMatch.matchNumber
+			}
+		)
+		nextRoundMatch.gameCode = gameCode
 	}
 }
