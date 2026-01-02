@@ -9,13 +9,13 @@ import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
 import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
+import { PlayerCard } from '../components/tournament/PlayerCard.js'
 
 export const TournamentPage = (): string => {
 	const code = routeParams.code || 'T-XXXXX'
 
 	return /*html*/ `
   <section class="h-screen">
-    <h1>Tournament Page</h1>
     <section class="grid grid-cols-[1fr_3fr] gap-10 h-full">
       <div class="col-span-1 flex flex-col items-center w-full min-w-0">
         <div class="pt-10 pb-5 w-full">
@@ -43,13 +43,13 @@ export const TournamentPage = (): string => {
         </div>
         <div class="flex-1">
           <div class="w-full grid grid-cols-3 grid-rows-9">
-            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'semi1-winner', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'final-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
-            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER ?', score: 2, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
@@ -61,13 +61,13 @@ export const TournamentPage = (): string => {
             <div></div>
             <div class="border-r-2 border-black"></div>
             <div></div>
-            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
             <div></div>
-            ${TournamentCell({ id: 'semi2-winner', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'final-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
           </div>
         </div>  
       </div>

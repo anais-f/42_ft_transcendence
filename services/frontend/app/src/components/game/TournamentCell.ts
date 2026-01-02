@@ -31,7 +31,7 @@ export function updateTournamentCellName(id: string, name: string): void {
 export function updateTournamentCellScore(
 	id: string,
 	score: number,
-	maxScore: number = 10
+	maxScore: number = 5
 ): void {
 	updateLives(`${id}-score`, score, maxScore, 3)
 }
