@@ -12,6 +12,7 @@ export type MatchTournament = {
 	matchNumber: number
 	player1Id?: number
 	player2Id?: number
+	winnerId?: number
 	status: 'ongoing' | 'completed' | 'waiting_for_players'
 	scorePlayer1?: number
 	scorePlayer2?: number

@@ -11,6 +11,8 @@ import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
 
+export const waitingPlayer = 'PLAYER ?'
+
 export const TournamentPage = (): string => {
 	const code = routeParams.code || 'T-XXXXX'
 
@@ -43,31 +45,31 @@ export const TournamentPage = (): string => {
         </div>
         <div class="flex-1">
           <div class="w-full grid grid-cols-3 grid-rows-9">
-            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match1-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'final-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'final-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div></div>
-            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
-            <div class="border-r-2 border-black"></div>
-            <div></div>
-            <div></div>
+            ${TournamentCell({ id: 'match1-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'final-winner', name: 'PLAYER ?', additionalClasses: 'border-b-2' })}
+            <div></div>
+            <div></div>
+            <div class="border-r-2 border-black"></div>
+            ${TournamentCell({ id: 'final-winner', name: waitingPlayer, additionalClasses: 'border-b-2' })}
             <div></div>
             <div class="border-r-2 border-black"></div>
             <div></div>
-            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match2-p1', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'final-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
             <div></div>
-            ${TournamentCell({ id: 'final-p2', name: 'PLAYER ?', score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'match2-p2', name: waitingPlayer, score: 0, maxScore: 0, additionalClasses: 'border-b-2 border-r-2' })}
           </div>
         </div>  
       </div>

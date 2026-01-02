@@ -6,6 +6,7 @@ class TournamentStore {
 	private _tournamentCode: string | null = null
 	private _players: (PlayerData | null)[] = []
 	private _status: 'pending' | 'ongoing' | 'completed' = 'pending'
+	private _playersMap = new Map<number, PlayerData>()
 
 	get status(): 'pending' | 'ongoing' | 'completed' {
 		return this._status
@@ -27,6 +28,10 @@ class TournamentStore {
 		return this._players
 	}
 
+	get playersMap(): Map<number, PlayerData> {
+		return this._playersMap
+	}
+
 	async syncPlayers(participantIds: number[]) {
 		const newPlayers: (PlayerData | null)[] = []
 
@@ -37,6 +42,7 @@ class TournamentStore {
 			} else {
 				const result = await UserByIdAPI(id)
 				if (!result.error && result.data) {
+					this._playersMap.set(id, result.data)
 					newPlayers.push({
 						id: result.data.user_id,
 						username: result.data.username,

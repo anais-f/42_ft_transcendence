@@ -24,10 +24,11 @@ export function onTournamentMatchEnd(
 		throw createHttpError.NotFound('Match not found')
 	}
 
-	// Update match status and scores
+	// Update match status, scores, and winner
 	currentMatch.status = 'completed'
 	currentMatch.scorePlayer1 = tournamentData.scorePlayer1
 	currentMatch.scorePlayer2 = tournamentData.scorePlayer2
+	currentMatch.winnerId = tournamentData.winnerId
 
 	// If this was the final (round 1), tournament is over
 	if (tournamentMatchData.round === 1) {

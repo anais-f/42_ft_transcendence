@@ -19,6 +19,7 @@ export const MatchTournamentSchema = z.object({
 	matchNumber: z.number(),
 	player1Id: z.number().optional(),
 	player2Id: z.number().optional(),
+	winnerId: z.number().optional(),
 	status: MatchStatusSchema,
 	scorePlayer1: z.number().optional(),
 	scorePlayer2: z.number().optional()
