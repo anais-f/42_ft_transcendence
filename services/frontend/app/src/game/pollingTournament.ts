@@ -11,6 +11,7 @@ import {
 } from '../components/game/TournamentCell.js'
 import { waitingPlayer } from '../pages/TournamentPage.js'
 import { GetTournamentResponseDTO } from '@ft_transcendence/common'
+import { handleJoinGameTournament } from '../events/tournament/gameTournament.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 
@@ -31,19 +32,6 @@ export async function pollingTournament() {
 		console.log('tournamentData', tournamentData)
 
 		tournamentStore.status = tournamentData.tournament.status
-		// for (let i = 0; i < 2; ++i) {
-		// 	if (
-		// 		tournamentData.tournament.matchs[i].gameCode &&
-		// 		(tournamentData.tournament.matchs[i].player1Id ===
-		// 			currentUser?.user_id ||
-		// 			tournamentData.tournament.matchs[i].player2Id ===
-		// 				currentUser?.user_id)
-		// 	) {
-		// 		tournamentStore[`gameCode${i + 1}`] = tournamentData.tournament.matchs[i].gameCode
-		// 		console.log('game code:', tournamentStore[`gameCode${i + 1}`])
-		// 		break
-		// 	}
-		// }
 
 		updateMatches('match', tournamentData)
 
@@ -92,14 +80,16 @@ function updateMatches(id: string, tournamentData: GetTournamentResponseDTO) {
 
 	for (let i = 0; i < 2; ++i) {
 		if (
-				tournamentData.tournament.matchs[i].gameCode &&
-				(tournamentData.tournament.matchs[i].player1Id ===
-						currentUser?.user_id ||
-						tournamentData.tournament.matchs[i].player2Id ===
-						currentUser?.user_id)
+			tournamentData.tournament.matchs[i].gameCode &&
+			(tournamentData.tournament.matchs[i].player1Id === currentUser?.user_id ||
+				tournamentData.tournament.matchs[i].player2Id === currentUser?.user_id)
 		) {
-			tournamentStore[`gameCode${i + 1}`] = tournamentData.tournament.matchs[i].gameCode
-			console.log('game code:', tournamentStore[`gameCode${i + 1}`])
+			if (!tournamentStore[`gameCode${i + 1}`]) {
+				tournamentStore[`gameCode${i + 1}`] =
+					tournamentData.tournament.matchs[i].gameCode
+				console.log('game code:', tournamentStore[`gameCode${i + 1}`])
+				handleJoinGameTournament(tournamentStore[`gameCode${i + 1}`])
+			}
 			break
 		}
 	}
