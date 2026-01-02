@@ -5,7 +5,10 @@ import { currentUser } from '../usecases/userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 import { ToastActionType } from '../types/toast.js'
 import { IApiResponse } from '../types/api.js'
-import { updateTournamentCellName } from '../components/game/TournamentCell.js'
+import {
+	updateTournamentCellName,
+	updateTournamentCellScore
+} from '../components/game/TournamentCell.js'
 import { waitingPlayer } from '../pages/TournamentPage.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
@@ -28,11 +31,6 @@ export async function pollingTournament() {
 
 		tournamentStore.status = tournamentData.tournament.status
 
-		// if (tournamentStore.status === 'completed') {
-		// 	console.log('Tournament completed, stopping polling.')
-		// 	return
-		// }
-
 		if (tournamentStore.status === 'ongoing') {
 			// console.log('ON GOING : ', tournamentData)
 			const p1 = tournamentStore.playersMap.get(
@@ -43,6 +41,22 @@ export async function pollingTournament() {
 				tournamentData.tournament.matchs[0].player2Id
 			)
 			updateTournamentCellName('match1-p2', p2?.username || waitingPlayer)
+			if (
+				tournamentData.tournament.matchs[0].scorePlayer1 !== undefined &&
+				tournamentData.tournament.matchs[0].scorePlayer2 !== undefined
+			) {
+				updateTournamentCellScore(
+					'match1-p1',
+					tournamentData.tournament.matchs[0].scorePlayer1,
+					5
+				)
+				updateTournamentCellScore(
+					'match1-p2',
+					tournamentData.tournament.matchs[0].scorePlayer2,
+					5
+				)
+			}
+
 			const p3 = tournamentStore.playersMap.get(
 				tournamentData.tournament.matchs[1].player1Id
 			)
@@ -51,6 +65,21 @@ export async function pollingTournament() {
 				tournamentData.tournament.matchs[1].player2Id
 			)
 			updateTournamentCellName('match2-p2', p4?.username || waitingPlayer)
+			if (
+				tournamentData.tournament.matchs[1].scorePlayer1 !== undefined &&
+				tournamentData.tournament.matchs[1].scorePlayer2 !== undefined
+			) {
+				updateTournamentCellScore(
+					'match2-p1',
+					tournamentData.tournament.matchs[1].scorePlayer1,
+					5
+				)
+				updateTournamentCellScore(
+					'match2-p2',
+					tournamentData.tournament.matchs[1].scorePlayer2,
+					5
+				)
+			}
 
 			const final = tournamentData.tournament.matchs[2]
 			if (final.player1Id) {
@@ -77,12 +106,32 @@ export async function pollingTournament() {
 					'final-winner',
 					winner?.username || waitingPlayer
 				)
+				if (
+					tournamentData.tournament.matchs[2].scorePlayer1 !== undefined &&
+					tournamentData.tournament.matchs[2].scorePlayer2 !== undefined
+				) {
+					updateTournamentCellScore(
+						'final-p1',
+						tournamentData.tournament.matchs[2].scorePlayer1,
+						5
+					)
+					updateTournamentCellScore(
+						'final-p2',
+						tournamentData.tournament.matchs[2].scorePlayer2,
+						5
+					)
+				}
 			}
 		}
 
 		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
 		updateAllPlayerCards('player_card_')
+
+		if (tournamentStore.status === 'completed') {
+			console.log('Tournament completed, stopping polling.')
+			return
+		}
 
 		pollingInterval = setTimeout(pollingTournament, 2000)
 	} catch (error) {
