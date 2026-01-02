@@ -1,6 +1,6 @@
 import {
 	PlayerCard,
-	updatePlayerCard
+	updateAllPlayerCards
 } from '../components/tournament/PlayerCard.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
@@ -79,22 +79,6 @@ export const TournamentPage = (): string => {
 let clickHandler: ((e: Event) => void) | null = null
 let pollingInterval: number | null = null
 
-function updateAllPlayerCards() {
-	const players = tournamentStore.players
-
-	console.log('PLAYERS : ', players)
-	for (let i = 0; i < 4; i++) {
-		const player = players[i]
-		const cardId = `player_card_${i}`
-
-		if (player) {
-			updatePlayerCard(cardId, player.username, player.avatar)
-		} else {
-			updatePlayerCard(cardId, 'Waiting...', '/avatars/img_default.png')
-		}
-	}
-}
-
 async function pollingTournament() {
 	try {
 		if (!tournamentStore.tournamentCode) return
@@ -124,7 +108,7 @@ async function pollingTournament() {
 
 		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
-		updateAllPlayerCards()
+		updateAllPlayerCards('player_card_')
 
 		pollingInterval = setTimeout(pollingTournament, 2000)
 	} catch (error) {

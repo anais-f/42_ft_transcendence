@@ -1,4 +1,5 @@
 import { escapeHtml } from '../../usecases/sanitize.js'
+import { tournamentStore } from '../../usecases/tournamentStore.js'
 
 interface PlayerCardProps {
 	id?: string
@@ -29,5 +30,21 @@ export const updatePlayerCard = (
       <p class="truncate w-full text-center">${name}</p>
     	<img src="${avatar}" alt="${name}" class="w-32 aspect-square object-cover">
     `
+	}
+}
+
+export function updateAllPlayerCards(playerCardPrefix: string) {
+	const players = tournamentStore.players
+
+	console.log('PLAYERS : ', players)
+	for (let i = 0; i < 4; i++) {
+		const player = players[i]
+		const cardId = `${playerCardPrefix}${i}`
+
+		if (player) {
+			updatePlayerCard(cardId, player.username, player.avatar)
+		} else {
+			updatePlayerCard(cardId, 'Waiting...', '/avatars/img_default.png')
+		}
 	}
 }
