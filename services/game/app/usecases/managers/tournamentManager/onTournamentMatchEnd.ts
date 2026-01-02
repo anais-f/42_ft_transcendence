@@ -78,20 +78,27 @@ export function onTournamentMatchEnd(
 		nextRoundMatch.player2Id !== undefined &&
 		nextRoundMatch.status === 'waiting_for_players'
 	) {
-		// Both players ready, start the match!
+		// Both players ready, wait 5 seconds before starting the next match
+		// to give players time to return to tournament page and prepare
 		nextRoundMatch.status = 'ongoing'
 		console.log(
-			`Starting next round match:  ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+			`Both players ready for round ${nextRoundMatch.round}. Starting match in 5 seconds...`
 		)
-		const gameCode = requestGame(
-			nextRoundMatch.player1Id,
-			nextRoundMatch.player2Id,
-			{
-				tournamentCode: tournamentCode,
-				round: nextRoundMatch.round,
-				matchNumber: nextRoundMatch.matchNumber
-			}
-		)
-		nextRoundMatch.gameCode = gameCode
+
+		setTimeout(() => {
+			console.log(
+				`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+			)
+			const gameCode = requestGame(
+				nextRoundMatch.player1Id,
+				nextRoundMatch.player2Id,
+				{
+					tournamentCode: tournamentCode,
+					round: nextRoundMatch.round,
+					matchNumber: nextRoundMatch.matchNumber
+				}
+			)
+			nextRoundMatch.gameCode = gameCode
+		}, 5000)
 	}
 }

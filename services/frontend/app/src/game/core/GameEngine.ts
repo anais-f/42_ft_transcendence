@@ -19,6 +19,9 @@ export class GameEngine {
 
 		renderer.clear()
 
+		// Sauvegarder backTo avant de clear pour que le onclose handler puisse l'utiliser
+		const savedBackTo = gameStore.backTo
+
 		if (this.ws) {
 			cleanupNetworkDispatcher(this.ws)
 			this.ws.close()
@@ -26,6 +29,7 @@ export class GameEngine {
 		}
 
 		gameStore.clear()
+		gameStore.backTo = savedBackTo
 	}
 }
 

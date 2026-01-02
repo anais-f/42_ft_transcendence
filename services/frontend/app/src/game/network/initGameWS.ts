@@ -7,6 +7,7 @@ import { dispatcher } from './dispatcher.js'
 
 export function initGameWS(backTo: string) {
 	gameStore.setOnOpponentJoin(oppenentJoinHandler)
+	gameStore.backTo = backTo
 	const token = gameStore.sessionToken
 	if (token) {
 		createGameWebSocket(token)
@@ -23,7 +24,7 @@ export function initGameWS(backTo: string) {
 
 				ws.onclose = () => {
 					if (!gameStore.navigatingToGame) {
-						window.navigate(backTo)
+						window.navigate(gameStore.backTo)
 					}
 					console.log('WS closed')
 				}
@@ -34,9 +35,9 @@ export function initGameWS(backTo: string) {
 					type: ToastActionType.ERROR_ACTION,
 					message: 'Connection to game server failed'
 				})
-				window.navigate(backTo)
+				window.navigate(gameStore.backTo)
 			})
 	} else {
-		window.navigate(backTo)
+		window.navigate(gameStore.backTo)
 	}
 }

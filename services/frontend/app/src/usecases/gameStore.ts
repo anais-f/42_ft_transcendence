@@ -9,6 +9,7 @@ class GameStore {
 	private _sessionToken: string | null = null
 	private _gameSocket: WebSocket | null = null
 	private _navigatingToGame: boolean = false
+	private _backTo: string = '/'
 	private _playerSlot: PlayerSlot = 'p1'
 	private _p1: PlayerData | null = null
 	private _p2: PlayerData | null = null
@@ -45,6 +46,14 @@ class GameStore {
 
 	set navigatingToGame(value: boolean) {
 		this._navigatingToGame = value
+	}
+
+	get backTo(): string {
+		return this._backTo
+	}
+
+	set backTo(value: string) {
+		this._backTo = value
 	}
 
 	get playerSlot(): PlayerSlot {
@@ -97,6 +106,7 @@ class GameStore {
 		this._sessionToken = null
 		this._gameSocket = null
 		this._navigatingToGame = false
+		this._backTo = '/'
 		this._playerSlot = 'p1'
 		this._p1 = null
 		this._p2 = null

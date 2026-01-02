@@ -10,6 +10,7 @@ import { tournamentStore } from '../usecases/tournamentStore.js'
 import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
+import { gameStore } from '../usecases/gameStore.js'
 
 export const waitingPlayer = 'PLAYER ?'
 
@@ -131,7 +132,7 @@ export function detachTournamentEvents() {
 		setPollingInterval(null)
 	}
 
-	if (tournamentStore.tournamentCode) {
+	if (tournamentStore.tournamentCode && !gameStore.navigatingToGame) {
 		quitTournamentAPI(tournamentStore.tournamentCode)
 	}
 
