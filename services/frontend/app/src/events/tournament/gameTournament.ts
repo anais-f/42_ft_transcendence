@@ -14,5 +14,4 @@ export async function handleJoinGameTournament(code: string) {
 
 	gameStore.sessionToken = data.wsToken
 	console.log(data.wsToken)
-	// window.navigate(`/play`)
 }

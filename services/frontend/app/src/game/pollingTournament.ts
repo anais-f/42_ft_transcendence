@@ -12,43 +12,59 @@ import {
 import { waitingPlayer } from '../pages/TournamentPage.js'
 import { GetTournamentResponseDTO } from '@ft_transcendence/common'
 import { handleJoinGameTournament } from '../events/tournament/gameTournament.js'
-import {initGameWS} from "./network/initGameWS.js";
+import { initGameWS } from './network/initGameWS.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
+let isPolling = false
 
 export function setPollingInterval(
 	value: ReturnType<typeof setTimeout> | null
 ): void {
 	pollingInterval = value
+	// Reset polling flag when manually stopping
+	if (value === null) {
+		isPolling = false
+	}
 }
 
-export async function pollingTournament() {
+async function pollingTournament() {
+	if (!tournamentStore.tournamentCode) return
+	const result = await getTournamentAPI(tournamentStore.tournamentCode)
+	// console.log(result)
+	if (errorGetTournament(result)) return
+
+	const tournamentData: GetTournamentResponseDTO = result.data
+	console.log('tournamentData', tournamentData)
+
+	tournamentStore.status = tournamentData.tournament.status
+
+	await updateMatches('match', tournamentData)
+
+	await tournamentStore.syncPlayers(tournamentData.tournament.participants)
+
+	updateAllPlayerCards('player_card_')
+}
+
+export async function pollingLoopTournament() {
+	if (isPolling) {
+		console.warn('Polling already in progress, skipping')
+		return
+	}
+
+	isPolling = true
+
 	try {
-		if (!tournamentStore.tournamentCode) return
-		const result = await getTournamentAPI(tournamentStore.tournamentCode)
-		// console.log(result)
-		if (errorGetTournament(result)) return
-
-		const tournamentData: GetTournamentResponseDTO = result.data
-		console.log('tournamentData', tournamentData)
-
-		tournamentStore.status = tournamentData.tournament.status
-
-		await updateMatches('match', tournamentData)
-
-		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
-
-		updateAllPlayerCards('player_card_')
-
+		await pollingTournament()
 		if (tournamentStore.status === 'completed') {
 			console.log('Tournament completed, stopping polling.')
 			return
 		}
-
-		pollingInterval = setTimeout(pollingTournament, 2000)
+		pollingInterval = setTimeout(pollingLoopTournament, 2000)
 	} catch (error) {
 		console.error('Error fetching tournament data:', error)
-		pollingInterval = setTimeout(pollingTournament, 5000)
+		pollingInterval = setTimeout(pollingLoopTournament, 2000)
+	} finally {
+		isPolling = false
 	}
 }
 
@@ -84,8 +100,8 @@ async function checkAndJoinUserMatches(
 		return
 	}
 
-	// Check first 2 matches (semi-finals) to see if user needs to join
-	for (let matchIndex = 0; matchIndex < 2; matchIndex++) {
+	// Check all 3 matches (2 semi-finals + final) to see if user needs to join
+	for (let matchIndex = 0; matchIndex < 3; matchIndex++) {
 		const match = tournament.matchs[matchIndex]
 
 		// Skip if match has no game code
@@ -98,15 +114,12 @@ async function checkAndJoinUserMatches(
 
 		if (!isUserInMatch) continue
 
-		// Check if user has already joined this match
-		const gameCodeKey = `gameCode${matchIndex + 1}` as
-			| 'gameCode1'
-			| 'gameCode2'
-		const alreadyJoined = tournamentStore[gameCodeKey]
+		// Check if user has already joined this game
+		const alreadyJoined = tournamentStore.hasJoinedGame(match.gameCode)
 
 		// Join match if not already joined and match is still ongoing
 		if (!alreadyJoined && match.winnerId === undefined) {
-			tournamentStore[gameCodeKey] = match.gameCode
+			tournamentStore.markGameAsJoined(match.gameCode)
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
 
 			await handleJoinGameTournament(match.gameCode)
@@ -115,7 +128,10 @@ async function checkAndJoinUserMatches(
 	}
 }
 
-async function updateMatches(id: string, tournamentData: GetTournamentResponseDTO) {
+async function updateMatches(
+	id: string,
+	tournamentData: GetTournamentResponseDTO
+) {
 	const tournament = tournamentData.tournament
 	if (!tournament || !['completed', 'ongoing'].includes(tournament.status)) {
 		return

@@ -1,6 +1,6 @@
 import {
 	pollingInterval,
-	pollingTournament,
+	pollingLoopTournament,
 	setPollingInterval
 } from '../game/pollingTournament.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
@@ -95,7 +95,7 @@ export async function attachTournamentEvents() {
 	tournamentStore.tournamentCode = code
 
 	setTimeout(() => {
-		pollingTournament()
+		pollingLoopTournament()
 	}, 1000)
 
 	clickHandler ??= (e: Event) => {

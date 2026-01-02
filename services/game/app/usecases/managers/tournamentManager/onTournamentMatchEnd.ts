@@ -85,20 +85,18 @@ export function onTournamentMatchEnd(
 			`Both players ready for round ${nextRoundMatch.round}. Starting match in 5 seconds...`
 		)
 
-		setTimeout(() => {
-			console.log(
-				`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
-			)
-			const gameCode = requestGame(
-				nextRoundMatch.player1Id,
-				nextRoundMatch.player2Id,
-				{
-					tournamentCode: tournamentCode,
-					round: nextRoundMatch.round,
-					matchNumber: nextRoundMatch.matchNumber
-				}
-			)
-			nextRoundMatch.gameCode = gameCode
-		}, 5000)
+		console.log(
+			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+		)
+		const gameCode = requestGame(
+			nextRoundMatch.player1Id,
+			nextRoundMatch.player2Id,
+			{
+				tournamentCode: tournamentCode,
+				round: nextRoundMatch.round,
+				matchNumber: nextRoundMatch.matchNumber
+			}
+		)
+		nextRoundMatch.gameCode = gameCode
 	}
 }
