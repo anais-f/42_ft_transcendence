@@ -6,8 +6,10 @@ import { updateGameMetrics } from '../metricsService.js'
 export function startTournament(code: string, tournament: Tournament) {
 	tournament.status = 'ongoing'
 	createTournamentTree(tournament)
-	// Only start the first round (highest round number)
-	startFirstRound(code, tournament)
+
+	setTimeout(() => {
+		startFirstRound(code, tournament)
+	}, 10000)
 
 	updateGameMetrics()
 }

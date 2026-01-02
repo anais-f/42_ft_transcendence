@@ -43,31 +43,31 @@ export const TournamentPage = (): string => {
         </div>
         <div class="flex-1">
           <div class="w-full grid grid-cols-3 grid-rows-9">
-            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER 1', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match1-p1', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'semi1-winner', name: 'PLAYER 1', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'semi1-winner', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
             <div></div>
-            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER 3', score: 2, additionalClasses: 'border-b-2 border-r-2' })}
-            <div class="border-r-2 border-black"></div>
-            <div></div>
-            <div></div>
+            ${TournamentCell({ id: 'match1-p2', name: 'PLAYER ?', score: 2, additionalClasses: 'border-b-2 border-r-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'final-winner', name: 'PLAYER 1', additionalClasses: 'border-b-2' })}
+            <div></div>
+            <div></div>
+            <div class="border-r-2 border-black"></div>
+            ${TournamentCell({ id: 'final-winner', name: 'PLAYER ?', additionalClasses: 'border-b-2' })}
             <div></div>
             <div class="border-r-2 border-black"></div>
             <div></div>
-            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER 2', score: 5, additionalClasses: 'border-b-2' })}
+            ${TournamentCell({ id: 'match2-p1', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2' })}
             <div class="border-r-2 border-black"></div>
             <div></div>
             <div class="border-r-2 border-black"></div>
-            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER 4', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'match2-p2', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
             <div></div>
-            ${TournamentCell({ id: 'semi2-winner', name: 'PLAYER 4', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
+            ${TournamentCell({ id: 'semi2-winner', name: 'PLAYER ?', score: 5, additionalClasses: 'border-b-2 border-r-2' })}
           </div>
         </div>  
       </div>
@@ -82,7 +82,7 @@ let pollingInterval: number | null = null
 function updateAllPlayerCards() {
 	const players = tournamentStore.players
 
-	console.log('PLAYERS : ', players)
+	// console.log('PLAYERS : ', players)
 	for (let i = 0; i < 4; i++) {
 		const player = players[i]
 		const cardId = `player_card_${i}`
@@ -105,7 +105,7 @@ async function pollingTournament() {
 		}
 
 		const tournamentData = result.data
-		console.log('tournamentData', tournamentData)
+		// console.log('tournamentData', tournamentData)
 
 		const isParticipant = tournamentData.tournament.participants.includes(
 			currentUser?.user_id
@@ -133,6 +133,9 @@ async function pollingTournament() {
 	}
 }
 
+function updateTree() {
+
+}
 export async function attachTournamentEvents() {
 	const content = document.getElementById('content')
 	if (!content) return
