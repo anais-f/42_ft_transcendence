@@ -19,7 +19,7 @@ export async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: `http://localhost:8080/social`,
+						url: `${env.SWAGGER_HOST}:8080/social`,
 						description: 'Local server'
 					}
 				],

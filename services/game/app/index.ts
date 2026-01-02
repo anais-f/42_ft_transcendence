@@ -21,7 +21,7 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: `http://localhost:8080/game`,
+						url: `${env.SWAGGER_HOST}:8080/game`,
 						description: 'Local server'
 					}
 				],

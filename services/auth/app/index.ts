@@ -53,7 +53,7 @@ async function runServer() {
 			},
 			servers: [
 				{
-					url: `http://localhost:8080/auth`,
+					url: `${env.SWAGGER_HOST}:8080/auth`,
 					description: 'Local server'
 				}
 			],
