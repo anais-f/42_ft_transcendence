@@ -1,14 +1,15 @@
+import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import {
-	PlayerCard,
-	updateAllPlayerCards
-} from '../components/tournament/PlayerCard.js'
+	pollingInterval,
+	pollingTournament,
+	setPollingInterval
+} from '../game/pollingTournament.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
-import { getTournamentAPI, quitTournamentAPI } from '../api/tournamentApi.js'
+import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
-import { currentUser } from '../usecases/userStore.js'
 
 export const TournamentPage = (): string => {
 	const code = routeParams.code || 'T-XXXXX'
@@ -77,45 +78,6 @@ export const TournamentPage = (): string => {
 }
 
 let clickHandler: ((e: Event) => void) | null = null
-let pollingInterval: number | null = null
-
-async function pollingTournament() {
-	try {
-		if (!tournamentStore.tournamentCode) return
-		const result = await getTournamentAPI(tournamentStore.tournamentCode)
-		if (result.error) {
-			console.error('Error fetching tournament data:', result.error)
-			return
-		}
-
-		const tournamentData = result.data
-		console.log('tournamentData', tournamentData)
-
-		const isParticipant = tournamentData.tournament.participants.includes(
-			currentUser?.user_id
-		)
-		if (!isParticipant) {
-			console.log('Not a participant, redirecting...')
-			window.navigate('/')
-			return
-		}
-
-		tournamentStore.status = tournamentData.tournament.status
-		if (tournamentStore.status === 'completed') {
-			console.log('Tournament completed, stopping polling.')
-			return
-		}
-
-		await tournamentStore.syncPlayers(tournamentData.tournament.participants)
-
-		updateAllPlayerCards('player_card_')
-
-		pollingInterval = setTimeout(pollingTournament, 2000)
-	} catch (error) {
-		console.error('Error fetching tournament data:', error)
-		pollingInterval = setTimeout(pollingTournament, 5000)
-	}
-}
 
 export async function attachTournamentEvents() {
 	const content = document.getElementById('content')
@@ -165,7 +127,7 @@ export function detachTournamentEvents() {
 
 	if (pollingInterval) {
 		clearTimeout(pollingInterval)
-		pollingInterval = null
+		setPollingInterval(null)
 	}
 
 	if (tournamentStore.tournamentCode) {
