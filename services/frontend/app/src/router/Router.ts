@@ -222,13 +222,6 @@ export class Router {
 		}
 	}
 
-	// Public method to navigate to a URL
-	// updates browser history and triggers navigation handling
-	/**
-	 * Navigate to a given URL
-	 * @param url
-	 * @param skipAuth
-	 */
 	public navigate = async (
 		url: string,
 		skipAuth: boolean = false
@@ -247,7 +240,6 @@ export class Router {
 
 	// Start the router
 	public async start(): Promise<void> {
-		// Expose navigate on window for inline onclicks
 		window.navigate = (url: string, skipAuth?: boolean) =>
 			this.navigate(url, skipAuth ?? false)
 

@@ -91,12 +91,12 @@ export const HomePage = (): string => {
 			variant: 'short'
 		})}
 		<h1 class="title_bloc mt-4">FEELING LONELY ?</h1>
-		<p class="font-special text-sm mb-4">You can join a game by entering the lobby code below</p>
+		<p class="font-special text-sm mb-4">You can join a game or a tournament by entering the lobby code below</p>
 		<form id="join_lobby_form" data-form="join-lobby" class="form_style">
 		  ${Input({
 				id: 'join_lobby',
 				name: 'join_lobby',
-				placeholder: 'Game code',
+				placeholder: 'Code',
 				type: 'text',
 				required: true
 			})}
