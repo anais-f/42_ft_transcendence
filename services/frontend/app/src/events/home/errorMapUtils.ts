@@ -12,7 +12,7 @@ export function sendGameError(error: string, status: number) {
 	if (status === 400) {
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,
-			message: 'Invalid game code!'
+			message: 'Invalid code!'
 		})
 	} else {
 		console.log(error)

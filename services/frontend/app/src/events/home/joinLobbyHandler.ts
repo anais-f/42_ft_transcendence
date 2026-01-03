@@ -19,8 +19,9 @@ export async function handleJoinLobby(e: Event) {
 		return
 	}
 
-	if (code.startsWith('T-')) await handleJoinTournament(code)
+	if (code.startsWith('T')) await handleJoinTournament(code)
 	else if (code.startsWith('G')) await handleJoinGame(code)
+	else sendGameError('', 400)
 }
 
 export async function handleJoinGame(code: string) {
