@@ -6,11 +6,11 @@ export function cleanupUserController(
 	request: FastifyRequest,
 	reply: FastifyReply
 ): void {
-	const { userId } = request.params as { userId: number }
-	if (userId === undefined) {
-		throw createHttpError.BadRequest('userId is required')
+	const { user_id } = request.params as { user_id: number }
+	if (user_id === undefined) {
+		throw createHttpError.BadRequest('user_id is required')
 	}
-	cleanupUserGamesAndTournaments(userId)
+	cleanupUserGamesAndTournaments(user_id)
 
 	reply.code(200).send()
 }
