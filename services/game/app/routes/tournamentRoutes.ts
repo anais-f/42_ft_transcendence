@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { CreateTournamentSchema } from '@ft_transcendence/common'
 import {
+	CreateTournamentSchema,
 	CodeParamSchema,
 	CreateTournamentResponseSchema,
 	GetTournamentResponseSchema,

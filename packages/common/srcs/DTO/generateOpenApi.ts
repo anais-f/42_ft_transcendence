@@ -4,7 +4,6 @@ import * as authSchemas from './authSchema.js'
 import * as twoFaSchemas from './2faSchema.js'
 import * as gameSchemas from './gameSchema.js'
 import * as matchHistorySchemas from './matchHistorySchema.js'
-import * as matchmakingSchemas from './matchmakingSchema.js'
 import * as paramsSchemas from './paramsSchema.js'
 import * as socialSchemas from './socialSchema.js'
 import * as tournamentSchemas from './tournamentSchema.js'
@@ -17,7 +16,6 @@ const schemas = {
 	...twoFaSchemas,
 	...gameSchemas,
 	...matchHistorySchemas,
-	...matchmakingSchemas,
 	...paramsSchemas,
 	...socialSchemas,
 	...tournamentSchemas,
