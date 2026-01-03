@@ -17,7 +17,7 @@ export const NextConfigModal = (): string => {
 		<div class="flex-1">
 			<div class="w-fit mx-auto text-center">
 				<h1 class="text-xl font-bold">VS</h1>
-				<pi id="btn-ready">Starting in 5</p>
+				<p id="btn-ready"></p>
 			</div>
 		</div>
 		<div class="flex-[2] text-center">
