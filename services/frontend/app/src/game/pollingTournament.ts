@@ -13,6 +13,7 @@ import { waitingPlayer } from '../pages/TournamentPage.js'
 import { GetTournamentResponseDTO } from '@ft_transcendence/common'
 import { handleJoinGameTournament } from '../events/tournament/gameTournament.js'
 import { initGameWS } from './network/initGameWS.js'
+import { gameStore } from '../usecases/gameStore.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 let isPolling = false
@@ -122,8 +123,10 @@ async function checkAndJoinUserMatches(
 			tournamentStore.markGameAsJoined(match.gameCode)
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
 
-			await handleJoinGameTournament(match.gameCode)
-			initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+			if (!gameStore.gameCode) {
+				await handleJoinGameTournament(match.gameCode)
+				initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+			}
 		}
 	}
 }
