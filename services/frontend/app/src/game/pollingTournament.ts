@@ -30,7 +30,7 @@ export function setPollingInterval(
 	}
 }
 
-async function pollingTournament() {
+export async function pollingTournament() {
 	if (!tournamentStore.tournamentCode) return
 	const result = await getTournamentAPI(tournamentStore.tournamentCode)
 	// console.log(result)

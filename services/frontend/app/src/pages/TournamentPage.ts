@@ -1,6 +1,7 @@
 import {
 	pollingInterval,
 	pollingLoopTournament,
+	pollingTournament,
 	setPollingInterval
 } from '../game/pollingTournament.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
@@ -17,7 +18,7 @@ import {
 } from '../events/tournament/nextMatchModal.js'
 import { hideModal } from '../components/modals/Modal.js'
 
-export const waitingPlayer = 'PLAYER ?'
+export const waitingPlayer = '???'
 
 export const TournamentPage = (): string => {
 	const code = routeParams.code || 'T-XXXXX'
@@ -100,6 +101,7 @@ export async function attachTournamentEvents() {
 
 	tournamentStore.tournamentCode = code
 
+    await pollingTournament()
 	setTimeout(() => {
 		pollingLoopTournament()
 	}, 1000)
