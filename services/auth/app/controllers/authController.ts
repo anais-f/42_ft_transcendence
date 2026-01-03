@@ -94,9 +94,30 @@ export async function validateAdminController(
 }
 
 export async function logoutController(
-	_request: FastifyRequest,
+	request: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
+	const userId = request.user?.user_id
+
+	// Call cleanup endpoint if user is authenticated
+	if (userId !== undefined) {
+		try {
+			await fetch(
+				`${env.GAME_SERVICE_URL}/api/game/internal/cleanup/${userId}`,
+				{
+					method: 'POST',
+					headers: {
+						authorization: env.INTERNAL_API_SECRET
+					},
+					signal: AbortSignal.timeout(3000)
+				}
+			)
+		} catch (e) {
+			console.error(`[Logout] Failed to cleanup user ${userId}:`, e)
+			// Don't block logout if cleanup fails
+		}
+	}
+
 	reply.clearCookie('auth_token', { path: '/' })
 	reply.clearCookie('twofa_token', { path: '/' })
 	return reply.code(200).send()
