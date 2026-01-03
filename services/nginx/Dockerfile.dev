@@ -2,18 +2,16 @@
 FROM alpine:3.19.4
 
 WORKDIR /app
-RUN apk add --no-cache nginx
+RUN apk add --no-cache nginx gettext
 RUN mkdir -p /usr/share/nginx/html/avatars
 
-COPY conf/default.dev.conf /etc/nginx/http.d/default.dev.conf
+COPY conf/default.dev.conf /etc/nginx/http.d/default.conf.template
 COPY avatars/img_default.png /usr/share/nginx/html/avatars/img_default.png
-COPY entrypoint.dev.sh /usr/local/bin/entrypoint.dev.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.dev.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \
     && chmod -R 755 /usr/share/nginx/html/avatars
 
-EXPOSE 8080
-
-ENTRYPOINT [ "entrypoint.dev.sh" ]
+ENTRYPOINT [ "entrypoint.sh" ]

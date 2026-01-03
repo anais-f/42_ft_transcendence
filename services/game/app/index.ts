@@ -3,12 +3,12 @@ import { createWsApp } from '@ft_transcendence/security'
 import { registerRoutes } from './routes/registerRoutes.js'
 import { env } from './env/checkEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
-import { runMigrations } from './database/connection.js'
+import { initDB } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
 import metricPlugin from 'fastify-metrics'
 
-// Run migrations
-runMigrations()
+// Run migrations first, then initialize tournament ID
+initDB()
 
 async function start(): Promise<void> {
 	const app = createWsApp(
@@ -41,10 +41,10 @@ async function start(): Promise<void> {
 		await app.register(metricPlugin.default, { endpoint: '/metrics' })
 		await app.ready()
 		await app.listen({
-			port: env.PORT,
+			port: 3000,
 			host: '0.0.0.0'
 		})
-		console.log(`listening on port: ${env.PORT}`)
+		console.log(`listening on port: 3000`)
 	} catch (err) {
 		console.error('Error starting server:', err)
 		process.exit(1)

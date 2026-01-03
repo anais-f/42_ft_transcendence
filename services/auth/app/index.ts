@@ -1,5 +1,5 @@
 import Fastify from 'fastify'
-import { runMigrations } from './database/connection.js'
+import { initDB } from './database/connection.js'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -41,7 +41,7 @@ setupFastifyMonitoringHooks(app)
 
 async function runServer() {
 	console.log('Starting Auth service...')
-	runMigrations()
+	initDB()
 	console.log('Admin user ensured')
 
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
@@ -80,10 +80,10 @@ async function runServer() {
 
 	await registerRoutes(app)
 	await app.listen({
-		port: env.PORT,
-		host: env.HOST
+		port: 3000,
+		host: '0.0.0.0'
 	})
-	console.log('Auth service running on http://localhost:', env.PORT)
+	console.log('Auth service running on http://localhost:', 3000)
 }
 
 runServer().catch((err) => {

@@ -11,6 +11,7 @@ import {
 } from '../usecases/authUsecases.js'
 import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
+import { tr } from 'zod/v4/locales'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -26,7 +27,7 @@ export async function registerController(
 	reply.setCookie('auth_token', token, {
 		httpOnly: true,
 		sameSite: 'strict',
-		secure: env.NODE_ENV === 'production',
+		secure: true,
 		path: '/',
 		maxAge: 60 * 60
 	})
@@ -49,7 +50,7 @@ export async function loginController(
 		reply.setCookie('twofa_token', result.token, {
 			httpOnly: true,
 			sameSite: 'strict',
-			secure: env.NODE_ENV === 'production',
+			secure: true,
 			path: '/',
 			maxAge: 60 * 5
 		})
@@ -58,7 +59,7 @@ export async function loginController(
 		reply.setCookie('auth_token', result.token, {
 			httpOnly: true,
 			sameSite: 'strict',
-			secure: env.NODE_ENV === 'production',
+			secure: true,
 			path: '/',
 			maxAge: 60 * 60
 		})
