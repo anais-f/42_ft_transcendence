@@ -14,6 +14,8 @@ import { GetTournamentResponseDTO } from '@ft_transcendence/common'
 import { handleJoinGameTournament } from '../events/tournament/gameTournament.js'
 import { initGameWS } from './network/initGameWS.js'
 import { gameStore } from '../usecases/gameStore.js'
+import { showModal } from '../components/modals/Modal.js'
+import { NEXT_MATCH_MODAL_ID } from '../events/tournament/nextMatchModal.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 let isPolling = false
@@ -124,6 +126,7 @@ async function checkAndJoinUserMatches(
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
 
 			if (!gameStore.gameCode) {
+				showModal(NEXT_MATCH_MODAL_ID)
 				await handleJoinGameTournament(match.gameCode)
 				initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
 			}

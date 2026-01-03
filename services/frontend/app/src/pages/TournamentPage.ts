@@ -11,6 +11,11 @@ import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { gameStore } from '../usecases/gameStore.js'
+import {
+	NEXT_MATCH_MODAL_ID,
+	NextConfigModal
+} from '../events/tournament/nextMatchModal.js'
+import { hideModal } from '../components/modals/Modal.js'
 
 export const waitingPlayer = 'PLAYER ?'
 
@@ -76,6 +81,7 @@ export const TournamentPage = (): string => {
       </div>
     </section>
   </section>
+  ${NextConfigModal()}
 `
 }
 
@@ -100,9 +106,10 @@ export async function attachTournamentEvents() {
 
 	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
-		const actionButton = target.closest('[data-action]')
+		const actionButton = target.closest('[data-action]') as HTMLElement
 
 		if (actionButton) {
+			e.preventDefault()
 			const action = actionButton.getAttribute('data-action')
 
 			if (action === 'copy-tournament-code') {
@@ -111,6 +118,12 @@ export async function attachTournamentEvents() {
 					'tournament-code',
 					'Copy Tournament Code'
 				)
+			}
+			if (action === 'close-modal') {
+				hideModal(NEXT_MATCH_MODAL_ID)
+			}
+			if (action === 'close-modal-overlay' && target === actionButton) {
+				hideModal(NEXT_MATCH_MODAL_ID)
 			}
 		}
 	}
