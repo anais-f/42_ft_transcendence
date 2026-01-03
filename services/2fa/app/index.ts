@@ -1,5 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify'
-import { runMigrations } from './database/connection.js'
+import { initDBs } from './database/connection.js'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -30,7 +30,7 @@ app.register(fastifyJwt, {
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-runMigrations()
+initDBs()
 
 setupErrorHandler(app)
 setupFastifyMonitoringHooks(app)
