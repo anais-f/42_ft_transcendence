@@ -19,10 +19,7 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 	const tournament = tournaments.get(tournamentCode.code)
 	if (!tournament) throw createHttpError.NotFound()
 
-	// if user is already in THIS tournament, he can join again
-	if (tournament.participants.includes(userId)) {
-		return tournament
-	}
+	if (tournament.participants.includes(userId)) return tournament
 
 	if (usersToTournament.has(userId))
 		throw createHttpError.Conflict('User is already in another tournament')

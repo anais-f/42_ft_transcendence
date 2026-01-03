@@ -47,7 +47,7 @@ app.register(Swagger as any, {
 		},
 		servers: [
 			{
-				url: `http://localhost:8080/2fa`,
+				url: `${env.SWAGGER_HOST}:8080/2fa`,
 				description: 'Local server'
 			}
 		],

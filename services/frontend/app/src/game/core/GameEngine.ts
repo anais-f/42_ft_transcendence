@@ -19,7 +19,6 @@ export class GameEngine {
 
 		renderer.clear()
 
-		// Sauvegarder backTo avant de clear pour que le onclose handler puisse l'utiliser
 		const savedBackTo = gameStore.backTo
 
 		if (this.ws) {

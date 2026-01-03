@@ -36,7 +36,6 @@ export const updatePlayerCard = (
 export function updateAllPlayerCards(playerCardPrefix: string) {
 	const players = tournamentStore.players
 
-	// console.log('PLAYERS : ', players)
 	for (let i = 0; i < 4; i++) {
 		const player = players[i]
 		const cardId = `${playerCardPrefix}${i}`

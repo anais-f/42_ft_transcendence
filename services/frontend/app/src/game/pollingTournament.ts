@@ -24,7 +24,6 @@ export function setPollingInterval(
 	value: ReturnType<typeof setTimeout> | null
 ): void {
 	pollingInterval = value
-	// Reset polling flag when manually stopping
 	if (value === null) {
 		isPolling = false
 	}
@@ -32,12 +31,11 @@ export function setPollingInterval(
 
 export async function pollingTournament() {
 	if (!tournamentStore.tournamentCode) return
+
 	const result = await getTournamentAPI(tournamentStore.tournamentCode)
-	// console.log(result)
 	if (errorGetTournament(result)) return
 
 	const tournamentData: GetTournamentResponseDTO = result.data
-	console.log('tournamentData', tournamentData)
 
 	tournamentStore.status = tournamentData.tournament.status
 
@@ -58,10 +56,12 @@ export async function pollingLoopTournament() {
 
 	try {
 		await pollingTournament()
+
 		if (tournamentStore.status === 'completed') {
 			console.log('Tournament completed, stopping polling.')
 			return
 		}
+
 		pollingInterval = setTimeout(pollingLoopTournament, 2000)
 	} catch (error) {
 		console.error('Error fetching tournament data:', error)
@@ -96,32 +96,23 @@ function errorGetTournament(result: IApiResponse): boolean {
 async function checkAndJoinUserMatches(
 	tournament: GetTournamentResponseDTO['tournament']
 ): Promise<void> {
-	if (!['completed', 'ongoing'].includes(tournament.status)) {
-		return
-	}
+	if (!['completed', 'ongoing'].includes(tournament.status)) return
 
-	if (!currentUser?.user_id) {
-		return
-	}
+	if (!currentUser?.user_id) return
 
-	// Check all 3 matches (2 semi-finals + final) to see if user needs to join
 	for (let matchIndex = 0; matchIndex < 3; matchIndex++) {
 		const match = tournament.matchs[matchIndex]
 
-		// Skip if match has no game code
 		if (!match.gameCode) continue
 
-		// Check if current user is a participant in this match
 		const isUserInMatch =
 			match.player1Id === currentUser.user_id ||
 			match.player2Id === currentUser.user_id
 
 		if (!isUserInMatch) continue
 
-		// Check if user has already joined this game
 		const alreadyJoined = tournamentStore.hasJoinedGame(match.gameCode)
 
-		// Join match if not already joined and match is still ongoing
 		if (!alreadyJoined && match.winnerId === undefined) {
 			tournamentStore.markGameAsJoined(match.gameCode)
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
@@ -140,16 +131,13 @@ async function updateMatches(
 	tournamentData: GetTournamentResponseDTO
 ) {
 	const tournament = tournamentData.tournament
-	if (!tournament || !['completed', 'ongoing'].includes(tournament.status)) {
+	if (!tournament || !['completed', 'ongoing'].includes(tournament.status))
 		return
-	}
 
-	// Check and join user matches
 	await checkAndJoinUserMatches(tournament)
 
 	for (let matchIndex = 0; matchIndex < 3; ++matchIndex) {
 		for (let playerIndex = 0; playerIndex < 2; ++playerIndex) {
-			// update Name
 			const p = tournamentStore.playersMap.get(
 				tournament.matchs[matchIndex][`player${playerIndex + 1}Id`]
 			)
@@ -158,7 +146,6 @@ async function updateMatches(
 				p?.username || waitingPlayer
 			)
 
-			// update Score
 			const score =
 				tournament.matchs[matchIndex][`scorePlayer${playerIndex + 1}`]
 			if (score !== undefined) {
@@ -169,9 +156,7 @@ async function updateMatches(
 	}
 
 	const winnerId = tournament.matchs[2]?.winnerId
-	if (!winnerId) {
-		return
-	}
+	if (!winnerId) return
 
 	const winner = tournamentStore.playersMap.get(winnerId)
 	updateTournamentCellName('final-winner', winner?.username || waitingPlayer)

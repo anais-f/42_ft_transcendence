@@ -72,19 +72,11 @@ export function onTournamentMatchEnd(
 		`Winner ${tournamentData.winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
 	)
 
-	// Check if both players are ready for the next match
 	if (
 		nextRoundMatch.player1Id !== undefined &&
 		nextRoundMatch.player2Id !== undefined &&
 		nextRoundMatch.status === 'waiting_for_players'
 	) {
-		// Both players ready, wait 5 seconds before starting the next match
-		// to give players time to return to tournament page and prepare
-		nextRoundMatch.status = 'ongoing'
-		console.log(
-			`Both players ready for round ${nextRoundMatch.round}. Starting match in 5 seconds...`
-		)
-
 		console.log(
 			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)

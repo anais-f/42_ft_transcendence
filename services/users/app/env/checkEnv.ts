@@ -23,6 +23,6 @@ const envSchema = z
 		SWAGGER_HOST: env.SWAGGER_HOST
 	}))
 
-export type IAuthEnv = z.infer<typeof envSchema>
+export type IUserEnv = z.infer<typeof envSchema>
 
 export const env = validateEnv(envSchema)
