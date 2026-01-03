@@ -55,11 +55,8 @@ export function tournamentRoutes(app: FastifyInstance) {
 		getTournamentController
 	)
 	app.delete(
-		'/api/game/quitTournament/:code',
+		'/api/game/quitTournament',
 		{
-			schema: {
-				params: CodeParamSchema
-			},
 			preHandler: jwtAuthMiddleware
 		},
 		quitTournamentController

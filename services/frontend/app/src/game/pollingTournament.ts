@@ -72,11 +72,12 @@ export async function pollingLoopTournament() {
 }
 
 function errorGetTournament(result: IApiResponse): boolean {
-	if ([403, 401, 409, 404].includes(result.status)) {
-		console.log('Not a participant, redirecting...')
+	if ([400, 401, 403, 404, 409].includes(result.status)) {
+		console.log('Invalid tournament code or not a participant, redirecting...')
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,
-			message: result.error || "You're not a participant of this tournament"
+			message:
+				result.error || "Invalid tournament code or you're not a participant"
 		})
 		window.navigate('/')
 		return true

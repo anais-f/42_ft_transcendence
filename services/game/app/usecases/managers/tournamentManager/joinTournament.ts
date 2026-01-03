@@ -2,7 +2,7 @@ import { FastifyRequest } from 'fastify'
 import createHttpError from 'http-errors'
 import {
 	tournaments,
-	usersInTournaments,
+	usersToTournament,
 	playerToGame,
 	busyPlayers
 } from '../gameData.js'
@@ -24,7 +24,7 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 		return tournament
 	}
 
-	if (usersInTournaments.has(userId))
+	if (usersToTournament.has(userId))
 		throw createHttpError.Conflict('User is already in another tournament')
 	if (playerToGame.has(userId))
 		throw createHttpError.Conflict('User is already in a match')
@@ -34,7 +34,7 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 		throw createHttpError.Conflict('Tournament is full')
 
 	tournament.participants.push(userId)
-	usersInTournaments.add(userId)
+	usersToTournament.set(userId, tournamentCode.code)
 	if (tournament.participants.length === tournament.maxParticipants)
 		startTournament(tournamentCode.code, tournament)
 

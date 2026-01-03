@@ -42,4 +42,4 @@ export const busyPlayers = new Set<number>()
 
 // tournament
 export const tournaments = new Map<string, Tournament>()
-export const usersInTournaments = new Set<number>()
+export const usersToTournament = new Map<number, string>()

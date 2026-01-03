@@ -1,6 +1,6 @@
 import { ITournamentMatchResult } from '../gameData.js'
 import createHttpError from 'http-errors'
-import { tournaments, usersInTournaments } from '../gameData.js'
+import { tournaments, usersToTournament } from '../gameData.js'
 import { requestGame } from '../gameManager/requestGame.js'
 import { updateGameMetrics } from '../metricsService.js'
 
@@ -39,7 +39,7 @@ export function onTournamentMatchEnd(
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
-			usersInTournaments.delete(userId)
+			usersToTournament.delete(userId)
 		})
 
 		updateGameMetrics()

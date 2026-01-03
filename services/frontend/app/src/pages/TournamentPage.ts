@@ -101,7 +101,7 @@ export async function attachTournamentEvents() {
 
 	tournamentStore.tournamentCode = code
 
-    await pollingTournament()
+	await pollingTournament()
 	setTimeout(() => {
 		pollingLoopTournament()
 	}, 1000)
@@ -148,7 +148,7 @@ export function detachTournamentEvents() {
 	}
 
 	if (tournamentStore.tournamentCode && !gameStore.navigatingToGame) {
-		quitTournamentAPI(tournamentStore.tournamentCode)
+		quitTournamentAPI()
 	}
 
 	tournamentStore.clear()

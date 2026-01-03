@@ -79,9 +79,9 @@ export async function getTournamentAPI(code: string): Promise<IApiResponse> {
 	}
 }
 
-export async function quitTournamentAPI(code: string): Promise<IApiResponse> {
+export async function quitTournamentAPI(): Promise<IApiResponse> {
 	try {
-		const res = await fetch(`/game/api/game/quitTournament/${code}`, {
+		const res = await fetch(`/game/api/game/quitTournament`, {
 			method: 'DELETE',
 			credentials: 'include',
 			keepalive: true

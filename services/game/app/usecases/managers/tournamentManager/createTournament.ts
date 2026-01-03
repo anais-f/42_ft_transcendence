@@ -8,7 +8,7 @@ import {
 	games,
 	playerToGame,
 	tournaments,
-	usersInTournaments
+	usersToTournament
 } from '../gameData.js'
 import { createInviteCode } from '../../../utils/createCode.js'
 import createHttpError from 'http-errors'
@@ -22,7 +22,7 @@ export function createTournament(
 	if (userId === undefined) {
 		throw createHttpError.Unauthorized()
 	}
-	if (usersInTournaments.has(userId)) {
+	if (usersToTournament.has(userId)) {
 		throw createHttpError.Conflict('User is already in another tournament')
 	}
 	if (playerToGame.has(userId)) {
@@ -39,7 +39,7 @@ export function createTournament(
 		matchs: []
 	}
 	tournaments.set(invitCode, tournament)
-	usersInTournaments.add(userId)
+	usersToTournament.set(userId, invitCode)
 
 	updateGameMetrics()
 
