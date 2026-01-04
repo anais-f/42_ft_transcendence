@@ -59,6 +59,7 @@ export async function pollingLoopTournament() {
 
 		if (tournamentStore.status === 'completed') {
 			console.log('Tournament completed, stopping polling.')
+			setTimeout(() => window.navigate('/'), 5000)
 			return
 		}
 
