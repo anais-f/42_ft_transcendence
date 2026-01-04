@@ -25,7 +25,8 @@ export function joinTournament(request: FastifyRequest): TournamentDTO {
 		throw createHttpError.Conflict('User is already in another tournament')
 	if (playerToGame.has(userId))
 		throw createHttpError.Conflict('User is already in a match')
-	if (busyPlayers.has(userId)) throw createHttpError.Conflict('User is busy')
+	if (busyPlayers.has(userId))
+		throw createHttpError.Conflict('player is already in a game')
 
 	if (tournament.participants.length >= tournament.maxParticipants)
 		throw createHttpError.Conflict('Tournament is full')
