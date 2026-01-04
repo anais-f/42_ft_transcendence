@@ -20,7 +20,7 @@ export async function joinGameApi(code: string): Promise<IApiResponse> {
 		if (!response.ok) {
 			return {
 				data: null,
-				error: payload.error || payload.message || 'Request failed',
+				error: payload.error || payload.message || 'Failed to join game',
 				status: payload.statusCode || response.status
 			}
 		}
