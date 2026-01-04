@@ -184,7 +184,7 @@ services:
   prometheus:
     image: prom/prometheus:v3.7.3
     profiles:
-      - "monitoring"
+      - 'monitoring'
     container_name: prometheus
     restart: on-failure
     networks:
@@ -218,7 +218,7 @@ services:
       context: ./services/monitoring/alertmanager
       dockerfile: Dockerfile
     profiles:
-      - "monitoring"
+      - 'monitoring'
     restart: on-failure
     container_name: alertmanager
     networks:
@@ -241,7 +241,7 @@ services:
   grafana:
     image: grafana/grafana-oss:12.2.0-17142428006
     profiles:
-      - "monitoring"
+      - 'monitoring'
     restart: on-failure
     container_name: grafana
     networks:
@@ -267,7 +267,7 @@ services:
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.5.1
     profiles:
-      - "monitoring"
+      - 'monitoring'
     container_name: nginx-exporter
     command:
       - '-nginx.scrape-uri=http://nginx:8080/stub_status'
