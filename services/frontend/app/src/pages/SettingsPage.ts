@@ -151,13 +151,14 @@ export const SettingsPage = (): string => {
 						maxLength: 6,
 						pattern: '[0-9]{6}'
 					})}
-					${Input({
+					<div class="${isGoogleUser ? 'hidden' : ''}">${Input({
 						id: 'disable_2fa_password',
 						name: 'password',
 						placeholder: 'Password',
 						type: 'password',
 						required: true
 					})}
+					</div>
 					${Button({
 						text: 'Disable 2FA',
 						id: 'disable_2fa_btn',
@@ -185,13 +186,14 @@ export const SettingsPage = (): string => {
 									maxLength: 6,
 									pattern: '[0-9]{6}'
 								})}
-								${Input({
+								<div class="${isGoogleUser ? 'hidden' : ''}">${Input({
 									id: 'enable_2fa_password',
 									name: 'password',
 									placeholder: 'Password',
 									type: 'password',
 									required: true
 								})}
+								</div>
 								${Button({
 									text: 'Verify & Enable',
 									id: 'enable_2fa_btn',
