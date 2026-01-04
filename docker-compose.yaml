@@ -28,8 +28,6 @@ services:
         condition: service_healthy
       game:
         condition: service_healthy
-      alertmanager:
-        condition: service_healthy
     healthcheck:
       test:
         - CMD-SHELL
@@ -185,6 +183,8 @@ services:
 
   prometheus:
     image: prom/prometheus:v3.7.3
+    profiles:
+      - "monitoring"
     container_name: prometheus
     restart: on-failure
     networks:
@@ -217,6 +217,8 @@ services:
     build:
       context: ./services/monitoring/alertmanager
       dockerfile: Dockerfile
+    profiles:
+      - "monitoring"
     restart: on-failure
     container_name: alertmanager
     networks:
@@ -238,6 +240,8 @@ services:
 
   grafana:
     image: grafana/grafana-oss:12.2.0-17142428006
+    profiles:
+      - "monitoring"
     restart: on-failure
     container_name: grafana
     networks:
@@ -262,6 +266,8 @@ services:
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.5.1
+    profiles:
+      - "monitoring"
     container_name: nginx-exporter
     command:
       - '-nginx.scrape-uri=http://nginx:8080/stub_status'

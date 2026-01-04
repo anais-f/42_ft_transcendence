@@ -21,19 +21,19 @@ test: down build
 
 .PHONY: build
 build:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
 
 .PHONY: up
 up: verif-env
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: debug
 debug:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
 
 .PHONY: down
 down:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: sh-%
 sh-%:
