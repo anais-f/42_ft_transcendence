@@ -117,7 +117,10 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	}
 
 	// STEP 1: Verify password
-	if (!(await verifyCurrentUserPassword(password))) {
+	if (
+		!currentUser?.is_google_user &&
+		!(await verifyCurrentUserPassword(password))
+	) {
 		form.reset()
 		return
 	}
@@ -175,7 +178,10 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	}
 
 	// STEP 1: Verify password
-	if (!(await verifyCurrentUserPassword(password))) {
+	if (
+		!currentUser?.is_google_user &&
+		!(await verifyCurrentUserPassword(password))
+	) {
 		form.reset()
 		return
 	}

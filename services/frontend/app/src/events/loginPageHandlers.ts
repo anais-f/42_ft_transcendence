@@ -157,7 +157,7 @@ export async function handleLogin(form: HTMLFormElement) {
 			type: ToastActionType.INFO_ACTION,
 			message: 'Please enter your 2FA code'
 		})
-		switchTo2FAForm()
+		switchTo2FAForm('login_form', '2fa_form')
 		return
 	}
 

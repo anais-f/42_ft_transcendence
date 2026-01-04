@@ -100,3 +100,9 @@ export function isUser2FAEnabled(id: number): boolean {
 	const row = stmt.get(id) as { two_fa_enabled: number } | undefined
 	return !!row && row.two_fa_enabled === 1
 }
+
+export function isGoogleUser(id: number): boolean {
+	const stmt = db().prepare('SELECT google_id FROM users WHERE user_id = ?')
+	const row = stmt.get(id) as { google_id: string | null } | undefined
+	return !!row && row.google_id !== null
+}
