@@ -16,7 +16,8 @@ import {
 export const SettingsPage = (): string => {
 	const is2FAEnabled = currentUser?.two_fa_enabled || false
 	const isGoogleUser = currentUser?.is_google_user || false
-	console.log('Rendering SettingsPage, 2FA enabled:', is2FAEnabled)
+	console.log('current user', currentUser)
+	console.log('Rendering SettingsPage')
 	const twoFATitle = is2FAEnabled ? 'DISABLE 2FA ?' : 'ENABLE 2FA ?'
 
 	return /*html*/ `
@@ -156,7 +157,7 @@ export const SettingsPage = (): string => {
 						name: 'password',
 						placeholder: 'Password',
 						type: 'password',
-						required: true
+						required: !isGoogleUser
 					})}
 					${Button({
 						text: 'Disable 2FA',
@@ -190,7 +191,7 @@ export const SettingsPage = (): string => {
 									name: 'password',
 									placeholder: 'Password',
 									type: 'password',
-									required: true
+									required: !isGoogleUser
 								})}
 								${Button({
 									text: 'Verify & Enable',

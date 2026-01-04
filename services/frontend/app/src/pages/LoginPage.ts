@@ -93,7 +93,6 @@ export const LoginPage = (): string => {
 		additionalClasses: 'form_button'
 	})}
 	</form>
-
 	<!-- 2FA Form -->
 	<form id="2fa_form" data-form="2fa" class="form_style hidden">
 		${Input({
@@ -119,6 +118,7 @@ export const LoginPage = (): string => {
 		variant: 'fill'
 	})}
 	</div>
+	
 	<div class="col-4-span-flex">
 		${LoremSection({
 			title: 'New Partener',
@@ -126,6 +126,26 @@ export const LoginPage = (): string => {
 			additionalClasses: 'mb-4'
 		})}
 		<div id="google-btn-container" class="mx-auto my-4 w-fit flex"></div>
+			<!-- 2FA Form -->
+	<form id="2fa_form_google" data-form="2fa" class="form_style hidden">
+		${Input({
+			id: '2fa_code',
+			name: '2fa_code',
+			placeholder: '000000',
+			type: 'text',
+			required: true,
+			maxLength: 6,
+			pattern: '[0-9]{6}',
+			autoComplete: 'one-time-code',
+			inputmode: 'numeric',
+			additionalClasses: 'tracking-widest text-center letter-spacing-widest'
+		})}
+		${Button({
+			id: '2fa_btn',
+			text: 'Validate',
+			type: 'submit'
+		})}
+	</form>
 		<img src="/assets/images/screamer_girl.png" alt="screamer girl" class="img_style">
 		${LoremSection({
 			variant: 'fill'
@@ -207,7 +227,27 @@ export async function initGoogleAuth() {
 					'310342889284-r3v02ostdrpt7ir500gfl0j0ft1rrnsu.apps.googleusercontent.com',
 				callback: async (response: CredentialResponse) => {
 					try {
-						await loginWithGoogleCredential(response.credential)
+						const { data, error } = await loginWithGoogleCredential(
+							response.credential
+						)
+
+						if (error) {
+							notyf.open({
+								type: ToastActionType.ERROR_ACTION,
+								message: error
+							})
+							return
+						}
+
+						if (data?.pre_2fa_required) {
+							notyf.open({
+								type: ToastActionType.INFO_ACTION,
+								message: 'Please enter your 2FA code'
+							})
+							switchTo2FAForm('google-btn-container', '2fa_form_google')
+							return
+						}
+
 						const authResult = await checkAuth()
 						setCurrentUser(authResult)
 						window.navigate('/', true)
@@ -244,11 +284,14 @@ export function cleanupGoogleAuth() {
 	console.log('Google Auth cleaned up')
 }
 
-export function switchTo2FAForm() {
-	const loginForm = document.getElementById('login_form')
+export function switchTo2FAForm(
+	originForm: HTMLFormElement,
+	finalForm: HTMLFormElement
+) {
+	const loginForm = document.getElementById(originForm)
 	loginForm?.classList.add('hidden')
 
-	const twoFAForm = document.getElementById('2fa_form')
+	const twoFAForm = document.getElementById(finalForm)
 	twoFAForm?.classList.remove('hidden')
 	twoFAForm?.classList.add('flex')
 
