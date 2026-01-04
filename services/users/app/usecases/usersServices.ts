@@ -79,7 +79,15 @@ export class UsersServices {
 				'Failed to get 2FA status from auth service'
 			)
 		}
-		console.log(`User ${user.user_id} 2FA status: ${two_fa_status}`)
+
+		let is_google_user = false
+		try {
+			is_google_user = await AuthApi.getGoogleUserStatus(user.user_id)
+		} catch (err) {
+			throw createHttpError.BadGateway(
+				'Failed to get Google user status from auth service'
+			)
+		}
 
 		return {
 			user_id: localUser.user_id,
@@ -87,7 +95,8 @@ export class UsersServices {
 			avatar: localUser.avatar,
 			status: localUser.status,
 			last_connection: localUser.last_connection,
-			two_fa_enabled: two_fa_status
+			two_fa_enabled: two_fa_status,
+			is_google_user: is_google_user
 		}
 	}
 

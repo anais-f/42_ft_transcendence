@@ -66,6 +66,7 @@ export class AuthApi {
 			'content-type': 'application/json',
 			authorization: secret
 		}
+
 		let response
 		try {
 			response = await fetch(url, {
@@ -82,9 +83,51 @@ export class AuthApi {
 				'Failed to fetch 2FA status from auth: ' + error.message
 			)
 		}
+
 		if (!response.ok)
 			throw createHttpError.BadGateway(`Auth service HTTP ${response.status}`)
 		const raw = (await response.json()) as { enabled: boolean }
+
 		return raw.enabled
+	}
+
+	/**
+	 * @description Get Google user status for a user from auth service
+	 * @param userId - The user ID
+	 * @returns Boolean indicating if user is a Google user
+	 * @throws Error if the request fails
+	 */
+	static async getGoogleUserStatus(userId: number): Promise<boolean> {
+		const base = env.AUTH_SERVICE_URL
+		const secret = env.INTERNAL_API_SECRET
+
+		const url = `${base}/api/internal/google/status/${userId}`
+		const headers = {
+			'content-type': 'application/json',
+			authorization: secret
+		}
+
+		let response
+		try {
+			response = await fetch(url, {
+				method: 'GET',
+				headers,
+				signal: AbortSignal.timeout(5000)
+			})
+		} catch (err: unknown) {
+			const error = err as Error
+			if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+				throw createHttpError.GatewayTimeout('Auth service timeout')
+			}
+			throw createHttpError.BadGateway(
+				'Failed to fetch Google user status from auth: ' + error.message
+			)
+		}
+
+		if (!response.ok)
+			throw createHttpError.BadGateway(`Auth service HTTP ${response.status}`)
+		const raw = (await response.json()) as { is_google_user: boolean }
+
+		return raw.is_google_user
 	}
 }
