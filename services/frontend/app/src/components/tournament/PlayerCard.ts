@@ -43,7 +43,7 @@ export function updateAllPlayerCards(playerCardPrefix: string) {
 		if (player) {
 			updatePlayerCard(cardId, player.username, player.avatar)
 		} else {
-			updatePlayerCard(cardId, 'Waiting...', '/avatars/img_default.png')
+			updatePlayerCard(cardId, 'Waiting...', '/assets/images/loading.png')
 		}
 	}
 }
