@@ -9,7 +9,7 @@ export function startTournament(code: string, tournament: Tournament) {
 
 	setTimeout(() => {
 		startFirstRound(code, tournament)
-	}, 10000)
+	}, 5000)
 
 	updateGameMetrics()
 }

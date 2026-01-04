@@ -43,6 +43,13 @@ export function onTournamentMatchEnd(
 		})
 
 		updateGameMetrics()
+		setTimeout(
+			() => {
+				tournaments.delete(tournamentCode)
+				console.log(`Tournament ${tournamentCode} data cleaned up from memory`)
+			},
+			1 * 60 * 1000
+		)
 		return
 	}
 
