@@ -40,7 +40,7 @@ export async function getPrivateUser(
 	req: FastifyRequest,
 	reply: FastifyReply
 ): Promise<void> {
-	const user = req.user as { user_id?: number } | undefined
+	const user = req.user as { user_id?: number; login?: string } | undefined
 	const userId = Number(user?.user_id)
 
 	if (!userId || userId <= 0)
@@ -50,7 +50,14 @@ export async function getPrivateUser(
 		user_id: userId
 	})
 
-	const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
+	const isGoogleUser = user?.login?.startsWith('google-') ?? false
+
+	const enrichedProfile = {
+		...rawProfile,
+		is_google_user: isGoogleUser
+	}
+
+	const parsed = UserPrivateProfileSchema.safeParse(enrichedProfile)
 	if (!parsed.success) {
 		console.error('UserPrivateProfile validation failed:', parsed.error)
 		throw createHttpError.InternalServerError('Invalid response data')

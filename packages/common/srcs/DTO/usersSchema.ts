@@ -97,7 +97,8 @@ export const UserPrivateProfileSchema = z
 		avatar: z.string(),
 		status: z.number().int().nonnegative(),
 		last_connection: z.string(),
-		two_fa_enabled: z.boolean().optional()
+		two_fa_enabled: z.boolean().optional(),
+		is_google_user: z.boolean().optional()
 	})
 	.meta({ description: 'Private user profile schema' })
 

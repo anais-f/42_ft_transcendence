@@ -27,8 +27,9 @@ export interface IPrivateUser {
 	username: string
 	avatar: string
 	status: UserStatus
-	last_connection: string // ISO timestamp
-	two_fa_enabled?: boolean // Optional: 2FA status from auth service
+	last_connection: string
+	two_fa_enabled?: boolean
+	is_google_user?: boolean
 }
 
 /**
