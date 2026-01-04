@@ -9,6 +9,7 @@ services:
       - '${PORT:-8080}:${PORT:-8080}'
     networks:
       - backend
+      - monitoring
     volumes:
       - avatars_data:/usr/share/nginx/html/avatars:ro
     secrets:
@@ -180,10 +181,108 @@ services:
       retries: 12
       start_period: 20s
 
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    profiles:
+      - 'monitoring'
+    container_name: prometheus
+    restart: on-failure
+    networks:
+      - backend
+      - monitoring
+    depends_on:
+      auth:
+        condition: service_healthy
+      users:
+        condition: service_healthy
+    volumes:
+      - prometheus_data:/prometheus
+      - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.route-prefix=/prometheus'
+      - '--web.external-url=http://localhost:8080/prometheus/'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:9090 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  alertmanager:
+    build:
+      context: ./services/monitoring/alertmanager
+      dockerfile: Dockerfile
+    profiles:
+      - 'monitoring'
+    restart: on-failure
+    container_name: alertmanager
+    networks:
+      - monitoring
+    env_file:
+      - .env
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    entrypoint: /entrypoint.sh
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:9093 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana-oss:12.2.0-17142428006
+    profiles:
+      - 'monitoring'
+    restart: on-failure
+    container_name: grafana
+    networks:
+      - monitoring
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./services/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./services/monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qS --spider http://127.0.0.1:3000 2>&1 | grep -E "HTTP/[0-9.]+ (2|3|4)[0-9]{2}" >/dev/null
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    profiles:
+      - 'monitoring'
+    container_name: nginx-exporter
+    command:
+      - '-nginx.scrape-uri=http://nginx:8080/stub_status'
+    ports:
+      - '9113:9113'
+    depends_on:
+      - nginx
+    networks:
+      - monitoring
+    restart: on-failure
+
 networks:
-  pong:
-    driver: bridge
   backend:
+    driver: bridge
+  monitoring:
     driver: bridge
 
 volumes:
@@ -193,6 +292,8 @@ volumes:
   db_2fa_data:
   db_game_data:
   avatars_data:
+  prometheus_data:
+  grafana_data:
 
 secrets:
   ssl_cert:
