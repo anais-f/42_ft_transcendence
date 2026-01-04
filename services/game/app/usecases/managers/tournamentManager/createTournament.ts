@@ -4,12 +4,7 @@ import {
 	TournamentDTO,
 	CreateTournamentResponseDTO
 } from '@ft_transcendence/common'
-import {
-	games,
-	playerToGame,
-	tournaments,
-	usersToTournament
-} from '../gameData.js'
+import { playerToGame, tournaments, usersToTournament } from '../gameData.js'
 import { createInviteCode } from '../../../utils/createCode.js'
 import createHttpError from 'http-errors'
 import { updateGameMetrics } from '../metricsService.js'
