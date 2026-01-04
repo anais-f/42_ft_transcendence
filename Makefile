@@ -13,14 +13,6 @@ install:
 	./scripts/setup-node.sh
 	npm install
 
-.PHONY: build-monitoring
-build-monitoring:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) build
-
-.PHONY: up-monitoring
-up-monitoring: verif-env
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) up -d
-
 .PHONY: test
 test: down build
 	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
