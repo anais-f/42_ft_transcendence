@@ -2,7 +2,7 @@ import { IApiResponse } from '../../types/api.js'
 
 export async function fetchMatchHistory(userId: number): Promise<IApiResponse> {
 	try {
-		const res = await fetch(`/game/api/game/matchHistory/${userId}`, {
+		const res = await fetch(`/game/api/user/matchHistory/${userId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -31,7 +31,7 @@ export async function fetchMatchHistory(userId: number): Promise<IApiResponse> {
 
 export async function fetchStats(userId: number): Promise<IApiResponse> {
 	try {
-		const res = await fetch(`/game/api/game/stats/${userId}`, {
+		const res = await fetch(`/game/api/user/stats/${userId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'

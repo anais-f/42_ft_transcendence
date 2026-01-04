@@ -12,7 +12,7 @@ import {
 
 export function statsRoutes(app: FastifyInstance) {
 	app.get(
-		'/api/game/matchHistory/:id',
+		'/api/user/matchHistory/:id',
 		{
 			schema: {
 				params: IdParamSchema,
@@ -25,7 +25,7 @@ export function statsRoutes(app: FastifyInstance) {
 		getUserMatchHistoryController
 	)
 	app.get(
-		'/api/game/stats/:id',
+		'/api/user/stats/:id',
 		{
 			schema: {
 				params: IdParamSchema,
