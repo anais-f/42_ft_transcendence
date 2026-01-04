@@ -20,13 +20,7 @@ export function endGame(code: string) {
 		return
 	}
 
-	saveMatchToHistory(
-		gameData.p1.id,
-		gameData.p2.id,
-		score.p1,
-		score.p2,
-		gameData.tournamentMatchData
-	)
+	saveMatchToHistory(gameData.p1.id, gameData.p2.id, score.p1, score.p2)
 
 	const p1Won = score.p1 > score.p2
 	const eogMessage = createEogMessage(

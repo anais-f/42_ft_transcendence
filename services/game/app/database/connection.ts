@@ -28,8 +28,7 @@ export function initDB() {
 		CREATE TABLE IF NOT EXISTS match_history (
 			id_match INTEGER PRIMARY KEY AUTOINCREMENT,
 			winner_id INTEGER NOT NULL,
-			played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			tournament_code TEXT DEFAULT NULL
+			played_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 
 		CREATE TABLE IF NOT EXISTS match_player (
