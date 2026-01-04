@@ -14,7 +14,7 @@ import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { gameStore } from '../usecases/gameStore.js'
 import {
 	NEXT_MATCH_MODAL_ID,
-	NextConfigModal
+	NextMatchModal
 } from '../events/tournament/nextMatchModal.js'
 import { hideModal } from '../components/modals/Modal.js'
 
@@ -82,7 +82,7 @@ export const TournamentPage = (): string => {
       </div>
     </section>
   </section>
-  ${NextConfigModal()}
+  ${NextMatchModal()}
 `
 }
 

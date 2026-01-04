@@ -1,10 +1,12 @@
 import { Modal } from '../../components/modals/Modal.js'
-import { PlayerCard } from '../../components/tournament/PlayerCard.js'
+import {
+	PlayerCard,
+} from '../../components/tournament/PlayerCard.js'
 import { currentUser } from '../../usecases/userStore.js'
 
 export const NEXT_MATCH_MODAL_ID = 'next-match-modal'
 
-export const NextConfigModal = (): string => {
+export const NextMatchModal = (): string => {
 	const content = /*html*/ `
 	<div class="flex flex-row space-x-4 items-center">
 		<div class="flex-[2] text-center">
