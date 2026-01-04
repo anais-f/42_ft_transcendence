@@ -115,13 +115,33 @@ async function checkAndJoinUserMatches(
 		const alreadyJoined = tournamentStore.hasJoinedGame(match.gameCode)
 
 		if (!alreadyJoined && match.winnerId === undefined) {
-			tournamentStore.markGameAsJoined(match.gameCode)
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
 
 			if (!gameStore.gameCode) {
 				showModal(NEXT_MATCH_MODAL_ID)
-				await handleJoinGameTournament(match.gameCode)
-				initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+				const result = await handleJoinGameTournament(match.gameCode)
+
+				if (result.alreadyInGame) {
+					// User is already in game from another tab, stop polling and redirect
+					console.log(
+						'Tournament already active in another tab, redirecting...'
+					)
+					if (pollingInterval) {
+						clearTimeout(pollingInterval)
+						setPollingInterval(null)
+					}
+					notyf.open({
+						type: ToastActionType.ERROR_ACTION,
+						message: 'Tournament is already active in another tab!'
+					})
+					setTimeout(() => window.navigate('/'), 2000)
+					return
+				}
+
+				if (result.success) {
+					tournamentStore.markGameAsJoined(match.gameCode)
+					initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+				}
 			}
 		}
 	}
