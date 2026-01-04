@@ -6,7 +6,7 @@ import {
 import {
 	games,
 	tournaments,
-	usersInTournaments,
+	usersToTournament,
 	GameStatus
 } from './gameData.js'
 import { TournamentStatus } from '@ft_transcendence/common'
@@ -51,7 +51,7 @@ export function updateGameMetrics(): void {
 	)
 
 	// Update players in tournaments
-	playersInTournamentsGauge.set(usersInTournaments.size)
+	playersInTournamentsGauge.set(usersToTournament.size)
 
 	console.log(
 		`[Metrics] Games: waiting=${gamesByStatus.waiting} active=${gamesByStatus.active} ended=${gamesByStatus.ended}`
@@ -59,5 +59,5 @@ export function updateGameMetrics(): void {
 	console.log(
 		`[Metrics] Tournaments: pending=${tournamentsByStatus.pending} ongoing=${tournamentsByStatus.ongoing} completed=${tournamentsByStatus.completed}`
 	)
-	console.log(`[Metrics] Players in tournaments:  ${usersInTournaments.size}`)
+	console.log(`[Metrics] Players in tournaments:  ${usersToTournament.size}`)
 }

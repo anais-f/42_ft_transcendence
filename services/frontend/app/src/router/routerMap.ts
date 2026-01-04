@@ -25,12 +25,24 @@ import {
 	detachProfileEvents
 } from '../pages/ProfilePage.js'
 import {
+	TournamentPage,
+	attachTournamentEvents,
+	detachTournamentEvents
+} from '../pages/TournamentPage.js'
+import {
 	LobbyPage,
 	attachLobbyEvents,
 	detachLobbyEvents
 } from '../pages/LobbyPage.js'
 
-export type Pages = 'home' | 'game' | 'lobby' | 'login' | 'profile' | 'settings'
+export type Pages =
+	| 'home'
+	| 'game'
+	| 'lobby'
+	| 'login'
+	| 'profile'
+	| 'settings'
+	| 'tournament'
 
 export type Route = {
 	id: string
@@ -96,5 +108,14 @@ export const routerMap: Record<Pages, Route> = {
 		binds: [attachSettingsEvents],
 		unbinds: [detachSettingsEvents],
 		index: 4
+	},
+
+	tournament: {
+		id: 'tournament',
+		url: '/tournament/:code',
+		page: TournamentPage,
+		binds: [attachTournamentEvents],
+		unbinds: [detachTournamentEvents],
+		index: 5
 	}
 }

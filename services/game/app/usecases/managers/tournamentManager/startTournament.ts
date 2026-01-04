@@ -3,16 +3,18 @@ import { requestGame } from '../gameManager/requestGame.js'
 import { createTournamentTree } from './createTournamentTree.js'
 import { updateGameMetrics } from '../metricsService.js'
 
-export function startTournament(tournament: Tournament) {
+export function startTournament(code: string, tournament: Tournament) {
 	tournament.status = 'ongoing'
 	createTournamentTree(tournament)
-	// Only start the first round (highest round number)
-	startFirstRound(tournament)
+
+	setTimeout(() => {
+		startFirstRound(code, tournament)
+	}, 10000)
 
 	updateGameMetrics()
 }
 
-function startFirstRound(tournament: Tournament) {
+function startFirstRound(code: string, tournament: Tournament) {
 	const roundMatches = tournament.matchs.filter(
 		(match) => match.round === Math.log2(tournament.maxParticipants)
 	)
@@ -22,10 +24,11 @@ function startFirstRound(tournament: Tournament) {
 			return
 		}
 		match.status = 'ongoing'
-		requestGame(match.player1Id, match.player2Id, {
-			tournamentId: tournament.id,
+		const gameCode = requestGame(match.player1Id, match.player2Id, {
+			tournamentCode: code,
 			round: match.round,
 			matchNumber: match.matchNumber
 		})
+		match.gameCode = gameCode
 	})
 }

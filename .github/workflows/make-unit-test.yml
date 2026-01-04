@@ -58,9 +58,9 @@ jobs:
           SOCIAL_SERVICE_URL=http://social:3000
           SOCIAL_DB_PATH=/data/db-social.sqlite
 
-          # Matchmaking service
-          MATCHMAKING_SERVICE_URL=http://matchmaking:3000
-          MATCHMAKING_DB_PATH=/data/db-matchmaking.sqlite
+          # Game service
+          GAME_SERVICE_URL=http://game:3000
+          GAME_DB_PATH=/data/db-game.sqlite
 
           # Admin credentials
           LOGIN_ADMIN=admin

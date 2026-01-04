@@ -7,7 +7,7 @@ export type GameStatus = 'waiting' | 'active' | 'ended'
 export type TPlayerSlot = 'p1' | 'p2'
 
 export interface ITournamentMatchData {
-	tournamentId: number
+	tournamentCode: string
 	round: number
 	matchNumber: number
 }
@@ -42,4 +42,4 @@ export const busyPlayers = new Set<number>()
 
 // tournament
 export const tournaments = new Map<string, Tournament>()
-export const usersInTournaments = new Set<number>()
+export const usersToTournament = new Map<number, string>()

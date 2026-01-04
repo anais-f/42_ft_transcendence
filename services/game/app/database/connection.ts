@@ -8,7 +8,7 @@ let db: Database
 
 export function getDb(): Database {
 	if (!db) {
-		const path = env.MATCHMAKING_DB_PATH
+		const path = env.GAME_DB_PATH
 		// Ensure directory exists
 		mkdirSync(dirname(path), { recursive: true })
 		db = new BetterSqlite3(path)
@@ -28,10 +28,7 @@ export function initDB() {
 		CREATE TABLE IF NOT EXISTS match_history (
 			id_match INTEGER PRIMARY KEY AUTOINCREMENT,
 			winner_id INTEGER NOT NULL,
-			played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-			round INTEGER DEFAULT -1,
-			match_number INTEGER DEFAULT -1,
-			id_tournament INTEGER DEFAULT -1
+			played_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 
 		CREATE TABLE IF NOT EXISTS match_player (

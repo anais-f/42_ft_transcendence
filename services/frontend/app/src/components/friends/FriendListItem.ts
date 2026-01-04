@@ -1,4 +1,4 @@
-import { UserLink } from '../UserLink.js'
+import { UserLink } from './UserLink.js'
 import { StatusCircle } from './StatusCircle.js'
 import { escapeHtml, sanitizeAvatarUrl } from '../../usecases/sanitize.js'
 

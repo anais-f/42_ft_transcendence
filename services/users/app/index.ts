@@ -61,7 +61,10 @@ function createApp(): FastifyInstance {
 				title: 'API for Users Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${env.HOST}/users`, description: 'Local server' }],
+			servers: [
+				{ url: `${env.SWAGGER_HOST}:8080/users`, description: 'Local server' }
+			],
+
 			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform

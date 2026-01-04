@@ -1,13 +1,13 @@
-import { currentUser } from '../usecases/userStore.js'
+import { currentUser } from '../../usecases/userStore.js'
 import {
 	verifyMyPasswordAPI,
 	setup2FAAPI,
 	verifySetup2FAAPI,
 	disable2FAAPI
-} from '../api/twoFAApi.js'
-import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { syncCurrentUser } from '../usecases/userValidation.js'
-import { ToastActionType } from '../types/toast.js'
+} from '../../api/twoFAApi.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
+import { syncCurrentUser } from '../../usecases/userValidation.js'
+import { ToastActionType } from '../../types/toast.js'
 
 /**
  * Verify the current user's password using JWT

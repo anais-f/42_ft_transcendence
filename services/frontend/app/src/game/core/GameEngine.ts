@@ -19,6 +19,8 @@ export class GameEngine {
 
 		renderer.clear()
 
+		const savedBackTo = gameStore.backTo
+
 		if (this.ws) {
 			cleanupNetworkDispatcher(this.ws)
 			this.ws.close()
@@ -26,6 +28,7 @@ export class GameEngine {
 		}
 
 		gameStore.clear()
+		gameStore.backTo = savedBackTo
 	}
 }
 

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z, number } from 'zod'
 
 export const MatchStatusSchema = z.enum([
 	'ongoing',
@@ -12,6 +12,18 @@ export const TournamentStatusSchema = z.enum([
 	'completed'
 ])
 
+export const CreateTournamentSchema = z
+	.object({
+		numberOfPlayers: z.literal(4)
+	})
+	.strict()
+
+export const RemoveFromTournamentSchema = z
+	.object({
+		userId: number().positive()
+	})
+	.strict()
+
 export const MatchTournamentSchema = z.object({
 	previousMatchId1: z.number().optional(),
 	previousMatchId2: z.number().optional(),
@@ -19,13 +31,17 @@ export const MatchTournamentSchema = z.object({
 	matchNumber: z.number(),
 	player1Id: z.number().optional(),
 	player2Id: z.number().optional(),
+	winnerId: z.number().optional(),
 	status: MatchStatusSchema,
 	scorePlayer1: z.number().optional(),
-	scorePlayer2: z.number().optional()
+	scorePlayer2: z.number().optional(),
+	gameCode: z
+		.string()
+		.regex(/^G-[A-Z0-9]{5}$/, 'Invalid game code')
+		.optional()
 })
 
 export const TournamentSchema = z.object({
-	id: z.number(),
 	status: TournamentStatusSchema,
 	maxParticipants: z.number(),
 	participants: z.array(z.number()),
@@ -70,3 +86,6 @@ export type CreateTournamentRequestDTO = z.infer<
 	typeof CreateTournamentRequestSchema
 >
 export type TournamentCodeParamDTO = z.infer<typeof TournamentCodeParamSchema>
+
+export type CreateTournamentDTO = z.infer<typeof CreateTournamentSchema>
+export type RemoveFromTournamentDTO = z.infer<typeof RemoveFromTournamentSchema>

@@ -27,7 +27,7 @@ export function handleBindGameCanvas() {
 			if (event.code !== GameWSCloseCodes.NORMAL) {
 				notfy.open({ type: 'info', message: 'You left the game' })
 			}
-			window.navigate('/')
+			window.navigate(gameStore.backTo)
 		}
 
 		ws.onerror = (error) => {

@@ -17,7 +17,12 @@ export async function start(): Promise<void> {
 					title: 'API for Social Service',
 					version: '1.0.0'
 				},
-				servers: [{ url: `${env.HOST}/social`, description: 'Local server' }],
+				servers: [
+					{
+						url: `${env.SWAGGER_HOST}:8080/social`,
+						description: 'Local server'
+					}
+				],
 				components: env.openAPISchema.components
 			},
 			transform: jsonSchemaTransform

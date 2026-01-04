@@ -23,7 +23,10 @@ export async function handleRegister(form: HTMLFormElement) {
 	const confPassword = formData.get('register_conf_password')
 
 	if (!password || !username) {
-		notyf.open({ type: 'info', message: 'Please fill all fields' })
+		notyf.open({
+			type: ToastActionType.INFO_ACTION,
+			message: 'Please fill all fields'
+		})
 		return
 	}
 
@@ -101,7 +104,10 @@ export async function handleLogin(form: HTMLFormElement) {
 	const password = formData.get('login_password')
 
 	if (!password || !username) {
-		notyf.open({ type: 'info', message: 'Please fill all fields' })
+		notyf.open({
+			type: ToastActionType.INFO_ACTION,
+			message: 'Please fill all fields'
+		})
 		return
 	}
 
@@ -147,7 +153,10 @@ export async function handleLogin(form: HTMLFormElement) {
 	}
 
 	if (data.pre_2fa_required) {
-		notyf.open({ type: 'info', message: 'Please enter your 2FA code' })
+		notyf.open({
+			type: ToastActionType.INFO_ACTION,
+			message: 'Please enter your 2FA code'
+		})
 		switchTo2FAForm()
 		return
 	}

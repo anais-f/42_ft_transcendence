@@ -81,13 +81,7 @@ function forfeit(gameData: GameData): ITournamentMatchResult | null {
 		gameData.p1.ws.send(eogMessage)
 	}
 
-	saveMatchToHistory(
-		gameData.p1.id,
-		gameData.p2.id,
-		scorePlayer1,
-		scorePlayer2,
-		gameData.tournamentMatchData
-	)
+	saveMatchToHistory(gameData.p1.id, gameData.p2.id, scorePlayer1, scorePlayer2)
 
 	if (gameData.tournamentMatchData) {
 		return createTournamentMatchResult(

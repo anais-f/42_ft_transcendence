@@ -51,7 +51,12 @@ async function runServer() {
 				title: 'API for Auth Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${env.HOST}/auth`, description: 'Local server' }],
+			servers: [
+				{
+					url: `${env.SWAGGER_HOST}:8080/auth`,
+					description: 'Local server'
+				}
+			],
 			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform

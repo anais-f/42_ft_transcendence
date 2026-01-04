@@ -14,7 +14,9 @@ const envSchema = z
 		TWOFA_SERVICE_URL: z.string().min(1),
 		TWOFA_ISSUER: z.string().default('FtTranscendence'),
 		INTERNAL_API_SECRET: z.string().min(1),
-		USERS_SERVICE_URL: z.string().min(1)
+		USERS_SERVICE_URL: z.string().min(1),
+		GAME_SERVICE_URL: z.string().min(1),
+		SWAGGER_HOST: z.string().min(1).default('http://localhost')
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
@@ -28,7 +30,9 @@ const envSchema = z
 		TWOFA_ISSUER: env.TWOFA_ISSUER,
 		INTERNAL_API_SECRET: env.INTERNAL_API_SECRET,
 		USERS_SERVICE_URL: env.USERS_SERVICE_URL,
-		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE)
+		GAME_SERVICE_URL: env.GAME_SERVICE_URL,
+		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE),
+		SWAGGER_HOST: env.SWAGGER_HOST
 	}))
 
 export type IAuthEnv = z.infer<typeof envSchema>

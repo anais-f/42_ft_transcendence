@@ -1,4 +1,4 @@
-import { escapeHtml } from '../usecases/sanitize.js'
+import { escapeHtml } from '../../usecases/sanitize.js'
 
 /**
  * Renders a clickable link to a user's profile with hover effect.

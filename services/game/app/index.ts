@@ -5,12 +5,10 @@ import { env } from './env/checkEnv.js'
 import { setupFastifyMonitoringHooks } from '@ft_transcendence/monitoring'
 import { initDB } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
-import { initializeTournamentId } from './usecases/managers/tournamentManager/createTournament.js'
 import metricPlugin from 'fastify-metrics'
 
 // Run migrations first, then initialize tournament ID
 initDB()
-initializeTournamentId()
 
 async function start(): Promise<void> {
 	const app = createWsApp(
@@ -23,7 +21,7 @@ async function start(): Promise<void> {
 				},
 				servers: [
 					{
-						url: `${env.HOST}/game`,
+						url: `${env.SWAGGER_HOST}:8080/game`,
 						description: 'Local server'
 					}
 				],
