@@ -27,19 +27,13 @@ export function leaveGame(code: string) {
 	if (gameData.p1) {
 		playerToGame.delete(gameData.p1.id)
 		busyPlayers.delete(gameData.p1.id)
-		if (gameData.p1.ws) {
-			console.log(`Closing WebSocket for player ${gameData.p1.id} - game abandoned (${code})`)
-			gameData.p1.ws.close(1001, 'Game abandoned')
-		}
+		gameData.p1.ws?.close(1001, 'Game abandoned')
 	}
 
 	if (gameData.p2) {
 		playerToGame.delete(gameData.p2.id)
 		busyPlayers.delete(gameData.p2.id)
-		if (gameData.p2.ws) {
-			console.log(`Closing WebSocket for player ${gameData.p2.id} - game abandoned (${code})`)
-			gameData.p2.ws.close(1001, 'Game abandoned')
-		}
+		gameData.p2.ws?.close(1001, 'Game abandoned')
 	}
 	games.delete(code)
 
