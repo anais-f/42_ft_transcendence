@@ -1,9 +1,4 @@
-import {
-	pollingInterval,
-	pollingLoopTournament,
-	pollingTournament,
-	setPollingInterval
-} from '../game/pollingTournament.js'
+import * as tournamentPoller from '../game/tournament/tournamentPoller.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
@@ -101,10 +96,7 @@ export async function attachTournamentEvents() {
 
 	tournamentStore.tournamentCode = code
 
-	await pollingTournament()
-	setTimeout(() => {
-		pollingLoopTournament()
-	}, 1000)
+	await tournamentPoller.start()
 
 	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
@@ -142,10 +134,8 @@ export function detachTournamentEvents() {
 		clickHandler = null
 	}
 
-	if (pollingInterval) {
-		clearTimeout(pollingInterval)
-		setPollingInterval(null)
-	}
+	tournamentPoller.stop()
+	window.cancelPendingNavigation()
 
 	if (tournamentStore.tournamentCode && !gameStore.navigatingToGame) {
 		quitTournamentAPI()

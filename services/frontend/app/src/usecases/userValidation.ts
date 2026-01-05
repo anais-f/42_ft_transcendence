@@ -12,7 +12,7 @@ export async function handleAuthSuccess(successMessage: string) {
 		type: ToastActionType.SUCCESS_ACTION,
 		message: successMessage
 	})
-	await window.navigate('/', true)
+	await window.navigate('/', { skipAuth: true })
 }
 
 export async function syncCurrentUser(errorMessage?: string): Promise<boolean> {
