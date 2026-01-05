@@ -91,6 +91,8 @@ jobs:
 
           HOST=0.0.0.0
 
+          SUBNET_DOCKER_MONITORING=0.0.0.0
+
           EOF
 
       - name: Install dependencies
