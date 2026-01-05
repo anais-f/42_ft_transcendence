@@ -49,7 +49,10 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			response: {
 				201: CodeParamSchema,
 				404: HttpErrorSchema.meta({ description: 'unknow game code' }),
-				409: HttpErrorSchema.meta({ description: 'player already in a game' })
+				409: HttpErrorSchema.meta({
+					description:
+						'player already in a game / player already in a tournament'
+				})
 			}
 		},
 		handler: createNewGameController

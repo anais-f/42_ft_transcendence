@@ -4,6 +4,7 @@ import { ToastActionType } from '../../types/toast.js'
 const remapError: Record<string, string> = {
 	'player is already in a game': 'You are already in a game!',
 	'a player is already in a game': 'You are already in a game!',
+	'player already in a tournament': 'You are already in a tournament!',
 	'player not allowed in this game':
 		'You are not authorized to join this game.',
 	'unknow game code': 'Invalid game code!',
