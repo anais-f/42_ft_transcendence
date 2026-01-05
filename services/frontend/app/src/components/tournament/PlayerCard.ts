@@ -34,10 +34,8 @@ export const updatePlayerCard = (
 }
 
 export function updateAllPlayerCards(playerCardPrefix: string) {
-	const players = tournamentStore.players
-
 	for (let i = 0; i < 4; i++) {
-		const player = players[i]
+		const player = tournamentStore.getPlayer(i)
 		const cardId = `${playerCardPrefix}${i}`
 
 		if (player) {
