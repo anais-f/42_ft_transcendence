@@ -6,6 +6,8 @@ import {
 	CreateGameSchema
 } from '@ft_transcendence/common'
 import { PaddleShape, ObstacleType } from '@ft_transcendence/pong-shared'
+import { usersToTournament } from '../../usecases/managers/gameData.js'
+import createHttpError from 'http-errors'
 
 export async function createNewGameController(
 	request: FastifyRequest,
@@ -13,6 +15,10 @@ export async function createNewGameController(
 ): Promise<void> {
 	const user = PublicUserAuthSchema.strip().parse(request.user)
 	const body = CreateGameSchema.parse(request.body ?? {})
+
+	if (usersToTournament.has(user.user_id)) {
+		throw createHttpError.Conflict('player already in a game')
+	}
 
 	const mapOptions = body.mapOptions
 		? {
