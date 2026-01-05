@@ -22,8 +22,10 @@ import { MapOptions } from '../api/game/createGame.js'
 import { ObstacleType, PaddleShape } from '@pong-shared'
 import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
 import { handleCreateTournament } from '../events/home/createTournamentHandler.js'
-import { GameConfig } from 'packages/pong-shared/dist/config.js'
-import { GAME_CONFIG_MODAL_ID } from '../components/modals/GameConfigModal.js'
+import {
+	GameConfigModal,
+	GAME_CONFIG_MODAL_ID
+} from '../components/modals/GameConfigModal.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
