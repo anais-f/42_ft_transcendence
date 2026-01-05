@@ -3,9 +3,15 @@ export interface CredentialResponse {
 	select_by: string
 }
 
+export interface NavigateOptions {
+	skipAuth?: boolean
+	delay?: number
+}
+
 declare global {
 	interface Window {
-		navigate: (url: string, skipAuth?: boolean) => void
+		navigate: (url: string, options?: NavigateOptions) => void
+		cancelPendingNavigation: () => void
 
 		google: {
 			accounts: {
