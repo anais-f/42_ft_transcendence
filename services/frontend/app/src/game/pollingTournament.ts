@@ -1,5 +1,8 @@
 import { getTournamentAPI } from '../api/tournamentApi.js'
-import { updateAllPlayerCards } from '../components/tournament/PlayerCard.js'
+import {
+	updateAllPlayerCards,
+	updatePlayerCard
+} from '../components/tournament/PlayerCard.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
 import { currentUser } from '../usecases/userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
@@ -43,6 +46,7 @@ export async function pollingTournament() {
 
 	await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
+	updateOpponent(tournamentData)
 	updateAllPlayerCards('player_card_')
 }
 
@@ -181,4 +185,32 @@ async function updateMatches(
 
 	const winner = tournamentStore.playersMap.get(winnerId)
 	updateTournamentCellName('final-winner', winner?.username || waitingPlayer)
+}
+
+function updateOpponent(tournamentData: GetTournamentResponseDTO) {
+	const matches = tournamentData.tournament.matchs.slice().reverse()
+
+	for (const match of matches) {
+		if (
+			match?.player1Id !== currentUser?.user_id &&
+			match?.player2Id !== currentUser?.user_id
+		) {
+			continue
+		}
+		const opponentId =
+			match.player1Id === currentUser?.user_id
+				? match.player2Id
+				: match.player1Id
+		if (!opponentId) {
+			return
+		}
+
+		const opponentData = tournamentStore.playersMap.get(opponentId)
+		updatePlayerCard(
+			'modal-opponent-card',
+			opponentData?.username || 'OPPONENT',
+			opponentData?.avatar || '/assets/images/loading.png'
+		)
+		break
+	}
 }
