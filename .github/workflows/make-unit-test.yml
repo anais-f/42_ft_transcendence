@@ -64,7 +64,7 @@ jobs:
 
           # Admin credentials
           LOGIN_ADMIN=admin
-          PASSWORD_ADMIN=admin1234
+          PASSWORD_ADMIN=Admin1234
 
           # Monitoring / other
           ADMIN_TOKEN=change-me
