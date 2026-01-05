@@ -17,6 +17,8 @@ export function eogHandler(data: unknown) {
 	const eogData = data as EogData
 	console.log('Game ended:', eogData)
 
+	gameStore.gameEnded = true
+
 	const myId = currentUser?.user_id
 	const didWin = myId === eogData.winnerId
 

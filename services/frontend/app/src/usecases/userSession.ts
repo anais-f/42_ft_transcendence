@@ -45,5 +45,5 @@ export async function logout() {
 	socialStore.clear()
 	setCurrentUser(null)
 
-	window.navigate('/login', true) // skipAuth = true to avoid 401
+	window.navigate('/login', { skipAuth: true }) // skipAuth = true to avoid 401
 }

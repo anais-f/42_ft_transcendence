@@ -1,9 +1,4 @@
-import {
-	pollingInterval,
-	pollingLoopTournament,
-	pollingTournament,
-	setPollingInterval
-} from '../game/pollingTournament.js'
+import * as tournamentPoller from '../game/tournament/tournamentPoller.js'
 import { TournamentCell } from '../components/game/TournamentCell.js'
 import { Button } from '../components/Button.js'
 import { handleCopyCode } from '../events/lobby/copyCodeHandler.js'
@@ -12,11 +7,11 @@ import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { gameStore } from '../usecases/gameStore.js'
+import { hideModal } from '../components/modals/Modal.js'
 import {
 	NEXT_MATCH_MODAL_ID,
 	NextMatchModal
-} from '../events/tournament/nextMatchModal.js'
-import { hideModal } from '../components/modals/Modal.js'
+} from '../components/modals/nextMatchModal.js'
 
 export const waitingPlayer = '???'
 
@@ -101,10 +96,7 @@ export async function attachTournamentEvents() {
 
 	tournamentStore.tournamentCode = code
 
-	await pollingTournament()
-	setTimeout(() => {
-		pollingLoopTournament()
-	}, 1000)
+	await tournamentPoller.start()
 
 	clickHandler ??= (e: Event) => {
 		const target = e.target as HTMLElement
@@ -142,10 +134,8 @@ export function detachTournamentEvents() {
 		clickHandler = null
 	}
 
-	if (pollingInterval) {
-		clearTimeout(pollingInterval)
-		setPollingInterval(null)
-	}
+	tournamentPoller.stop()
+	window.cancelPendingNavigation()
 
 	if (tournamentStore.tournamentCode && !gameStore.navigatingToGame) {
 		quitTournamentAPI()

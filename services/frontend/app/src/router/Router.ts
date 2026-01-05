@@ -8,8 +8,18 @@ import {
 	createSocialWebSocketApi
 } from '../api/homeWsApi.js'
 import { handleSocialDispatcher } from '../events/home/socialDispatcher.js'
+import { NavigateOptions } from '../types/google-type.js'
 
 export let routeParams: Record<string, string> = {}
+
+let pendingNavigationTimeout: ReturnType<typeof setTimeout> | null = null
+
+export function cancelPendingNavigation(): void {
+	if (pendingNavigationTimeout) {
+		clearTimeout(pendingNavigationTimeout)
+		pendingNavigationTimeout = null
+	}
+}
 
 /**
  * Router class to manage client-side routing,
@@ -193,7 +203,7 @@ export class Router {
 			// skipAuth=true because we just checked and user is authenticated
 			if (url === '/login' && user !== null) {
 				this.isNavigating = false
-				await this.navigate('/', true)
+				await this.navigate('/', { skipAuth: true })
 				return
 			}
 
@@ -201,7 +211,7 @@ export class Router {
 			// skipAuth=true because we just checked and user is not authenticated
 			if (!route.public && !user) {
 				this.isNavigating = false
-				await this.navigate('/login', true)
+				await this.navigate('/login', { skipAuth: true })
 				return
 			}
 
@@ -211,7 +221,7 @@ export class Router {
 			console.error('Error during navigation:', e)
 			if (!route.public) {
 				this.isNavigating = false // to new navigation
-				await this.navigate('/login', true)
+				await this.navigate('/login', { skipAuth: true })
 				return
 			}
 		} finally {
@@ -224,8 +234,19 @@ export class Router {
 
 	public navigate = async (
 		url: string,
-		skipAuth: boolean = false
+		options: NavigateOptions = {}
 	): Promise<void> => {
+		const { skipAuth = false, delay } = options
+
+		if (delay) {
+			pendingNavigationTimeout = setTimeout(() => {
+				pendingNavigationTimeout = null
+				history.pushState(null, '', url)
+				this.handleNav(skipAuth)
+			}, delay)
+			return
+		}
+
 		history.pushState(null, '', url)
 		await this.handleNav(skipAuth)
 	}
@@ -240,8 +261,9 @@ export class Router {
 
 	// Start the router
 	public async start(): Promise<void> {
-		window.navigate = (url: string, skipAuth?: boolean) =>
-			this.navigate(url, skipAuth ?? false)
+		window.navigate = (url: string, options?: NavigateOptions) =>
+			this.navigate(url, options ?? {})
+		window.cancelPendingNavigation = cancelPendingNavigation
 
 		await this.handleNav()
 	}

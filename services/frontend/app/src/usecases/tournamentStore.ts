@@ -1,10 +1,9 @@
 import { PlayerData } from '../types/game.js'
 import { UserByIdAPI } from '../api/usersApi.js'
-import { currentUser } from './userStore.js'
 
 class TournamentStore {
 	private _tournamentCode: string | null = null
-	private _players: (PlayerData | null)[] = []
+	private _playerIds: number[] = []
 	private _status: 'pending' | 'ongoing' | 'completed' = 'pending'
 	private _playersMap = new Map<number, PlayerData>()
 	private _joinedGameCodes = new Set<string>()
@@ -17,8 +16,8 @@ class TournamentStore {
 		this._joinedGameCodes.add(gameCode)
 	}
 
-	get joinedGameCodes(): Set<string> {
-		return this._joinedGameCodes
+	unmarkGameAsJoined(gameCode: string): void {
+		this._joinedGameCodes.delete(gameCode)
 	}
 
 	get status(): 'pending' | 'ongoing' | 'completed' {
@@ -37,44 +36,39 @@ class TournamentStore {
 		this._tournamentCode = code
 	}
 
-	get players(): (PlayerData | null)[] {
-		return this._players
+	get playerIds(): number[] {
+		return this._playerIds
 	}
 
 	get playersMap(): Map<number, PlayerData> {
 		return this._playersMap
 	}
 
-	async syncPlayers(participantIds: number[]) {
-		const newPlayers: (PlayerData | null)[] = []
+	getPlayer(index: number): PlayerData | null {
+		const id = this._playerIds[index]
+		return id ? (this._playersMap.get(id) ?? null) : null
+	}
 
+	async syncPlayers(participantIds: number[]): Promise<void> {
 		for (const id of participantIds) {
-			const existingPlayer = this._players.find((p) => p?.id === id)
-			if (existingPlayer) {
-				newPlayers.push(existingPlayer)
-			} else {
-				const result = await UserByIdAPI(id)
-				if (!result.error && result.data) {
-					this._playersMap.set(id, result.data)
-					newPlayers.push({
-						id: result.data.user_id,
-						username: result.data.username,
-						avatar: result.data.avatar
-					})
-				}
+			if (this._playersMap.has(id)) continue
+
+			const result = await UserByIdAPI(id)
+			if (!result.error && result.data) {
+				this._playersMap.set(id, {
+					id: result.data.user_id,
+					username: result.data.username,
+					avatar: result.data.avatar
+				})
 			}
 		}
 
-		while (newPlayers.length < 4) {
-			newPlayers.push(null)
-		}
-
-		this._players = newPlayers
+		this._playerIds = participantIds
 	}
 
-	clear() {
+	clear(): void {
 		this._tournamentCode = null
-		this._players = []
+		this._playerIds = []
 		this._status = 'pending'
 		this._playersMap.clear()
 		this._joinedGameCodes.clear()
