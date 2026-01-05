@@ -12,11 +12,11 @@ import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { gameStore } from '../usecases/gameStore.js'
+import { hideModal } from '../components/modals/Modal.js'
 import {
 	NEXT_MATCH_MODAL_ID,
-	NextConfigModal
-} from '../events/tournament/nextMatchModal.js'
-import { hideModal } from '../components/modals/Modal.js'
+	NextMatchModal
+} from '../components/modals/nextMatchModal.js'
 
 export const waitingPlayer = '???'
 
@@ -82,7 +82,7 @@ export const TournamentPage = (): string => {
       </div>
     </section>
   </section>
-  ${NextConfigModal()}
+  ${NextMatchModal()}
 `
 }
 

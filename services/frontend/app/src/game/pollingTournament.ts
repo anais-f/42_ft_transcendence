@@ -1,5 +1,8 @@
 import { getTournamentAPI } from '../api/tournamentApi.js'
-import { updateAllPlayerCards } from '../components/tournament/PlayerCard.js'
+import {
+	updateAllPlayerCards,
+	updatePlayerCard
+} from '../components/tournament/PlayerCard.js'
 import { tournamentStore } from '../usecases/tournamentStore.js'
 import { currentUser } from '../usecases/userStore.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
@@ -15,7 +18,7 @@ import { handleJoinGameTournament } from '../events/tournament/gameTournament.js
 import { initGameWS } from './network/initGameWS.js'
 import { gameStore } from '../usecases/gameStore.js'
 import { showModal } from '../components/modals/Modal.js'
-import { NEXT_MATCH_MODAL_ID } from '../events/tournament/nextMatchModal.js'
+import { NEXT_MATCH_MODAL_ID } from '../components/modals/nextMatchModal.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 let isPolling = false
@@ -43,6 +46,7 @@ export async function pollingTournament() {
 
 	await tournamentStore.syncPlayers(tournamentData.tournament.participants)
 
+	updateOpponent(tournamentData)
 	updateAllPlayerCards('player_card_')
 }
 
@@ -59,6 +63,7 @@ export async function pollingLoopTournament() {
 
 		if (tournamentStore.status === 'completed') {
 			console.log('Tournament completed, stopping polling.')
+			setTimeout(() => window.navigate('/'), 5000)
 			return
 		}
 
@@ -114,13 +119,33 @@ async function checkAndJoinUserMatches(
 		const alreadyJoined = tournamentStore.hasJoinedGame(match.gameCode)
 
 		if (!alreadyJoined && match.winnerId === undefined) {
-			tournamentStore.markGameAsJoined(match.gameCode)
 			console.log(`Joining match ${matchIndex}:`, match.gameCode)
 
 			if (!gameStore.gameCode) {
 				showModal(NEXT_MATCH_MODAL_ID)
-				await handleJoinGameTournament(match.gameCode)
-				initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+				const result = await handleJoinGameTournament(match.gameCode)
+
+				if (result.alreadyInGame) {
+					// User is already in game from another tab, stop polling and redirect
+					console.log(
+						'Tournament already active in another tab, redirecting...'
+					)
+					if (pollingInterval) {
+						clearTimeout(pollingInterval)
+						setPollingInterval(null)
+					}
+					notyf.open({
+						type: ToastActionType.ERROR_ACTION,
+						message: 'Tournament is already active in another tab!'
+					})
+					setTimeout(() => window.navigate('/'), 2000)
+					return
+				}
+
+				if (result.success) {
+					tournamentStore.markGameAsJoined(match.gameCode)
+					initGameWS(`/tournament/${tournamentStore.tournamentCode}`)
+				}
 			}
 		}
 	}
@@ -160,4 +185,32 @@ async function updateMatches(
 
 	const winner = tournamentStore.playersMap.get(winnerId)
 	updateTournamentCellName('final-winner', winner?.username || waitingPlayer)
+}
+
+function updateOpponent(tournamentData: GetTournamentResponseDTO) {
+	const matches = tournamentData.tournament.matchs.slice().reverse()
+
+	for (const match of matches) {
+		if (
+			match?.player1Id !== currentUser?.user_id &&
+			match?.player2Id !== currentUser?.user_id
+		) {
+			continue
+		}
+		const opponentId =
+			match.player1Id === currentUser?.user_id
+				? match.player2Id
+				: match.player1Id
+		if (!opponentId) {
+			return
+		}
+
+		const opponentData = tournamentStore.playersMap.get(opponentId)
+		updatePlayerCard(
+			'modal-opponent-card',
+			opponentData?.username || 'OPPONENT',
+			opponentData?.avatar || '/assets/images/loading.png'
+		)
+		break
+	}
 }

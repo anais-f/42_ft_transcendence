@@ -64,7 +64,7 @@ jobs:
 
           # Admin credentials
           LOGIN_ADMIN=admin
-          PASSWORD_ADMIN=admin1234
+          PASSWORD_ADMIN=Admin1234
 
           # Monitoring / other
           ADMIN_TOKEN=change-me
@@ -90,6 +90,8 @@ jobs:
           DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
 
           HOST=0.0.0.0
+
+          SUBNET_DOCKER_MONITORING=0.0.0.0
 
           EOF
 

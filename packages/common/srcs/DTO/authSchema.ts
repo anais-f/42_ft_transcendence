@@ -3,7 +3,6 @@ import { RegisterLoginSchema } from './usersSchema.js'
 
 const PASSWORD_REGEX =
 	/^(?=.*[A-Z])(?=.*\d)(?=.*[a-z])[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,./?-]{8,128}$/
-//TODO : enhance password regex to enforce stronger passwords
 
 export const PasswordSchema = z
 	.string()

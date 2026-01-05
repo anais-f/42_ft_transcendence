@@ -27,11 +27,13 @@ export function leaveGame(code: string) {
 	if (gameData.p1) {
 		playerToGame.delete(gameData.p1.id)
 		busyPlayers.delete(gameData.p1.id)
+		gameData.p1.ws?.close(1001, 'Game abandoned')
 	}
 
 	if (gameData.p2) {
 		playerToGame.delete(gameData.p2.id)
 		busyPlayers.delete(gameData.p2.id)
+		gameData.p2.ws?.close(1001, 'Game abandoned')
 	}
 	games.delete(code)
 

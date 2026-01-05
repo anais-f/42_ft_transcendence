@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { validateEnv, loadOpenAPISchema } from '@ft_transcendence/common'
+import {
+	validateEnv,
+	loadOpenAPISchema,
+	PasswordSchema
+} from '@ft_transcendence/common'
 
 const envSchema = z
 	.object({
@@ -9,7 +13,7 @@ const envSchema = z
 		JWT_SECRET: z.string().min(1),
 		AUTH_DB_PATH: z.string().min(1),
 		LOGIN_ADMIN: z.string().min(1),
-		PASSWORD_ADMIN: z.string().min(1),
+		PASSWORD_ADMIN: PasswordSchema,
 		GOOGLE_CLIENT_ID: z.string().min(1),
 		TWOFA_SERVICE_URL: z.string().min(1),
 		TWOFA_ISSUER: z.string().default('FtTranscendence'),
