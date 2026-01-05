@@ -1,6 +1,6 @@
 # Microservices Architecture - ft_transcendence
 
-> **Note**: The diagrams below are automatically rendered by GitHub.  
+> **Note**:     The diagrams below are automatically rendered by GitHub.        
 > If you don't see them, make sure you're on github.com (not in raw mode).
 
 ## Architecture Overview
@@ -8,25 +8,25 @@
 ```mermaid
 graph TB
     Client[Client Browser]
-
+    
     Client -->|HTTPS 8080| Nginx[NGINX Reverse Proxy]
-
+    
     Nginx --> Frontend[Frontend Vite TypeScript TailwindCSS]
     Nginx --> Auth[Auth Authentication]
     Nginx --> Users[Users Profiles]
     Nginx --> TwoFA[2FA Two-Factor Auth]
     Nginx --> Social[Social Friends Notifications]
     Nginx --> Game[Game Pong Logic]
-
+    
     Auth -->|volume| DB_Auth[(SQLite Auth)]
     Users -->|volume| DB_Users[(SQLite Users)]
     Social -->|volume| DB_Social[(SQLite Social)]
     TwoFA -->|volume| DB_2FA[(SQLite 2FA)]
     Game -->|volume| DB_Game[(SQLite Game)]
-
+    
     Users -->|volume| Avatars[(Avatars Storage)]
     Nginx -->|volume RO| Avatars
-
+    
     style Nginx fill:#2d6fb5,stroke:#1a4d8f,color:#fff
     style Frontend fill:#646cff,stroke:#535bf2,color:#fff
     style Auth fill:#f39c12,stroke:#e67e22,color:#fff
@@ -39,29 +39,26 @@ graph TB
 ## Services
 
 ### NGINX (Reverse Proxy)
-
 - **Exposed port**: 8080
 - **Role**: Single entry point, SSL/TLS management, request routing
 - **Dependencies**: All backend services
-- **Volumes**: Avatars (read-only)
-- **Secrets**: SSL certificates (cert.pem, key.pem)
+- **Volumes**:  Avatars (read-only)
+- **Secrets**: SSL certificates (cert. pem, key.pem)
+- **Configuration**: Uses environment variables for service URLs
 
 ### Frontend
-
 - **Technology**: Vite + TypeScript + TailwindCSS
 - **Internal port**: 3000
 - **Role**: User interface (SPA)
-- **Dependencies**: None (base service)
+- **Dependencies**:  None (base service)
 
 ### Auth Service
-
 - **Internal port**: 3000
-- **Role**: Authentication and session management (JWT)
+- **Role**: Authentication and session management (JWT), admin validation
 - **Database**: SQLite (db_auth_data volume)
 - **Dependencies**: Frontend
 
 ### Users Service
-
 - **Internal port**: 3000
 - **Role**: User profile management
 - **Database**: SQLite (db_users_data volume)
@@ -69,23 +66,20 @@ graph TB
 - **Dependencies**: Frontend, Auth
 
 ### 2FA Service
-
 - **Internal port**: 3000
 - **Role**: Two-factor authentication (TOTP)
 - **Database**: SQLite (db_2fa_data volume)
-- **Dependencies**: Auth, Users
+- **Dependencies**:  Auth, Users
 
 ### Social Service
-
 - **Internal port**: 3000
 - **Role**: Friend relationships, presence tracking, real-time notifications via WebSocket
 - **Database**: SQLite (db_social_data volume)
 - **Dependencies**: Frontend, Auth, Users
 
 ### Game Service
-
 - **Internal port**: 3000
-- **Role**: Pong game logic, matchmaking, real-time gameplay via WebSocket
+- **Role**:  Pong game logic, matchmaking, real-time gameplay via WebSocket
 - **Database**: SQLite (db_game_data volume)
 - **Dependencies**: Frontend
 
@@ -103,29 +97,29 @@ sequenceDiagram
     U->>N: GET /login
     N->>F: Forward request
     F-->>U: Login page
-
+    
     U->>N: POST /api/auth/login
     N->>A: Forward credentials
     A->>A: Verify password
     A-->>F: JWT Token
-
-    F->>2:  GET /api/2fa/status
-    2->>A:  Verify JWT
+    
+    F->>2:   GET /api/2fa/status
+    2->>A:   Verify JWT
     A-->>2: Token valid
     2-->>F: 2FA enabled
-
+    
     F-->>U: Request 2FA code
-
+    
     U->>N: POST /api/2fa/verify
     N->>2: Forward 2FA code + JWT
     2->>2: Validate TOTP
-    2-->>F:  Verified
-
+    2-->>F:   Verified
+    
     F->>US: GET /api/users/profile
-    US->>A:  Verify JWT
-    A-->>US:  Token valid
-    US-->>F:  User data
-    F-->>U: Dashboard
+    US->>A:   Verify JWT
+    A-->>US:   Token valid
+    US-->>F:   User data
+    F-->>U:  Dashboard
 ```
 
 ## Service Dependencies and Communication
@@ -135,11 +129,11 @@ graph TB
     subgraph Entry["Entry Point"]
         Nginx[NGINX Reverse Proxy Port 8080]
     end
-
+    
     subgraph Frontend_Layer["Frontend Layer"]
         Frontend[Frontend SPA Vite TypeScript TailwindCSS Port 3000]
     end
-
+    
     subgraph Backend["Backend Services"]
         Auth[Auth Service JWT Management Port 3000]
         Users[Users Service Profile Management Port 3000]
@@ -147,7 +141,7 @@ graph TB
         Social[Social Service Friends Presence Notifications Port 3000]
         Game[Game Service Pong Gameplay Port 3000]
     end
-
+    
     subgraph Data["Data Layer"]
         DB_Auth[(SQLite Auth Data Volume)]
         DB_Users[(SQLite Users Data Volume)]
@@ -156,9 +150,9 @@ graph TB
         DB_Game[(SQLite Game Data Volume)]
         Avatars[(Avatars File Storage Volume)]
     end
-
+    
     Client[Client Browser] -->|HTTPS requests| Nginx
-
+    
     Nginx -->|static files| Frontend
     Nginx -->|api auth| Auth
     Nginx -->|api users| Users
@@ -166,25 +160,25 @@ graph TB
     Nginx -->|api social WebSocket| Social
     Nginx -->|api game WebSocket| Game
     Nginx -->|avatars static| Avatars
-
+    
     Frontend -.->|REST API JWT| Auth
     Frontend -.->|REST API JWT| Users
     Frontend -.->|REST API JWT| TwoFA
-    Frontend -.->|REST WebSocket JWT| Social
-    Frontend -.->|REST WebSocket JWT| Game
-
+    Frontend -.->|REST API JWT</br>WebSocket| Social
+    Frontend -.->|REST API JWT</br>WebSocket| Game
+    
     Users <-->|Internal API Key| Auth
     Auth -->|Internal API Key| TwoFA
-
+    
     Social -->|Internal API Key| Users
-
+ 
     Auth -->|Read Write| DB_Auth
     Users -->|Read Write| DB_Users
     Users -->|Read Write| Avatars
     TwoFA -->|Read Write| DB_2FA
     Social -->|Read Write| DB_Social
     Game -->|Read Write| DB_Game
-
+    
     style Nginx fill:#2d6fb5,stroke:#1a4d8f,color:#fff
     style Frontend fill:#646cff,stroke:#535bf2,color:#fff
     style Auth fill:#f39c12,stroke:#e67e22,color:#fff
@@ -197,10 +191,10 @@ graph TB
 ### Communication Patterns
 
 **1. Client → Services (via NGINX)**
-
 - All HTTP/HTTPS requests go through NGINX reverse proxy
 - NGINX routes based on URL path (`/api/auth/*`, `/api/users/*`, etc.)
-- WebSocket connections for real-time communication (Social: friend notifications, Game: gameplay)
+- NGINX uses environment variables for service URLs (e.g., `${AUTH_SERVICE_URL}`)
+- WebSocket connections for real-time communication (Social:   friend notifications, Game: gameplay)
 
 **2. Service-to-Service Communication**
 
@@ -208,42 +202,59 @@ Services communicate via internal Docker network (`backend`) using REST API call
 
 #### Internal API Reference
 
-| From Service | To Service       | Authentication | Endpoint                                | Purpose                            |
-| ------------ | ---------------- | -------------- | --------------------------------------- | ---------------------------------- |
-| **Auth**     | **Users**        | API Key        | `POST /api/internal/users/new-user`     | Create new user after registration |
-| **Users**    | **Auth**         | API Key        | `GET /api/internal/2fa/status/: id`     | Get 2FA status for user profile    |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/setup`          | Setup 2FA for user                 |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/verify`         | Verify 2FA code                    |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/disable`        | Disable 2FA for user               |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/status`         | Get 2FA status                     |
-| **Social**   | **Users**        | API Key        | `GET /api/internal/users/profile/: id`  | Get user profile data              |
-| **Social**   | **Users**        | API Key        | `PATCH /api/internal/users/: id/status` | Update user online/offline status  |
-| **Frontend** | **All Services** | JWT            | All `/api/*` public endpoints           | User authentication                |
+| From Service | To Service | Authentication | Endpoint | Purpose |
+|--------------|-----------|----------------|----------|---------|
+| **Auth** | **Users** | API Key | `POST /api/internal/users/new-user` | Create new user after registration |
+| **Users** | **Auth** | API Key | `GET /api/internal/2fa/status/: id` | Get 2FA status for user profile |
+| **Auth** | **2FA** | API Key | `POST /api/internal/2fa/setup` | Setup 2FA for user |
+| **Auth** | **2FA** | API Key | `POST /api/internal/2fa/verify` | Verify 2FA code |
+| **Auth** | **2FA** | API Key | `POST /api/internal/2fa/disable` | Disable 2FA for user |
+| **Auth** | **2FA** | API Key | `POST /api/internal/2fa/status` | Get 2FA status |
+| **Social** | **Users** | API Key | `GET /api/internal/users/profile/: id` | Get user profile data |
+| **Social** | **Users** | API Key | `PATCH /api/internal/users/: id/status` | Update user online/offline status |
+| **Frontend** | **All Services** | JWT | All `/api/*` public endpoints | User authentication |
 
 **Note**: The **Game** service operates independently and does not make internal API calls to other services.
 
-**3. Data Persistence**
+**3. Admin Authentication**
+- Admin validation is handled by Auth service
+- `/stub_status` endpoint (NGINX metrics) is restricted to internal networks only
 
+**4. Data Persistence**
 - Each service has its own isolated SQLite database (database per service pattern)
 - Databases stored in Docker volumes for persistence
 - Avatars shared between Users (RW) and NGINX (RO)
 
-**4. Real-time Communication**
-
+**5. Real-time Communication**
 - **Social Service WebSocket**: Friend request notifications, presence updates (online/offline status)
 - **Game Service WebSocket**: Real-time game state synchronization, player movements, score updates
 
 ## Services Summary
 
-| Service      | Port | Technology                                 | Database        | Main Role                            |
-| ------------ | ---- | ------------------------------------------ | --------------- | ------------------------------------ |
-| **NGINX**    | 8080 | Nginx                                      | -               | Reverse proxy, SSL/TLS, static files |
-| **Frontend** | 3000 | Vite + TypeScript + TailwindCSS            | -               | User interface (SPA)                 |
-| **Auth**     | 3000 | Node.js + TypeScript + Fastify             | SQLite (volume) | JWT Authentication                   |
-| **Users**    | 3000 | Node.js + TypeScript + Fastify             | SQLite (volume) | Profile management                   |
-| **2FA**      | 3000 | Node.js + TypeScript + Fastify             | SQLite (volume) | Two-factor auth (TOTP)               |
-| **Social**   | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Friends, presence, notifications     |
-| **Game**     | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Pong game, real-time gameplay        |
+| Service | Port | Technology | Database | Main Role |
+|---------|------|------------|----------|-----------|
+| **NGINX** | 8080 | Nginx | - | Reverse proxy, SSL/TLS, static files |
+| **Frontend** | 3000 | Vite + TypeScript + TailwindCSS | - | User interface (SPA) |
+| **Auth** | 3000 | Node.js + TypeScript + Fastify | SQLite (volume) | JWT Authentication, admin validation |
+| **Users** | 3000 | Node. js + TypeScript + Fastify | SQLite (volume) | Profile management |
+| **2FA** | 3000 | Node.js + TypeScript + Fastify | SQLite (volume) | Two-factor auth (TOTP) |
+| **Social** | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Friends, presence, notifications |
+| **Game** | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Pong game, real-time gameplay |
+
+## Environment Variables
+
+The NGINX configuration requires the following environment variables for service URLs:
+
+```bash
+# Service URLs for NGINX routing
+AUTH_SERVICE_URL=http://auth:3000
+USERS_SERVICE_URL=http://users:3000
+TWOFA_SERVICE_URL=http://2fa:3000
+SOCIAL_SERVICE_URL=http://social:3000
+GAME_SERVICE_URL=http://game:3000
+```
+
+These variables allow dynamic service routing and are substituted at container startup. 
 
 ## Exposed Endpoints
 
@@ -257,35 +268,47 @@ https://localhost:8080/
 │   └── /api/social/ws      → WebSocket (friend notifications, presence)
 ├── /api/game/*             → Game Service (matchmaking, game state)
 │   └── /api/game/ws        → WebSocket (real-time gameplay)
-└── /avatars/*              → Static avatars (NGINX serves from volume)
+├── /avatars/*              → Static avatars (NGINX serves from volume)
+├── /auth/docs/             → Auth API documentation (admin only)
+├── /users/docs/            → Users API documentation (admin only)
+├── /2fa/docs/              → 2FA API documentation (admin only)
+├── /social/docs/           → Social API documentation (admin only)
+├── /game/docs/             → Game API documentation (admin only)
+└── /stub_status            → NGINX metrics (internal network only)
 ```
 
 ## Networks
 
-- **backend**: Main network for inter-service communication
-- **pong**: Dedicated network (potentially for game WebSocket isolation)
+- **backend**: Main network for inter-service communication and monitoring
+- **monitoring**: Dedicated network for monitoring stack (Prometheus, Grafana, AlertManager)
 
 ## Persistent Volumes
 
-| Volume           | Usage                                   | Services               | Access |
-| ---------------- | --------------------------------------- | ---------------------- | ------ |
-| `db_auth_data`   | Authentication data (SQLite)            | Auth                   | RW     |
-| `db_users_data`  | User profiles (SQLite)                  | Users                  | RW     |
-| `db_social_data` | Friend relationships, presence (SQLite) | Social                 | RW     |
-| `db_2fa_data`    | 2FA secrets (SQLite)                    | 2FA                    | RW     |
-| `db_game_data`   | Game history (SQLite)                   | Game                   | RW     |
-| `avatars_data`   | Avatar images                           | Users (RW), NGINX (RO) | Mixed  |
+| Volume | Usage | Services | Access |
+|--------|-------|----------|--------|
+| `db_auth_data` | Authentication data (SQLite) | Auth | RW |
+| `db_users_data` | User profiles (SQLite) | Users | RW |
+| `db_social_data` | Friend relationships, presence (SQLite) | Social | RW |
+| `db_2fa_data` | 2FA secrets (SQLite) | 2FA | RW |
+| `db_game_data` | Game history (SQLite) | Game | RW |
+| `avatars_data` | Avatar images | Users (RW), NGINX (RO) | Mixed |
+| `prometheus_data` | Metrics time-series database | Prometheus | RW |
+| `grafana_data` | Dashboards and configuration | Grafana | RW |
 
 ## Healthchecks
 
 All Node.js services use a TCP healthcheck on port 3000:
-
 - **Interval**: 5-30s
 - **Timeout**: 3s
-- **Retries**: 5-12
+- **Retries**:  5-12
 - **Start period**: 10-20s
 
 NGINX has an HTTP healthcheck on port 8080.
+
+Monitoring services have HTTP healthchecks: 
+- **Prometheus**: Port 9090
+- **Grafana**: Port 3000
+- **AlertManager**: Port 9093
 
 ## Startup Order
 
@@ -295,7 +318,11 @@ NGINX has an HTTP healthcheck on port 8080.
 4. **2FA** (depends on Auth + Users)
 5. **Social** (depends on Frontend + Auth + Users)
 6. **Game** (depends on Frontend)
-7. **NGINX** (depends on all services)
+7. **Prometheus** (depends on Auth + Users for scraping)
+8. **AlertManager** (depends on Prometheus)
+9. **Grafana** (depends on Prometheus)
+10. **NGINX Exporter** (depends on NGINX)
+11. **NGINX** (depends on all services)
 
 ## Getting Started
 
@@ -311,21 +338,20 @@ make verif-env
 ### Build the application
 
 ```bash
-# Build all services
+# Build all services (includes monitoring stack)
 make build
 ```
 
 ### Start the application
 
 ```bash
-# Start all services in detached mode
+# Start all services in detached mode (includes monitoring)
 make up
 ```
 
 This command will:
-
 - Verify environment variables
-- Start all Docker containers
+- Start all Docker containers including monitoring stack
 - Services will be accessible at `https://localhost:8080`
 
 ### Development mode
@@ -372,6 +398,11 @@ make logs-social
 
 # View Game service logs
 make logs-game
+
+# View monitoring logs
+make logs-prometheus
+make logs-grafana
+make logs-alertmanager
 ```
 
 ### Access service shell
@@ -388,6 +419,10 @@ make sh-auth
 
 # Access Users shell
 make sh-users
+
+# Access monitoring shells
+make sh-prometheus
+make sh-grafana
 ```
 
 ### Code formatting
@@ -408,7 +443,6 @@ make test
 ```
 
 This command will:
-
 - Stop any running services
 - Build fresh containers
 - Run the test suite
@@ -427,14 +461,14 @@ make debug
 
 ### Reset all databases
 
-**Warning**: This will delete all data in volumes.
+**Warning**: This will delete all data in volumes.  
 
 ```bash
 # Stop services and remove all volumes
 make reset-db
 ```
 
-After resetting, rebuild and restart:
+After resetting, rebuild and restart:  
 
 ```bash
 make build
@@ -482,20 +516,20 @@ make test
 
 ## Monitoring
 
-This project includes a complete monitoring stack with Prometheus, Grafana and AlertManager.
+This project includes a complete monitoring stack with Prometheus, Grafana and AlertManager integrated into the main build.
 
 See **[monitoring.md](./monitoring.md)** for the complete monitoring architecture documentation.
 
+**Monitoring is now included by default** when you run: 
+
 ```bash
-# Build monitoring stack
-make build-monitoring
+# Start application with monitoring
+make up
 
-# Start with monitoring
-make up-monitoring
-
-# Access monitoring interfaces
-# - Grafana: http://localhost:8080/grafana/
-# - Prometheus: http://localhost:8080/prometheus/
+# Access monitoring interfaces (admin authentication required)
+# - Grafana: https://localhost:8080/grafana/
+# - Prometheus: https://localhost:8080/prometheus/
+# - AlertManager: https://localhost:8080/alertmanager/
 ```
 
 ## Troubleshooting
@@ -545,17 +579,14 @@ make logs-frontend
 
 ## Architecture Principles
 
-This architecture follows microservices best practices:
-
+This architecture follows microservices best practices:  
 - Separation of concerns
 - Database per service pattern
 - API-based communication with API Key authentication for internal services
-- Centralized gateway (NGINX)
+- Centralized gateway (NGINX) with parameterized routing
 - Health monitoring on all services
 - Container orchestration with Docker Compose
 - Environment-based configuration
 - Automated testing pipeline
-
-```
-
+- Integrated monitoring stack
 ```
