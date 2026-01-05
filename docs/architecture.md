@@ -209,26 +209,11 @@ graph LR
 
 Services communicate via internal Docker network (`backend`) using REST API calls with API Key authentication (`INTERNAL_API_SECRET`).
 
-#### Internal API Reference
-
-| From Service | To Service       | Authentication | Endpoint                               | Purpose                                                   |
-| ------------ | ---------------- | -------------- | -------------------------------------- | --------------------------------------------------------- |
-| **Auth**     | **Game**         | API Key        | `/api/game/internal/cleanup/:id`       | Clear game websockets if logout during game or tournament |
-| **Auth**     | **Users**        | API Key        | `POST /api/internal/users/new-user`    | Create new user after registration                        |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/verify`        | Verify 2FA code                                           |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/setup`         | Setup 2FA for user                                        |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/disable`       | Disable 2FA for user                                      |
-| **Auth**     | **2FA**          | API Key        | `POST /api/internal/2fa/status`        | Get 2FA status                                            |
-| **Social**   | **Users**        | API Key        | `GET /api/internal/users/profile/:id`  | Get user profile data                                     |
-| **Social**   | **Users**        | API Key        | `PATCH /api/internal/users/:id/status` | Update user online/offline status                         |
-| **Users**    | **Auth**         | API Key        | `GET /api/internal/2fa/status/:id`     | Get 2FA status for user profile                           |
-| **Frontend** | **All Services** | JWT            | All `/api/*` public endpoints          | User authentication                                       |
-
-**Note**: The **Game** service operates independently and does not make internal API calls to other services.
+For the complete list of internal calls (endpoints, authentication, purpose), see: [docs/internal_api.md](./internal_api.md)
 
 **3. Admin Authentication**
 
-- Admin validation is handled by Auth service
+- Admin validation is handled by Auth service for acces to monitoring
 - `/stub_status` endpoint (NGINX metrics) is restricted to internal networks only
 
 **4. Data Persistence**
@@ -241,54 +226,6 @@ Services communicate via internal Docker network (`backend`) using REST API call
 
 - **Social Service WebSocket**: Friend request notifications, presence updates (online/offline status)
 - **Game Service WebSocket**: Real-time game state synchronization, player movements, score updates
-
-## Services Summary
-
-| Service      | Port | Technology                                 | Database        | Main Role                            |
-| ------------ | ---- | ------------------------------------------ | --------------- | ------------------------------------ |
-| **NGINX**    | 8080 | Nginx                                      | -               | Reverse proxy, SSL/TLS, static files |
-| **Frontend** | 3000 | Vite + TypeScript + TailwindCSS            | -               | User interface (SPA)                 |
-| **Auth**     | 3000 | Node.js + TypeScript + Fastify             | SQLite (volume) | JWT Authentication, admin validation |
-| **Users**    | 3000 | Node. js + TypeScript + Fastify            | SQLite (volume) | Profile management                   |
-| **2FA**      | 3000 | Node.js + TypeScript + Fastify             | SQLite (volume) | Two-factor auth (TOTP)               |
-| **Social**   | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Friends, presence, notifications     |
-| **Game**     | 3000 | Node.js + TypeScript + Fastify + WebSocket | SQLite (volume) | Pong game, real-time gameplay        |
-
-## Environment Variables
-
-The NGINX configuration requires the following environment variables for service URLs:
-
-```bash
-# Service URLs for NGINX routing
-AUTH_SERVICE_URL=http://auth:3000
-USERS_SERVICE_URL=http://users:3000
-TWOFA_SERVICE_URL=http://2fa:3000
-SOCIAL_SERVICE_URL=http://social:3000
-GAME_SERVICE_URL=http://game:3000
-```
-
-These variables allow dynamic service routing and are substituted at container startup.
-
-## Exposed Endpoints
-
-```
-https://localhost:8080/
-├── /                       → Frontend (Vite SPA)
-├── /api/auth/*             → Auth Service (login, logout, verify)
-├── /api/users/*            → Users Service (profile, avatars)
-├── /api/2fa/*              → 2FA Service (setup, verify)
-├── /api/social/*           → Social Service (friends, requests)
-│   └── /api/social/ws      → WebSocket (friend notifications, presence)
-├── /api/game/*             → Game Service (matchmaking, game state)
-│   └── /api/game/ws        → WebSocket (real-time gameplay)
-├── /avatars/*              → Static avatars (NGINX serves from volume)
-├── /auth/docs/             → Auth API documentation (admin only)
-├── /users/docs/            → Users API documentation (admin only)
-├── /2fa/docs/              → 2FA API documentation (admin only)
-├── /social/docs/           → Social API documentation (admin only)
-├── /game/docs/             → Game API documentation (admin only)
-└── /stub_status            → NGINX metrics (internal network only)
-```
 
 ## Networks
 
@@ -308,23 +245,6 @@ https://localhost:8080/
 | `prometheus_data` | Metrics time-series database            | Prometheus             | RW     |
 | `grafana_data`    | Dashboards and configuration            | Grafana                | RW     |
 
-## Healthchecks
-
-All Node.js services use a TCP healthcheck on port 3000:
-
-- **Interval**: 5-30s
-- **Timeout**: 3s
-- **Retries**: 5-12
-- **Start period**: 10-20s
-
-NGINX has an HTTP healthcheck on port 8080.
-
-Monitoring services have HTTP healthchecks:
-
-- **Prometheus**: Port 9090
-- **Grafana**: Port 3000
-- **AlertManager**: Port 9093
-
 ## Startup Order
 
 1. **Frontend** (base service, no dependencies)
@@ -341,201 +261,13 @@ Monitoring services have HTTP healthchecks:
 
 ## Getting Started
 
-### Prerequisites
-
-Ensure you have the required environment variables configured:
-
-```bash
-# Verify environment setup
-make verif-env
-```
-
-### Build the application
-
-```bash
-# Build all services (includes monitoring stack)
-make build
-```
-
-### Start the application
-
-```bash
-# Start all services in detached mode (includes monitoring)
-make up
-```
-
-This command will:
-
-- Verify environment variables
-- Start all Docker containers including monitoring stack
-- Services will be accessible at `https://localhost:8080`
-
-### Development mode
-
-For development with hot-reload:
-
-```bash
-# Build development environment
-make dev-build
-
-# Start in development mode
-make dev-up
-```
-
-### Stop the application
-
-```bash
-# Stop all services
-make down
-```
-
-## Useful Commands
-
-### View logs from specific services
-
-```bash
-# View NGINX logs
-make logs-nginx
-
-# View Frontend logs
-make logs-frontend
-
-# View Auth service logs
-make logs-auth
-
-# View Users service logs
-make logs-users
-
-# View 2FA service logs
-make logs-2fa
-
-# View Social service logs
-make logs-social
-
-# View Game service logs
-make logs-game
-
-# View monitoring logs
-make logs-prometheus
-make logs-grafana
-make logs-alertmanager
-```
-
-### Access service shell
-
-```bash
-# Access NGINX shell
-make sh-nginx
-
-# Access Frontend shell
-make sh-frontend
-
-# Access Auth shell
-make sh-auth
-
-# Access Users shell
-make sh-users
-
-# Access monitoring shells
-make sh-prometheus
-make sh-grafana
-```
-
-### Code formatting
-
-```bash
-# Format code
-make format
-
-# Check formatting
-make format-check
-```
-
-### Run tests
-
-```bash
-# Run all tests
-make test
-```
-
-This command will:
-
-- Stop any running services
-- Build fresh containers
-- Run the test suite
-- Clean up after tests
-
-### Debug mode
-
-Run services with logs visible in the console:
-
-```bash
-# Start in debug mode with console logs
-make debug
-```
-
-## Database Management
-
-### Reset all databases
-
-**Warning**: This will delete all data in volumes.
-
-```bash
-# Stop services and remove all volumes
-make reset-db
-```
-
-After resetting, rebuild and restart:
-
-```bash
-make build
-make up
-```
-
-## Development Workflow
-
-### Initial setup
-
-```bash
-# Install dependencies and hooks
-make install
-
-# Build the project
-make build
-
-# Start services
-make up
-```
-
-### Daily development
-
-```bash
-# Start development mode
-make dev-up
-
-# View logs
-make logs-frontend
-make logs-auth
-
-# Access a service shell
-make sh-users
-```
-
-### Before committing
-
-```bash
-# Check code formatting
-make format-check
-
-# Run tests
-make test
-```
+or setup, commands and development instructions, see: [docs/getting_started.md](./getting_started.md)
 
 ## Monitoring
 
 This project includes a complete monitoring stack with Prometheus, Grafana and AlertManager integrated into the main build.
 
-See **[monitoring.md](./monitoring.md)** for the complete monitoring architecture documentation.
+See **[docs/monitoring.md](./monitoring.md)** for the complete monitoring architecture documentation.
 
 **Monitoring is now included by default** when you run:
 
@@ -547,51 +279,6 @@ make up
 # - Grafana: https://localhost:8080/grafana/
 # - Prometheus: https://localhost:8080/prometheus/
 # - AlertManager: https://localhost:8080/alertmanager/
-```
-
-## Troubleshooting
-
-### Services won't start
-
-```bash
-# Check environment variables
-make verif-env
-
-# Rebuild containers
-make build
-
-# Try starting again
-make up
-```
-
-### Port conflicts
-
-If port 8080 is already in use, modify the `PORT` variable in your `.env` file:
-
-```bash
-PORT=8081
-```
-
-### Database issues
-
-```bash
-# Reset all databases
-make reset-db
-
-# Rebuild and restart
-make build
-make up
-```
-
-### View service status
-
-```bash
-# Check running containers
-docker ps
-
-# View logs for debugging
-make logs-nginx
-make logs-frontend
 ```
 
 ## Architecture Principles
