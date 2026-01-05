@@ -3,24 +3,12 @@ import type {
 	MatchHistoryItemDTO,
 	PlayerStatsDTO
 } from '@ft_transcendence/common'
-import { ITournamentMatchData } from '../usecases/managers/gameData.js'
-
-export function getNextTournamentId(): number {
-	const db = getDb()
-	const result = db
-		.prepare('SELECT MAX(id_tournament) as max_id FROM match_history')
-		.get() as { max_id: number | null }
-
-	// If no tournaments exist yet, start at 1, otherwise increment the max
-	return result.max_id !== null && result.max_id >= 0 ? result.max_id + 1 : 1
-}
 
 export function saveMatchToHistory(
 	player1Id: number,
 	player2Id: number,
 	scorePlayer1: number,
-	scorePlayer2: number,
-	tournamentMatchData: ITournamentMatchData | undefined
+	scorePlayer2: number
 ): number {
 	console.log(
 		`[${player1Id}]: ${scorePlayer1} | [${player2Id}]: ${scorePlayer2}`
@@ -31,16 +19,11 @@ export function saveMatchToHistory(
 	const matchResult = db
 		.prepare(
 			`
-		INSERT INTO match_history (winner_id, id_tournament, round, match_number)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO match_history (winner_id)
+		VALUES (?)
 	`
 		)
-		.run(
-			winnerId,
-			tournamentMatchData?.tournamentId ?? -1,
-			tournamentMatchData?.round ?? -1,
-			tournamentMatchData?.matchNumber ?? -1
-		)
+		.run(winnerId)
 
 	const matchId = matchResult.lastInsertRowid as number
 
@@ -68,13 +51,10 @@ export function getMatchHistoryByPlayerId(
 	const matches = db
 		.prepare(
 			`
-		SELECT 
+		SELECT
 			mh.id_match,
 			mh.winner_id,
 			mh.played_at,
-			mh.id_tournament,
-			mh.round,
-			mh.match_number,
 			mp1.player_id as player1_id,
 			mp1.score as player1_score,
 			mp2.player_id as player2_id,

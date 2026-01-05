@@ -1,4 +1,4 @@
-import { IApiResponse } from '../types/api.js'
+import { IApiResponse } from '../../types/api.js'
 
 export async function fetchMatchHistory(userId: number): Promise<IApiResponse> {
 	try {

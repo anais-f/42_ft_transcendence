@@ -1,13 +1,13 @@
-import { currentUser } from '../usecases/userStore.js'
+import { currentUser } from '../../usecases/userStore.js'
 import {
 	verifyMyPasswordAPI,
 	setup2FAAPI,
 	verifySetup2FAAPI,
 	disable2FAAPI
-} from '../api/twoFAApi.js'
-import { notyfGlobal as notyf } from '../utils/notyf.js'
-import { syncCurrentUser } from '../usecases/userValidation.js'
-import { ToastActionType } from '../types/toast.js'
+} from '../../api/twoFAApi.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
+import { syncCurrentUser } from '../../usecases/userValidation.js'
+import { ToastActionType } from '../../types/toast.js'
 
 /**
  * Verify the current user's password using JWT
@@ -117,7 +117,10 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	}
 
 	// STEP 1: Verify password
-	if (!(await verifyCurrentUserPassword(password))) {
+	if (
+		!currentUser?.is_google_user &&
+		!(await verifyCurrentUserPassword(password))
+	) {
 		form.reset()
 		return
 	}
@@ -175,7 +178,10 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 	}
 
 	// STEP 1: Verify password
-	if (!(await verifyCurrentUserPassword(password))) {
+	if (
+		!currentUser?.is_google_user &&
+		!(await verifyCurrentUserPassword(password))
+	) {
 		form.reset()
 		return
 	}

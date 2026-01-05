@@ -7,9 +7,9 @@ RUN mkdir -p /usr/share/nginx/html/avatars
 
 COPY conf/default.dev.conf /etc/nginx/http.d/default.conf.template
 COPY avatars/img_default.png /usr/share/nginx/html/avatars/img_default.png
-COPY entrypoint.dev.sh /usr/local/bin/entrypoint.dev.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.dev.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R 1000:1000 /usr/share/nginx/html/avatars \
     && chmod -R 755 /usr/share/nginx/html/avatars

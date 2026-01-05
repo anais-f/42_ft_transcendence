@@ -26,7 +26,7 @@ export const GameConfig = {
 	},
 	game: {
 		tps: 60,
-		maxLives: 10,
+		maxLives: 3,
 		pauseTicksAfterPoint: 120,
 		countdownSteps: 3,
 		countdownSeconds: 5

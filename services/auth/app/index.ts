@@ -1,5 +1,5 @@
 import Fastify from 'fastify'
-import { runMigrations } from './database/connection.js'
+import { initDB } from './database/connection.js'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -41,7 +41,7 @@ setupFastifyMonitoringHooks(app)
 
 async function runServer() {
 	console.log('Starting Auth service...')
-	runMigrations()
+	initDB()
 	console.log('Admin user ensured')
 
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
@@ -51,7 +51,12 @@ async function runServer() {
 				title: 'API for Auth Service',
 				version: '1.0.0'
 			},
-			servers: [{ url: `${env.HOST}/auth`, description: 'Local server' }],
+			servers: [
+				{
+					url: `${env.SWAGGER_HOST}:8080/auth`,
+					description: 'Local server'
+				}
+			],
 			components: env.openAPISchema.components
 		},
 		transform: jsonSchemaTransform

@@ -1,7 +1,6 @@
 import { ITournamentMatchResult } from '../gameData.js'
 import createHttpError from 'http-errors'
-import { tournaments, usersInTournaments } from '../gameData.js'
-import { getTournamentCodeById } from '../tournamentManager/tournamentUsecases.js'
+import { tournaments, usersToTournament } from '../gameData.js'
 import { requestGame } from '../gameManager/requestGame.js'
 import { updateGameMetrics } from '../metricsService.js'
 
@@ -9,10 +8,7 @@ export function onTournamentMatchEnd(
 	tournamentData: ITournamentMatchResult
 ): void {
 	const tournamentMatchData = tournamentData.tournamentMatchData
-	const tournamentCode = getTournamentCodeById(tournamentMatchData.tournamentId)
-	if (!tournamentCode) {
-		throw createHttpError.NotFound('Tournament code not found')
-	}
+	const tournamentCode = tournamentMatchData.tournamentCode
 	const tournament = tournaments.get(tournamentCode)
 	if (!tournament) {
 		throw createHttpError.NotFound('Tournament not found')
@@ -28,24 +24,32 @@ export function onTournamentMatchEnd(
 		throw createHttpError.NotFound('Match not found')
 	}
 
-	// Update match status and scores
+	// Update match status, scores, and winner
 	currentMatch.status = 'completed'
 	currentMatch.scorePlayer1 = tournamentData.scorePlayer1
 	currentMatch.scorePlayer2 = tournamentData.scorePlayer2
+	currentMatch.winnerId = tournamentData.winnerId
 
 	// If this was the final (round 1), tournament is over
 	if (tournamentMatchData.round === 1) {
 		tournament.status = 'completed'
 		console.log(
-			`Tournament ${tournamentMatchData.tournamentId} completed!  Winner: ${tournamentData.winnerId}`
+			`Tournament ${tournamentCode} completed!  Winner: ${tournamentData.winnerId}`
 		)
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
-			usersInTournaments.delete(userId)
+			usersToTournament.delete(userId)
 		})
 
 		updateGameMetrics()
+		setTimeout(
+			() => {
+				tournaments.delete(tournamentCode)
+				console.log(`Tournament ${tournamentCode} data cleaned up from memory`)
+			},
+			1 * 60 * 1000
+		)
 		return
 	}
 
@@ -75,21 +79,23 @@ export function onTournamentMatchEnd(
 		`Winner ${tournamentData.winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
 	)
 
-	// Check if both players are ready for the next match
 	if (
 		nextRoundMatch.player1Id !== undefined &&
 		nextRoundMatch.player2Id !== undefined &&
 		nextRoundMatch.status === 'waiting_for_players'
 	) {
-		// Both players ready, start the match!
-		nextRoundMatch.status = 'ongoing'
 		console.log(
-			`Starting next round match:  ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
+			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
-		requestGame(nextRoundMatch.player1Id, nextRoundMatch.player2Id, {
-			tournamentId: tournament.id,
-			round: nextRoundMatch.round,
-			matchNumber: nextRoundMatch.matchNumber
-		})
+		const gameCode = requestGame(
+			nextRoundMatch.player1Id,
+			nextRoundMatch.player2Id,
+			{
+				tournamentCode: tournamentCode,
+				round: nextRoundMatch.round,
+				matchNumber: nextRoundMatch.matchNumber
+			}
+		)
+		nextRoundMatch.gameCode = gameCode
 	}
 }

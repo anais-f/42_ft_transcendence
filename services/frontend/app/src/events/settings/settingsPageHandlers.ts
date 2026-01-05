@@ -2,15 +2,15 @@ import {
 	updateUsernameAPI,
 	updateAvatarAPI,
 	changePasswordAPI
-} from '../api/settingsApi.js'
-import { notyfGlobal as notyf } from '../utils/notyf.js'
+} from '../../api/settingsApi.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import {
 	validateUsername,
 	validatePassword,
 	validateAvatarFile,
 	syncCurrentUser
-} from '../usecases/userValidation.js'
-import { ToastActionType } from '../types/toast.js'
+} from '../../usecases/userValidation.js'
+import { ToastActionType } from '../../types/toast.js'
 
 /**
  * Handler for changing username
@@ -26,6 +26,7 @@ export async function handleUsername(form: HTMLFormElement) {
 			type: ToastActionType.ERROR_ACTION,
 			message: 'Username cannot be empty'
 		})
+		form.reset()
 		return
 	}
 
@@ -35,6 +36,7 @@ export async function handleUsername(form: HTMLFormElement) {
 			type: ToastActionType.ERROR_ACTION,
 			message: usernameResult.error
 		})
+		form.reset()
 		return
 	}
 
@@ -82,6 +84,7 @@ export async function handlerAvatar(form: HTMLFormElement) {
 			type: ToastActionType.ERROR_ACTION,
 			message: avatarResult.error
 		})
+		form.reset()
 		return
 	}
 

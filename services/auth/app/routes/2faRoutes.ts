@@ -5,7 +5,8 @@ import {
 	verify2faLoginController,
 	disable2faController,
 	status2faController,
-	internalStatus2faController
+	internalStatus2faController,
+	internalGoogleUserStatusController
 } from '../controllers/2faController.js'
 import {
 	Enable2FAResponseSchema,
@@ -78,5 +79,15 @@ export async function twoFARoutes(app: FastifyInstance) {
 			preHandler: apiKeyMiddleware
 		},
 		internalStatus2faController
+	)
+	app.get(
+		'/api/internal/google/status/:id',
+		{
+			schema: {
+				params: IdParamSchema
+			},
+			preHandler: apiKeyMiddleware
+		},
+		internalGoogleUserStatusController
 	)
 }

@@ -1,5 +1,5 @@
 import { LivesComp } from './Lives.js'
-import { UserLink } from '../UserLink.js'
+import { UserLink } from '../friends/UserLink.js'
 
 /**
  * Renders a single line in the game history table.

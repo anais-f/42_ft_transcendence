@@ -10,6 +10,7 @@ import { oppenentJoinHandler } from '../events/lobby/opponentJoinHandler.js'
 import { notyfGlobal as notyf } from '../utils/notyf.js'
 import { ToastActionType } from '../types/toast.js'
 import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
+import { initGameWS } from '../game/network/initGameWS.js'
 
 export const LobbyPage = (): string => {
 	const code = routeParams.code || gameStore.gameCode || 'G-XXXXX'
@@ -115,47 +116,18 @@ export function attachLobbyEvents() {
 			const action = actionButton.getAttribute('data-action')
 
 			if (action === 'copy-code') {
-				handleCopyCode(actionButton as HTMLElement)
+				handleCopyCode(
+					actionButton as HTMLElement,
+					'lobby-code',
+					'Copy Lobby Code'
+				)
 			}
 		}
 	}
 
 	content.addEventListener('click', clickHandler)
 
-	gameStore.setOnOpponentJoin(oppenentJoinHandler)
-
-	const token = gameStore.sessionToken
-	if (token) {
-		createGameWebSocket(token)
-			.then((ws: WebSocket) => {
-				console.log('WS connected')
-				ws.binaryType = 'arraybuffer'
-				gameStore.gameSocket = ws
-
-				ws.onmessage = dispatcher
-
-				ws.onerror = (error) => {
-					console.error('WS error:', error)
-				}
-
-				ws.onclose = () => {
-					if (!gameStore.navigatingToGame) {
-						window.navigate('/')
-					}
-					console.log('WS closed')
-				}
-			})
-			.catch((error: any) => {
-				console.error('WS connection failed:', error)
-				notyf.open({
-					type: ToastActionType.ERROR_ACTION,
-					message: 'Connection to game server failed'
-				})
-				window.navigate('/')
-			})
-	} else {
-		window.navigate('/')
-	}
+	initGameWS('/')
 
 	console.log('Lobby page events attached')
 }

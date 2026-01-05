@@ -13,35 +13,27 @@ install:
 	./scripts/setup-node.sh
 	npm install
 
-.PHONY: build-monitoring
-build-monitoring:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) build
-
-.PHONY: up-monitoring
-up-monitoring: verif-env
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_MONITORING) up -d
-
 .PHONY: test
 test: down build
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) up -d || (make down && exit 1)
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_FILE_TEST) run --rm test || (make down && exit 1)
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: build
 build:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) build
 
 .PHONY: up
 up: verif-env
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up -d
 
 .PHONY: debug
 debug:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) up || make down
 
 .PHONY: down
 down:
-	docker compose -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
+	docker compose --profile monitoring -p $(NAME) -f $(DOCKER_COMPOSE_FILE) down --remove-orphans
 
 .PHONY: sh-%
 sh-%:

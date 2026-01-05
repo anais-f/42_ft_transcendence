@@ -6,16 +6,18 @@ import {
 	handleUsername,
 	handleChangePassword,
 	handlerAvatar
-} from '../events/settingsPageHandlers.js'
+} from '../events/settings/settingsPageHandlers.js'
 import {
 	handleGenerateQRCode,
 	handleEnable2FA,
 	handleDisable2FA
-} from '../events/settings2FAPageHandlers.js'
+} from '../events/settings/settings2FAPageHandlers.js'
 
 export const SettingsPage = (): string => {
 	const is2FAEnabled = currentUser?.two_fa_enabled || false
-	console.log('Rendering SettingsPage, 2FA enabled:', is2FAEnabled)
+	const isGoogleUser = currentUser?.is_google_user || false
+	console.log('current user', currentUser)
+	console.log('Rendering SettingsPage')
 	const twoFATitle = is2FAEnabled ? 'DISABLE 2FA ?' : 'ENABLE 2FA ?'
 
 	return /*html*/ `
@@ -51,53 +53,55 @@ export const SettingsPage = (): string => {
 
    	<div class="col-4-span-flex">
    		<img src="/assets/images/paddle.png" alt="paddle" class="img_style py-0 mb-4 flex-shrink min-h-0">
-   		${LoremSection({
-				variant: 'xs',
-				additionalClasses: 'mb-4'
-			})}
-  		<h1 class="title_bloc">CHANGE PASSWORD ?</h1>
-  		<form id="change_password_form" data-form="password_form" class="form_style">
-				${Input({
-					id: 'old_password',
-					name: 'old_password',
-					placeholder: 'Old Password',
-					type: 'password',
-					required: true
+			<div class=" ${isGoogleUser ? 'hidden' : ''}">
+				${LoremSection({
+					variant: 'xs',
+					additionalClasses: 'mb-4'
 				})}
-				${Input({
-					id: 'new_password',
-					name: 'new_password',
-					placeholder: 'New Password',
-					type: 'password',
-					required: true
-				})}
-				${Input({
-					id: 'confirm_new_password',
-					name: 'confirm_new_password',
-					placeholder: 'Confirm New Password',
-					type: 'password',
-					required: true
-				})}
-				${
-					is2FAEnabled
-						? Input({
-								id: 'password_2fa_code',
-								name: 'password_2fa_code',
-								placeholder: '2FA Code',
-								type: 'text',
-								required: true,
-								maxLength: 6,
-								pattern: '[0-9]{6}'
-							})
-						: ''
-				}
+				<h1 class="title_bloc">CHANGE PASSWORD ?</h1>
+  			<form id="change_password_form" data-form="password_form" class="form_style">
+					${Input({
+						id: 'old_password',
+						name: 'old_password',
+						placeholder: 'Old Password',
+						type: 'password',
+						required: true
+					})}
+					${Input({
+						id: 'new_password',
+						name: 'new_password',
+						placeholder: 'New Password',
+						type: 'password',
+						required: true
+					})}
+					${Input({
+						id: 'confirm_new_password',
+						name: 'confirm_new_password',
+						placeholder: 'Confirm New Password',
+						type: 'password',
+						required: true
+					})}
+					${
+						is2FAEnabled
+							? Input({
+									id: 'password_2fa_code',
+									name: 'password_2fa_code',
+									placeholder: '2FA Code',
+									type: 'text',
+									required: true,
+									maxLength: 6,
+									pattern: '[0-9]{6}'
+								})
+							: ''
+					}
 				${Button({
 					text: 'Save it',
 					id: 'change_password_btn',
 					type: 'submit',
 					additionalClasses: 'form_button'
 				})}
-			</form>
+				</form>
+			</div>   		 		
 			${LoremSection({
 				variant: 'fill'
 			})}
@@ -148,13 +152,14 @@ export const SettingsPage = (): string => {
 						maxLength: 6,
 						pattern: '[0-9]{6}'
 					})}
-					${Input({
+					<div class="${isGoogleUser ? 'hidden' : ''}">${Input({
 						id: 'disable_2fa_password',
 						name: 'password',
 						placeholder: 'Password',
 						type: 'password',
-						required: true
+						required: !isGoogleUser
 					})}
+					</div>
 					${Button({
 						text: 'Disable 2FA',
 						id: 'disable_2fa_btn',
@@ -182,13 +187,14 @@ export const SettingsPage = (): string => {
 									maxLength: 6,
 									pattern: '[0-9]{6}'
 								})}
-								${Input({
+								<div class="${isGoogleUser ? 'hidden' : ''}">${Input({
 									id: 'enable_2fa_password',
 									name: 'password',
 									placeholder: 'Password',
 									type: 'password',
-									required: true
+									required: !isGoogleUser
 								})}
+								</div>
 								${Button({
 									text: 'Verify & Enable',
 									id: 'enable_2fa_btn',

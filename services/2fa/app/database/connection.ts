@@ -15,7 +15,7 @@ export function getDb(): Database {
 	return db
 }
 
-export function runMigrations() {
+export function initDB() {
 	const db = getDb()
 
 	db.pragma('journal_mode = WAL')

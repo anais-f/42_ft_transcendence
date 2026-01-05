@@ -1,5 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify'
-import { runMigrations } from './database/connection.js'
+import { initDB } from './database/connection.js'
 import {
 	ZodTypeProvider,
 	validatorCompiler,
@@ -30,7 +30,7 @@ app.register(fastifyJwt, {
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-runMigrations()
+initDB()
 
 setupErrorHandler(app)
 setupFastifyMonitoringHooks(app)
@@ -45,7 +45,12 @@ app.register(Swagger as any, {
 			title: 'API for 2FA Service',
 			version: '1.0.0'
 		},
-		servers: [{ url: `${env.HOST}/2fa`, description: 'Local server' }],
+		servers: [
+			{
+				url: `${env.SWAGGER_HOST}:8080/2fa`,
+				description: 'Local server'
+			}
+		],
 		components: env.openAPISchema.components
 	},
 	transform: jsonSchemaTransform

@@ -2,7 +2,7 @@ import { fetchMatchHistory } from '../../api/game/statsGameApi.js'
 import { fetchStats } from '../../api/game/statsGameApi.js'
 import { StatBox } from '../../components/game/StatBox.js'
 import { GameHistoryRow } from '../../components/game/HistoryRow.js'
-import { fetchUserById } from '../../api/usersApi.js'
+import { UserByIdAPI } from '../../api/usersApi.js'
 
 /**
  * Fetch user stats and render them into the stats container
@@ -48,10 +48,10 @@ export async function fetchAndRenderMatchHistory(
 
 	const rows = []
 	for (const match of matches) {
-		const player1Response = await fetchUserById(match.player1_id)
+		const player1Response = await UserByIdAPI(match.player1_id)
 		const player1Name =
 			player1Response.data?.username || `Player ${match.player1_id}`
-		const player2Response = await fetchUserById(match.player2_id)
+		const player2Response = await UserByIdAPI(match.player2_id)
 		const player2Name =
 			player2Response.data?.username || `Player ${match.player2_id}`
 

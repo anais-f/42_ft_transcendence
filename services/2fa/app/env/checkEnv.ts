@@ -14,7 +14,8 @@ const envSchema = z
 			.transform((key) => Buffer.from(key, 'base64'))
 			.refine((buffer) => buffer.length === 32, {
 				message: 'TOTP_ENC_KEY must decode to 32 bytes (AES-256)'
-			})
+			}),
+		SWAGGER_HOST: z.string().min(1).default('http://localhost')
 	})
 	.transform((env) => ({
 		HOST: env.HOST,
@@ -22,7 +23,8 @@ const envSchema = z
 		JWT_SECRET: env.JWT_SECRET,
 		TWOFA_DB_PATH: env.TWOFA_DB_PATH,
 		TOTP_ENC_KEY: env.TOTP_ENC_KEY,
-		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE)
+		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE),
+		SWAGGER_HOST: env.SWAGGER_HOST
 	}))
 
 export type I2faEnv = z.infer<typeof envSchema>

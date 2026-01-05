@@ -26,17 +26,3 @@ export function getTournamentByUser(userId: number): string | undefined {
 	}
 	return undefined
 }
-
-/**
- * Get tournament code by tournament ID
- */
-export function getTournamentCodeById(
-	tournamentId: number
-): string | undefined {
-	for (const [code, tournament] of tournaments.entries()) {
-		if (tournament.id === tournamentId) {
-			return code
-		}
-	}
-	return undefined
-}

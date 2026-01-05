@@ -1,4 +1,4 @@
-import { fetchUserById } from '../../api/usersApi.js'
+import { UserByIdAPI } from '../../api/usersApi.js'
 import { IPublicProfileUser } from '@ft_transcendence/common'
 import { checkIsFriendApi } from '../../api/friends/getFriendsApi.js'
 import { Button } from '../../components/Button.js'
@@ -42,7 +42,7 @@ function renderProfile(user: IPublicProfileUser) {
  * @param userId - The user ID to fetch profile for
  */
 export async function initAndRenderUserProfile(userId: number) {
-	const responseUser = await fetchUserById(userId)
+	const responseUser = await UserByIdAPI(userId)
 	if (responseUser.error || !responseUser.data) {
 		console.error('User not found: ', responseUser.error)
 		const username = document.getElementById('profile-username')
