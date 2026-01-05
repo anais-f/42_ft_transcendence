@@ -102,7 +102,7 @@ export async function logoutController(
 
 	if (userId === undefined) return
 	try {
-		await fetch(`${env.GAME_SERVICE_URL}/api/game/internal/cleanup/${userId}`, {
+		await fetch(`${env.GAME_SERVICE_URL}/api/internal/game/cleanup/${userId}`, {
 			method: 'POST',
 			headers: {
 				authorization: env.INTERNAL_API_SECRET
