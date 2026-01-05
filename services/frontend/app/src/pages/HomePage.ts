@@ -26,6 +26,7 @@ import { MapOptions } from '../api/game/createGame.js'
 import { ObstacleType, PaddleShape } from '@pong-shared'
 import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
 import { handleCreateTournament } from '../events/home/createTournamentHandler.js'
+import { UserLink } from '../components/friends/UserLink.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -42,7 +43,12 @@ export const HomePage = (): string => {
     <div class="col-4-span-flex">
         <h1 class="title_bloc">PROFILE</h1>
         <img src="${safeAvatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">
-        <h1 class="username_style">${user.username}</h1>
+        ${UserLink({
+					id: user.user_id.toString(),
+					username: user.username,
+					fontSize: 'xxl',
+					additionalClasses: 'py-4'
+				})}
         ${LoremSection({
 					variant: 'fill'
 				})}
