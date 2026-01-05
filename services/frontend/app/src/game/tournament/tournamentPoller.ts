@@ -7,7 +7,7 @@ import { checkAndJoinUserMatches } from './tournamentMatchJoin.js'
 type PollingState = 'idle' | 'running'
 
 let state: PollingState = 'idle'
-let timeoutId: ReturnType<typeof setTimeout> | null = null
+let pollingTimeoutId: ReturnType<typeof setTimeout> | null = null
 
 const POLLING_INTERVAL_MS = 2000
 
@@ -22,9 +22,9 @@ export async function start(): Promise<void> {
 }
 
 export function stop(): void {
-	if (timeoutId) {
-		clearTimeout(timeoutId)
-		timeoutId = null
+	if (pollingTimeoutId) {
+		clearTimeout(pollingTimeoutId)
+		pollingTimeoutId = null
 	}
 	state = 'idle'
 }
@@ -36,7 +36,7 @@ export function isRunning(): boolean {
 function scheduleNext(): void {
 	if (state !== 'running') return
 
-	timeoutId = setTimeout(async () => {
+	pollingTimeoutId = setTimeout(async () => {
 		if (state !== 'running') return
 
 		await poll()
@@ -61,7 +61,7 @@ async function poll(): Promise<void> {
 		if (tournamentStore.status === 'completed') {
 			console.log('[TournamentPoller] Tournament completed, stopping')
 			stop()
-			setTimeout(() => window.navigate('/'), 5000)
+			window.navigate('/', { delay: 5000 })
 		}
 	} catch (error) {
 		console.error('[TournamentPoller] Error:', error)

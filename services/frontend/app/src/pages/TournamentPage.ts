@@ -135,6 +135,7 @@ export function detachTournamentEvents() {
 	}
 
 	tournamentPoller.stop()
+	window.cancelPendingNavigation()
 
 	if (tournamentStore.tournamentCode && !gameStore.navigatingToGame) {
 		quitTournamentAPI()

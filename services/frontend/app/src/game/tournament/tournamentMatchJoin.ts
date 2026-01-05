@@ -45,7 +45,7 @@ async function joinMatch(
 			type: ToastActionType.ERROR_ACTION,
 			message: 'Tournament is already active in another tab!'
 		})
-		setTimeout(() => window.navigate('/'), 2000)
+		window.navigate('/', { delay: 2000 })
 		return
 	}
 
