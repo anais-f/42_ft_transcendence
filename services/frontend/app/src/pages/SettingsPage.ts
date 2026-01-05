@@ -115,15 +115,17 @@ export const SettingsPage = (): string => {
 			})}
 	 		<h1 class="title_bloc">CHANGE AVATAR ?</h1>
 	 		<form id="change_avatar_form" data-form="avatar_form" class="form_style">
-				${Input({
-					id: 'change_avatar',
-					name: 'change_avatar',
-					placeholder: 'Avatar',
-					type: 'file',
-					required: true,
-					additionalClasses:
-						'p-12 border-2 border-dashed text-center file:hidden'
-				})}
+	 			<div id="avatar_input_wrapper" class="relative w-full">
+					${Input({
+						id: 'change_avatar',
+						name: 'change_avatar',
+						placeholder: 'Avatar',
+						type: 'file',
+						required: true,
+						additionalClasses:
+							'avatar_style border-2 border-dashed text-center file:hidden cursor-pointer'
+					})}
+				</div>
 				${Button({
 					text: 'Save it',
 					id: 'change_avatar_btn',
@@ -216,6 +218,7 @@ export const SettingsPage = (): string => {
 
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 let clickHandler: ((e: Event) => Promise<void>) | null = null
+let changeHandler: ((e: Event) => Promise<void>) | null = null
 
 export async function attachSettingsEvents() {
 	const content = document.getElementById('content')
@@ -247,8 +250,38 @@ export async function attachSettingsEvents() {
 		}
 	}
 
+	changeHandler ??= async (e: Event) => {
+		const target = e.target as HTMLInputElement
+		if (target?.id === 'change_avatar') {
+			const file = target.files?.[0]
+			const wrapper = document.getElementById('avatar_input_wrapper')
+
+			if (file && wrapper && target) {
+				const imgUrl = URL.createObjectURL(file)
+
+				let preview = document.getElementById(
+					'avatar_preview'
+				) as HTMLImageElement
+				if (!preview) {
+					preview = document.createElement('img')
+					preview.id = 'avatar_preview'
+					preview.className =
+						'absolute inset-0 w-full h-full object-cover pointer-events-none'
+					wrapper.appendChild(preview)
+				}
+
+				preview.src = imgUrl
+				preview.onload = () => {
+					URL.revokeObjectURL(imgUrl)
+				}
+				target.classList.add('text-transparent')
+			}
+		}
+	}
+
 	content.addEventListener('submit', submitHandler)
 	content.addEventListener('click', clickHandler)
+	content.addEventListener('change', changeHandler)
 
 	console.log('Settings page events attached')
 }
@@ -264,6 +297,11 @@ export function detachSettingsEvents() {
 	if (content && clickHandler) {
 		content.removeEventListener('click', clickHandler)
 		clickHandler = null
+	}
+
+	if (content && changeHandler) {
+		content.removeEventListener('change', changeHandler)
+		changeHandler = null
 	}
 
 	console.log('Settings page events detached')
