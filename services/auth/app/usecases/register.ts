@@ -2,8 +2,7 @@ import {
 	createUser,
 	findUserByLogin,
 	createAdminUser,
-	createGoogleUser,
-	isUser2FAEnabled
+	createGoogleUser
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
@@ -37,7 +36,7 @@ export async function loginUser(login: string, password: string) {
 	}
 	successfulLoginCounter.inc()
 	const isAdmin = Boolean(user.is_admin)
-	if (!isUser2FAEnabled(user.user_id)) {
+	if (!user.two_fa_enabled) {
 		return {
 			token: signToken(
 				{

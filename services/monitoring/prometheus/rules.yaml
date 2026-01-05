@@ -93,7 +93,7 @@ groups:
           description: '{{ $value }} failed login attempts in the last 5 minutes.'
 
       - alert: AdminFailedLoginAttempts
-        expr: increase(failed_login_attempts_total{role="admin"}[5m]) > 1
+        expr: sum(increase(failed_login_attempts_total{username="admin"}[5m])) > 1
         for: 0m
         labels:
           severity: critical

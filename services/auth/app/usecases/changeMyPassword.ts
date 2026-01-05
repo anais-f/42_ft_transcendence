@@ -1,11 +1,11 @@
 import createHttpError from 'http-errors'
 import {
 	findUserById,
-	isUser2FAEnabled,
 	changeUserPassword
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { env } from '../env/checkEnv.js'
+import { status2FA } from './twofa.js'
 
 /**
  * Verify a 2FA code by calling the 2FA service
@@ -82,7 +82,7 @@ export async function changeMyPassword(
 		throw createHttpError.Unauthorized('Invalid old password')
 	}
 
-	if (isUser2FAEnabled(userId)) {
+	if (user.two_fa_enabled) {
 		if (!twofaCode) {
 			throw createHttpError.BadRequest('2FA code required')
 		}
