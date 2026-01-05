@@ -46,10 +46,9 @@ export async function googleLoginUsecase(
 
 	const user = findUserByGoogleId(googleId)
 	if (user) {
-		const status2fa = await status2FA(user.user_id)
-		user.two_fa_enabled = status2fa.enabled
+		const is2FAEnabled = await status2FA(user.user_id)
 		console.log('Google user already exists, logging in')
-		if (!user.two_fa_enabled) {
+		if (!is2FAEnabled.enabled) {
 			const authToken = signToken(
 				{
 					user_id: user.user_id,

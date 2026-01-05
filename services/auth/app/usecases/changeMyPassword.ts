@@ -81,8 +81,8 @@ export async function changeMyPassword(
 	if (!isOldPasswordValid) {
 		throw createHttpError.Unauthorized('Invalid old password')
 	}
-
-	if (user.two_fa_enabled) {
+	const is2FAEnabled = await status2FA(userId)
+	if (is2FAEnabled.enabled) {
 		if (!twofaCode) {
 			throw createHttpError.BadRequest('2FA code required')
 		}
