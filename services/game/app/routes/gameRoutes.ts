@@ -7,13 +7,13 @@ import {
 	CodeParamSchema,
 	createTokenSchema,
 	CreateGameSchema,
-	IWsJwtTokenQuery
+	IWsJwtTokenQuery,
+	HttpErrorSchema
 } from '@ft_transcendence/common'
 import { handleGameWsConnection } from '../controllers/game/wsControllers.js'
 import { createNewGameController } from '../controllers/game/newGameController.js'
 import { joinGameController } from '../controllers/game/joinGameController.js'
 import { getAssignedGameController } from '../controllers/game/getAssignedGameController.js'
-import z from 'zod'
 
 export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
@@ -28,15 +28,11 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			params: CodeParamSchema,
 			response: {
 				201: createTokenSchema,
-				404: z.object().meta({ description: 'unknow game code' }),
-				409: z
-					.union([
-						z.object({}).meta({ description: 'player already in a game' }),
-						z
-							.object({})
-							.meta({ description: 'player not allowed in this game' })
-					])
-					.meta({ description: 'conflict error' })
+				404: HttpErrorSchema.meta({ description: 'unknow game code' }),
+				409: HttpErrorSchema.meta({
+					description:
+						'player already in a game / player not allowed in this game'
+				})
 			}
 		},
 		handler: joinGameController
@@ -52,8 +48,8 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 			body: CreateGameSchema,
 			response: {
 				201: CodeParamSchema,
-				404: z.object().meta({ description: 'unknow game code' }),
-				409: z.object().meta({ description: 'player already in a game' })
+				404: HttpErrorSchema.meta({ description: 'unknow game code' }),
+				409: HttpErrorSchema.meta({ description: 'player already in a game' })
 			}
 		},
 		handler: createNewGameController
@@ -68,7 +64,9 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 				'This endpoint returns the game code for a game the player is already assigned to.',
 			response: {
 				200: CodeParamSchema,
-				404: z.any().meta({ description: 'no game assigned to the player.' })
+				404: HttpErrorSchema.meta({
+					description: 'no game assigned to the player.'
+				})
 			}
 		},
 		handler: getAssignedGameController
