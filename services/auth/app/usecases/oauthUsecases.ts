@@ -67,6 +67,7 @@ export async function googleLoginUsecase(
 			const pre2faToken = signToken(
 				{
 					user_id: user.user_id,
+					is_admin: user.is_admin,
 					type: '2fa'
 				},
 				'5m'
