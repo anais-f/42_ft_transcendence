@@ -46,7 +46,7 @@ class TournamentStore {
 
 	getPlayer(index: number): PlayerData | null {
 		const id = this._playerIds[index]
-		return id ? this._playersMap.get(id) ?? null : null
+		return id ? (this._playersMap.get(id) ?? null) : null
 	}
 
 	async syncPlayers(participantIds: number[]): Promise<void> {
