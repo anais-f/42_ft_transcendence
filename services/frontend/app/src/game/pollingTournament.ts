@@ -18,7 +18,7 @@ import { handleJoinGameTournament } from '../events/tournament/gameTournament.js
 import { initGameWS } from './network/initGameWS.js'
 import { gameStore } from '../usecases/gameStore.js'
 import { showModal } from '../components/modals/Modal.js'
-import { NEXT_MATCH_MODAL_ID } from '../events/tournament/nextMatchModal.js'
+import { NEXT_MATCH_MODAL_ID } from '../components/modals/nextMatchModal.js'
 
 export let pollingInterval: ReturnType<typeof setTimeout> | null
 let isPolling = false

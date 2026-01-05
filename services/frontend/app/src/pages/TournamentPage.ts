@@ -12,11 +12,8 @@ import { quitTournamentAPI } from '../api/tournamentApi.js'
 import { routeParams } from '../router/Router.js'
 import { PlayerCard } from '../components/tournament/PlayerCard.js'
 import { gameStore } from '../usecases/gameStore.js'
-import {
-	NEXT_MATCH_MODAL_ID,
-	NextMatchModal
-} from '../events/tournament/nextMatchModal.js'
 import { hideModal } from '../components/modals/Modal.js'
+import { NEXT_MATCH_MODAL_ID, NextMatchModal } from '../components/modals/nextMatchModal.js'
 
 export const waitingPlayer = '???'
 
