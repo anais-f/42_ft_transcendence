@@ -2,23 +2,23 @@
 
 ## Overview
 
-The monitoring system uses the Prometheus/Grafana stack for metrics collection, visualization and real-time alerting.  It includes specialized exporters for detailed infrastructure metrics and Discord integration for alert notifications.
+The monitoring system uses the Prometheus/Grafana stack for metrics collection, visualization and real-time alerting. It includes specialized exporters for detailed infrastructure metrics and Discord integration for alert notifications.
 
 **The monitoring stack is now integrated into the main `docker-compose.yaml` file** and starts automatically with the application.
 
 ```mermaid
 graph TB
     Client[Client Browser]
-    
+
     Client -->|HTTPS 8080| Nginx[NGINX Reverse Proxy]
-    
+
     Nginx --> Grafana[Grafana Dashboards]
     Nginx --> Prometheus[Prometheus Metrics]
     Nginx --> AlertManager[AlertManager Alerts]
-    
+
     NginxExporter[NGINX Exporter]
     Nginx -->|stub_status| NginxExporter
-    
+
     Prometheus -->|scrape| Auth[Auth Service]
     Prometheus -->|scrape| Users[Users Service]
     Prometheus -->|scrape| Social[Social Service]
@@ -26,15 +26,15 @@ graph TB
     Prometheus -->|scrape| TwoFA[2FA Service]
     Prometheus -->|scrape| Frontend[Frontend]
     Prometheus -->|scrape| NginxExporter
-    
+
     Prometheus -->|query| Grafana
     Prometheus -->|alerts| AlertManager
-    
+
     AlertManager -->|webhook| Discord[Discord Notifications]
-    
+
     Prometheus -.-> PromData[(Prometheus Data)]
     Grafana -.-> GrafanaData[(Grafana Data)]
-    
+
     style Nginx fill:#2d6fb5,stroke:#1a4d8f,color:#fff
     style NginxExporter fill:#009639,stroke:#006b29,color:#fff
     style Prometheus fill:#e6522c,stroke:#c7321b,color:#fff
@@ -52,9 +52,10 @@ graph TB
 ## Monitoring Stack
 
 ### Prometheus
+
 - **Internal port**: 9090
 - **External URL**: `https://localhost:8080/prometheus/` (admin authentication required)
-- **Role**: 
+- **Role**:
   - Collect metrics from all microservices
   - Collect NGINX metrics via nginx-prometheus-exporter
   - Store in time-series database
@@ -62,10 +63,11 @@ graph TB
 - **Configuration**:
   - `prometheus.yaml`: Configuration of targets to scrape
   - `rules.yaml`: Alerting rules
-- **Volume**:  `prometheus_data` (metrics persistence)
-- **Scraping**:  Automatic collection every X seconds
+- **Volume**: `prometheus_data` (metrics persistence)
+- **Scraping**: Automatic collection every X seconds
 
 ### Grafana
+
 - **Internal port**: 3000
 - **External URL**: `https://localhost:8080/grafana/` (admin authentication required)
 - **Role**:
@@ -78,6 +80,7 @@ graph TB
 - **Volume**: `grafana_data` (config & dashboards persistence)
 
 ### AlertManager
+
 - **Internal port**: 9093
 - **External URL**: `https://localhost:8080/alertmanager/` (admin authentication required)
 - **Role**:
@@ -86,11 +89,12 @@ graph TB
   - Grouping and silencing
   - Send notifications via Discord webhook
   - Support for additional notification channels (email, Slack, etc.)
-- **Configuration**:  Environment variables (. env)
-- **Discord Integration**:  Configured webhook URL for real-time alerts
+- **Configuration**: Environment variables (. env)
+- **Discord Integration**: Configured webhook URL for real-time alerts
 - **Dependencies**: Prometheus
 
 ### NGINX Prometheus Exporter
+
 - **Internal port**: 9113
 - **Exposed port**: 9113 (for external access)
 - **Metrics endpoint**: `http://localhost:9113/metrics`
@@ -99,7 +103,7 @@ graph TB
   - Collect connection statistics
   - Monitor request rates and response codes
   - Track upstream server health
-- **Configuration**:  Connects to NGINX stub_status endpoint (`/stub_status`)
+- **Configuration**: Connects to NGINX stub_status endpoint (`/stub_status`)
 - **Metrics exposed**:
   - Active connections
   - Requests per second
@@ -154,43 +158,46 @@ sequenceDiagram
 Each microservice exposes metrics on the `/metrics` endpoint:
 
 **Standard Metrics:**
+
 - HTTP Requests (Total, Duration, Errors)
 - System Metrics (CPU, Memory, Disk)
 - Node. js Metrics (Event Loop, Heap)
 
 **Custom Metrics:**
-- **Auth**:  Login attempts, JWT issued
+
+- **Auth**: Login attempts, JWT issued
 - **Users**: Active users, Profiles
 - **Game**: Games played, Duration
-- **Social**:  Messages, Friends
+- **Social**: Messages, Friends
 
 **Infrastructure Metrics:**
+
 - **NGINX**: Connections, Requests/s, Response codes
 
 ### Metrics Examples
 
 #### Application Metrics
 
-| Metric | Type | Description |
-|--------|------|-------------|
-| `http_request_duration_seconds` | Histogram | HTTP request duration |
-| `http_requests_total` | Counter | Total number of requests |
-| `nodejs_heap_size_used_bytes` | Gauge | Memory used |
-| `auth_login_attempts_total` | Counter | Login attempts |
-| `game_sessions_active` | Gauge | Active game sessions |
-| `users_registered_total` | Counter | Registered users |
+| Metric                          | Type      | Description              |
+| ------------------------------- | --------- | ------------------------ |
+| `http_request_duration_seconds` | Histogram | HTTP request duration    |
+| `http_requests_total`           | Counter   | Total number of requests |
+| `nodejs_heap_size_used_bytes`   | Gauge     | Memory used              |
+| `auth_login_attempts_total`     | Counter   | Login attempts           |
+| `game_sessions_active`          | Gauge     | Active game sessions     |
+| `users_registered_total`        | Counter   | Registered users         |
 
 #### NGINX Metrics (via nginx-prometheus-exporter)
 
-| Metric | Type | Description |
-|--------|------|-------------|
-| `nginx_connections_active` | Gauge | Current active client connections |
-| `nginx_connections_accepted` | Counter | Total accepted client connections |
-| `nginx_connections_handled` | Counter | Total handled connections |
-| `nginx_http_requests_total` | Counter | Total HTTP requests |
-| `nginx_connections_reading` | Gauge | Connections reading request |
-| `nginx_connections_writing` | Gauge | Connections writing response |
-| `nginx_connections_waiting` | Gauge | Idle connections waiting for request |
+| Metric                       | Type    | Description                          |
+| ---------------------------- | ------- | ------------------------------------ |
+| `nginx_connections_active`   | Gauge   | Current active client connections    |
+| `nginx_connections_accepted` | Counter | Total accepted client connections    |
+| `nginx_connections_handled`  | Counter | Total handled connections            |
+| `nginx_http_requests_total`  | Counter | Total HTTP requests                  |
+| `nginx_connections_reading`  | Gauge   | Connections reading request          |
+| `nginx_connections_writing`  | Gauge   | Connections writing response         |
+| `nginx_connections_waiting`  | Gauge   | Idle connections waiting for request |
 
 ## Alerting Rules
 
@@ -204,12 +211,12 @@ groups:
       - alert: HighErrorRate
         expr: rate(http_requests_total{status=~"5.."}[5m]) > 0. 05
         for: 5m
-        labels:  
+        labels:
           severity: critical
         annotations:
-          summary:  "High error rate on service"
-          description: "Service is experiencing high error rate"
-      
+          summary: 'High error rate on service'
+          description: 'Service is experiencing high error rate'
+
       # Service down
       - alert: ServiceDown
         expr: up{job="microservices"} == 0
@@ -217,29 +224,29 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Service is down"
-          description: "Service has been down for more than 2 minutes"
-      
+          summary: 'Service is down'
+          description: 'Service has been down for more than 2 minutes'
+
       # High memory usage
       - alert: HighMemoryUsage
-        expr:  nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes > 0.9
+        expr: nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes > 0.9
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary:  "High memory usage on service"
-          description: "Memory usage is critically high"
-      
+          summary: 'High memory usage on service'
+          description: 'Memory usage is critically high'
+
       # NGINX high connection rate
       - alert: NginxHighConnectionRate
-        expr:  rate(nginx_connections_accepted[5m]) > 100
+        expr: rate(nginx_connections_accepted[5m]) > 100
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary:  "High connection rate on NGINX"
-          description: "NGINX is accepting high number of connections per second"
-      
+          summary: 'High connection rate on NGINX'
+          description: 'NGINX is accepting high number of connections per second'
+
       # NGINX connection handling issues
       - alert: NginxConnectionHandlingIssues
         expr: (nginx_connections_accepted - nginx_connections_handled) > 0
@@ -247,15 +254,15 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary:  "NGINX is dropping connections"
-          description: "Connections have been accepted but not handled"
+          summary: 'NGINX is dropping connections'
+          description: 'Connections have been accepted but not handled'
 ```
 
 ## Discord Alert Integration
 
 ### Configuration
 
-AlertManager is configured to send alerts to Discord via webhook:  
+AlertManager is configured to send alerts to Discord via webhook:
 
 ```yaml
 # alertmanager.yml
@@ -275,7 +282,7 @@ route:
 
 ### Discord Webhook Setup
 
-1. Create a webhook in your Discord server:  
+1. Create a webhook in your Discord server:
    - Go to Server Settings → Integrations → Webhooks
    - Click "New Webhook"
    - Copy the webhook URL
@@ -288,6 +295,7 @@ route:
 ### Alert Message Format
 
 Discord messages include:
+
 - **Alert Name**: Type of alert triggered
 - **Severity**: critical, warning, info
 - **Summary**: Brief description
@@ -295,7 +303,8 @@ Discord messages include:
 - **Timestamp**: When the alert fired
 - **Status**: firing or resolved
 
-Example Discord alert:  
+Example Discord alert:
+
 ```
 CRITICAL ALERT
 
@@ -311,43 +320,50 @@ Details:
 
 ## Network Architecture
 
-The monitoring system uses two Docker networks:  
+The monitoring system uses two Docker networks:
 
 **monitoring network:**
+
 - Grafana
 - AlertManager
 - Prometheus
 - NGINX Exporter
 
 **backend network:**
+
 - All application services
 - NGINX
 - Prometheus (bridge)
 
 **External:**
+
 - Discord (via webhook)
 
 ## Grafana Dashboards
 
-### Dashboard:  Services Overview
-- **Metrics**:  Availability, latency, error rate
+### Dashboard: Services Overview
+
+- **Metrics**: Availability, latency, error rate
 - **Services**: Auth, Users, Social, Game, 2FA, Frontend
 
 ### Dashboard: System Resources
+
 - **Metrics**: CPU, RAM, Disk I/O
 - **Per service**: Individual consumption
 
 ### Dashboard: NGINX Performance
+
 - **Metrics**:
   - Active connections
   - Requests per second
   - Connection states (reading, writing, waiting)
   - Request/response rates
   - Upstream server status
-- **Visualizations**:  Time series graphs, gauges, stat panels
+- **Visualizations**: Time series graphs, gauges, stat panels
 
 ### Dashboard: Business Metrics
-- **Auth**:  Logins/day, active tokens
+
+- **Auth**: Logins/day, active tokens
 - **Users**: New users, modified profiles
 - **Game**: Games played, average duration
 - **Social**: Messages sent, friends added
@@ -372,7 +388,7 @@ services:
         condition: service_healthy
       users:
         condition:  service_healthy
-    volumes:  
+    volumes:
       - prometheus_data:/prometheus
       - ./services/monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml: ro
       - ./services/monitoring/prometheus/rules.yaml:/etc/prometheus/rules.yml:ro
@@ -388,7 +404,7 @@ services:
     restart: on-failure
     networks:
       - monitoring
-    volumes:  
+    volumes:
       - grafana_data:/var/lib/grafana
       - ./services/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./services/monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
@@ -399,24 +415,24 @@ services:
       - . env
 
   alertmanager:
-    build: 
+    build:
       context: ./services/monitoring/alertmanager
       dockerfile: Dockerfile
     container_name: alertmanager
     restart: on-failure
-    networks: 
+    networks:
       - monitoring
     env_file:
       - .env
     depends_on:
-      prometheus: 
+      prometheus:
         condition: service_healthy
     entrypoint: /entrypoint.sh
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.5.1
     container_name: nginx-exporter
-    command:  
+    command:
       - '-nginx.scrape-uri=http://nginx: 8080/stub_status'
     ports:
       - '9113:9113'
@@ -431,22 +447,23 @@ services:
 
 All monitoring interfaces are protected by admin authentication (`/_admin_validate`):
 
-| Service | URL | Authentication | Description |
-|---------|-----|----------------|-------------|
-| Grafana | `https://localhost:8080/grafana/` | Admin JWT required | Dashboards & visualizations |
-| Prometheus | `https://localhost:8080/prometheus/` | Admin JWT required | PromQL query interface |
-| AlertManager | `https://localhost:8080/alertmanager/` | Admin JWT required | Alert management |
-| NGINX Exporter | `http://localhost:9113/metrics` | Public (port exposed) | NGINX metrics endpoint |
-| NGINX stub_status | `https://localhost:8080/stub_status` | Internal network only | NGINX status page |
+| Service           | URL                                    | Authentication        | Description                 |
+| ----------------- | -------------------------------------- | --------------------- | --------------------------- |
+| Grafana           | `https://localhost:8080/grafana/`      | Admin JWT required    | Dashboards & visualizations |
+| Prometheus        | `https://localhost:8080/prometheus/`   | Admin JWT required    | PromQL query interface      |
+| AlertManager      | `https://localhost:8080/alertmanager/` | Admin JWT required    | Alert management            |
+| NGINX Exporter    | `http://localhost:9113/metrics`        | Public (port exposed) | NGINX metrics endpoint      |
+| NGINX stub_status | `https://localhost:8080/stub_status`   | Internal network only | NGINX status page           |
 
-**Note**: You need to be logged in as an admin user to access Grafana, Prometheus, and AlertManager interfaces. 
+**Note**: You need to be logged in as an admin user to access Grafana, Prometheus, and AlertManager interfaces.
 
 ## Monitoring Healthchecks
 
-All monitoring services have healthchecks:   
+All monitoring services have healthchecks:
+
 - **Interval**: 30s
 - **Timeout**: 3s
-- **Retries**:  5
+- **Retries**: 5
 - **Start period**: 10s
 
 ## Startup Order (Monitoring)
@@ -460,14 +477,15 @@ All monitoring services have healthchecks:
 
 ## Persistent Volumes
 
-| Volume | Usage | Service |
-|--------|-------|---------|
+| Volume            | Usage                | Service    |
+| ----------------- | -------------------- | ---------- |
 | `prometheus_data` | Time-series database | Prometheus |
-| `grafana_data` | Dashboards & config | Grafana |
+| `grafana_data`    | Dashboards & config  | Grafana    |
 
 ## Integration with Main Architecture
 
-The monitoring is now **fully integrated** into the main build: 
+The monitoring is now **fully integrated** into the main build:
+
 - No separate docker-compose file needed
 - Starts automatically with `make up`
 - No application code modification required
@@ -568,7 +586,7 @@ make logs-alertmanager
 
 1. Verify you are logged in as an admin user
 2. Check that NGINX is running and healthy
-3. Verify admin validation endpoint is working: 
+3. Verify admin validation endpoint is working:
    ```bash
    make logs-nginx
    make logs-auth
@@ -600,7 +618,8 @@ make up
 
 **Monitoring Best Practices**
 
-This monitoring setup follows industry standards: 
+This monitoring setup follows industry standards:
+
 - Time-series metrics collection with Prometheus
 - Rich visualization with Grafana
 - Intelligent alerting with AlertManager
@@ -611,4 +630,7 @@ This monitoring setup follows industry standards:
 - Scalable architecture
 - Admin-only access for security
 - Fully integrated with main application stack
+
+```
+
 ```
