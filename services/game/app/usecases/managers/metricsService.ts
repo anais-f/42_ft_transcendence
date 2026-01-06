@@ -52,12 +52,4 @@ export function updateGameMetrics(): void {
 
 	// Update players in tournaments
 	playersInTournamentsGauge.set(usersToTournament.size)
-
-	console.log(
-		`[Metrics] Games: waiting=${gamesByStatus.waiting} active=${gamesByStatus.active} ended=${gamesByStatus.ended}`
-	)
-	console.log(
-		`[Metrics] Tournaments: pending=${tournamentsByStatus.pending} ongoing=${tournamentsByStatus.ongoing} completed=${tournamentsByStatus.completed}`
-	)
-	console.log(`[Metrics] Players in tournaments:  ${usersToTournament.size}`)
 }

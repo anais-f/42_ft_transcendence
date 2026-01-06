@@ -18,9 +18,7 @@ export function createTournamentTree(tournament: Tournament) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
-	console.log('Before shuffle:', tournament.participants)
 	shuffle(tournament.participants)
-	console.log('Shuffled participants:', tournament.participants)
 	if (tournament.participants.length !== tournament.maxParticipants) {
 		throw createHttpError.Conflict(
 			'Not enough participants to create the tournament tree'
@@ -48,13 +46,6 @@ export function createTournamentTree(tournament: Tournament) {
 	for (let round = maxRound - 1; round > 0; --round) {
 		const matchesInRound =
 			tournament.maxParticipants / 2 ** (maxRound - round + 1)
-		console.log(
-			'Creating matches for round',
-			round,
-			'with',
-			matchesInRound,
-			'matches'
-		)
 		for (let match = 0; match < matchesInRound; match++) {
 			tournament.matches.push({
 				previousMatchId1: match * 2,
@@ -65,6 +56,4 @@ export function createTournamentTree(tournament: Tournament) {
 			})
 		}
 	}
-	console.log('Tournament Matches:', tournament.matches)
-	console.log('Tournament tree created successfully')
 }

@@ -60,10 +60,6 @@ export function initGameWsConnection(
 		startCountdown(gameData, gameCode)
 	}
 
-	console.log(
-		`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`
-	)
-
 	return { user, gameCode, playerSlot, gameData }
 }
 

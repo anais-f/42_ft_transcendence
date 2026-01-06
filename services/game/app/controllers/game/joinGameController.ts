@@ -9,7 +9,6 @@ export async function joinGameController(
 ): Promise<void> {
 	const user = PublicUserAuthSchema.strip().parse(request.user)
 	const param = CodeParamSchema.parse(request.params)
-	console.log(param)
 
 	GameManager.withGameError(() =>
 		GameManager.joinGame(param.code, user.user_id)

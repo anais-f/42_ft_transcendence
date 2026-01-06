@@ -17,7 +17,6 @@ export function startTimeOut(code: string, ms: number = 10000) {
 			gameData.status === 'waiting' &&
 			(!gameData.p1.ws || !gameData.p2?.ws)
 		) {
-			console.log(`time out reached for game ${code}`)
 			leaveGame(code)
 		}
 	}, ms)

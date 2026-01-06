@@ -33,9 +33,6 @@ export function onTournamentMatchEnd(
 	// If this was the final (round 1), tournament is over
 	if (tournamentMatchData.round === 1) {
 		tournament.status = 'completed'
-		console.log(
-			`Tournament ${tournamentCode} completed!  Winner: ${tournamentData.winnerId}`
-		)
 
 		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
@@ -43,13 +40,7 @@ export function onTournamentMatchEnd(
 		})
 
 		updateGameMetrics()
-		setTimeout(
-			() => {
-				tournaments.delete(tournamentCode)
-				console.log(`Tournament ${tournamentCode} data cleaned up from memory`)
-			},
-			1 * 60 * 1000
-		)
+		setTimeout(() => tournaments.delete(tournamentCode), 1 * 60 * 1000	)
 		return
 	}
 
@@ -62,7 +53,6 @@ export function onTournamentMatchEnd(
 	)
 
 	if (!nextRoundMatch) {
-		console.error('No next round match found for winner')
 		return
 	}
 
@@ -75,18 +65,11 @@ export function onTournamentMatchEnd(
 		nextRoundMatch.player2Id = tournamentData.winnerId
 	}
 
-	console.log(
-		`Winner ${tournamentData.winnerId} advanced to round ${nextRoundMatch.round}, match ${nextRoundMatch.matchNumber}`
-	)
-
 	if (
 		nextRoundMatch.player1Id !== undefined &&
 		nextRoundMatch.player2Id !== undefined &&
 		nextRoundMatch.status === 'waiting_for_players'
 	) {
-		console.log(
-			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
-		)
 		const gameCode = GameManager.requestGame(
 			nextRoundMatch.player1Id,
 			nextRoundMatch.player2Id,

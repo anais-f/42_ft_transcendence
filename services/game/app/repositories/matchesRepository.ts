@@ -10,9 +10,6 @@ export function saveMatchToHistory(
 	scorePlayer1: number,
 	scorePlayer2: number
 ): number {
-	console.log(
-		`[${player1Id}]: ${scorePlayer1} | [${player2Id}]: ${scorePlayer2}`
-	)
 	const db = getDb()
 	const winnerId = scorePlayer1 > scorePlayer2 ? player1Id : player2Id
 

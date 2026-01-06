@@ -24,11 +24,7 @@ export function registerGameSocketEvents(
 		}
 	})
 
-	socket.on('close', (code) => {
-		console.log(
-			`[-] ${ctx.user.login}(${ctx.user.user_id}) disconnected from game: ${ctx.gameCode} (code: ${code})`
-		)
-
+	socket.on('close', () => {
 		const currentGame = games.get(ctx.gameCode)
 		const player = currentGame?.[ctx.playerSlot]
 		if (player) {

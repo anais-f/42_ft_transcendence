@@ -20,23 +20,6 @@ import * as GameManager from '../managers/gameManager/index.js'
 import { updateHUDs } from './gameUpdate/updateHUDs.js'
 import { PacketSender } from './PacketSender.js'
 
-function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
-	if (prev.length !== current.length) return true
-	for (let i = 0; i < prev.length; i++) {
-		if (
-			!prev[i].p1.equals(current[i].p1) ||
-			!prev[i].p2.equals(current[i].p2)
-		) {
-			return true
-		}
-	}
-	return false
-}
-
-function cloneSegments(segs: Segment[]): Segment[] {
-	return segs.map((s) => s.clone())
-}
-
 export function startGame(gameData: GameData, gameCode: string): void {
 	const gameInstance = createGame(MAX_LIVES, gameData.mapOptions)
 	updateGameMetrics()
@@ -145,3 +128,21 @@ async function startGameLoop(
 	packetSender.stop()
 	GameManager.endGame(gameCode)
 }
+
+function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
+	if (prev.length !== current.length) return true
+	for (let i = 0; i < prev.length; i++) {
+		if (
+			!prev[i].p1.equals(current[i].p1) ||
+			!prev[i].p2.equals(current[i].p2)
+		) {
+			return true
+		}
+	}
+	return false
+}
+
+function cloneSegments(segs: Segment[]): Segment[] {
+	return segs.map((s) => s.clone())
+}
+
