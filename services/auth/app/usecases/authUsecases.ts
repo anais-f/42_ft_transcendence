@@ -61,7 +61,7 @@ export async function registerUserUsecase(
 			is_admin: false,
 			type: 'auth'
 		},
-		'1h'
+		'4h'
 	)
 	successfulLoginCounter.inc()
 

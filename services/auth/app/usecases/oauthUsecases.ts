@@ -57,7 +57,7 @@ export async function googleLoginUsecase(
 					is_admin: user.is_admin,
 					type: 'auth'
 				},
-				'1h'
+				'4h'
 			)
 			return {
 				response: {
@@ -128,7 +128,7 @@ export async function googleLoginUsecase(
 			is_admin: false,
 			type: 'auth'
 		},
-		'1h'
+		'4h'
 	)
 
 	return {
