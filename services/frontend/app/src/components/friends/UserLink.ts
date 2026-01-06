@@ -12,7 +12,7 @@ import { escapeHtml } from '../../usecases/sanitize.js'
 interface UserLinkProps {
 	id: string
 	username: string
-	fontSize?: 'sm' | 'base' | 'lg' | 'xl'
+	fontSize?: 'sm' | 'base' | 'lg' | 'xl' | 'xxl'
 	additionalClasses?: string
 }
 
@@ -20,7 +20,8 @@ const fontSizeClasses: Record<string, string> = {
 	sm: 'text-sm',
 	base: 'text-base',
 	lg: 'text-lg',
-	xl: 'text-xl'
+	xl: 'text-xl',
+	xxl: 'text-2xl'
 }
 
 /**
