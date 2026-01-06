@@ -78,6 +78,16 @@ function createApp(): FastifyInstance {
 	return app
 }
 
+/**
+ * Syncs users from auth service on startup.
+ *
+ * Required because:
+ * - Auth service may create users while users service is down
+ * - Ensures users table is consistent with auth service
+ * - Only inserts missing users (idempotent)
+ *
+ * @throws If auth service is unreachable - prevents startup
+ */
 async function initializeUsers(): Promise<void> {
 	try {
 		console.log('Initializing users from auth service...')

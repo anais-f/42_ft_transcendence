@@ -29,7 +29,6 @@ export async function getPublicUser(
 
 	const parsed = UserPublicProfileSchema.safeParse(rawProfile)
 	if (!parsed.success) {
-		console.error('UserProfile validation failed:', parsed.error)
 		throw createHttpError.InternalServerError('Invalid response data')
 	}
 
@@ -52,18 +51,12 @@ export async function getPrivateUser(
 
 	const parsed = UserPrivateProfileSchema.safeParse(rawProfile)
 	if (!parsed.success) {
-		console.error('UserPrivateProfile validation failed:', parsed.error)
 		throw createHttpError.InternalServerError('Invalid response data')
 	}
 
 	reply.code(200).send(parsed.data)
 }
 
-/**
- * @description Search user by exact username
- * @param req - Fastify request with username in query
- * @param reply - Fastify reply
- */
 export async function searchUserByUsernameController(
 	req: FastifyRequest<{ Querystring: { username: string } }>,
 	reply: FastifyReply
@@ -74,7 +67,6 @@ export async function searchUserByUsernameController(
 
 	const parsed = UserSearchResultSchema.safeParse(result)
 	if (!parsed.success) {
-		console.error('UserSearchResult validation failed:', parsed.error)
 		throw createHttpError.InternalServerError('Invalid response data')
 	}
 

@@ -13,7 +13,6 @@ import { updateUserMetrics } from './metricsService.js'
 export class UsersServices {
 	static async createUser(newUser: PublicUserAuthDTO): Promise<void> {
 		if (UsersRepository.existsById({ user_id: newUser.user_id })) {
-			console.log(`User ${newUser.user_id} already exists, skipping creation`)
 			return
 		}
 
@@ -21,7 +20,6 @@ export class UsersServices {
 			user_id: newUser.user_id,
 			login: newUser.login
 		})
-		console.log(`User ${newUser.user_id} ${newUser.login} created`)
 
 		updateUserMetrics()
 	}
