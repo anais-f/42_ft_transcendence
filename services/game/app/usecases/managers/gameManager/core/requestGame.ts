@@ -3,32 +3,16 @@ import {
 	PaddleShape,
 	ObstacleType
 } from '@ft_transcendence/pong-shared'
-import { games, playerToGame } from '../gameData.js'
+import { games, playerToGame } from '../../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
-import { ITournamentMatchData } from '../gameData.js'
-import { updateGameMetrics } from '../metricsService.js'
+import { ITournamentMatchData } from '../../gameData.js'
+import { updateGameMetrics } from '../../metricsService.js'
 import { leaveGame } from './leaveGame.js'
-import { createInviteCode } from '../../createCode.js'
+import { createInviteCode } from '../../../createCode.js'
 
 const DEFAULT_MAP_OPTIONS: MapOptions = {
 	paddleShape: PaddleShape.Classic,
 	obstacle: ObstacleType.None
-}
-
-function canPlayerCreateGame(playerId: number): boolean {
-	if (!playerToGame.has(playerId)) {
-		return true
-	}
-
-	const existingCode = playerToGame.get(playerId)
-	const existingGame = games.get(existingCode!)
-
-	if (existingGame && !existingGame.p2) {
-		leaveGame(existingCode!)
-		return true
-	}
-
-	return false
 }
 
 /*
@@ -79,4 +63,20 @@ export function requestGame(
 	updateGameMetrics()
 
 	return newCode
+}
+
+function canPlayerCreateGame(playerId: number): boolean {
+	if (!playerToGame.has(playerId)) {
+		return true
+	}
+
+	const existingCode = playerToGame.get(playerId)
+	const existingGame = games.get(existingCode!)
+
+	if (existingGame && !existingGame.p2) {
+		leaveGame(existingCode!)
+		return true
+	}
+
+	return false
 }

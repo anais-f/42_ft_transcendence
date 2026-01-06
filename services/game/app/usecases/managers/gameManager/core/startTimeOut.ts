@@ -1,4 +1,4 @@
-import { games } from '../gameData.js'
+import { games } from '../../gameData.js'
 import { leaveGame } from './leaveGame.js'
 
 export function startTimeOut(code: string, ms: number = 10000) {

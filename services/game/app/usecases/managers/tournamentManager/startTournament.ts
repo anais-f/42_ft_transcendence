@@ -1,5 +1,5 @@
 import { Tournament } from '@ft_transcendence/common'
-import { requestGame } from '../gameManager/requestGame.js'
+import * as GameManager from '../../managers/gameManager/index.js'
 import { createTournamentTree } from './createTournamentTree.js'
 import { updateGameMetrics } from '../metricsService.js'
 
@@ -24,7 +24,7 @@ function startFirstRound(code: string, tournament: Tournament) {
 			return
 		}
 		match.status = 'ongoing'
-		const gameCode = requestGame(match.player1Id, match.player2Id, {
+		const gameCode = GameManager.requestGame(match.player1Id, match.player2Id, {
 			tournamentCode: code,
 			round: match.round,
 			matchNumber: match.matchNumber

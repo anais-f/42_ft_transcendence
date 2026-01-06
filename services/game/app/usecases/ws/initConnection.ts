@@ -9,7 +9,7 @@ import {
 	playerToGame,
 	Iplayer
 } from '../managers/gameData.js'
-import { startCountdown } from './startCountdown.js'
+import { startCountdown } from './gameUpdate/startCountdown.js'
 
 export interface ConnectionContext {
 	user: WsTokenPayload

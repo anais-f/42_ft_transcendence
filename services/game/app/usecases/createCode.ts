@@ -2,8 +2,8 @@ import { games, tournaments } from '../usecases/managers/gameData.js'
 
 type codeID = 'T' | 'G'
 const localMap: Record<codeID, Map<string, any>> = {
-	'T': tournaments,
-	'G': games
+	T: tournaments,
+	G: games
 }
 
 export function createInviteCode(type: 'T' | 'G'): string {

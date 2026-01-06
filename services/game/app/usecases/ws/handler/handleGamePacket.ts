@@ -1,4 +1,4 @@
-import { TPlayerSlot, games } from '../managers/gameData.js'
+import { TPlayerSlot, games } from '../../managers/gameData.js'
 import {
 	C01Move,
 	C02RequestScore,

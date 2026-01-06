@@ -1,7 +1,7 @@
 import { ITournamentMatchResult } from '../gameData.js'
 import createHttpError from 'http-errors'
 import { tournaments, usersToTournament } from '../gameData.js'
-import { requestGame } from '../gameManager/requestGame.js'
+import * as GameManager from '../gameManager/index.js'
 import { updateGameMetrics } from '../metricsService.js'
 
 export function onTournamentMatchEnd(
@@ -87,7 +87,7 @@ export function onTournamentMatchEnd(
 		console.log(
 			`Starting next round match: ${nextRoundMatch.player1Id} vs ${nextRoundMatch.player2Id}`
 		)
-		const gameCode = requestGame(
+		const gameCode = GameManager.requestGame(
 			nextRoundMatch.player1Id,
 			nextRoundMatch.player2Id,
 			{

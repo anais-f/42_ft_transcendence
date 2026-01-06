@@ -13,12 +13,12 @@ import {
 } from '@ft_transcendence/pong-shared'
 import { SPacketsType } from '@ft_transcendence/pong-shared/network/Packet/packetTypes.js'
 import Bottleneck from 'bottleneck'
-import { GameData } from '../../managers/gameData.js'
-import { createGame, IGameData } from '../../createGame.js'
-import { PacketSender } from '../PacketSender.js'
-import { updateHUDs } from './updateHUDs.js'
-import { endGame } from '../../managers/gameManager/endGame.js'
-import { updateGameMetrics } from '../../managers/metricsService.js'
+import { GameData } from '../managers/gameData.js'
+import { IGameData, createGame } from '../createGame.js'
+import { updateGameMetrics } from '../managers/metricsService.js'
+import * as GameManager from '../managers/gameManager/index.js'
+import { updateHUDs } from './gameUpdate/updateHUDs.js'
+import { PacketSender } from './PacketSender.js'
 
 function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
 	if (prev.length !== current.length) return true
@@ -43,7 +43,6 @@ export function startGame(gameData: GameData, gameCode: string): void {
 
 	gameData.gameInstance = gameInstance
 
-	// Register paddles with the game engine for synchronized updates
 	gameInstance.GE.registerPaddles(
 		[gameInstance.pad1, gameInstance.pad2],
 		PAD_SPEED
@@ -54,7 +53,6 @@ export function startGame(gameData: GameData, gameCode: string): void {
 	gameData.p1.ws?.send(staticBuffer)
 	gameData.p2?.ws?.send(staticBuffer)
 
-	// Send initial dynamic segments immediately
 	const dynamicPacket = new S09DynamicSegments(gameInstance.GE.dynamicBorders)
 	const dynamicBuffer = dynamicPacket.serialize()
 	gameData.p1.ws?.send(dynamicBuffer)
@@ -145,5 +143,5 @@ async function startGameLoop(
 	}
 
 	packetSender.stop()
-	endGame(gameCode)
+	GameManager.endGame(gameCode)
 }

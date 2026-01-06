@@ -3,7 +3,7 @@ import {
 	playerToGame,
 	busyPlayers,
 	usersToTournament
-} from '../gameData.js'
+} from '../../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 
 export function joinGame(gameCode: string, pID: number) {

@@ -1,11 +1,11 @@
 import { COUNTDOWN_SECONDS } from '@ft_transcendence/pong-shared'
-import { GameData } from '../managers/gameData.js'
-import { startGame } from './loop/startGame.js'
-import { clearGameTimeout } from '../managers/gameManager/startTimeOut.js'
+import { GameData } from '../../managers/gameData.js'
+import * as GameManager from '../../managers/gameManager/index.js'
+import { startGame } from '../startGame.js'
 
 // lobby count down
 export function startCountdown(gameData: GameData, gameCode: string) {
-	clearGameTimeout(gameCode)
+	GameManager.clearGameTimeout(gameCode)
 
 	let remaining = COUNTDOWN_SECONDS
 

@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { requestGame } from '../../usecases/managers/gameManager/requestGame.js'
-import { withGameError } from '../../usecases/managers/gameManager/errors/withGameError.js'
+import * as GameManager from '../../usecases/managers/gameManager/index.js'
+import { withGameError } from '../../usecases/managers/gameManager/core/errors/withGameError.js'
 import {
 	PublicUserAuthSchema,
 	CreateGameSchema
@@ -28,7 +28,7 @@ export async function createNewGameController(
 		: undefined
 
 	const gameCode = withGameError(() =>
-		requestGame(user.user_id, undefined, undefined, mapOptions)
+		GameManager.requestGame(user.user_id, undefined, undefined, mapOptions)
 	)
 
 	reply.code(201).send({ code: gameCode })

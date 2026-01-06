@@ -1,8 +1,7 @@
 import WebSocket from 'ws'
 import { games } from '../managers/gameData.js'
-import { leaveGame } from '../managers/gameManager/leaveGame.js'
-import { handleGamePacket } from './handleGamePacket.js'
-import { handleJsonMessage } from './handleJsonMessage.js'
+import * as GameManager from '../managers/gameManager/index.js'
+import * as wsHandler from './handler/index.js'
 import { ConnectionContext } from './initConnection.js'
 
 export function registerGameSocketEvents(
@@ -11,14 +10,17 @@ export function registerGameSocketEvents(
 ): void {
 	socket.on('message', (data, isBinary) => {
 		if (isBinary) {
-			handleGamePacket(data as Buffer, ctx.gameCode, ctx.playerSlot)
+			wsHandler.handleGamePacket(data as Buffer, ctx.gameCode, ctx.playerSlot)
 		} else {
 			try {
 				const message = JSON.parse(data.toString())
-				handleJsonMessage(message, ctx.user, ctx.gameCode, ctx.playerSlot)
-			} catch (e) {
-				console.error('Invalid JSON message:', e)
-			}
+				wsHandler.handleJsonMessage(
+					message,
+					ctx.user,
+					ctx.gameCode,
+					ctx.playerSlot
+				)
+			} catch (e) {}
 		}
 	})
 
@@ -34,9 +36,7 @@ export function registerGameSocketEvents(
 		}
 
 		try {
-			leaveGame(ctx.gameCode)
-		} catch (e) {
-			console.error('Error on leaveGame:', e)
-		}
+			GameManager.leaveGame(ctx.gameCode)
+		} catch (e) {}
 	})
 }
