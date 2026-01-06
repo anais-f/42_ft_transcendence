@@ -68,7 +68,7 @@ export async function authRoutes(app: FastifyInstance) {
 		{
 			schema: {
 				description:
-					'Authenticates a user via Google OAuth. Creates account if first login.',
+					'Authenticates a user with Google OAuth and creates their account if necessary.',
 				tags: ['auth', 'oauth'],
 				body: LoginGoogleSchema,
 				response: {
