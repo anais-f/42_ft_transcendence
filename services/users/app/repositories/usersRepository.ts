@@ -84,14 +84,6 @@ export class UsersRepository {
 		)
 	}
 
-	static updateLastConnection(user: IUserConnection): void {
-		const updateStmt = db.prepare(
-			'UPDATE users SET last_connection = ? WHERE user_id = ? '
-		)
-		const now = new Date().toISOString()
-		updateStmt.run(now, user.user_id)
-	}
-
 	static updateUserAvatar(user: IUserAvatar): void {
 		const updateStmt = db.prepare(
 			'UPDATE users SET avatar = ? WHERE user_id = ?'
@@ -148,29 +140,6 @@ export class UsersRepository {
 			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ? '
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
-	}
-
-	static getUserByUsername(
-		username: IUsername
-	): UserPublicProfileDTO | undefined {
-		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
-		)
-		return selectStmt.get(username) as UserPublicProfileDTO | undefined
-	}
-
-	static getLastConnectionById(user: IUserId): string | undefined {
-		const selectStmt = db.prepare(
-			'SELECT last_connection FROM users WHERE user_id = ?'
-		)
-		const row = selectStmt.get(user.user_id) as { last_connection: string }
-		return row.last_connection
-	}
-
-	static getAvatarById(user: IUserId): string | undefined {
-		const selectStmt = db.prepare('SELECT avatar FROM users WHERE user_id = ?')
-		const row = selectStmt.get(user.user_id) as { avatar: string }
-		return row.avatar
 	}
 
 	static getUserStatusById(user: IUserId): UserStatus | undefined {

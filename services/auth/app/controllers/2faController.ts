@@ -15,7 +15,6 @@ import {
 	status2FA
 } from '../usecases/twofa.js'
 import { isGoogleUser } from '../repositories/userRepository.js'
-import { env } from '../env/checkEnv.js'
 
 export async function enable2faController(
 	req: FastifyRequest,
@@ -124,7 +123,7 @@ export async function status2faController(
 	if (!payload || !payload.user_id)
 		throw createHttpError.Unauthorized('Invalid cookieToken')
 
-	const result: Status2FAResponseDTO = status2FA(payload.user_id)
+	const result: Status2FAResponseDTO = await status2FA(payload.user_id)
 	return reply.code(200).send(result)
 }
 
@@ -136,7 +135,7 @@ export async function internalStatus2faController(
 	const userId = Number(id)
 	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')
 
-	const result: Status2FAResponseDTO = status2FA(userId)
+	const result: Status2FAResponseDTO = await status2FA(userId)
 	console.log('[2FAController] internalStatus2faController called', result)
 	return reply.code(200).send(result)
 }

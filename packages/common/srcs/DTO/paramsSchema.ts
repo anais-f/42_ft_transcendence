@@ -14,5 +14,12 @@ export const CodeParamSchema = z.object({
 		})
 })
 
+export const HttpErrorSchema = z.any().meta({
+	type: 'object',
+	properties: {
+		error: { type: 'string' }
+	}
+})
+
 export type IdParamDTO = z.infer<typeof IdParamSchema>
 export type CodeParamDTO = z.infer<typeof CodeParamSchema>

@@ -270,7 +270,7 @@ services:
       - 'monitoring'
     container_name: nginx-exporter
     command:
-      - '-nginx.scrape-uri=http://nginx:8080/stub_status'
+      - '-nginx.scrape-uri=https://nginx:8080/stub_status'
     ports:
       - '9113:9113'
     depends_on:

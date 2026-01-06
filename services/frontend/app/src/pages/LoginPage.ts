@@ -250,7 +250,7 @@ export async function initGoogleAuth() {
 
 						const authResult = await checkAuth()
 						setCurrentUser(authResult)
-						window.navigate('/', true)
+						window.navigate('/', { skipAuth: true })
 					} catch (err) {
 						console.error('Google Login Error:', err)
 						notyf.open({
