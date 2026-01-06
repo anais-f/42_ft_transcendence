@@ -2,7 +2,7 @@ export type Tournament = {
 	status: 'pending' | 'ongoing' | 'completed'
 	maxParticipants: number
 	participants: number[]
-	matchs: MatchTournament[]
+	matches: MatchTournament[]
 }
 
 export type MatchTournament = {

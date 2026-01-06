@@ -15,7 +15,7 @@ export function startTournament(code: string, tournament: Tournament) {
 }
 
 function startFirstRound(code: string, tournament: Tournament) {
-	const roundMatches = tournament.matchs.filter(
+	const roundMatches = tournament.matches.filter(
 		(match) => match.round === Math.log2(tournament.maxParticipants)
 	)
 	roundMatches.forEach((match) => {

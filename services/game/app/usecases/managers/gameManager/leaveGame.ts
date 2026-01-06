@@ -1,5 +1,5 @@
 import { GameState } from '@ft_transcendence/pong-shared'
-import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
+import { saveMatchToHistory } from '../../../repositories/matchesRepository.js'
 import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
 import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'

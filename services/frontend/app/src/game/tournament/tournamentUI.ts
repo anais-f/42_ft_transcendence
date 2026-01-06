@@ -8,7 +8,7 @@ import {
 import { updatePlayerCard } from '../../components/tournament/PlayerCard.js'
 import { waitingPlayer } from '../../pages/TournamentPage.js'
 
-type Match = GetTournamentResponseDTO['tournament']['matchs'][number]
+type Match = GetTournamentResponseDTO['tournament']['matches'][number]
 
 function getPlayerName(playerId: number | undefined): string {
 	if (!playerId) return waitingPlayer
@@ -38,16 +38,16 @@ export function updateBracket(
 	const { tournament } = tournamentData
 	if (!['completed', 'ongoing'].includes(tournament.status)) return
 
-	tournament.matchs.forEach((match, index) => updateMatch(id, index, match))
+	tournament.matches.forEach((match, index) => updateMatch(id, index, match))
 
-	const winnerId = tournament.matchs[2]?.winnerId
+	const winnerId = tournament.matches[2]?.winnerId
 	if (winnerId) {
 		updateTournamentCellName('final-winner', getPlayerName(winnerId))
 	}
 }
 
 export function updateOpponent(tournamentData: GetTournamentResponseDTO): void {
-	const match = tournamentData.tournament.matchs
+	const match = tournamentData.tournament.matches
 		.slice()
 		.reverse()
 		.find(

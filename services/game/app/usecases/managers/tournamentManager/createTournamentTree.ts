@@ -37,7 +37,7 @@ export function createTournamentTree(tournament: Tournament) {
 				`Invalid participant indices: ${player1Index}, ${player2Index}`
 			)
 		}
-		tournament.matchs.push({
+		tournament.matches.push({
 			round: maxRound,
 			matchNumber: match,
 			player1Id: player1,
@@ -56,7 +56,7 @@ export function createTournamentTree(tournament: Tournament) {
 			'matches'
 		)
 		for (let match = 0; match < matchesInRound; match++) {
-			tournament.matchs.push({
+			tournament.matches.push({
 				previousMatchId1: match * 2,
 				previousMatchId2: match * 2 + 1,
 				round: round,
@@ -65,6 +65,6 @@ export function createTournamentTree(tournament: Tournament) {
 			})
 		}
 	}
-	console.log('Tournament Matches:', tournament.matchs)
+	console.log('Tournament Matches:', tournament.matches)
 	console.log('Tournament tree created successfully')
 }

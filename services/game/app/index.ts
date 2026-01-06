@@ -7,7 +7,6 @@ import { initDB } from './database/connection.js'
 import { gameRoutes } from './routes/gameRoutes.js'
 import metricPlugin from 'fastify-metrics'
 
-// Run migrations first, then initialize tournament ID
 initDB()
 
 async function start(): Promise<void> {
@@ -16,7 +15,7 @@ async function start(): Promise<void> {
 		{
 			openapi: {
 				info: {
-					title: 'api for game',
+					title: 'game/tournament API',
 					version: '1.0.0'
 				},
 				servers: [
@@ -44,7 +43,6 @@ async function start(): Promise<void> {
 			port: 3000,
 			host: '0.0.0.0'
 		})
-		console.log(`listening on port: 3000`)
 	} catch (err) {
 		console.error('Error starting server:', err)
 		process.exit(1)

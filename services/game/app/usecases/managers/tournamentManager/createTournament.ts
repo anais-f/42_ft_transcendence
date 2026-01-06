@@ -5,9 +5,9 @@ import {
 	CreateTournamentResponseDTO
 } from '@ft_transcendence/common'
 import { playerToGame, tournaments, usersToTournament } from '../gameData.js'
-import { createInviteCode } from '../../../utils/createCode.js'
-import createHttpError from 'http-errors'
 import { updateGameMetrics } from '../metricsService.js'
+import { createInviteCode } from '../../createCode.js'
+import createHttpError from 'http-errors'
 
 export function createTournament(
 	request: FastifyRequest
@@ -31,7 +31,7 @@ export function createTournament(
 		status: 'pending',
 		maxParticipants: parsed.data.numberOfPlayers,
 		participants: [userId],
-		matchs: []
+		matches: []
 	}
 	tournaments.set(invitCode, tournament)
 	usersToTournament.set(userId, invitCode)

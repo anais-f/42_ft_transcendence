@@ -15,7 +15,7 @@ export function onTournamentMatchEnd(
 	}
 
 	// Find the match that just ended
-	const currentMatch = tournament.matchs.find(
+	const currentMatch = tournament.matches.find(
 		(m) =>
 			m.round === tournamentMatchData.round &&
 			m.matchNumber === tournamentMatchData.matchNumber
@@ -54,7 +54,7 @@ export function onTournamentMatchEnd(
 	}
 
 	// Find the next round match that this winner should advance to
-	const nextRoundMatch = tournament.matchs.find(
+	const nextRoundMatch = tournament.matches.find(
 		(m) =>
 			m.round === tournamentMatchData.round - 1 &&
 			(m.previousMatchId1 === tournamentMatchData.matchNumber ||
