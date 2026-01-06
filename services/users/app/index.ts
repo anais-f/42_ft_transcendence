@@ -62,7 +62,10 @@ function createApp(): FastifyInstance {
 				version: '1.0.0'
 			},
 			servers: [
-				{ url: `${env.SWAGGER_HOST}:8080/users`, description: 'Local server' }
+				{
+					url: `${env.SWAGGER_HOST}:${env.PORT}/users`,
+					description: 'Local server'
+				}
 			],
 
 			components: env.openAPISchema.components
