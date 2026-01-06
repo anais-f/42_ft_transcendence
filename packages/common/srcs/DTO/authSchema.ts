@@ -1,8 +1,7 @@
 import { z } from 'zod'
 import { RegisterLoginSchema } from './usersSchema.js'
 
-const PASSWORD_REGEX =
-	/^(?=.*[A-Z])(?=.*\d)(?=.*[a-z])[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,./?-]{8,128}$/
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[a-z])[^<>$]{8,128}$/
 
 export const PasswordSchema = z
 	.string()
@@ -10,7 +9,7 @@ export const PasswordSchema = z
 	.max(128, 'Password must be at most 128 characters long')
 	.regex(
 		PASSWORD_REGEX,
-		'Password must include at least one capital letter, one lower case letter and one number'
+		'Password must include at least one capital letter, one lower case letter and one number and exclude <>$ characters'
 	)
 
 export const RegisterSchema = z
