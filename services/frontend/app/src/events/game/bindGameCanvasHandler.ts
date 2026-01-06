@@ -24,7 +24,7 @@ export function handleBindGameCanvas() {
 
 		ws.onclose = (event) => {
 			console.log(`Game WS closed (code: ${event.code})`)
-			if (event.code !== GameWSCloseCodes.NORMAL) {
+			if (event.code !== GameWSCloseCodes.NORMAL && !gameStore.gameEnded) {
 				notfy.open({ type: 'info', message: 'You left the game' })
 			}
 			window.navigate(gameStore.backTo)

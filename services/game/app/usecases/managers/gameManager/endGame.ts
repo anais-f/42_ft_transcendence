@@ -33,6 +33,8 @@ export function endGame(code: string) {
 
 	gameData.p1.ws?.send(eogMessage)
 	gameData.p2.ws?.send(eogMessage)
+	gameData.p1.ws?.close(1000, 'Game ended')
+	gameData.p2.ws?.close(1000, 'Game ended')
 
 	let tournamentData = undefined
 	if (gameData.tournamentMatchData) {

@@ -1,10 +1,25 @@
-import { games, playerToGame, busyPlayers } from '../gameData.js'
+import {
+	games,
+	playerToGame,
+	busyPlayers,
+	usersToTournament
+} from '../gameData.js'
 import { startTimeOut } from './startTimeOut.js'
 
 export function joinGame(gameCode: string, pID: number) {
 	const gameData = games.get(gameCode)
 	if (!gameData) {
 		throw new Error('unknown game code')
+	}
+
+	if (usersToTournament.has(pID)) {
+		const playerTournamentCode = usersToTournament.get(pID)
+		const isGameFromTournament =
+			gameData.tournamentMatchData?.tournamentCode === playerTournamentCode
+
+		if (!isGameFromTournament) {
+			throw new Error('player not allowed in this game')
+		}
 	}
 
 	if (busyPlayers.has(pID)) {
