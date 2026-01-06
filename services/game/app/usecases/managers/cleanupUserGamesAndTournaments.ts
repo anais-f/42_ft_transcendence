@@ -22,5 +22,5 @@ export function cleanupUserGamesAndTournaments(userId: number): void {
 
 	try {
 		quitTournamentByUserId(userId)
-	} catch (e: any) {}
+	} catch (e) {}
 }

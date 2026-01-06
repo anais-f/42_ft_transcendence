@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors'
 import { Tournament } from '@ft_transcendence/common'
 
-function shuffle(array: any[]) {
+function shuffle(array: unknown[]) {
 	let currentIndex = array.length
 
 	while (currentIndex != 0) {
