@@ -7,6 +7,4 @@ import { UsersRepository } from '../repositories/usersRepository.js'
 export function updateUserMetrics(): void {
 	const totalUsers = UsersRepository.getTotalUsersCount()
 	totalRegisteredUsersGauge.set(totalUsers)
-
-	console.log(`[Metrics] Total registered users: ${totalUsers}`)
 }

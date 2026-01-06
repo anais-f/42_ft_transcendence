@@ -30,7 +30,6 @@ const ALLOWED_EXTENSIONS: readonly string[] = ['.jpg', '.jpeg', '.png']
 const MAX_SIZE = 5 * 1024 * 1024
 
 export class UpdateUsersServices {
-	/** Update username in user profile */
 	static async updateUsernameProfile(
 		user: { user_id: number },
 		newUsername: string
@@ -45,7 +44,6 @@ export class UpdateUsersServices {
 		})
 	}
 
-	/** Update user status (online/offline) */
 	static async updateUserStatus(
 		userId: number,
 		status: UserStatus,
@@ -60,7 +58,6 @@ export class UpdateUsersServices {
 		const currentStatus = UsersRepository.getUserStatusById({ user_id: userId })
 
 		if (currentStatus === status) {
-			console.log(`User ${userId} status already ${status}, ignoring update`)
 			return
 		}
 
@@ -73,10 +70,20 @@ export class UpdateUsersServices {
 			status,
 			lastConnection
 		)
-		console.log(`User ${userId} status updated to ${status}`)
 	}
 
-	/** Check and update user avatar */
+	/**
+	 * Validates, saves avatar image and cleans up old avatars atomically.
+	 *
+	 * Process:
+	 * 1. Validates file type and size
+	 * 2. Saves to temp file then renames (atomic)
+	 * 3. Updates database
+	 * 4. Deletes old avatar files for this user
+	 *
+	 * @throws {BadRequest} If file type/size invalid
+	 * @throws {InternalServerError} If save fails (no partial state)
+	 */
 	static async checkUserAvatar(
 		params: CheckUserAvatarParams
 	): Promise<boolean> {
@@ -87,11 +94,6 @@ export class UpdateUsersServices {
 	}
 }
 
-// --------------------- Helpers (module-private) ---------------------
-
-/**
- * Internal helper: validate avatar image
- */
 async function _validateAvatar(params: CheckUserAvatarParams) {
 	const { user_id, avatarBuffer, originalName, mimeType } = params
 
@@ -105,11 +107,6 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 			: ''
 
 	if (fileExtension && !ALLOWED_EXTENSIONS.includes(fileExtension)) {
-		console.warn(
-			'[avatars] original file extension not allowed:',
-			fileExtension,
-			' - continuing based on detectedType'
-		)
 		throw createHttpError.BadRequest('Invalid file extension')
 	}
 
@@ -126,21 +123,9 @@ async function _validateAvatar(params: CheckUserAvatarParams) {
 	if (!ALLOWED_TYPES.includes(detectedType.mime))
 		throw createHttpError.BadRequest('Invalid image type')
 
-	if (mimeType && mimeType !== detectedType.mime) {
-		console.warn(
-			'[avatars] MIME mismatch: header=',
-			mimeType,
-			'detected=',
-			detectedType.mime
-		)
-	}
-
 	return detectedType
 }
 
-/**
- * Internal helper: generate file paths for avatar storage
- */
 async function _generateAvatarPaths(
 	user_id: number,
 	detectedType: { ext: string | undefined; mime: string }
@@ -157,21 +142,9 @@ async function _generateAvatarPaths(
 	const tempPath = path.join(avatarsDir, `.tmp_${filename}`)
 	const publicPath = path.posix.join('/avatars', filename)
 
-	console.log(
-		'[avatars] generateAvatarPaths - chosen ext:',
-		ext,
-		'filename:',
-		filename,
-		'detected mime:',
-		detectedType.mime
-	)
-
 	return { avatarsDir, outPath, tempPath, publicPath, filename }
 }
 
-/**
- * Internal helper: save avatar and cleanup old files
- */
 async function _saveAvatarAndCleanup(
 	paths: AvatarPaths,
 	avatarBuffer: Buffer,
@@ -183,7 +156,6 @@ async function _saveAvatarAndCleanup(
 		await fs.mkdir(avatarsDir, { recursive: true })
 		await fs.writeFile(tempPath, avatarBuffer)
 		await fs.rename(tempPath, outPath)
-		console.log(`Avatar saved successfully: ${filename}`)
 	} catch (err) {
 		try {
 			await fs.unlink(tempPath)
@@ -209,9 +181,8 @@ async function _saveAvatarAndCleanup(
 	for (const file of oldFiles) {
 		try {
 			await fs.unlink(path.join(avatarsDir, file))
-			console.log(`Deleted old avatar: ${file}`)
 		} catch (err) {
-			console.warn(`Failed to delete old avatar file ${file}:`, err)
+			// Ignore cleanup errors
 		}
 	}
 }

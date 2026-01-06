@@ -15,16 +15,7 @@ import createHttpError from 'http-errors'
 
 const defaultAvatar: string = '/avatars/img_default.png'
 
-/**
- * @description Repository for users table
- * @class UsersRepository
- */
 export class UsersRepository {
-	/**
-	 * @description Check if a user exists by id
-	 * @param user - The id of the user to check
-	 * @returns A Result indicating whether the user exists or an error occurred
-	 */
 	static existsById(user: IUserId): boolean {
 		const selectStmt = db.prepare('SELECT 1 FROM users WHERE user_id = ?')
 		const row = selectStmt.get(user.user_id)
@@ -38,21 +29,28 @@ export class UsersRepository {
 	}
 
 	/**
-	 * @description Generate a unique username by incrementing if necessary
-	 * @param baseUsername - The base username (login) to check
-	 * @returns A unique username
+	 * Generates a unique username by appending incrementing numbers.
+	 *
+	 * Algorithm:
+	 * - First tries base username as-is
+	 * - Then tries username1, username2, username3...
+	 * - Stops at 10000 attempts or if length exceeds 32 chars
+	 *
+	 * Examples:
+	 * - "john" exists → returns "john1"
+	 * - "john", "john1", "john2" exist → returns "john3"
+	 *
+	 * @throws {UnprocessableEntity} If cannot generate unique username within limits
 	 */
 	private static generateUniqueUsername(baseUsername: string): string {
 		let username = baseUsername
 		let counter = 1
-		let candidateUsername = `${baseUsername}${counter}`
 
 		while (this.existsByUsername({ username })) {
 			username = `${baseUsername}${counter}`
 			counter++
-			candidateUsername = `${baseUsername}${counter}`
 
-			if (counter > 10000 || candidateUsername.length > 32) {
+			if (counter > 10000 || username.length > 32) {
 				throw createHttpError.UnprocessableEntity(
 					'Unable to generate unique username'
 				)
@@ -63,9 +61,12 @@ export class UsersRepository {
 	}
 
 	/**
-	 * @description Insert a new user with default values
-	 * @param user - The id of the user to insert
-	 * @returns A Result indicating success or an error occurred
+	 * Creates a new user with auto-generated unique username.
+	 *
+	 * IMPORTANT: Uses INSERT OR IGNORE - silently skips if user_id exists.
+	 * Username is generated from login by appending numbers if needed.
+	 *
+	 * @param user - Must contain user_id and login from auth service
 	 */
 	static insertUser(user: IPublicUserAuth): void {
 		const uniqueUsername = this.generateUniqueUsername(user.login)
@@ -81,18 +82,6 @@ export class UsersRepository {
 			UserStatus.OFFLINE,
 			now
 		)
-	}
-
-	/**
-	 * @description Update methods for last connection, status, username or avatars
-	 */
-
-	static updateLastConnection(user: IUserConnection): void {
-		const updateStmt = db.prepare(
-			'UPDATE users SET last_connection = ? WHERE user_id = ? '
-		)
-		const now = new Date().toISOString()
-		updateStmt.run(now, user.user_id)
 	}
 
 	static updateUserAvatar(user: IUserAvatar): void {
@@ -146,37 +135,11 @@ export class UsersRepository {
 		}
 	}
 
-	/**
-	 * @description Some get methods according to the table fields
-	 */
 	static getUserById(user: IUserId): UserPublicProfileDTO | undefined {
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE user_id = ? '
 		)
 		return selectStmt.get(user.user_id) as UserPublicProfileDTO | undefined
-	}
-
-	static getUserByUsername(
-		username: IUsername
-	): UserPublicProfileDTO | undefined {
-		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar, status, last_connection FROM users WHERE username = ?'
-		)
-		return selectStmt.get(username) as UserPublicProfileDTO | undefined
-	}
-
-	static getLastConnectionById(user: IUserId): string | undefined {
-		const selectStmt = db.prepare(
-			'SELECT last_connection FROM users WHERE user_id = ?'
-		)
-		const row = selectStmt.get(user.user_id) as { last_connection: string }
-		return row.last_connection
-	}
-
-	static getAvatarById(user: IUserId): string | undefined {
-		const selectStmt = db.prepare('SELECT avatar FROM users WHERE user_id = ?')
-		const row = selectStmt.get(user.user_id) as { avatar: string }
-		return row.avatar
 	}
 
 	static getUserStatusById(user: IUserId): UserStatus | undefined {
@@ -185,9 +148,6 @@ export class UsersRepository {
 		return row?.status as UserStatus | undefined
 	}
 
-	/**
-	 * @description Get all users or users
-	 */
 	static getAllUsers(): IPrivateUser[] {
 		const selectStmt = db.prepare(
 			'SELECT user_id, username, avatar, status, last_connection FROM users'
@@ -195,9 +155,6 @@ export class UsersRepository {
 		return selectStmt.all() as IPrivateUser[]
 	}
 
-	/**
-	 * @description Delete user by id
-	 */
 	static deleteUserById(user: IUserId): void {
 		const deleteStmt = db.prepare('DELETE FROM users WHERE user_id = ?')
 		deleteStmt.run(user.user_id)
