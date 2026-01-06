@@ -365,7 +365,7 @@
 			"targets": [
 				{
 					"editorMode": "builder",
-					"expr": "sum(increase(failed_login_attempts_total{username=\"admin\"}[5m]))",
+					"expr": "sum(increase(failed_login_attempts_total{username=\"transcendence\"}[5m]))",
 					"legendFormat": "{{active_user}}",
 					"range": true,
 					"refId": "A"
