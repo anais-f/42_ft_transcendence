@@ -46,7 +46,7 @@ export async function authRoutes(app: FastifyInstance) {
 		{
 			schema: {
 				description:
-					'Authenticates a user with login and password. Returns a JWT token or requires 2FA verification.',
+					'Authenticates a user with login and password. Returns a JWT token or ask for 2FA verification.',
 				tags: ['auth'],
 				body: LoginActionSchema,
 				response: {
