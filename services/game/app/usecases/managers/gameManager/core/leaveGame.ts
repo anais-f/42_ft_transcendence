@@ -1,12 +1,12 @@
 import { GameState } from '@ft_transcendence/pong-shared'
-import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
-import { games, GameData, playerToGame, busyPlayers } from '../gameData.js'
+import { saveMatchToHistory } from '../../../../repositories/matchesRepository.js'
+import { games, GameData, playerToGame, busyPlayers } from '../../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
-import { ITournamentMatchResult } from '../gameData.js'
-import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
-import { createEogMessage } from './eogMessage.js'
-import { updateGameMetrics } from '../metricsService.js'
+import { createTournamentMatchResult } from '../../tournamentManager/tournamentUsecases.js'
+import { ITournamentMatchResult } from '../../gameData.js'
+import { onTournamentMatchEnd } from '../../tournamentManager/onTournamentMatchEnd.js'
+import { initEOG } from '../../../ws/gameUpdate/eogMessage.js'
+import { updateGameMetrics } from '../../metricsService.js'
 
 export function leaveGame(code: string) {
 	const gameData = games.get(code)
@@ -60,7 +60,7 @@ function forfeit(gameData: GameData): ITournamentMatchResult | null {
 		winnerId = gameData.p2.id
 		scorePlayer1 = 0
 		scorePlayer2 = 1
-		const eogMessage = createEogMessage(
+		const eogMessage = initEOG(
 			gameData.p2.id,
 			gameData.p1.id,
 			scorePlayer1,
@@ -73,7 +73,7 @@ function forfeit(gameData: GameData): ITournamentMatchResult | null {
 		winnerId = gameData.p1.id
 		scorePlayer1 = 1
 		scorePlayer2 = 0
-		const eogMessage = createEogMessage(
+		const eogMessage = initEOG(
 			gameData.p1.id,
 			gameData.p2.id,
 			scorePlayer1,

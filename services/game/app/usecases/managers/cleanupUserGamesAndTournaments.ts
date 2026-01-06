@@ -1,5 +1,5 @@
 import { playerToGame, games } from './gameData.js'
-import { leaveGame } from './gameManager/leaveGame.js'
+import * as GameManager from './gameManager/index.js'
 import { quitTournamentByUserId } from './tournamentManager/quitTournament.js'
 
 export function cleanupUserGamesAndTournaments(userId: number): void {
@@ -16,11 +16,11 @@ export function cleanupUserGamesAndTournaments(userId: number): void {
 					gameData.p2.ws = null
 				}
 			}
-			leaveGame(gameCode)
+			GameManager.leaveGame(gameCode)
 		} catch (e) {}
 	}
 
 	try {
 		quitTournamentByUserId(userId)
-	} catch (e: any) {}
+	} catch (e) {}
 }

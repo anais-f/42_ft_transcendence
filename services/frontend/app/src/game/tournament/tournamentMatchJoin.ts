@@ -9,14 +9,14 @@ import { NEXT_MATCH_MODAL_ID } from '../../components/modals/nextMatchModal.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { ToastActionType } from '../../types/toast.js'
 
-type Match = GetTournamentResponseDTO['tournament']['matchs'][number]
+type Match = GetTournamentResponseDTO['tournament']['matches'][number]
 
 function findPendingUserMatch(
 	tournament: GetTournamentResponseDTO['tournament']
 ): Match | null {
 	if (!currentUser?.user_id) return null
 
-	for (const match of tournament.matchs) {
+	for (const match of tournament.matches) {
 		if (!match.gameCode) continue
 		if (match.winnerId !== undefined) continue
 		if (tournamentStore.hasJoinedGame(match.gameCode)) continue

@@ -1,10 +1,10 @@
-import { saveMatchToHistory } from '../../../repositories/matchsRepository.js'
-import { games, playerToGame, busyPlayers } from '../gameData.js'
+import { saveMatchToHistory } from '../../../../repositories/matchesRepository.js'
+import { games, playerToGame, busyPlayers } from '../../gameData.js'
 import { clearGameTimeout } from './startTimeOut.js'
-import { createTournamentMatchResult } from '../tournamentManager/tournamentUsecases.js'
-import { onTournamentMatchEnd } from '../tournamentManager/onTournamentMatchEnd.js'
-import { createEogMessage } from './eogMessage.js'
-import { updateGameMetrics } from '../metricsService.js'
+import { createTournamentMatchResult } from '../../tournamentManager/tournamentUsecases.js'
+import { onTournamentMatchEnd } from '../../tournamentManager/onTournamentMatchEnd.js'
+import { initEOG } from '../../../ws/gameUpdate/eogMessage.js'
+import { updateGameMetrics } from '../../metricsService.js'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -23,7 +23,7 @@ export function endGame(code: string) {
 	saveMatchToHistory(gameData.p1.id, gameData.p2.id, score.p1, score.p2)
 
 	const p1Won = score.p1 > score.p2
-	const eogMessage = createEogMessage(
+	const eogMessage = initEOG(
 		p1Won ? gameData.p1.id : gameData.p2.id,
 		p1Won ? gameData.p2.id : gameData.p1.id,
 		score.p1,
@@ -54,7 +54,6 @@ export function endGame(code: string) {
 
 	updateGameMetrics()
 
-	// Call tournament callback after cleanup
 	if (tournamentData) {
 		onTournamentMatchEnd(tournamentData)
 	}

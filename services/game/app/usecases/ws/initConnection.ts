@@ -9,7 +9,7 @@ import {
 	playerToGame,
 	Iplayer
 } from '../managers/gameData.js'
-import { startCountdown } from './startCountdown.js'
+import { startCountdown } from './gameUpdate/startCountdown.js'
 
 export interface ConnectionContext {
 	user: WsTokenPayload
@@ -59,10 +59,6 @@ export function initGameWsConnection(
 	if (gameData.p1.ws && gameData.p2?.ws) {
 		startCountdown(gameData, gameCode)
 	}
-
-	console.log(
-		`[+] ${user.login}(${user.user_id}) join game: ${gameCode} as ${playerSlot}`
-	)
 
 	return { user, gameCode, playerSlot, gameData }
 }

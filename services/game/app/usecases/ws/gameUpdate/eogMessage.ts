@@ -8,7 +8,7 @@ export interface EogData {
 	reason: EogReason
 }
 
-export function createEogMessage(
+export function initEOG(
 	winnerId: number,
 	loserId: number,
 	p1Score: number,

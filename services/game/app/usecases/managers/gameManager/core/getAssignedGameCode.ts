@@ -1,4 +1,4 @@
-import { games, playerToGame } from '../gameData.js'
+import { games, playerToGame } from '../../gameData.js'
 
 export function getAssignedGameCode(pID: number): string {
 	const gameCode = playerToGame.get(pID)

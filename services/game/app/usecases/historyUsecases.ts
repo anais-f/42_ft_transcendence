@@ -1,4 +1,4 @@
-import { getMatchHistoryByPlayerId } from '../repositories/matchsRepository.js'
+import { getMatchHistoryByPlayerId } from '../repositories/matchesRepository.js'
 import type { MatchHistoryResponseDTO } from '@ft_transcendence/common'
 
 export function getUserMatchHistory(

@@ -14,7 +14,7 @@ Tournament {
   status: 'pending' | 'ongoing' | 'completed'
   maxParticipants: number  // Must be a power of 2 (2, 4, 8, 16, etc.)
   participants: number[]   // Player IDs
-  matchs: MatchTournament[]
+  matches: MatchTournament[]
 }
 
 MatchTournament {
@@ -195,7 +195,7 @@ Round 1:
 To track the flow:
 
 ```typescript
-console.log('Tournament Matches:', tournament.matchs)
+console.log('Tournament Matches:', tournament.matches)
 console.log('Match completed:', { round, matchNumber, winnerId })
 console.log('Next match ready:', { player1Id, player2Id })
 ```
