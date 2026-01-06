@@ -19,7 +19,8 @@ import {
 	UserProfileUpdateUsernameSchema,
 	UpdateUserStatusSchema,
 	UserIdCoerceSchema,
-	UserSearchResultSchema
+	UserSearchResultSchema,
+	HttpErrorSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware, apiKeyMiddleware } from '@ft_transcendence/security'
 
@@ -37,7 +38,7 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			body: PublicUserAuthSchema,
 			response: {
 				201: z.object({ message: z.string() }),
-				401: z.object().meta({ description: 'Invalid API key' })
+				401: HttpErrorSchema.meta({ description: 'Invalid API key' })
 			}
 		},
 		handler: handleUserCreated
@@ -53,9 +54,9 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			params: UserIdCoerceSchema,
 			response: {
 				200: UserPublicProfileSchema,
-				400: z.object().meta({ description: 'Invalid user ID' }),
-				401: z.object().meta({ description: 'Authentication required' }),
-				404: z.object().meta({ description: 'User not found' })
+				400: HttpErrorSchema.meta({ description: 'Invalid user ID' }),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: getPublicUser
@@ -66,15 +67,14 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 		url: '/api/internal/users/profile/:user_id(\\d+)',
 		preHandler: [apiKeyMiddleware],
 		schema: {
-			description:
-				'Internal endpoint for services to fetch user profile data.',
+			description: 'Internal endpoint for services to fetch user profile data.',
 			tags: ['Internal'],
 			params: UserIdCoerceSchema,
 			response: {
 				200: UserPublicProfileSchema,
-				400: z.object().meta({ description: 'Invalid user ID' }),
-				401: z.object().meta({ description: 'Invalid API key' }),
-				404: z.object().meta({ description: 'User not found' })
+				400: HttpErrorSchema.meta({ description: 'Invalid user ID' }),
+				401: HttpErrorSchema.meta({ description: 'Invalid API key' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: getPublicUser
@@ -90,9 +90,9 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			tags: ['Users'],
 			response: {
 				200: UserPrivateProfileSchema,
-				401: z.object().meta({ description: 'Authentication required' }),
-				404: z.object().meta({ description: 'User not found' }),
-				502: z.object().meta({ description: 'Auth service unreachable' })
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' }),
+				502: HttpErrorSchema.meta({ description: 'Auth service unreachable' })
 			}
 		},
 		handler: getPrivateUser
@@ -109,10 +109,10 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			body: UserProfileUpdateUsernameSchema,
 			response: {
 				200: z.object({ message: z.string() }),
-				400: z.object().meta({ description: 'Invalid username format' }),
-				401: z.object().meta({ description: 'Authentication required' }),
-				404: z.object().meta({ description: 'User not found' }),
-				409: z.object().meta({ description: 'Username already taken' })
+				400: HttpErrorSchema.meta({ description: 'Invalid username format' }),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' }),
+				409: HttpErrorSchema.meta({ description: 'Username already taken' })
 			}
 		},
 		handler: updateUsername
@@ -129,15 +129,12 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			consumes: ['multipart/form-data', 'image/jpeg', 'image/png'],
 			response: {
 				200: z.object({ message: z.string() }),
-				400: z
-					.union([
-						z.object().meta({ description: 'Invalid file type' }),
-						z.object().meta({ description: 'File too large (max 5MB)' }),
-						z.object().meta({ description: 'Missing file' })
-					])
-					.meta({ description: 'Bad request' }),
-				401: z.object().meta({ description: 'Authentication required' }),
-				500: z.object().meta({ description: 'Failed to save avatar' })
+				400: HttpErrorSchema.meta({
+					description:
+						'Invalid file type / File too large (max 5MB) / Missing file'
+				}),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				500: HttpErrorSchema.meta({ description: 'Failed to save avatar' })
 			}
 		},
 		handler: updateAvatar
@@ -155,9 +152,9 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			body: UpdateUserStatusSchema,
 			response: {
 				200: z.object({ message: z.string() }),
-				400: z.object().meta({ description: 'Invalid user ID or status' }),
-				401: z.object().meta({ description: 'Invalid API key' }),
-				404: z.object().meta({ description: 'User not found' })
+				400: HttpErrorSchema.meta({ description: 'Invalid user ID or status' }),
+				401: HttpErrorSchema.meta({ description: 'Invalid API key' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: updateUserStatus
@@ -180,9 +177,9 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 			}),
 			response: {
 				200: UserSearchResultSchema,
-				400: z.object().meta({ description: 'Invalid username format' }),
-				401: z.object().meta({ description: 'Authentication required' }),
-				404: z.object().meta({ description: 'User not found' })
+				400: HttpErrorSchema.meta({ description: 'Invalid username format' }),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: searchUserByUsernameController
