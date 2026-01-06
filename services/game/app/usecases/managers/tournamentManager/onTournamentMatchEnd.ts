@@ -40,7 +40,7 @@ export function onTournamentMatchEnd(
 		})
 
 		updateGameMetrics()
-		setTimeout(() => tournaments.delete(tournamentCode), 1 * 60 * 1000	)
+		setTimeout(() => tournaments.delete(tournamentCode), 1 * 60 * 1000)
 		return
 	}
 

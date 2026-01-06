@@ -145,4 +145,3 @@ function segmentsChanged(prev: Segment[], current: Segment[]): boolean {
 function cloneSegments(segs: Segment[]): Segment[] {
 	return segs.map((s) => s.clone())
 }
-
