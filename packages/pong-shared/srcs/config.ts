@@ -16,7 +16,7 @@ export interface MapOptions {
 
 export const GameConfig = {
 	ball: {
-		speed: 0.4,
+		speed: 0.35,
 		speedIncreaseFactor: 1.05,
 		maxSpeed: 1.2,
 		radius: 0.5
@@ -26,7 +26,7 @@ export const GameConfig = {
 	},
 	game: {
 		tps: 60,
-		maxLives: 3,
+		maxLives: 5,
 		pauseTicksAfterPoint: 120,
 		countdownSteps: 3,
 		countdownSeconds: 5
@@ -55,4 +55,4 @@ export const GAME_SPACE_WIDTH = GameConfig.arena.width
 export const GAME_SPACE_HEIGHT = GameConfig.arena.height
 
 // 100 = 2 decimal precision, range -327.68 to 327.67
-export const NETWORK_PRECISION = 100
+export const NETWORK_PRECISION = 1000

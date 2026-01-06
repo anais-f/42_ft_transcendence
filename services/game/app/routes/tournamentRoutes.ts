@@ -19,6 +19,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/game/createTournament',
 		{
 			schema: {
+				tags: ['tournament'],
 				body: CreateTournamentSchema,
 				response: {
 					200: CreateTournamentResponseSchema
@@ -32,6 +33,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/game/joinTournament/:code',
 		{
 			schema: {
+				tags: ['tournament'],
 				params: CodeParamSchema,
 				response: {
 					200: JoinTournamentResponseSchema
@@ -45,6 +47,7 @@ export function tournamentRoutes(app: FastifyInstance) {
 		'/api/game/tournament/:code',
 		{
 			schema: {
+				tags: ['tournament', 'info'],
 				params: CodeParamSchema,
 				response: {
 					200: GetTournamentResponseSchema
@@ -57,7 +60,10 @@ export function tournamentRoutes(app: FastifyInstance) {
 	app.delete(
 		'/api/game/quitTournament',
 		{
-			preHandler: jwtAuthMiddleware
+			preHandler: jwtAuthMiddleware,
+			schema: {
+				tags: ['tournament']
+			}
 		},
 		quitTournamentController
 	)

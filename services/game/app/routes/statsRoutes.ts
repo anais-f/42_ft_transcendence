@@ -15,6 +15,7 @@ export function statsRoutes(app: FastifyInstance) {
 		'/api/user/matchHistory/:id',
 		{
 			schema: {
+				tags: ['info'],
 				params: IdParamSchema,
 				response: {
 					200: MatchHistoryResponseSchema
@@ -28,6 +29,7 @@ export function statsRoutes(app: FastifyInstance) {
 		'/api/user/stats/:id',
 		{
 			schema: {
+				tags: ['info'],
 				params: IdParamSchema,
 				response: {
 					200: PlayerStatsSchema

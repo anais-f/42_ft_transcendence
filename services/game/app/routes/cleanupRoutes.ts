@@ -8,6 +8,7 @@ export function cleanupRoutes(app: FastifyInstance) {
 		'/api/game/internal/cleanup/:user_id',
 		{
 			schema: {
+				tags: ['game', 'tournament'],
 				params: UserIdCoerceSchema
 			},
 			preHandler: apiKeyMiddleware
