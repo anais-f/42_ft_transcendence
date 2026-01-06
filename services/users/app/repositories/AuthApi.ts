@@ -7,11 +7,6 @@ import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
 
 export class AuthApi {
-	/**
-	 * @description Fetch all users from the auth service
-	 * @returns Array of users with user_id and username
-	 * @throws Error if the request fails
-	 */
 	static async getAllUsers() {
 		const base = env.AUTH_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
@@ -51,12 +46,6 @@ export class AuthApi {
 		return parsed.data.users
 	}
 
-	/**
-	 * @description Get 2FA status for a user from auth service
-	 * @param userId - The user ID
-	 * @returns Boolean indicating if 2FA is enabled
-	 * @throws Error if the request fails
-	 */
 	static async get2FAStatus(userId: number): Promise<boolean> {
 		const base = env.AUTH_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
@@ -91,12 +80,6 @@ export class AuthApi {
 		return raw.enabled
 	}
 
-	/**
-	 * @description Get Google user status for a user from auth service
-	 * @param userId - The user ID
-	 * @returns Boolean indicating if user is a Google user
-	 * @throws Error if the request fails
-	 */
 	static async getGoogleUserStatus(userId: number): Promise<boolean> {
 		const base = env.AUTH_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET

@@ -21,7 +21,6 @@ export async function updateUsername(
 
 	const parsed = UserProfileUpdateUsernameSchema.safeParse({ username })
 	if (!parsed.success) {
-		console.error('UserProfileUpdateUsername validation failed:', parsed.error)
 		throw createHttpError.BadRequest('Invalid user data')
 	}
 
@@ -92,7 +91,6 @@ export async function updateUserStatus(
 
 	const parsed = UpdateUserStatusSchema.safeParse(body)
 	if (!parsed.success) {
-		console.error('UpdateUserStatus validation failed:', parsed.error)
 		throw createHttpError.BadRequest('Invalid user data')
 	}
 
