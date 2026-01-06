@@ -10,6 +10,7 @@ import { generateUsername } from './register.js'
 import createHttpError from 'http-errors'
 import { OAuth2Client } from 'google-auth-library'
 import { env } from '../env/checkEnv.js'
+import { status2FA } from './twofa.js'
 
 const getGoogleClient = () => {
 	return new OAuth2Client(env.GOOGLE_CLIENT_ID || undefined)
@@ -45,8 +46,9 @@ export async function googleLoginUsecase(
 
 	const user = findUserByGoogleId(googleId)
 	if (user) {
+		const is2FAEnabled = await status2FA(user.user_id)
 		console.log('Google user already exists, logging in')
-		if (!user.two_fa_enabled) {
+		if (!is2FAEnabled.enabled) {
 			const authToken = signToken(
 				{
 					user_id: user.user_id,

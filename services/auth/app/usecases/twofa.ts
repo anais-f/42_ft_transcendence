@@ -1,8 +1,4 @@
 import createHttpError from 'http-errors'
-import {
-	setUser2FAEnabled,
-	isUser2FAEnabled
-} from '../repositories/userRepository.js'
 import { signToken } from '../utils/jwt.js'
 import {
 	Call2FAResponseDTO,
@@ -60,25 +56,6 @@ export async function enable2FA(
 	}
 }
 
-export async function verify2FASetup(
-	userId: number,
-	twofaCode: string
-): Promise<void> {
-	const { ok, status, data } = await call2faService(
-		'/api/internal/2fa/verify',
-		{
-			user_id: userId,
-			twofa_code: twofaCode
-		}
-	)
-
-	if (!ok) {
-		throw createHttpError(status, data.error || '2FA service error')
-	}
-
-	setUser2FAEnabled(userId, true)
-}
-
 export async function verify2FALogin(
 	userId: number,
 	login: string,
@@ -96,8 +73,6 @@ export async function verify2FALogin(
 	if (!ok) {
 		throw createHttpError(status, data.error || '2FA service error')
 	}
-
-	setUser2FAEnabled(userId, true)
 
 	const newToken = signToken(
 		{
@@ -138,11 +113,35 @@ export async function disable2FA(
 	if (!ok) {
 		throw createHttpError(status, data.error || '2FA service error')
 	}
-
-	setUser2FAEnabled(userId, false)
 }
 
-export function status2FA(userId: number): Status2FAResponseDTO {
-	const enabled = isUser2FAEnabled(userId)
-	return { enabled }
+export async function status2FA(userId: number): Promise<Status2FAResponseDTO> {
+	const { ok, status, data } = await call2faService(
+		'/api/internal/2fa/status',
+		{
+			user_id: userId
+		}
+	)
+	if (!ok) {
+		throw createHttpError(status, data.error || '2FA service error')
+	}
+	console.log('[TwoFA] status2FA', userId, data.enabled)
+	return { enabled: data.enabled }
+}
+
+export async function verify2FASetup(
+	userId: number,
+	twofaCode: string
+): Promise<void> {
+	const { ok, status, data } = await call2faService(
+		'/api/internal/2fa/verify',
+		{
+			user_id: userId,
+			twofa_code: twofaCode
+		}
+	)
+
+	if (!ok) {
+		throw createHttpError(status, data.error || '2FA service error')
+	}
 }

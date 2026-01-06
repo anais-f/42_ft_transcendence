@@ -2,8 +2,7 @@ import {
 	createUser,
 	findUserByLogin,
 	createAdminUser,
-	createGoogleUser,
-	isUser2FAEnabled
+	createGoogleUser
 } from '../repositories/userRepository.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
 import { signToken } from '../utils/jwt.js'
@@ -11,6 +10,7 @@ import {
 	failedLoginAttemptsCounter,
 	successfulLoginCounter
 } from '@ft_transcendence/monitoring'
+import { status2FA } from './twofa.js'
 
 export async function registerAdminUser(login: string, password: string) {
 	const hashed = await hashPassword(password)
@@ -37,7 +37,8 @@ export async function loginUser(login: string, password: string) {
 	}
 	successfulLoginCounter.inc()
 	const isAdmin = Boolean(user.is_admin)
-	if (!isUser2FAEnabled(user.user_id)) {
+	const is2FAEnabled = await status2FA(user.user_id)
+	if (!is2FAEnabled.enabled) {
 		return {
 			token: signToken(
 				{
