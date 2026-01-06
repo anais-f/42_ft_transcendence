@@ -136,7 +136,6 @@ export async function internalStatus2faController(
 	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')
 
 	const result: Status2FAResponseDTO = await status2FA(userId)
-	console.log('[2FAController] internalStatus2faController called', result)
 	return reply.code(200).send(result)
 }
 
@@ -149,9 +148,5 @@ export async function internalGoogleUserStatusController(
 	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')
 
 	const is_google_user = isGoogleUser(userId)
-	console.log('[2FAController] internalGoogleUserStatusController called', {
-		userId,
-		is_google_user
-	})
 	return reply.code(200).send({ is_google_user })
 }
