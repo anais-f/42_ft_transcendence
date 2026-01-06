@@ -209,7 +209,7 @@ graph LR
 
 Services communicate via internal Docker network (`backend`) using REST API calls with API Key authentication (`INTERNAL_API_SECRET`).
 
-For the complete list of internal calls (endpoints, authentication, purpose), see: [docs/internal_api.md](./internal_api.md)
+For the complete list of internal calls (endpoints, authentication, purpose), see: **[docs/internal_api.md](./internal_api.md)**
 
 **3. Admin Authentication**
 
@@ -261,7 +261,7 @@ For the complete list of internal calls (endpoints, authentication, purpose), se
 
 ## Getting Started
 
-or setup, commands and development instructions, see: [docs/getting_started.md](./getting_started.md)
+or setup, commands and development instructions, see: **[docs/getting_started.md](./getting_started.md)**
 
 ## Monitoring
 
