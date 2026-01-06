@@ -120,7 +120,7 @@ export async function verify2FALogin(
 			is_admin: isAdmin,
 			type: 'auth'
 		},
-		'1h'
+		'4h'
 	)
 
 	return { auth_token: newToken }
