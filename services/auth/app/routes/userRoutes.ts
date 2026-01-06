@@ -20,8 +20,7 @@ export async function userRoutes(app: FastifyInstance) {
 		'/api/user/me/password',
 		{
 			schema: {
-				description:
-					'Changes the password for the authenticated user.',
+				description: 'Changes the password for the authenticated user.',
 				tags: ['user'],
 				body: ChangeMyPasswordSchema,
 				response: {
@@ -44,7 +43,7 @@ export async function userRoutes(app: FastifyInstance) {
 		{
 			schema: {
 				description:
-					'Verifies if the provided password matches the authenticated user\'s password.',
+					"Verifies if the provided password matches the authenticated user's password.",
 				tags: ['user', 'auth'],
 				body: PasswordBodySchema,
 				response: {
@@ -63,8 +62,7 @@ export async function userRoutes(app: FastifyInstance) {
 		'/api/internal/users',
 		{
 			schema: {
-				description:
-					'Internal endpoint to list all users with auth info.',
+				description: 'Internal endpoint to list all users with auth info.',
 				tags: ['user', 'internal'],
 				response: {
 					200: PublicUserListAuthSchema,
@@ -82,8 +80,7 @@ export async function userRoutes(app: FastifyInstance) {
 		'/api/users/:id',
 		{
 			schema: {
-				description:
-					'Returns public user information by ID.',
+				description: 'Returns public user information by ID.',
 				tags: ['user'],
 				params: IdParamSchema,
 				response: {

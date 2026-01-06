@@ -90,8 +90,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 		'/api/2fa/disable',
 		{
 			schema: {
-				description:
-					'Disables 2FA for the authenticated user.',
+				description: 'Disables 2FA for the authenticated user.',
 				tags: ['2fa'],
 				response: {
 					200: { type: 'object' },
@@ -112,8 +111,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 		'/api/2fa/status',
 		{
 			schema: {
-				description:
-					'Returns the 2FA status for the authenticated user.',
+				description: 'Returns the 2FA status for the authenticated user.',
 				tags: ['2fa'],
 				response: {
 					200: status2FAResponseSchema,
@@ -131,8 +129,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 		'/api/internal/2fa/status/:id',
 		{
 			schema: {
-				description:
-					'Internal endpoint to get 2FA status for a specific user.',
+				description: 'Internal endpoint to get 2FA status for a specific user.',
 				tags: ['2fa', 'internal'],
 				params: IdParamSchema,
 				response: {

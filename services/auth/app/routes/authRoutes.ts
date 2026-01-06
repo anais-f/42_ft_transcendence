@@ -89,8 +89,7 @@ export async function authRoutes(app: FastifyInstance) {
 		'/api/admin/validate',
 		{
 			schema: {
-				description:
-					'Validates if the current user has admin privileges.',
+				description: 'Validates if the current user has admin privileges.',
 				tags: ['auth', 'admin'],
 				response: {
 					200: { type: 'object' },
@@ -111,8 +110,7 @@ export async function authRoutes(app: FastifyInstance) {
 		'/api/logout',
 		{
 			schema: {
-				description:
-					'Logs out the current user and invalidates the session.',
+				description: 'Logs out the current user and invalidates the session.',
 				tags: ['auth'],
 				response: {
 					200: { type: 'object' }
