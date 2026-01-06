@@ -56,7 +56,7 @@ app.register(Swagger, {
 })
 
 await app.register(SwaggerUI, {
-	routePrefix: '/docs',
+	routePrefix: '/docs'
 })
 
 await registerRoutes(app)
