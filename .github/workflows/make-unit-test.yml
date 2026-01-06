@@ -63,7 +63,6 @@ jobs:
           GAME_DB_PATH=/data/db-game.sqlite
 
           # Admin credentials
-          LOGIN_ADMIN=admin
           PASSWORD_ADMIN=Admin1234
 
           # Monitoring / other
