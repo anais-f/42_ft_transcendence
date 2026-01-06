@@ -25,6 +25,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			description:
 				'This endpoint allows a player to join an existing game using the game code. The received JWT serves to authenticate the player for subsequent interactions within the game.',
+			tags: ['game'],
 			params: CodeParamSchema,
 			response: {
 				201: createTokenSchema,
@@ -45,6 +46,7 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			description:
 				'This endpoint creates a new game and assigns Player 1 to the requester. Note that the requester still needs to join the game using the code returned.',
+			tags: ['game'],
 			body: CreateGameSchema,
 			response: {
 				201: CodeParamSchema,
@@ -65,6 +67,8 @@ export const gameRoutes: FastifyPluginAsync = async (fastify) => {
 		schema: {
 			description:
 				'This endpoint returns the game code for a game the player is already assigned to.',
+			tags: ['game', 'info'],
+			deprecated: true,
 			response: {
 				200: CodeParamSchema,
 				404: HttpErrorSchema.meta({
