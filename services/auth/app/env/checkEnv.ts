@@ -26,7 +26,7 @@ const envSchema = z
 		PORT: env.PORT,
 		JWT_SECRET: env.JWT_SECRET,
 		AUTH_DB_PATH: env.AUTH_DB_PATH,
-		LOGIN_ADMIN: "transcendence",
+		LOGIN_ADMIN: 'transcendence',
 		PASSWORD_ADMIN: env.PASSWORD_ADMIN,
 		GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID,
 		TWOFA_SERVICE_URL: env.TWOFA_SERVICE_URL,
