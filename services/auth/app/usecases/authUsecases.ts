@@ -1,4 +1,4 @@
-import { LoginResponseDTO } from '@ft_transcendence/common'
+import { LoginResponseDTO, PublicUserAuthDTO } from '@ft_transcendence/common'
 import { registerUser, loginUser } from './register.js'
 import {
 	findPublicUserByLogin,
@@ -9,16 +9,21 @@ import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
 import { successfulLoginCounter } from '@ft_transcendence/monitoring'
 
+interface SqliteError extends Error {
+	code?: string
+}
+
 export async function registerUserUsecase(
 	login: string,
 	password: string
-): Promise<{ publicUser: any; token: string }> {
+): Promise<{ publicUser: PublicUserAuthDTO; token: string }> {
 	const authApiSecret = env.INTERNAL_API_SECRET
 
 	try {
 		await registerUser(login, password)
-	} catch (e: any) {
-		if (e?.code === 'SQLITE_CONSTRAINT_UNIQUE')
+	} catch (e) {
+		const sqliteError = e as SqliteError
+		if (sqliteError?.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			throw createHttpError.Conflict('Login already exists')
 		throw createHttpError.InternalServerError('Database error')
 	}
