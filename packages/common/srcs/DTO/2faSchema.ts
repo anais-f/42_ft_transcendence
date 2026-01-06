@@ -84,7 +84,7 @@ export const Call2FAResponseSchema = z
 	.object({
 		ok: z.boolean(),
 		status: z.number().int().positive(),
-		data: z.unknown()
+		data: z.any()
 	})
 	.strict()
 
