@@ -40,16 +40,8 @@ export async function broadcastStatusChangeToFriends(
 				sentCount++
 			}
 		}
-
-		console.log(
-			`[BROADCAST] Status change for user ${userId} sent to ${sentCount}/${friends.length} friends`
-		)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.error(
-			`[BROADCAST] Failed to broadcast status change for user ${userId}:`,
-			message
-		)
 	}
 }
 
@@ -76,15 +68,7 @@ export async function broadcastPresenceToAll(
 		} as StatusChangePayload
 
 		broadcast(payload)
-
-		console.log(
-			`[BROADCAST] Presence change for user ${userId} sent to all connected users`
-		)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
-		console.error(
-			`[BROADCAST] Failed to broadcast presence change for user ${userId}:`,
-			message
-		)
 	}
 }

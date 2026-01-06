@@ -58,26 +58,15 @@ async function sendNotification(
 			isFriendshipUpdate ? friendInfo : undefined
 		)
 		if (!sent) {
-			console.log(
-				`User ${friendId.user_id}, ${fromUsername}, not connected, notification not sent`
-			)
 		}
 
 		return sent
 	} catch (error) {
-		console.log('Failed to send notification:', error)
 		return false
 	}
 }
 
 export class FriendService {
-	/**
-	 * Send a friend request from userId to friendId
-	 * If a pending request exists from friendId to userId, accept it instead
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async sendFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -119,12 +108,6 @@ export class FriendService {
 		return
 	}
 
-	/**
-	 * Accept a friend request from friendId to userId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async acceptFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -177,12 +160,6 @@ export class FriendService {
 		await sendNotification(userId, friendId, friendRejectedNotification)
 	}
 
-	/**
-	 * Cancel a sent friend request from userId to friendId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async cancelFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
@@ -204,12 +181,6 @@ export class FriendService {
 		SocialRepository.deleteRelation(userId, friendId)
 	}
 
-	/**
-	 * Remove a friend relationship between userId and friendId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async removeFriend(userId: IUserId, friendId: IUserId): Promise<void> {
 		if (userId.user_id === friendId.user_id)
 			throw createHttpError.BadRequest('Cannot remove yourself as a friend')
@@ -225,11 +196,6 @@ export class FriendService {
 		await sendNotification(userId, friendId, friendRemovedNotification)
 	}
 
-	/**
-	 * Get the friends list for a user
-	 * @param userId
-	 * @return IPublicProfileUser[]
-	 */
 	static async getFriendsList(userId: IUserId): Promise<IPublicProfileUser[]> {
 		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
@@ -240,11 +206,6 @@ export class FriendService {
 		)
 	}
 
-	/**
-	 * Get pending friend requests for a user
-	 * @param userId
-	 * @return PendingFriendsListDTO
-	 */
 	static async getPendingRequests(
 		userId: IUserId
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {

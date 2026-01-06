@@ -48,10 +48,7 @@ function setupMessageHandler(
 
 		try {
 			const message = JSON.parse(rawMessage)
-			console.log(`[WS] Valid JSON command from ${username}:`, message)
-			// TODO: Add Zod validation and implement message routing
 		} catch (e) {
-			console.warn(`[WS] Invalid message from ${username}, rejected`)
 			socket.send(
 				JSON.stringify({
 					type: WSMessageType.ERROR_OCCURRED,

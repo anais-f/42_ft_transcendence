@@ -58,12 +58,6 @@ function sendFriendNotification(
 
 	const sent = sendToUser(toUserId, notification)
 
-	if (sent) {
-		console.log(`${type} notification sent to ${toUserId}`)
-	} else {
-		console.log(`User ${toUserId} not connected, ${type} notification not sent`)
-	}
-
 	return sent
 }
 
