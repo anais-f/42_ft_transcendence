@@ -1,11 +1,17 @@
 import { games, tournaments } from '../usecases/managers/gameData.js'
 
+type codeID = 'T' | 'G'
+const localMap: Record<codeID, Map<string, any>> = {
+	'T': tournaments,
+	'G': games
+}
+
 export function createInviteCode(type: 'T' | 'G'): string {
 	let code: string = ''
 
 	do {
 		code = `${type}-${randomAlphaNumeric(5)}`
-	} while (games.has(code) || tournaments.has(code))
+	} while (localMap[type].has(code))
 
 	return code
 }
