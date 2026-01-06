@@ -11,16 +11,28 @@ import {
 	PublicUserListAuthSchema,
 	PublicUserAuthSchema,
 	IdParamSchema,
-	PasswordBodySchema
+	PasswordBodySchema,
+	HttpErrorSchema
 } from '@ft_transcendence/common'
 
-// TODO : Add authentication/authorization middleware where necessary and delete user only by himself or admin
 export async function userRoutes(app: FastifyInstance) {
 	app.patch(
 		'/api/user/me/password',
 		{
 			schema: {
-				body: ChangeMyPasswordSchema
+				description:
+					'Changes the password for the authenticated user.',
+				tags: ['user'],
+				body: ChangeMyPasswordSchema,
+				response: {
+					200: { type: 'object' },
+					400: HttpErrorSchema.meta({
+						description: 'Invalid request body'
+					}),
+					401: HttpErrorSchema.meta({
+						description: 'Not authenticated or wrong current password'
+					})
+				}
 			},
 			preHandler: jwtAuthMiddleware
 		},
@@ -31,31 +43,57 @@ export async function userRoutes(app: FastifyInstance) {
 		'/api/verify-my-password',
 		{
 			schema: {
-				body: PasswordBodySchema
+				description:
+					'Verifies if the provided password matches the authenticated user\'s password.',
+				tags: ['user', 'auth'],
+				body: PasswordBodySchema,
+				response: {
+					200: { type: 'object' },
+					401: HttpErrorSchema.meta({
+						description: 'Not authenticated or wrong password'
+					})
+				}
 			},
 			preHandler: jwtAuthMiddleware
 		},
 		verifyMyPasswordController
 	)
+
 	app.get(
 		'/api/internal/users',
 		{
 			schema: {
+				description:
+					'Internal endpoint to list all users with auth info.',
+				tags: ['user', 'internal'],
 				response: {
-					200: PublicUserListAuthSchema
+					200: PublicUserListAuthSchema,
+					401: HttpErrorSchema.meta({
+						description: 'Invalid API key'
+					})
 				}
 			},
 			preHandler: apiKeyMiddleware
 		},
 		listPublicUsersController
 	)
+
 	app.get(
 		'/api/users/:id',
 		{
 			schema: {
+				description:
+					'Returns public user information by ID.',
+				tags: ['user'],
 				params: IdParamSchema,
 				response: {
-					200: PublicUserAuthSchema
+					200: PublicUserAuthSchema,
+					401: HttpErrorSchema.meta({
+						description: 'Not authenticated'
+					}),
+					404: HttpErrorSchema.meta({
+						description: 'User not found'
+					})
 				}
 			},
 			preHandler: jwtAuthMiddleware
