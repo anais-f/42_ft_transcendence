@@ -14,6 +14,7 @@ import fastifyJwt from '@fastify/jwt'
 import { setupErrorHandler } from '@ft_transcendence/common'
 import Swagger from '@fastify/swagger'
 import { env } from './env/checkEnv.js'
+import SwaggerUI from '@fastify/swagger-ui'
 
 export const app: FastifyInstance = Fastify({
 	logger: { level: 'info' }
@@ -37,9 +38,7 @@ setupFastifyMonitoringHooks(app)
 
 await app.register(metricPlugin.default, { endpoint: '/metrics' })
 
-await registerRoutes(app)
-
-app.register(Swagger as any, {
+app.register(Swagger, {
 	openapi: {
 		info: {
 			title: 'API for 2FA Service',
@@ -47,7 +46,7 @@ app.register(Swagger as any, {
 		},
 		servers: [
 			{
-				url: `${env.SWAGGER_HOST}:8080/2fa`,
+				url: `${env.SWAGGER_HOST}:${env.PORT}/2fa`,
 				description: 'Local server'
 			}
 		],
@@ -55,6 +54,12 @@ app.register(Swagger as any, {
 	},
 	transform: jsonSchemaTransform
 })
+
+await app.register(SwaggerUI, {
+	routePrefix: '/docs'
+})
+
+await registerRoutes(app)
 
 const start = async () => {
 	try {
