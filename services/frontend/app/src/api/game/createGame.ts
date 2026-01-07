@@ -26,7 +26,7 @@ export async function createGameApi(
 		const payload = await response.json()
 		if (!response.ok) {
 			return {
-				data: null,
+				data: payload,
 				error: payload.error || payload.message || 'Request failed',
 				status: payload.statusCode || response.status
 			}

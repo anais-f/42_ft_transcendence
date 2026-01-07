@@ -18,7 +18,11 @@ export function joinGame(gameCode: string, pID: number) {
 			gameData.tournamentMatchData?.tournamentCode === playerTournamentCode
 
 		if (!isGameFromTournament) {
-			throw new Error('player not allowed in this game')
+			const error = new Error('player not allowed in this game') as Error & {
+				tournamentCode?: string
+			}
+			error.tournamentCode = playerTournamentCode
+			throw error
 		}
 	}
 

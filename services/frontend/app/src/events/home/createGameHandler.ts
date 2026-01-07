@@ -2,11 +2,16 @@ import { gameStore } from '../../usecases/gameStore.js'
 import { createGameApi, MapOptions } from '../../api/game/createGame.js'
 import { joinGameApi } from '../../api/game/joinGame.js'
 import { sendGameError } from './errorMapUtils.js'
+import { showRejoinTournamentModal } from './rejoinTournamentModalHandler.js'
 
 export async function handleCreateGame(mapOptions?: MapOptions) {
 	const { data, error, status } = await createGameApi(mapOptions)
 
 	if (error) {
+		if (data?.tournamentCode) {
+			showRejoinTournamentModal(data?.tournamentCode)
+			return
+		}
 		sendGameError(error, status)
 		return
 	}

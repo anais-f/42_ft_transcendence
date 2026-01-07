@@ -30,6 +30,11 @@ export async function handleJoinGame(code: string) {
 
 	gameStore.gameCode = code
 	if (error) {
+		if (data?.tournamentCode) {
+			showRejoinTournamentModal(data?.tournamentCode)
+			gameStore.clear()
+			return
+		}
 		sendGameError(error, status)
 		gameStore.clear()
 		return
