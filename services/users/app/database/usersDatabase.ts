@@ -16,4 +16,5 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
     status INTEGER NOT NULL,
     last_connection TEXT NOT NULL
   );
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_nocase ON users(LOWER(username));
 `)

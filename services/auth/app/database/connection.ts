@@ -32,5 +32,6 @@ export function initDB() {
 	  google_id TEXT UNIQUE,
 	  is_admin BOOLEAN DEFAULT FALSE
     );
+	CREATE UNIQUE INDEX IF NOT EXISTS idx_users_login_nocase ON users(LOWER(login));
   `)
 }
