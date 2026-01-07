@@ -28,12 +28,8 @@ export async function broadcastStatusChangeToFriends(
 			}
 		} as StatusChangePayload
 
-		let sentCount = 0
 		for (const friend of friends) {
-			const sent = sendToUser(friend.user_id, payload)
-			if (sent) {
-				sentCount++
-			}
+			sendToUser(friend.user_id, payload)
 		}
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)

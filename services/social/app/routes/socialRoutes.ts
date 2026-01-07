@@ -68,7 +68,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				200: z.object({ message: z.string() }),
 				400: HttpErrorSchema.meta({
 					description:
-						"Can't add yourself / Already friends / Friend request already sent / Friend limit reached (20 max)"
+						"Can't add yourself / Already friends / Friend request already sent / Friend limit reached"
 				}),
 				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
 				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
@@ -89,7 +89,7 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 				200: z.object({ message: z.string() }),
 				400: HttpErrorSchema.meta({
 					description:
-						"Can't accept yourself / Already friends / No pending request / Friend limit reached (20 max)"
+						"Can't accept yourself / Already friends / No pending request / Friend limit reached"
 				}),
 				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
 				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
