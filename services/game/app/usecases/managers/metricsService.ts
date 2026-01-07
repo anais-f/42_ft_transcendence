@@ -11,7 +11,6 @@ import {
 } from './gameData.js'
 import { TournamentStatus } from '@ft_transcendence/common'
 
-
 export function updateGameMetrics(): void {
 	const gamesByStatus: Record<GameStatus, number> = {
 		waiting: 0,
