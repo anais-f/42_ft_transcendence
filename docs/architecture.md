@@ -198,7 +198,7 @@ graph LR
   subgraph Legend["Legend"]
     direction LR
     LS1[Service] ==>|HTTP API| LS2[Service]
-    LS3[Service] -.->|WebSocket| LS4[Service]
+    LS3[Service] <-.->|WebSocket| LS4[Service]
   end
 
   style Auth fill:#f39c12,stroke:#e67e22,color:#fff
