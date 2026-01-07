@@ -134,9 +134,7 @@ export class packetBuilder {
 				default:
 					break
 			}
-		} catch (e) {
-			console.log('ignored packet: ' + e)
-		}
+		} catch (e) {}
 		return null
 	}
 }

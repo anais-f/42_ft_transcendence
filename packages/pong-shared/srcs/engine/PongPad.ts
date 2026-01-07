@@ -6,7 +6,6 @@ export enum padDirection {
 	DOWN = -1
 }
 
-// NOTE: be carefull with references to Vec2 in Segments (don't forget `.clone()`)
 export class PongPad {
 	private _velocity: Vector2 = new Vector2(0, 0)
 

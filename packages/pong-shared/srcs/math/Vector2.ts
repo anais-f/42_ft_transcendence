@@ -1,7 +1,6 @@
 import { EPSILON } from '../define.js'
 
 export class Vector2 {
-	// init class fields
 	private _x: number
 	private _y: number
 
@@ -10,7 +9,6 @@ export class Vector2 {
 		this._y = y
 	}
 
-	// getters
 	get x(): number {
 		return this._x
 	}
@@ -18,7 +16,6 @@ export class Vector2 {
 		return this._y
 	}
 
-	// setters
 	set x(newX: number) {
 		this._x = newX
 	}
@@ -31,7 +28,6 @@ export class Vector2 {
 		this._y = newY
 	}
 
-	// operator
 	public static subtract(v1: Vector2, v2: Vector2): Vector2 {
 		return new Vector2(v1.x - v2.x, v1.y - v2.y)
 	}

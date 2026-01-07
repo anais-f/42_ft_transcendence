@@ -51,7 +51,6 @@ export class Circle {
 			return null
 		}
 
-		// weird fix
 		if (sqDistance <= 0) {
 			return [this._rad > other.rad ? other.pos : this.pos]
 		}
@@ -77,7 +76,6 @@ export class Circle {
 			p2.y + (h * (other.pos.x - this._origin.x)) / distance
 		)
 
-		// weird fix
 		if (isNaN(t1.x) || isNaN(t2.x) || isNaN(t1.y) || isNaN(t2.y)) {
 			return [this._rad > other.rad ? other.pos : this.pos]
 		}

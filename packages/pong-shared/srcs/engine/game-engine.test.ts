@@ -3,7 +3,7 @@ import { GameEngine, GameState } from './game-engine.js'
 import { Segment } from '../math/Segment.js'
 import { Vector2 } from '../math/Vector2.js'
 import { padDirection, PongPad } from './PongPad.js'
-import { createScore, IScore } from './IScore.js'
+import { createScore } from './IScore.js'
 
 jest.mock('bottleneck', () => {
 	return class MockBottleneck {
@@ -30,15 +30,13 @@ describe('game-engine', () => {
 	const segD = new Segment(pointB, pointC)
 
 	let pad1: PongPad
-	let pad2: PongPad
 	let padSeg2: Segment
 	let padSeg1: Segment
-	const scoreData: IScore = createScore(5)
+	const scoreData = createScore(5)
 	beforeAll(() => {
 		padSeg2 = new Segment(pointG.clone(), pointH.clone())
 		padSeg1 = new Segment(pointE.clone(), pointF.clone())
 		pad1 = new PongPad([padSeg1], null)
-		pad2 = new PongPad([padSeg2], null)
 		game = new GameEngine(
 			60,
 			scoreData,

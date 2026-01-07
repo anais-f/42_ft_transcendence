@@ -5,6 +5,7 @@ import { createTournamentMatchResult } from '../../tournamentManager/tournamentU
 import { onTournamentMatchEnd } from '../../tournamentManager/onTournamentMatchEnd.js'
 import { initEOG } from '../../../ws/gameUpdate/eogMessage.js'
 import { updateGameMetrics } from '../../metricsService.js'
+import { GameWSCloseCodes } from '@ft_transcendence/pong-shared'
 
 export function endGame(code: string) {
 	const gameData = games.get(code)
@@ -33,8 +34,8 @@ export function endGame(code: string) {
 
 	gameData.p1.ws?.send(eogMessage)
 	gameData.p2.ws?.send(eogMessage)
-	gameData.p1.ws?.close(1000, 'Game ended')
-	gameData.p2.ws?.close(1000, 'Game ended')
+	gameData.p1.ws?.close(GameWSCloseCodes.NORMAL, 'Game ended')
+	gameData.p2.ws?.close(GameWSCloseCodes.NORMAL, 'Game ended')
 
 	let tournamentData = undefined
 	if (gameData.tournamentMatchData) {
