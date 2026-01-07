@@ -39,6 +39,19 @@ function cancelPendingDisconnect(userId: number): void {
 	}
 }
 
+/**
+ * Registers a new WebSocket connection for a user.
+ *
+ * Behavior:
+ * - Cancels any pending disconnect timer (allows quick page reload)
+ * - Replaces existing connection if user already connected (new tab)
+ * - Only triggers handleUserOnline on first connection (not on reconnect)
+ *
+ * IMPORTANT: Returns true only for first connection, false for tab switches.
+ * This prevents duplicate "user came online" notifications on page reload.
+ *
+ * @returns true if this is the user's first connection, false if replacing existing
+ */
 export async function addConnection(
 	userId: number,
 	ws: WebSocket
@@ -75,6 +88,20 @@ export async function addConnection(
 	return isFirstConnection
 }
 
+/**
+ * Removes a WebSocket connection with delayed offline notification.
+ *
+ * IMPORTANT: Waits 2 seconds before marking user offline to handle quick
+ * page reloads. If user reconnects during this delay (via addConnection),
+ * the timer is cancelled and user stays online seamlessly.
+ *
+ * This prevents:
+ * - Flickering online/offline status during page navigation
+ * - Unnecessary "user went offline" notifications to friends
+ * - Race conditions between disconnect and reconnect events
+ *
+ * @returns true if connection removed, false if not found or already removed
+ */
 export function removeConnection(userId: number, ws: WebSocket): boolean {
 	const currentConn = wsConnections.get(userId)
 
@@ -142,10 +169,10 @@ export function getTotalConnections(): number {
 	return wsConnections.size
 }
 
-export function getOnlineUsers(): number[] {
-	const onlineUsers: number[] = []
-	for (const userId of wsConnections.keys()) {
-		onlineUsers.push(Number(userId))
-	}
-	return onlineUsers
-}
+// export function getOnlineUsers(): number[] {
+// 	const onlineUsers: number[] = []
+// 	for (const userId of wsConnections.keys()) {
+// 		onlineUsers.push(Number(userId))
+// 	}
+// 	return onlineUsers
+// }

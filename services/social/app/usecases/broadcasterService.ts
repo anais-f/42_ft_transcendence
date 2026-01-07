@@ -7,11 +7,6 @@ import {
 	WSMessageType
 } from '@ft_transcendence/common'
 
-/**
- * Broadcast a status change to all friends of a user
- * @param userId - User ID whose status changed
- * @param status - UserStatus enum value (ONLINE, OFFLINE)
- */
 export async function broadcastStatusChangeToFriends(
 	userId: number,
 	status: UserStatus
@@ -40,34 +35,6 @@ export async function broadcastStatusChangeToFriends(
 				sentCount++
 			}
 		}
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-	}
-}
-
-/**
- * Broadcast presence change to all connected users (for public profiles, etc)
- * @param userId - User ID whose status changed
- * @param status - UserStatus enum value (ONLINE, OFFLINE)
- */
-export async function broadcastPresenceToAll(
-	userId: number,
-	status: UserStatus
-): Promise<void> {
-	try {
-		const timestamp = new Date().toISOString()
-
-		const payload = {
-			type: WSMessageType.USER_STATUS_CHANGE,
-			data: {
-				userId: userId,
-				status: status,
-				timestamp: timestamp,
-				...(status === UserStatus.OFFLINE && { lastSeen: timestamp })
-			}
-		} as StatusChangePayload
-
-		broadcast(payload)
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error)
 	}

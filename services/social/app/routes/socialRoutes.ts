@@ -16,7 +16,6 @@ import {
 	requestFriendController,
 	rejectFriendController,
 	acceptFriendController,
-	cancelFriendController,
 	removeFriendController,
 	getFriendsListController,
 	getPendingRequestsController,
@@ -82,17 +81,6 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			body: UserIdCoerceSchema
 		},
 		handler: rejectFriendController
-	})
-
-	// POST /api/social/cancel-request-friend
-	server.route({
-		method: 'POST',
-		url: '/api/social/cancel-request-friend',
-		preHandler: jwtAuthMiddleware,
-		schema: {
-			body: UserIdCoerceSchema
-		},
-		handler: cancelFriendController
 	})
 
 	// POST /api/social/remove-friend

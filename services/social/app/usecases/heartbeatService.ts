@@ -12,6 +12,17 @@ export function handlePong(userId: number): void {
 	}
 }
 
+/**
+ * Starts WebSocket heartbeat monitoring to detect stale connections.
+ *
+ * Process:
+ * - Sends ping every 30 seconds to all active connections
+ * - Terminates connections that haven't responded with pong in 60 seconds
+ * - Idempotent: safe to call multiple times (returns early if already running)
+ *
+ * IMPORTANT: Dead connections (network issues, closed browser) may not trigger
+ * 'close' event immediately. Heartbeat ensures they're cleaned up via timeout.
+ */
 export function startHeartbeat(): void {
 	if (heartbeatInterval) return
 

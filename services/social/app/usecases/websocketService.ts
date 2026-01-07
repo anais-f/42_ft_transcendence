@@ -3,13 +3,6 @@ import { addConnection, getTotalConnections } from './connectionManager.js'
 import { UsersApi } from '../repositories/UsersApi.js'
 import { WSMessageType, WSCloseCodes } from '@ft_transcendence/common'
 
-/**
- * Initialize WebSocket connection: add to connection manager, fetch user data, send welcome
- * @param socket WebSocket connection
- * @param userId User ID
- * @param userLogin User login (fallback username)
- * @returns Object with username and total connected users
- */
 export async function initializeConnection(
 	socket: WebSocket,
 	userId: number,

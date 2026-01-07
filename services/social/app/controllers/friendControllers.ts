@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { FriendService } from '../usecases/friendService.js'
-import { IUserId, RelationStatus } from '@ft_transcendence/common'
+import { IUserId } from '@ft_transcendence/common'
 import createHttpError from 'http-errors'
 import { SocialRepository } from '../repositories/socialRepository.js'
 
@@ -56,18 +56,6 @@ export async function rejectFriendController(
 		reply,
 		FriendService.rejectFriendRequest,
 		'Friend request rejected'
-	)
-}
-
-export async function cancelFriendController(
-	req: FastifyRequest,
-	reply: FastifyReply
-): Promise<void> {
-	return handleFriendAction(
-		req,
-		reply,
-		FriendService.cancelFriendRequest,
-		'Friend request canceled'
 	)
 }
 
