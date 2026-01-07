@@ -15,9 +15,6 @@ export function createTournamentMatchResult(
 	}
 }
 
-/**
- * Helper to get tournament code from a user or game
- */
 export function getTournamentByUser(userId: number): string | undefined {
 	for (const [code, tournament] of tournaments.entries()) {
 		if (tournament.participants.includes(userId)) {

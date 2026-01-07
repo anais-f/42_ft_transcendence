@@ -2,10 +2,6 @@ import createHttpError from 'http-errors'
 import { FastifyRequest } from 'fastify'
 import { tournaments, usersToTournament } from '../gameData.js'
 
-/**
- * Quit tournament by userId
- * Throws errors if user is not in a tournament or tournament has already started
- */
 export function quitTournamentByUserId(userId: number): void {
 	const tournamentCode = usersToTournament.get(userId)
 	if (!tournamentCode) {
@@ -30,9 +26,6 @@ export function quitTournamentByUserId(userId: number): void {
 	}
 }
 
-/**
- * HTTP handler for quitting tournament
- */
 export function quitTournament(request: FastifyRequest): void {
 	const userId = request.user.user_id
 	if (userId === undefined) {

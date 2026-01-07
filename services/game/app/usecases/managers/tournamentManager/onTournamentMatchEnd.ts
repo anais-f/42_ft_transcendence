@@ -14,7 +14,6 @@ export function onTournamentMatchEnd(
 		throw createHttpError.NotFound('Tournament not found')
 	}
 
-	// Find the match that just ended
 	const currentMatch = tournament.matches.find(
 		(m) =>
 			m.round === tournamentMatchData.round &&
@@ -24,17 +23,14 @@ export function onTournamentMatchEnd(
 		throw createHttpError.NotFound('Match not found')
 	}
 
-	// Update match status, scores, and winner
 	currentMatch.status = 'completed'
 	currentMatch.scorePlayer1 = tournamentData.scorePlayer1
 	currentMatch.scorePlayer2 = tournamentData.scorePlayer2
 	currentMatch.winnerId = tournamentData.winnerId
 
-	// If this was the final (round 1), tournament is over
 	if (tournamentMatchData.round === 1) {
 		tournament.status = 'completed'
 
-		// Clean up participants from tracking
 		tournament.participants.forEach((userId) => {
 			usersToTournament.delete(userId)
 		})
@@ -44,7 +40,6 @@ export function onTournamentMatchEnd(
 		return
 	}
 
-	// Find the next round match that this winner should advance to
 	const nextRoundMatch = tournament.matches.find(
 		(m) =>
 			m.round === tournamentMatchData.round - 1 &&
@@ -56,7 +51,6 @@ export function onTournamentMatchEnd(
 		return
 	}
 
-	// Place winner in the appropriate slot of next match
 	if (nextRoundMatch.previousMatchId1 === tournamentMatchData.matchNumber) {
 		nextRoundMatch.player1Id = tournamentData.winnerId
 	} else if (

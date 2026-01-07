@@ -6,9 +6,7 @@ import { tournaments } from '../gameData.js'
 export function getTournament(request: FastifyRequest): TournamentDTO {
 	const userId = request.user.user_id
 	if (userId === undefined) {
-		throw createHttpError.Unauthorized(
-			"You're not a participant of this tournament"
-		)
+		throw createHttpError.Unauthorized("You're not authenticated")
 	}
 	const tournamentCode = CodeParamSchema.parse(request.params)
 	const tournament = tournaments.get(tournamentCode.code)
@@ -16,7 +14,7 @@ export function getTournament(request: FastifyRequest): TournamentDTO {
 		throw createHttpError.NotFound('Unknown tournament')
 	}
 	if (!tournament.participants.includes(userId)) {
-		throw createHttpError.Unauthorized(
+		throw createHttpError.Forbidden(
 			"You're not a participant of this tournament"
 		)
 	}
