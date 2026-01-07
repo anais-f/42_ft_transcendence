@@ -21,9 +21,13 @@ export function setupErrorHandler(app: FastifyInstance): void {
 			})
 
 			if (error.statusCode) {
-				return reply.code(error.statusCode).send({
+				const response: Record<string, unknown> = {
 					error: error.message
-				})
+				}
+				if ('tournamentCode' in error && error.tournamentCode) {
+					response.tournamentCode = error.tournamentCode
+				}
+				return reply.code(error.statusCode).send(response)
 			}
 
 			if (error instanceof ZodError) {

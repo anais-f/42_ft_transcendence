@@ -14,7 +14,7 @@ export async function CreateTournamentAPI(): Promise<IApiResponse> {
 		const payload = await response.json()
 		if (!response.ok) {
 			return {
-				data: null,
+				data: payload,
 				error:
 					payload.error || payload.message || 'Failed to create tournament',
 				status: payload.statusCode || response.status
@@ -37,7 +37,7 @@ export async function JoinTournamentAPI(code: string): Promise<IApiResponse> {
 		const payload = await response.json()
 		if (!response.ok) {
 			return {
-				data: null,
+				data: payload,
 				error: payload.error || payload.message || 'Failed to join tournament',
 				status: payload.statusCode || response.status
 			}
