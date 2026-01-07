@@ -41,7 +41,7 @@ export async function start(): Promise<void> {
 			host: '0.0.0.0'
 		})
 		console.log('Listening on port ', 3000)
-		console.log(`Swagger UI available at ${env.HOST}/social/docs`)
+		console.log(`Swagger UI available at ${env.SWAGGER_HOST}/social/docs`)
 
 		startHeartbeat()
 		console.log('WebSocket heartbeat monitoring started')
