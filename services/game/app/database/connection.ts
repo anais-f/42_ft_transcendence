@@ -9,8 +9,6 @@ let db: Database
 export function getDb(): Database {
 	if (!db) {
 		const path = env.GAME_DB_PATH
-		// Ensure directory exists
-		mkdirSync(dirname(path), { recursive: true })
 		db = new BetterSqlite3(path)
 	}
 	return db
