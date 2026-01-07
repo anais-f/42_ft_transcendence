@@ -1,11 +1,11 @@
-import { joinGameApi } from '../../api/game/joinGame.js'
+import { joinGameAPI } from '../../api/game/joinGame.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import { sendGameError } from '../home/errorMapUtils.js'
 
 export async function handleJoinGameTournament(
 	code: string
 ): Promise<{ success: boolean; alreadyInGame: boolean }> {
-	const { data, error, status } = await joinGameApi(code)
+	const { data, error, status } = await joinGameAPI(code)
 
 	if (error) {
 		// 409 means the user is already in the game from another tab

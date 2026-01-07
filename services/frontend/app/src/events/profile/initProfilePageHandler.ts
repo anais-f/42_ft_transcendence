@@ -1,6 +1,6 @@
-import { UserByIdAPI } from '../../api/usersApi.js'
+import { userByIdAPI } from '../../api/usersApi.js'
 import { IPublicProfileUser } from '@ft_transcendence/common'
-import { checkIsFriendApi } from '../../api/friends/getFriendsApi.js'
+import { checkIsFriendAPI } from '../../api/friends/getFriendsApi.js'
 import { Button } from '../../components/Button.js'
 import { currentUser } from '../../usecases/userStore.js'
 import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
@@ -42,7 +42,7 @@ function renderProfile(user: IPublicProfileUser) {
  * @param userId - The user ID to fetch profile for
  */
 export async function initAndRenderUserProfile(userId: number) {
-	const responseUser = await UserByIdAPI(userId)
+	const responseUser = await userByIdAPI(userId)
 	if (responseUser.error || !responseUser.data) {
 		console.error('User not found: ', responseUser.error)
 		const username = document.getElementById('profile-username')
@@ -56,7 +56,7 @@ export async function initAndRenderUserProfile(userId: number) {
 		return
 	}
 
-	const statusResponse = await checkIsFriendApi(userId)
+	const statusResponse = await checkIsFriendAPI(userId)
 	if (statusResponse.error) {
 		console.error('Error checking friendship status: ', statusResponse.error)
 		return

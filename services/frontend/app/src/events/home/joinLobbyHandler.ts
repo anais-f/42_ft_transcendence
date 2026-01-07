@@ -1,7 +1,7 @@
-import { joinGameApi } from '../../api/game/joinGame.js'
+import { joinGameAPI } from '../../api/game/joinGame.js'
 import { gameStore } from '../../usecases/gameStore.js'
 import { sendGameError } from './errorMapUtils.js'
-import { JoinTournamentAPI } from '../../api/tournamentApi.js'
+import { joinTournamentAPI } from '../../api/tournamentApi.js'
 import { tournamentStore } from '../../usecases/tournamentStore.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { ToastActionType } from '../../types/toast.js'
@@ -25,7 +25,7 @@ export async function handleJoinLobby(e: Event) {
 }
 
 export async function handleJoinGame(code: string) {
-	const { data, error, status } = await joinGameApi(code)
+	const { data, error, status } = await joinGameAPI(code)
 
 	gameStore.gameCode = code
 	if (error) {
@@ -39,7 +39,7 @@ export async function handleJoinGame(code: string) {
 }
 
 export async function handleJoinTournament(code: string) {
-	const { data, error, status } = await JoinTournamentAPI(code)
+	const { data, error, status } = await joinTournamentAPI(code)
 
 	tournamentStore.tournamentCode = code
 	if (error) {

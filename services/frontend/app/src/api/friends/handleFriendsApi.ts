@@ -1,7 +1,7 @@
 // routes for accept, request, decline, remove friend
 import { IApiResponse } from '../../types/api.js'
 
-export async function requestFriendApi(userId: number): Promise<IApiResponse> {
+export async function requestFriendAPI(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/request-friend`, {
 			method: 'POST',
@@ -28,7 +28,7 @@ export async function requestFriendApi(userId: number): Promise<IApiResponse> {
 	}
 }
 
-export async function acceptFriendApi(userId: number): Promise<IApiResponse> {
+export async function acceptFriendAPI(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/accept-friend`, {
 			method: 'POST',
@@ -55,7 +55,7 @@ export async function acceptFriendApi(userId: number): Promise<IApiResponse> {
 	}
 }
 
-export async function rejectFriendApi(userId: number): Promise<IApiResponse> {
+export async function rejectFriendAPI(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/reject-friend`, {
 			method: 'POST',

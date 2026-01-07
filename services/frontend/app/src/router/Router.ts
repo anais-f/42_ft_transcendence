@@ -4,8 +4,8 @@ import { setCurrentUser, currentUser } from '../usecases/userStore.js'
 import { IPrivateUser } from '@ft_transcendence/common'
 import { socialStore } from '../usecases/socialStore.js'
 import {
-	createSocialTokenApi,
-	createSocialWebSocketApi
+	createSocialTokenAPI,
+	createSocialWebSocketAPI
 } from '../api/homeWsApi.js'
 import { handleSocialDispatcher } from '../events/home/socialDispatcher.js'
 import { NavigateOptions } from '../types/google-type.js'
@@ -180,9 +180,9 @@ export class Router {
 
 			// 2. --- SOCIAL WEBSOCKET MANAGEMENT ---
 			if (user && !socialStore.socialSocket) {
-				const token = await createSocialTokenApi()
+				const token = await createSocialTokenAPI()
 				if (token) {
-					const ws = createSocialWebSocketApi(token.data.wsToken)
+					const ws = createSocialWebSocketAPI(token.data.wsToken)
 
 					socialStore.socialSocket = ws
 

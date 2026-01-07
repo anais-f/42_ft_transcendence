@@ -1,5 +1,5 @@
 import {
-	requestFriendApi,
+	requestFriendAPI,
 	removeFriendApi
 } from '../../api/friends/handleFriendsApi.js'
 import { updateFriendButton } from './initProfilePageHandler.js'
@@ -9,7 +9,7 @@ import { updateFriendButton } from './initProfilePageHandler.js'
  * @param userId - The user ID to add as friend
  */
 export async function handleAddFriend(userId: number): Promise<void> {
-	const response = await requestFriendApi(userId)
+	const response = await requestFriendAPI(userId)
 	if (response.error) {
 		console.error('Error sending friend request: ', response.error)
 		return

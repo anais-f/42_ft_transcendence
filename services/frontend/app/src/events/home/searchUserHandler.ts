@@ -1,4 +1,4 @@
-import { UserByUsernameAPI } from '../../api/usersApi.js'
+import { userByUsernameAPI } from '../../api/usersApi.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { validateUsername } from '../../usecases/userValidation.js'
 import { ToastActionType } from '../../types/toast.js'
@@ -16,7 +16,7 @@ export async function handleSearchUser(e: Event): Promise<void> {
 		return
 	}
 
-	const user = await UserByUsernameAPI(username.data)
+	const user = await userByUsernameAPI(username.data)
 	if (!user) {
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,

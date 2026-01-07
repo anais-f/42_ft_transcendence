@@ -1,9 +1,9 @@
-import { UserByIdAPI } from '../../../api/usersApi.js'
+import { userByIdAPI } from '../../../api/usersApi.js'
 import { gameStore } from '../../../usecases/gameStore.js'
 
 export async function opponentHandler(data: unknown) {
 	const { id } = data as { id: number }
-	const opponent = await UserByIdAPI(id)
+	const opponent = await userByIdAPI(id)
 	if (opponent.error || !opponent.data) {
 		console.error('Failed to fetch opponent data')
 		return

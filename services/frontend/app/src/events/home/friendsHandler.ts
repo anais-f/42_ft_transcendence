@@ -1,10 +1,10 @@
 import {
-	getFriendsListApi,
-	getPendingRequestsApi
+	getFriendsListAPI,
+	getPendingRequestsAPI
 } from '../../api/friends/getFriendsApi.js'
 import {
-	acceptFriendApi,
-	rejectFriendApi
+	acceptFriendAPI,
+	rejectFriendAPI
 } from '../../api/friends/handleFriendsApi.js'
 import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
 import { FriendListItem } from '../../components/friends/FriendListItem.js'
@@ -16,7 +16,7 @@ export async function fetchAndRenderFriendsList(): Promise<void> {
 	const listFriends = document.getElementById('friend_list')
 	if (!listFriends) return
 
-	const friendsResponse = await getFriendsListApi()
+	const friendsResponse = await getFriendsListAPI()
 	if (friendsResponse.error || !friendsResponse.data) {
 		console.error('Failed to fetch friends list:', friendsResponse.error)
 		return
@@ -48,7 +48,7 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
 	const listRequests = document.getElementById('request_list')
 	if (!listRequests) return
 
-	const requestsResponse = await getPendingRequestsApi()
+	const requestsResponse = await getPendingRequestsAPI()
 	if (requestsResponse.error || !requestsResponse.data) {
 		console.error('Failed to fetch friend requests:', requestsResponse.error)
 		return
@@ -77,7 +77,7 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
  * @param requestId
  */
 export async function acceptFriendRequest(requestId: number): Promise<void> {
-	const response = await acceptFriendApi(requestId)
+	const response = await acceptFriendAPI(requestId)
 	if (response.error) {
 		console.error('Failed to accept friend request:', response.error)
 		return
@@ -91,7 +91,7 @@ export async function acceptFriendRequest(requestId: number): Promise<void> {
  * @param requestId
  */
 export async function declineFriendRequest(requestId: number): Promise<void> {
-	const response = await rejectFriendApi(requestId)
+	const response = await rejectFriendAPI(requestId)
 	if (response.error) {
 		console.error('Failed to decline friend request:', response.error)
 		return

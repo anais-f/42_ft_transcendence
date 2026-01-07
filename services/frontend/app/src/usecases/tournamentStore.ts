@@ -1,5 +1,5 @@
 import { PlayerData } from '../types/game.js'
-import { UserByIdAPI } from '../api/usersApi.js'
+import { userByIdAPI } from '../api/usersApi.js'
 
 class TournamentStore {
 	private _tournamentCode: string | null = null
@@ -53,7 +53,7 @@ class TournamentStore {
 		for (const id of participantIds) {
 			if (this._playersMap.has(id)) continue
 
-			const result = await UserByIdAPI(id)
+			const result = await userByIdAPI(id)
 			if (!result.error && result.data) {
 				this._playersMap.set(id, {
 					id: result.data.user_id,
