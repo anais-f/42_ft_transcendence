@@ -263,7 +263,6 @@ export class GameEngine {
 		return { scored: false, tUsed: safeT * budget }
 	}
 
-	// main collision routine: handles initial collision + sub-ticks if paddle pushes ball.
 	private _processCollisions(): boolean {
 		const MAX_SUB_TICKS = 20
 
@@ -273,13 +272,13 @@ export class GameEngine {
 			return true
 		}
 
-		// move paddles to final position
+		// Move paddles to final position
 		let budgetRemaining = 1.0 - result.tUsed
 		if (this._paddles.length > 0) {
 			this._movePaddles()
 		}
 
-		// if ball is now inside a paddle simulate sub-ticks to push it out
+		// If ball is now inside a paddle simulate sub-ticks to push it out
 		for (let i = 0; i < MAX_SUB_TICKS && budgetRemaining > EPSILON; i++) {
 			if (!this._hasOverlap()) {
 				break
@@ -291,7 +290,7 @@ export class GameEngine {
 				return true
 			}
 
-			// failsafe if ball is stuck
+			// Failsafe if ball is stuck
 			budgetRemaining -= result.tUsed
 			if (result.tUsed < EPSILON) {
 				this._forcePushOut()
@@ -357,7 +356,7 @@ export class GameEngine {
 			this._ball.speed = BALL_SPEED
 		}
 
-		// process collisions paddle movement + sub-ticks if needed
+		// Process collisions paddle movement + sub-ticks if needed
 		if (this._processCollisions()) {
 			this._ball.shape.pos.setXY(0, 0)
 			this._ball.velo = this.getRandomVelo()

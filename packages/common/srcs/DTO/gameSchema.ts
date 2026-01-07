@@ -19,6 +19,7 @@ export const CreateGameSchema = z
 		mapOptions: MapOptionsSchema.optional()
 	})
 	.strict()
+	.meta({ description: 'Create a new game with optional map configuration' })
 
 export type MapOptionsDTO = z.infer<typeof MapOptionsSchema>
 export type CreateGameDTO = z.infer<typeof CreateGameSchema>

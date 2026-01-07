@@ -10,6 +10,7 @@ export const verify2FASchema = z
 			.regex(/^\d{6}$/, '2FA code must be a 6-digit number')
 	})
 	.strict()
+	.meta({ description: 'Verify 2FA code for a user' })
 
 export const setup2FASchema = z
 	.object({
@@ -18,18 +19,21 @@ export const setup2FASchema = z
 		label: z.string()
 	})
 	.strict()
+	.meta({ description: 'Setup 2FA for a user with issuer and label' })
 
 export const disable2FASchema = z
 	.object({
 		user_id: z.number().int().positive()
 	})
 	.strict()
+	.meta({ description: 'Disable 2FA for a user' })
 
 export const status2FASchema = z
 	.object({
 		user_id: z.number().int().positive()
 	})
 	.strict()
+	.meta({ description: 'Check 2FA status for a user' })
 
 export const twofaCodeSchema = z
 	.object({
@@ -40,6 +44,7 @@ export const twofaCodeSchema = z
 			.regex(/^\d{6}$/, '2FA code must be a 6-digit number')
 	})
 	.strict()
+	.meta({ description: '2FA code validation schema' })
 
 export const setup2FAResponseSchema = z
 	.object({
@@ -87,6 +92,7 @@ export const Call2FAResponseSchema = z
 		data: z.any()
 	})
 	.strict()
+	.meta({ description: 'Generic 2FA service response' })
 
 export const Enable2FAResponseSchema = z
 	.object({
@@ -95,12 +101,14 @@ export const Enable2FAResponseSchema = z
 		expires_at: z.string()
 	})
 	.strict()
+	.meta({ description: 'Response when enabling 2FA with QR code data' })
 
 export const Verify2FALoginResponseSchema = z
 	.object({
 		auth_token: z.string()
 	})
 	.strict()
+	.meta({ description: '2FA login verification response with auth token' })
 
 export const internalGoogleUserStatusResponseSchema = z
 	.object({

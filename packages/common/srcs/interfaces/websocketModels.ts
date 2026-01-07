@@ -10,17 +10,17 @@ export enum WSMessageType {
 }
 
 export enum WSCloseCodes {
-	NORMAL = 'Normal Closure', //1000
-	GOING_AWAY = 'Going Away', //1001
-	PROTOCOL_ERROR = 'Protocol Error', //1002
-	UNSUPPORTED_DATA = 'Unsupported Data', //1003
-	NO_STATUS_RECEIVED = 'No Status Received', //1005
-	ABNORMAL_CLOSURE = 'Abnormal Closure', //1006
-	INVALID_FRAME_PAYLOAD_DATA = 'Invalid Frame Payload Data', //1007
-	POLICY_VIOLATION = 'Policy Violation', //1008
-	MESSAGE_TOO_LARGE = 'Message Too Large', //1009
-	MANDATORY_EXTENSION_MISSING = 'Mandatory Extension Missing', //1010
-	SERVER_ERROR = 'Server Error' //1011
+	NORMAL = 'Normal Closure',
+	GOING_AWAY = 'Going Away',
+	PROTOCOL_ERROR = 'Protocol Error',
+	UNSUPPORTED_DATA = 'Unsupported Data',
+	NO_STATUS_RECEIVED = 'No Status Received',
+	ABNORMAL_CLOSURE = 'Abnormal Closure',
+	INVALID_FRAME_PAYLOAD_DATA = 'Invalid Frame Payload Data',
+	POLICY_VIOLATION = 'Policy Violation',
+	MESSAGE_TOO_LARGE = 'Message Too Large',
+	MANDATORY_EXTENSION_MISSING = 'Mandatory Extension Missing',
+	SERVER_ERROR = 'Server Error'
 }
 
 /**
@@ -56,10 +56,6 @@ export interface NotificationPayload {
 	}
 }
 
-/**
- * Payload structure for user status change messages
- * Sent when a user changes their online/offline status
- */
 export interface StatusChangePayload {
 	type: WSMessageType.USER_STATUS_CHANGE
 	data: {

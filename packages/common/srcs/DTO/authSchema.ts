@@ -18,6 +18,7 @@ export const RegisterSchema = z
 		password: PasswordSchema
 	})
 	.strict()
+	.meta({ description: 'User registration with login and password' })
 
 export const LoginActionSchema = z
 	.object({
@@ -25,28 +26,34 @@ export const LoginActionSchema = z
 		password: PasswordSchema
 	})
 	.strict()
+	.meta({ description: 'User login with credentials' })
 
 export const RegisterGoogleSchema = z
 	.object({
 		google_id: z.string().min(1, 'Google ID is required')
 	})
 	.strict()
+	.meta({ description: 'Google user registration with Google ID' })
 
-export const LogoutParamsSchema = z.object({
-	userId: z.coerce.number().int().positive().min(1)
-})
+export const LogoutParamsSchema = z
+	.object({
+		userId: z.coerce.number().int().positive().min(1)
+	})
+	.meta({ description: 'User ID parameter for logout' })
 
 export const PasswordBodySchema = z
 	.object({
 		password: PasswordSchema
 	})
 	.strict()
+	.meta({ description: 'Password in request body' })
 
 export const LoginGoogleSchema = z
 	.object({
 		credential: z.string().min(1, 'Google credential is required')
 	})
 	.strict()
+	.meta({ description: 'Google login with JWT credential' })
 
 export const ChangeMyPasswordSchema = z
 	.object({
@@ -59,20 +66,34 @@ export const ChangeMyPasswordSchema = z
 			.optional()
 	})
 	.strict()
+	.meta({
+		description: 'Change password with old password and optional 2FA code'
+	})
 
-export const RegisterResponseSchema = z.object({
-	message: z.string(),
-	token: z.string()
-})
+export const RegisterResponseSchema = z
+	.object({
+		message: z.string(),
+		token: z.string()
+	})
+	.meta({
+		description: 'Registration response with success message and auth token'
+	})
 
-export const LoginResponseSchema = z.object({
-	pre_2fa_required: z.boolean(),
-	token: z.string().optional()
-})
+export const LoginResponseSchema = z
+	.object({
+		pre_2fa_required: z.boolean(),
+		token: z.string().optional()
+	})
+	.meta({
+		description:
+			'Login response indicating if 2FA is required and optional auth token'
+	})
 
-export const ConfigResponseSchema = z.object({
-	googleClientId: z.string().nullable()
-})
+export const ConfigResponseSchema = z
+	.object({
+		googleClientId: z.string().nullable()
+	})
+	.meta({ description: 'Authentication configuration with Google client ID' })
 
 export type PasswordBodyDTO = z.infer<typeof PasswordBodySchema>
 export type RegisterDTO = z.infer<typeof RegisterSchema>

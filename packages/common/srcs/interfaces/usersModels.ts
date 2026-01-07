@@ -1,8 +1,3 @@
-/**
- * Interface representing a user row in the database
- * Contains sensitive information like password
- * Used internally in the auth service
- */
 export interface IUserAuth {
 	user_id: number
 	login: string
@@ -16,11 +11,6 @@ export type IPublicUserAuth = Omit<
 	'is_admin' | 'password' | 'google_id'
 >
 
-/**
- * Comprehensive user model for application use
- * Every information from users table
- * Used across various services
- */
 export interface IPrivateUser {
 	user_id: number
 	username: string
@@ -31,10 +21,6 @@ export interface IPrivateUser {
 	is_google_user?: boolean
 }
 
-/**
- * Types for specific user fields
- * Used in function parameters and return types
- */
 export type IUserId = Pick<IPrivateUser, 'user_id'>
 export type IUsername = Pick<IPrivateUser, 'username'>
 export type IUsernameId = Pick<IPrivateUser, 'user_id' | 'username'>
