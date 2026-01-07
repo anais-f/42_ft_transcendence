@@ -1,6 +1,6 @@
 import { IApiResponse } from '../types/api.js'
 
-export async function createSocialTokenApi(): Promise<IApiResponse> {
+export async function createSocialTokenAPI(): Promise<IApiResponse> {
 	try {
 		const response = await fetch('/social/api/social/create-token', {
 			method: 'POST',
@@ -21,7 +21,7 @@ export async function createSocialTokenApi(): Promise<IApiResponse> {
 	}
 }
 
-export function createSocialWebSocketApi(token: string): WebSocket {
+export function createSocialWebSocketAPI(token: string): WebSocket {
 	const wsUrl = `wss://${window.location.host}/social/api/social/ws?token=${token}`
 	return new WebSocket(wsUrl)
 }

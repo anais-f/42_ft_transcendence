@@ -15,11 +15,8 @@ declare global {
 
 		google: {
 			accounts: {
-				// fonctionnality related to Google Accounts
 				id: {
-					// functionality related to One Tap and Sign In With Google
 					initialize: (config: {
-						// initialization of the Google Sign-In client
 						client_id: string
 						callback: (response: CredentialResponse) => void
 						auto_select?: boolean
@@ -37,7 +34,7 @@ declare global {
 							width?: string
 						}
 					) => void
-					prompt: (momentNotification?: (notification: any) => void) => void // display the One Tap prompt for popup
+					prompt: (momentNotification?: (notification: any) => void) => void
 				}
 			}
 		}

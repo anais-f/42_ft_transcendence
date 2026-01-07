@@ -11,11 +11,6 @@ import { ToastActionType } from '../types/toast.js'
 import { jwtDecode } from 'jwt-decode'
 import { IJwtPayload } from '@ft_transcendence/common'
 
-/**
- * Handler for the registration form
- * @param form
- * @return void
- */
 export async function handleRegister(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const username = formData.get('register_login')
@@ -85,19 +80,12 @@ export async function handleRegister(form: HTMLFormElement) {
 			if (payload.login) {
 				sessionStorage.setItem('register_login', payload.login)
 			}
-		} catch (error) {
-			console.error('Failed to decode JWT:', error)
-		}
+		} catch (error) {}
 	}
 
 	await handleAuthSuccess('Account created successfully!')
 }
 
-/**
- * Handler for the login form
- * @param form
- * @return void
- */
 export async function handleLogin(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const username = formData.get('login_login')
@@ -164,11 +152,6 @@ export async function handleLogin(form: HTMLFormElement) {
 	await handleAuthSuccess('Login successful!')
 }
 
-/**
- * Handler for the 2FA form
- * @param form
- * @return void
- */
 export async function handle2FASubmit(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const code = formData.get('2fa_code')

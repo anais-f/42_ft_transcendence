@@ -15,7 +15,6 @@ interface EogData {
 
 export function eogHandler(data: unknown) {
 	const eogData = data as EogData
-	console.log('Game ended:', eogData)
 
 	gameStore.gameEnded = true
 

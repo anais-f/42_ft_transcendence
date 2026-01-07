@@ -46,7 +46,6 @@ function handleJsonMessage(data: string) {
 	if (handler) {
 		handler(msg.data)
 	} else {
-		console.warn('Unknown message type:', msg.type)
 	}
 }
 
@@ -68,10 +67,6 @@ function handleBinaryMessage(data: ArrayBuffer) {
 	} else if (packet instanceof S08Countdown) {
 		countdownHandler(packet)
 	}
-}
-
-export function setupNetworkDispatcher(ws: WebSocket): void {
-	ws.addEventListener('message', dispatcher)
 }
 
 export function cleanupNetworkDispatcher(ws: WebSocket): void {

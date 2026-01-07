@@ -1,11 +1,9 @@
 /**
  * StatBox Component
  * Renders a statistic box with a label and value.
- * @param props - The properties of the StatBox.
  * @param props.label - The label of the statistic.
  * @param props.value - The value of the statistic.
  * @param props.color - The color class for the value text.
- * @returns The HTML string representing the StatBox.
  */
 interface StatProps {
 	label: string
@@ -13,11 +11,6 @@ interface StatProps {
 	color: string
 }
 
-/**
- * StatBox component
- * @param props
- * @constructor
- */
 export const StatBox = (props: StatProps): string => {
 	const { label, value, color } = props
 

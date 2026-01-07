@@ -12,11 +12,6 @@ import {
 } from '../../usecases/userValidation.js'
 import { ToastActionType } from '../../types/toast.js'
 
-/**
- * Handler for changing username
- * @param form
- * @return void
- */
 export async function handleUsername(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const newUsername = formData.get('change_username') as string
@@ -69,11 +64,6 @@ export async function handleUsername(form: HTMLFormElement) {
 	form.reset()
 }
 
-/**
- * Handler for changing avatar
- * @param form
- * @return void
- */
 export async function handlerAvatar(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const avatarFile = formData.get('change_avatar') as File
@@ -117,11 +107,6 @@ export async function handlerAvatar(form: HTMLFormElement) {
 	form.reset()
 }
 
-/**
- * Handler for changing password
- * @param form
- * @return void
- */
 export async function handleChangePassword(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const oldPassword = formData.get('old_password') as string

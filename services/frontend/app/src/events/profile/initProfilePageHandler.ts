@@ -1,14 +1,10 @@
-import { UserByIdAPI } from '../../api/usersApi.js'
+import { userByIdAPI } from '../../api/usersApi.js'
 import { IPublicProfileUser } from '@ft_transcendence/common'
-import { checkIsFriendApi } from '../../api/friends/getFriendsApi.js'
+import { checkIsFriendAPI } from '../../api/friends/getFriendsApi.js'
 import { Button } from '../../components/Button.js'
 import { currentUser } from '../../usecases/userStore.js'
 import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
 
-/**
- * Render the user profile data into the DOM
- * @param user
- */
 function renderProfile(user: IPublicProfileUser) {
 	const avatarImg = document.getElementById(
 		'profile-avatar'
@@ -34,17 +30,17 @@ function renderProfile(user: IPublicProfileUser) {
 		'profile-last-seen'
 	) as HTMLInputElement
 	if (lastSeenElem)
-		lastSeenElem.textContent = new Date(user.last_connection).toLocaleString()
+		lastSeenElem.textContent = new Date(user.last_connection).toLocaleString(
+			'en-US',
+			{
+				timeZone: 'Europe/Paris'
+			}
+		)
 }
 
-/**
- * Initialize the profile page by fetching user data and rendering it
- * @param userId - The user ID to fetch profile for
- */
 export async function initAndRenderUserProfile(userId: number) {
-	const responseUser = await UserByIdAPI(userId)
+	const responseUser = await userByIdAPI(userId)
 	if (responseUser.error || !responseUser.data) {
-		console.error('User not found: ', responseUser.error)
 		const username = document.getElementById('profile-username')
 		if (username) username.textContent = 'Error loading profile'
 		return
@@ -56,9 +52,8 @@ export async function initAndRenderUserProfile(userId: number) {
 		return
 	}
 
-	const statusResponse = await checkIsFriendApi(userId)
+	const statusResponse = await checkIsFriendAPI(userId)
 	if (statusResponse.error) {
-		console.error('Error checking friendship status: ', statusResponse.error)
 		return
 	}
 
@@ -69,10 +64,6 @@ export async function initAndRenderUserProfile(userId: number) {
 	renderProfile(responseUser.data)
 }
 
-/**
- * Update the friend button based on friendship status
- * @param status - The friendship status: 'none', 'pending', 'friend', or 'no_button'
- */
 export function updateFriendButton(
 	status: 'none' | 'pending' | 'friend' | 'no_button'
 ) {

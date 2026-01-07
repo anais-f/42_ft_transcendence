@@ -1,4 +1,3 @@
-import { escapeHtml } from '../../usecases/sanitize.js'
 import { LivesComp, updateLives } from '../game/Lives.js'
 
 interface TournamentCellProps {
@@ -11,11 +10,10 @@ interface TournamentCellProps {
 
 export const TournamentCell = (props: TournamentCellProps): string => {
 	const { id, name, score, maxScore = 5, additionalClasses = '' } = props
-	const safeName = escapeHtml(name)
 
 	return /*html*/ `
 	<div class="px-2 w-full flex justify-between items-center border-black ${additionalClasses}">
-		<span id="${id}" class="truncate">${safeName}</span>
+		<span id="${id}" class="truncate">${name}</span>
 		${score !== undefined ? LivesComp({ livesID: `${id}-score`, current: score, max: maxScore, size: 3 }) : ''}
 	</div>
   `
