@@ -5,12 +5,6 @@ import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
 
 export class UsersApi {
-	/**
-	 * @description Check if a user exists by fetching their public profile
-	 * @param user - User ID to check
-	 * @returns true if user exists, false otherwise
-	 * @throws HttpError if the request fails (non-404 errors)
-	 */
 	static async userExists(user: IUserId): Promise<boolean> {
 		const base = env.USERS_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET
@@ -32,7 +26,6 @@ export class UsersApi {
 			)
 		}
 
-		//To check
 		if (response.status === 404) return false
 		if (!response.ok) {
 			let bodyText = ''
@@ -49,12 +42,6 @@ export class UsersApi {
 		return true
 	}
 
-	/**
-	 * @description Get user data by ID
-	 * @param user - User ID
-	 * @returns User data with username, avatar, status, last_connection
-	 * @throws HttpError if the request fails or data is invalid
-	 */
 	static async getUserData(user: IUserId): Promise<IPublicProfileUser> {
 		const base = env.USERS_SERVICE_URL
 		const secret = env.INTERNAL_API_SECRET

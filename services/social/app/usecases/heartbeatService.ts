@@ -5,10 +5,6 @@ const HEARTBEAT_INTERVAL_MS = 30000
 const PONG_TIMEOUT_MS = 60000
 let heartbeatInterval: NodeJS.Timeout | null = null
 
-/**
- * Handle pong response from client
- * @param userId - User ID
- */
 export function handlePong(userId: number): void {
 	const conn = wsConnections.get(userId)
 	if (conn) {
@@ -17,8 +13,15 @@ export function handlePong(userId: number): void {
 }
 
 /**
- * Start heartbeat interval (ping every 30s)
- * If a client does not respond with pong within timeout, connection is terminated
+ * Starts WebSocket heartbeat monitoring to detect stale connections.
+ *
+ * Process:
+ * - Sends ping every 30 seconds to all active connections
+ * - Terminates connections that haven't responded with pong in 60 seconds
+ * - Idempotent: safe to call multiple times (returns early if already running)
+ *
+ * IMPORTANT: Dead connections (network issues, closed browser) may not trigger
+ * 'close' event immediately. Heartbeat ensures they're cleaned up via timeout.
  */
 export function startHeartbeat(): void {
 	if (heartbeatInterval) return
@@ -32,23 +35,16 @@ export function startHeartbeat(): void {
 					conn.ws.ping()
 					const timeSinceLastPong = now - conn.lastHeartbeat.getTime()
 					if (timeSinceLastPong > PONG_TIMEOUT_MS) {
-						console.warn(
-							`User ${userId} not responding to heartbeat (${timeSinceLastPong}ms), terminating connection`
-						)
 						conn.ws.terminate()
 					}
 				}
 			} catch (e) {
 				const message = e instanceof Error ? e.message : String(e)
-				console.warn(`Heartbeat failed for user ${userId}:`, message)
 			}
 		}
 	}, HEARTBEAT_INTERVAL_MS) as NodeJS.Timeout
 }
 
-/**
- * Stop heartbeat interval
- */
 export function stopHeartbeat(): void {
 	if (heartbeatInterval) {
 		clearInterval(heartbeatInterval)
