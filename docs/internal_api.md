@@ -15,7 +15,3 @@ This document list all inter-services calls.
 | **Users**    | **Auth**   | API Key        | `GET /api/internal/users`              | Get all users for update DB                               |
 | **Users**    | **Auth**   | API Key        | `GET /api/internal/2fa/status/:id`     | Get 2FA status for user profile                           |
 | **Users**    | **Auth**   | API Key        | `GET /api/internal/2fa/status/:id`     | Get isGoogle info for user profile                        |
-
-```
-
-```

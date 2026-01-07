@@ -89,6 +89,19 @@ graph TB
 - **Volumes**: SQLite (db_game_data volume)
 - **Dependencies**: Frontend
 
+## Database
+
+Using SQLite with Better-sqlite3 for efficient, file-based data storage.
+SQLite is a file, so it has to lock it when writing to prevent data corruption.
+Better-sqlite3 is synchronous, so each operation blocks the event loop until it completes.
+There are some risks of using SQLite in a concurrent environment, especially with multiple instances of the service. It's not only for performance but also for data integrity and preventing database locks and crash.
+The pragmas set here help manage how SQLite handles concurrency and performance:
+
+- **WAL** : Write-Ahead Logging, writen to improve concurrency and performance in SQLite databases. Reading doesn't block writing and vice versa, allowing multiple operations to occur simultaneously.
+- **NORMAL** : Balances performance and data integrity. It reduces the number of sync operations to disk, improving speed while still providing a reasonable level of data safety.
+- **CACHE_SIZE** = -64000 : Sets the cache size to 64MB. A negative value indicates the size is in kilobytes. A larger cache can improve performance by reducing disk I/O operations.
+- **BUSY_TIMEOUT** = 5000 : Sets the busy timeout to 5000 milliseconds (5 seconds). This means that if the database is locked (e.g., by another connection), SQLite will wait up to 5 seconds for the lock to be released before returning a "database is busy" error.
+
 ## Authentication Flow
 
 ```mermaid
@@ -216,34 +229,15 @@ For the complete list of internal calls (endpoints, authentication, purpose), se
 - Admin validation is handled by Auth service for acces to monitoring
 - `/stub_status` endpoint (NGINX metrics) is restricted to internal networks only
 
-**4. Data Persistence**
-
-- Each service has its own isolated SQLite database (database per service pattern)
-- Databases stored in Docker volumes for persistence
-- Avatars shared between Users (RW) and NGINX (RO)
-
-**5. Real-time Communication**
+**4. Real-time Communication**
 
 - **Social Service WebSocket**: Friend request notifications, presence updates (online/offline status)
 - **Game Service WebSocket**: Real-time game state synchronization, player movements, score updates
 
 ## Networks
 
-- **backend**: Main network for inter-service communication and monitoring
+- **backend**: Main network for inter-service communication
 - **monitoring**: Dedicated network for monitoring stack (Prometheus, Grafana, AlertManager)
-
-## Persistent Volumes
-
-| Volume            | Usage                                   | Services               | Access |
-| ----------------- | --------------------------------------- | ---------------------- | ------ |
-| `db_auth_data`    | Authentication data (SQLite)            | Auth                   | RW     |
-| `db_users_data`   | User profiles (SQLite)                  | Users                  | RW     |
-| `db_social_data`  | Friend relationships, presence (SQLite) | Social                 | RW     |
-| `db_2fa_data`     | 2FA secrets (SQLite)                    | 2FA                    | RW     |
-| `db_game_data`    | Game history (SQLite)                   | Game                   | RW     |
-| `avatars_data`    | Avatar images                           | Users (RW), NGINX (RO) | Mixed  |
-| `prometheus_data` | Metrics time-series database            | Prometheus             | RW     |
-| `grafana_data`    | Dashboards and configuration            | Grafana                | RW     |
 
 ## Startup Order
 
@@ -256,8 +250,8 @@ For the complete list of internal calls (endpoints, authentication, purpose), se
 7. **Prometheus** (depends on Auth + Users for scraping)
 8. **AlertManager** (depends on Prometheus)
 9. **Grafana** (depends on Prometheus)
-10. **NGINX Exporter** (depends on NGINX)
-11. **NGINX** (depends on all services)
+10. **NGINX** (depends on all services)
+11. **NGINX Exporter** (depends on NGINX)
 
 ## Getting Started
 
@@ -268,18 +262,6 @@ or setup, commands and development instructions, see: **[docs/getting_started.md
 This project includes a complete monitoring stack with Prometheus, Grafana and AlertManager integrated into the main build.
 
 See **[docs/monitoring.md](./monitoring.md)** for the complete monitoring architecture documentation.
-
-**Monitoring is now included by default** when you run:
-
-```bash
-# Start application with monitoring
-make up
-
-# Access monitoring interfaces (admin authentication required)
-# - Grafana: https://localhost:8080/grafana/
-# - Prometheus: https://localhost:8080/prometheus/
-# - AlertManager: https://localhost:8080/alertmanager/
-```
 
 ## Architecture Principles
 
@@ -294,7 +276,3 @@ This architecture follows microservices best practices:
 - Environment-based configuration
 - Automated testing pipeline
 - Integrated monitoring stack
-
-```
-
-```

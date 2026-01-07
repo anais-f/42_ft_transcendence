@@ -105,7 +105,3 @@ make format
 # Run tests
 make test
 ```
-
-```
-
-```
