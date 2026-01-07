@@ -15,7 +15,7 @@ make verif-env
 ### Build the application
 
 ```bash
-# Build all services (includes monitoring stack)
+# Build all services
 make build
 ```
 
