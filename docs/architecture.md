@@ -78,14 +78,14 @@ graph TB
 ### Social Service
 
 - **Internal port**: 3000
-- **Role**: Friend relationships, presence tracking, real-time notifications via WebSocket
+- **Role**: Friend relationships, presence tracking, real-time notifications
 - **Volumes**: SQLite (db_social_data volume)
 - **Dependencies**: Frontend, Auth, Users
 
 ### Game Service
 
 - **Internal port**: 3000
-- **Role**: Pong game logic, matchmaking, real-time gameplay via WebSocket
+- **Role**: Pong game logic, matchmaking, real-time gameplay
 - **Volumes**: SQLite (db_game_data volume)
 - **Dependencies**: Frontend
 
