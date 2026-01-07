@@ -14,12 +14,6 @@ export interface CreatedWsToken {
 	expiresIn: number
 }
 
-/**
- * Create a WebSocket authentication token
- * @param fastify - Fastify instance (provides jwt plugin)
- * @param user - User payload
- * @returns Token and expiration in seconds
- */
 export function createWsToken(
 	fastify: FastifyInstance,
 	user: WsTokenPayload
