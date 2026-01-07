@@ -23,7 +23,9 @@ export class UsersRepository {
 	}
 
 	static existsByUsername(username: IUsername): boolean {
-		const selectStmt = db.prepare('SELECT 1 FROM users WHERE username = ? ')
+		const selectStmt = db.prepare(
+			'SELECT 1 FROM users WHERE LOWER(username) = LOWER(?)'
+		)
 		const row = selectStmt.get(username.username)
 		return !!row
 	}
@@ -164,7 +166,7 @@ export class UsersRepository {
 		username: IUsername
 	): UserSearchResultDTO | null {
 		const selectStmt = db.prepare(
-			'SELECT user_id, username, avatar FROM users WHERE username = ?'
+			'SELECT user_id, username, avatar FROM users WHERE LOWER(username) = LOWER(?)'
 		)
 		const row = selectStmt.get(username.username) as
 			| UserSearchResultDTO
