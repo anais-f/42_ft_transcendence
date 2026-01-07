@@ -175,11 +175,9 @@ class Renderer {
 			const t = Math.min(elapsed / OVERLAY_ANIMATION_MS, 1)
 			const easeOut = 1 - Math.pow(1 - t, 3)
 
-			// fade in background
 			ctx.fillStyle = `rgba(0, 0, 0, ${0.4 * easeOut})`
 			ctx.fillRect(0, 0, width, height)
 
-			// scale in text
 			const text = this.gameResult === 'win' ? 'VICTORY' : 'DEFEAT'
 			const color =
 				this.gameResult === 'win' ? OVERLAY_WIN_COLOR : OVERLAY_LOSE_COLOR

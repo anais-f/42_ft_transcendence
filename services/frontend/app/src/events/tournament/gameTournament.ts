@@ -8,9 +8,7 @@ export async function handleJoinGameTournament(
 	const { data, error, status } = await joinGameAPI(code)
 
 	if (error) {
-		// 409 means the user is already in the game from another tab
 		if (status === 409) {
-			console.log('Already in game from another tab:', code)
 			gameStore.clear()
 			return { success: false, alreadyInGame: true }
 		}

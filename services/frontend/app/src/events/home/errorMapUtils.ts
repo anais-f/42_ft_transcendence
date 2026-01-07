@@ -18,7 +18,6 @@ export function sendGameError(error: string, status: number) {
 			message: 'Invalid code!'
 		})
 	} else {
-		console.log(error)
 		const errorMessage = remapError[error] || error
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,

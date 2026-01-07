@@ -6,7 +6,7 @@ import {
 import { PlayerComp } from '../components/game/Player.js'
 import { handleResizeCanvas } from '../events/game/resizeCanvasHandler.js'
 
-const DEFAULT_AVATAR = '/assets/images/rhino.png'
+const DEFAULT_AVATAR = '/assets/images/loading.png'
 
 export const GamePage = (): string => {
 	const isP1 = gameStore.playerSlot === 'p1'

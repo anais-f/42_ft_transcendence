@@ -70,7 +70,6 @@ export const LoginPage = (): string => {
 			variant: 'short'
 		})}
 	<h1 class="title_bloc mt-4">RESUME READING</h1>
-	<!-- Login Form -->
 	<form id="login_form" data-form="login" class="form_style">
 	${Input({
 		id: 'login_login',
@@ -93,7 +92,6 @@ export const LoginPage = (): string => {
 		additionalClasses: 'form_button'
 	})}
 	</form>
-	<!-- 2FA Form -->
 	<form id="2fa_form" data-form="2fa" class="form_style hidden">
 		${Input({
 			id: '2fa_code',
@@ -103,7 +101,6 @@ export const LoginPage = (): string => {
 			required: true,
 			maxLength: 6,
 			pattern: '[0-9]{6}',
-			autoComplete: 'one-time-code',
 			inputmode: 'numeric',
 			additionalClasses: 'tracking-widest text-center letter-spacing-widest'
 		})}
@@ -136,7 +133,6 @@ export const LoginPage = (): string => {
 			required: true,
 			maxLength: 6,
 			pattern: '[0-9]{6}',
-			autoComplete: 'one-time-code',
 			inputmode: 'numeric',
 			additionalClasses: 'tracking-widest text-center letter-spacing-widest'
 		})}
@@ -173,15 +169,6 @@ export async function attachLoginEvents() {
 		if (formName === 'register') await handleRegister(form as HTMLFormElement)
 		if (formName === 'login') await handleLogin(form as HTMLFormElement)
 		if (formName === '2fa') await handle2FASubmit(form as HTMLFormElement)
-	}
-
-	clickHandler ??= (e: Event) => {
-		const target = e.target as HTMLElement
-		const actionButton = target.closest('[data-action]')
-		if (actionButton) {
-			const action = actionButton.getAttribute('data-action')
-			// Handle actions if needed
-		}
 	}
 
 	content.addEventListener('submit', submitHandler)

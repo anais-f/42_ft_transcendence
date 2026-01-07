@@ -7,12 +7,6 @@ interface StatusCircleProps {
 	additionalClasses?: string
 }
 
-/**
- * Renders a status indicator with an optional animation
- * when the user is online.
- * @param props
- * @constructor
- */
 export const StatusCircle = (props: StatusCircleProps): string => {
 	const { isOnline, id, additionalClasses } = props
 

@@ -1,10 +1,5 @@
 import { IApiResponse } from '../types/api.js'
 
-/**
- * Update username for current user
- * @param username - New username
- * @returns Promise with result containing data, error and status
- */
 export async function updateUsernameAPI(
 	username: string
 ): Promise<IApiResponse> {
@@ -35,11 +30,6 @@ export async function updateUsernameAPI(
 	}
 }
 
-/**
- * Upload avatar for current user
- * @param avatarFile - Avatar file to upload
- * @returns Promise with result containing data, error and status
- */
 export async function updateAvatarAPI(avatarFile: File): Promise<IApiResponse> {
 	try {
 		const formData = new FormData()
@@ -68,13 +58,6 @@ export async function updateAvatarAPI(avatarFile: File): Promise<IApiResponse> {
 	}
 }
 
-/**
- * Change password for current user
- * @param oldPassword - Current password
- * @param newPassword - New password
- * @param twofaCode - Optional 2FA code if enabled
- * @returns Promise with result containing data, error and status
- */
 export async function changePasswordAPI(
 	oldPassword: string,
 	newPassword: string,

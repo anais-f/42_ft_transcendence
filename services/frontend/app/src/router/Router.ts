@@ -21,10 +21,6 @@ export function cancelPendingNavigation(): void {
 	}
 }
 
-/**
- * Router class to manage client-side routing,
- * including authentication checks and page rendering.
- */
 export class Router {
 	private isNavigating = false
 	private currentRoute: Route | null = null
@@ -36,21 +32,14 @@ export class Router {
 		this.initEventListeners()
 	}
 
-	/**
-	 * Get the route object for a given URL
-	 * @param url
-	 * @private
-	 */
 	private getRoute(url: string): Route {
 		routeParams = {}
 
-		// exact match first
 		const exactMatch = Object.values(routerMap).find(
 			(route) => route.url === url
 		)
 		if (exactMatch) return exactMatch
 
-		// dynamic match
 		for (const route of Object.values(routerMap)) {
 			const match = this.matchDynamicRoute(route.url, url)
 			if (match) {
@@ -62,12 +51,6 @@ export class Router {
 		return this.HOME_ROUTE
 	}
 
-	/**
-	 * Match dynamic route patterns like /user/:id
-	 * @param pattern
-	 * @param url
-	 * @private
-	 */
 	private matchDynamicRoute(
 		pattern: string,
 		url: string
@@ -84,10 +67,8 @@ export class Router {
 			const urlPart = urlParts[i]
 
 			if (patternPart.startsWith(':')) {
-				// dynamic segment
 				params[patternPart.slice(1)] = urlPart
 			} else if (patternPart !== urlPart) {
-				// static segment doesn't match
 				return null
 			}
 		}
@@ -95,11 +76,6 @@ export class Router {
 		return params
 	}
 
-	/**
-	 * Update the page number in the header
-	 * @param route
-	 * @private
-	 */
 	private updatePageNumber(route: Route): void {
 		const pageNumberElement = document.getElementById('page-number')
 		if (pageNumberElement) {
@@ -107,41 +83,28 @@ export class Router {
 		}
 	}
 
-	/**
-	 * Render the page for a given route
-	 * and manage binds/unbinds
-	 * @param route
-	 * @private
-	 */
 	private renderPage(route: Route): void {
 		const contentDiv = document.getElementById(this.rootElementId)
 		if (!contentDiv) return
 
-		// cleanup old page (unbind)
 		if (this.currentRoute?.unbinds) {
 			this.currentRoute.unbinds.forEach((unbind) => {
 				try {
 					unbind()
-				} catch (e: unknown) {
-					console.warn('Error during unbind:', e)
-				}
+				} catch (e) {}
 			})
 		}
 
-		// render new page
 		contentDiv.innerHTML = route.page()
 		this.currentRoute = route
 		this.updatePageNumber(route)
 
-		// setup new page (bind)
 		if (route.binds) {
 			setTimeout(() => {
 				route.binds?.forEach((bind) => {
 					try {
 						bind()
-					} catch (e: unknown) {
-						console.warn('Error during bind:', e)
-					}
+					} catch (e) {}
 				})
 				console.log('Rendered:', route.id)
 			}, 0)
@@ -150,15 +113,8 @@ export class Router {
 		}
 	}
 
-	/**
-	 * Handle navigation logic
-	 * manages authentication checks, WebSocket setup, and page rendering
-	 * @param skipAuth
-	 * @private
-	 */
 	private async handleNav(skipAuth: boolean = false): Promise<void> {
 		if (this.isNavigating) {
-			console.log('Navigation already in progress, skipping')
 			return
 		}
 
@@ -169,7 +125,6 @@ export class Router {
 		try {
 			let user: IPrivateUser | null = currentUser
 
-			// 1. --- AUTHENTICATION CHECK API ---
 			if (!skipAuth) {
 				const authCheckResult = await checkAuth()
 				setCurrentUser(authCheckResult)
@@ -188,47 +143,34 @@ export class Router {
 
 					ws.onopen = () => {}
 					ws.onmessage = handleSocialDispatcher
-					ws.onerror = (error) => {
-						console.error('Social WS error:', error)
-					}
+					ws.onerror = () => {}
 					ws.onclose = () => {
 						socialStore.socialSocket = null
 					}
 				}
 			}
 
-			// --- REDIRECTION GUARDS ---
-
-			// GUARD 1: Authenticated on /login
-			// skipAuth=true because we just checked and user is authenticated
 			if (url === '/login' && user !== null) {
 				this.isNavigating = false
 				await this.navigate('/', { skipAuth: true })
 				return
 			}
 
-			// GUARD 2: Non-authenticated on protected route
-			// skipAuth=true because we just checked and user is not authenticated
 			if (!route.public && !user) {
 				this.isNavigating = false
 				await this.navigate('/login', { skipAuth: true })
 				return
 			}
 
-			// 3. RENDER PAGE
 			this.renderPage(route)
-		} catch (e: unknown) {
-			console.error('Error during navigation:', e)
+		} catch (e) {
 			if (!route.public) {
-				this.isNavigating = false // to new navigation
+				this.isNavigating = false
 				await this.navigate('/login', { skipAuth: true })
 				return
 			}
 		} finally {
-			// if rendering happened WITHOUT redirection, reset state
-			if (this.isNavigating === true) {
-				this.isNavigating = false
-			}
+			this.isNavigating = false
 		}
 	}
 
@@ -251,15 +193,12 @@ export class Router {
 		await this.handleNav(skipAuth)
 	}
 
-	// Setup event listeners for popstate (back/forward navigation)
 	private initEventListeners(): void {
 		window.addEventListener('popstate', async () => {
-			console.log('Browser back/forward')
 			await this.handleNav()
 		})
 	}
 
-	// Start the router
 	public async start(): Promise<void> {
 		window.navigate = (url: string, options?: NavigateOptions) =>
 			this.navigate(url, options ?? {})

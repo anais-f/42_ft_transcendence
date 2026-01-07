@@ -4,17 +4,12 @@ import { StatBox } from '../../components/game/StatBox.js'
 import { GameHistoryRow } from '../../components/game/HistoryRow.js'
 import { userByIdAPI } from '../../api/usersApi.js'
 
-/**
- * Fetch user stats and render them into the stats container
- * @param userId
- */
 export async function fetchAndRenderStats(userId: number): Promise<void> {
 	const statsContainer = document.getElementById('stats-boxes')
 	if (!statsContainer) return
 
 	const statsResponse = await getStatsAPI(userId)
 	if (statsResponse.error || !statsResponse.data) {
-		console.error('Failed to fetch user stats:', statsResponse.error)
 		return
 	}
 
@@ -28,10 +23,6 @@ export async function fetchAndRenderStats(userId: number): Promise<void> {
 	`
 }
 
-/**
- * Fetch user match history and render it into the history container
- * @param userId
- */
 export async function fetchAndRenderMatchHistory(
 	userId: number
 ): Promise<void> {
@@ -57,7 +48,9 @@ export async function fetchAndRenderMatchHistory(
 
 		rows.push(
 			GameHistoryRow({
-				date: new Date(match.played_at).toLocaleDateString(),
+				date: new Date(match.played_at).toLocaleDateString('en-US', {
+					timeZone: 'Europe/Paris'
+				}),
 				result: match.winner_id === userId ? 'Win' : 'Loss',
 				player1: player1Name,
 				player1Id: match.player1_id,

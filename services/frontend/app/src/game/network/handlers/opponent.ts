@@ -5,7 +5,6 @@ export async function opponentHandler(data: unknown) {
 	const { id } = data as { id: number }
 	const opponent = await userByIdAPI(id)
 	if (opponent.error || !opponent.data) {
-		console.error('Failed to fetch opponent data')
 		return
 	}
 

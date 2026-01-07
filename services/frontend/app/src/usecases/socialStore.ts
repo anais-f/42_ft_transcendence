@@ -1,8 +1,3 @@
-/**
- * SocialStore class to manage social WebSocket and session token.
- * Provides getters and setters for sessionToken and socialSocket.
- * Includes a clear method to reset the store.
- */
 class SocialStore {
 	private _socialSocket: WebSocket | null = null
 

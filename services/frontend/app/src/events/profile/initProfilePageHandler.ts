@@ -5,10 +5,6 @@ import { Button } from '../../components/Button.js'
 import { currentUser } from '../../usecases/userStore.js'
 import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
 
-/**
- * Render the user profile data into the DOM
- * @param user
- */
 function renderProfile(user: IPublicProfileUser) {
 	const avatarImg = document.getElementById(
 		'profile-avatar'
@@ -34,17 +30,17 @@ function renderProfile(user: IPublicProfileUser) {
 		'profile-last-seen'
 	) as HTMLInputElement
 	if (lastSeenElem)
-		lastSeenElem.textContent = new Date(user.last_connection).toLocaleString()
+		lastSeenElem.textContent = new Date(user.last_connection).toLocaleString(
+			'en-US',
+			{
+				timeZone: 'Europe/Paris'
+			}
+		)
 }
 
-/**
- * Initialize the profile page by fetching user data and rendering it
- * @param userId - The user ID to fetch profile for
- */
 export async function initAndRenderUserProfile(userId: number) {
 	const responseUser = await userByIdAPI(userId)
 	if (responseUser.error || !responseUser.data) {
-		console.error('User not found: ', responseUser.error)
 		const username = document.getElementById('profile-username')
 		if (username) username.textContent = 'Error loading profile'
 		return
@@ -58,7 +54,6 @@ export async function initAndRenderUserProfile(userId: number) {
 
 	const statusResponse = await checkIsFriendAPI(userId)
 	if (statusResponse.error) {
-		console.error('Error checking friendship status: ', statusResponse.error)
 		return
 	}
 
@@ -69,10 +64,6 @@ export async function initAndRenderUserProfile(userId: number) {
 	renderProfile(responseUser.data)
 }
 
-/**
- * Update the friend button based on friendship status
- * @param status - The friendship status: 'none', 'pending', 'friend', or 'no_button'
- */
 export function updateFriendButton(
 	status: 'none' | 'pending' | 'friend' | 'no_button'
 ) {

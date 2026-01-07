@@ -29,10 +29,6 @@ export function stop(): void {
 	state = 'idle'
 }
 
-export function isRunning(): boolean {
-	return state === 'running'
-}
-
 function scheduleNext(): void {
 	if (state !== 'running') return
 
@@ -59,11 +55,8 @@ async function poll(): Promise<void> {
 		updateAllPlayerCards('player_card_')
 
 		if (tournamentStore.status === 'completed') {
-			console.log('[TournamentPoller] Tournament completed, stopping')
 			stop()
 			window.navigate('/', { delay: 5000 })
 		}
-	} catch (error) {
-		console.error('[TournamentPoller] Error:', error)
-	}
+	} catch (error) {}
 }
