@@ -6,11 +6,7 @@ export interface MapOptions {
 	obstacle?: ObstacleType
 }
 
-export interface NewGameResponse {
-	code: string
-}
-
-export async function createGameApi(
+export async function createGameAPI(
 	mapOptions?: MapOptions
 ): Promise<IApiResponse> {
 	try {

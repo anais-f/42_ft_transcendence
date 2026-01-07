@@ -39,18 +39,16 @@ import {
 export const HomePage = (): string => {
 	const user = currentUser || {
 		username: 'Guest',
-		avatar: '/avatars/img_default.png'
+		avatar: '/avatars/img_default.png',
+		user_id: 0
 	}
-
-	// Sanitize user avatar
-	const safeAvatar = sanitizeAvatarUrl(user.avatar)
 
 	return /*html*/ `
   <section class="grid grid-cols-4 gap-10 h-full w-full">
 
     <div class="col-4-span-flex">
         <h1 class="title_bloc">PROFILE</h1>
-        <img src="${safeAvatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">
+        <img src="${user.avatar}" onerror="this.src='/avatars/img_default.png'" alt="User's avatar" class="avatar_style">
         ${UserLink({
 					id: user.user_id.toString(),
 					username: user.username,
@@ -144,9 +142,7 @@ export const HomePage = (): string => {
 						})}
         </form>
         
-        <!-- FRIENDS SECTION -->
         <div id="friends_section" class="flex flex-col flex-1 w-full min-h-0">
-            <!-- RELATIONSHIP SECTION -->
             <div id="relationship" class="w-full flex flex-col flex-[70%] min-h-0">
                 <h1 class="title_bloc mt-2 !mb-1">RELATIONSHIP</h1>
                 <div id="div_friend_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
@@ -156,7 +152,6 @@ export const HomePage = (): string => {
                 </div>
             </div>
             
-            <!-- GET IN TOUCH SECTION -->
             <div id="request_friend" class="w-full flex flex-col flex-[30%] min-h-0">
                 <h1 class="title_bloc mt-2 !mb-1">GET IN TOUCH</h1>
                 <div id="div_request_list" class="w-full flex-1 border-2 border-black overflow-y-scroll">
@@ -165,7 +160,6 @@ export const HomePage = (): string => {
                     </ul>
                 </div>
             </div>
-        <!-- END FRIEND SECTION -->
         </div>    
     
     </div>
@@ -179,11 +173,6 @@ export const HomePage = (): string => {
 let clickHandler: ((e: Event) => Promise<void>) | null = null
 let submitHandler: ((e: Event) => Promise<void>) | null = null
 
-/**
- * Initialize the home page by clearing existing friend and request lists.
- * This function prepares the home page for fresh content loading.
- * @returns {Promise<void>} A promise that resolves when initialization is complete.
- */
 async function initHomePage(): Promise<void> {
 	try {
 		console.log('Initializing home page...')
@@ -194,12 +183,6 @@ async function initHomePage(): Promise<void> {
 	}
 }
 
-/**
- * Attach event listeners for the home page.
- * Sets up handlers for button clicks such as logout and navigation to settings.
- * Logs attachment status to the console.
- * @returns {Promise<void>} A promise that resolves when event listeners are attached.
- */
 export async function attachHomeEvents(): Promise<void> {
 	const content = document.getElementById('content')
 	if (!content) {
@@ -289,12 +272,6 @@ export async function attachHomeEvents(): Promise<void> {
 	console.log('Home page events attached')
 }
 
-/**
- * Detach event listeners for the home page.
- * Removes handlers for button clicks to prevent memory leaks.
- * Logs detachment status to the console.
- * @returns {void}
- */
 export function detachHomeEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return

@@ -1,6 +1,11 @@
-import { escapeHtml } from '../../usecases/sanitize.js'
 import { tournamentStore } from '../../usecases/tournamentStore.js'
 
+/**
+ * Renders a player card with the player's name and avatar.
+ * @param props.id - The optional ID for the player card element.
+ * @param props.name - The name of the player.
+ * @param props.avatarUrl - The URL of the player's avatar image.
+ */
 interface PlayerCardProps {
 	id?: string
 	name: string
@@ -9,12 +14,11 @@ interface PlayerCardProps {
 
 export const PlayerCard = (props: PlayerCardProps): string => {
 	const { id, name, avatarUrl = '/avatars/img_default.png' } = props
-	const safeName = escapeHtml(name)
 
 	return /*html*/ `
     <div class="flex flex-col items-center justify-center" id="${id ?? ''}">
-    	<p class="truncate w-full text-center">${safeName}</p>
-    	<img src="${avatarUrl}" alt="${safeName}" class="w-32 aspect-square object-cover">
+    	<p class="truncate w-full text-center">${name}</p>
+    	<img src="${avatarUrl}" alt="${name}" class="w-32 aspect-square object-cover">
     </div>
   `
 }

@@ -35,9 +35,6 @@ function isErrorResponse(
 	onStopPolling: () => void
 ): boolean {
 	if ([400, 401, 403, 404, 409].includes(result.status)) {
-		console.log(
-			'[TournamentSync] Invalid tournament code or not a participant, redirecting...'
-		)
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,
 			message:
@@ -48,10 +45,6 @@ function isErrorResponse(
 		return true
 	}
 	if (result.error) {
-		console.error(
-			'[TournamentSync] Error fetching tournament data:',
-			result.error
-		)
 		return true
 	}
 	return false

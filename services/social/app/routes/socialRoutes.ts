@@ -2,6 +2,7 @@ import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import '@fastify/websocket'
 import WebSocket from 'ws'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
 import { handleSocialWSConnection } from '../controllers/websocketControllers.js'
 import {
@@ -9,14 +10,14 @@ import {
 	UserIdCoerceSchema,
 	PendingFriendsListSchema,
 	createTokenSchema,
-	IWsJwtTokenQuery
+	IWsJwtTokenQuery,
+	HttpErrorSchema
 } from '@ft_transcendence/common'
 import { createTokenController } from '@ft_transcendence/security'
 import {
 	requestFriendController,
 	rejectFriendController,
 	acceptFriendController,
-	cancelFriendController,
 	removeFriendController,
 	getFriendsListController,
 	getPendingRequestsController,
@@ -27,14 +28,17 @@ import {
 export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 	const server = fastify.withTypeProvider<ZodTypeProvider>()
 
-	// POST /api/social/create-token
 	server.route({
 		method: 'POST',
 		url: '/api/social/create-token',
 		preHandler: jwtAuthMiddleware,
 		schema: {
+			description:
+				'Create a temporary JWT for connecting to the social service WebSocket endpoint.',
+			tags: ['Social'],
 			response: {
-				201: createTokenSchema
+				201: createTokenSchema,
+				401: HttpErrorSchema.meta({ description: 'Authentication required' })
 			}
 		},
 		handler: createTokenController
@@ -51,107 +55,157 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 		)
 	})
 
-	// POST /api/social/request-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/request-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema
+			description:
+				'Send a friend request to another user. Auto-accepts if the other user already sent a request.',
+			tags: ['Friends'],
+			body: UserIdCoerceSchema,
+			response: {
+				200: z.object({ message: z.string() }),
+				400: HttpErrorSchema.meta({
+					description:
+						"Can't add yourself / Already friends / Friend request already sent / Friend limit reached"
+				}),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
+			}
 		},
 		handler: requestFriendController
 	})
 
-	// POST /api/social/accept-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/accept-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema
+			description: 'Accept an incoming friend request.',
+			tags: ['Friends'],
+			body: UserIdCoerceSchema,
+			response: {
+				200: z.object({ message: z.string() }),
+				400: HttpErrorSchema.meta({
+					description:
+						"Can't accept yourself / Already friends / No pending request / Friend limit reached"
+				}),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
+			}
 		},
 		handler: acceptFriendController
 	})
 
-	// POST /api/social/reject-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/reject-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema
+			description: 'Reject an incoming friend request.',
+			tags: ['Friends'],
+			body: UserIdCoerceSchema,
+			response: {
+				200: z.object({ message: z.string() }),
+				400: HttpErrorSchema.meta({
+					description: "Can't reject yourself / No pending request"
+				}),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
+			}
 		},
 		handler: rejectFriendController
 	})
 
-	// POST /api/social/cancel-request-friend
-	server.route({
-		method: 'POST',
-		url: '/api/social/cancel-request-friend',
-		preHandler: jwtAuthMiddleware,
-		schema: {
-			body: UserIdCoerceSchema
-		},
-		handler: cancelFriendController
-	})
-
-	// POST /api/social/remove-friend
 	server.route({
 		method: 'POST',
 		url: '/api/social/remove-friend',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			body: UserIdCoerceSchema
+			description: 'Remove an existing friend.',
+			tags: ['Friends'],
+			body: UserIdCoerceSchema,
+			response: {
+				200: z.object({ message: z.string() }),
+				400: HttpErrorSchema.meta({
+					description: "Can't remove yourself / Not friends"
+				}),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'Friend user not found' })
+			}
 		},
 		handler: removeFriendController
 	})
 
-	// GET /api/social/friends-list/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/friends-list/me',
 		preHandler: jwtAuthMiddleware,
 		schema: {
+			description:
+				"Get the authenticated user's complete friends list with profiles (username, avatar, status, last connection).",
+			tags: ['Friends'],
 			response: {
-				200: FriendsListSchema
+				200: FriendsListSchema,
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: getFriendsListController
 	})
 
-	// GET /api/social/pending-requests/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/pending-requests/me',
 		preHandler: jwtAuthMiddleware,
 		schema: {
+			description:
+				'Get pending friend requests that the authenticated user needs to approve (incoming requests).',
+			tags: ['Friends'],
 			response: {
-				200: PendingFriendsListSchema
+				200: PendingFriendsListSchema,
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: getPendingRequestsController
 	})
 
-	// GET /api/social/requests-sent/me
 	server.route({
 		method: 'GET',
 		url: '/api/social/requests-sent/me',
 		preHandler: jwtAuthMiddleware,
 		schema: {
+			description:
+				'Get pending friend requests sent by the authenticated user (outgoing requests).',
+			tags: ['Friends'],
 			response: {
-				200: PendingFriendsListSchema
+				200: PendingFriendsListSchema,
+				401: HttpErrorSchema.meta({ description: 'Authentication required' }),
+				404: HttpErrorSchema.meta({ description: 'User not found' })
 			}
 		},
 		handler: getPendingSentRequestsController
 	})
 
-	// GET /api/social/is-friend/:user_id
 	server.route({
 		method: 'GET',
 		url: '/api/social/is-friend/:user_id',
 		preHandler: jwtAuthMiddleware,
 		schema: {
-			params: UserIdCoerceSchema
+			description:
+				'Check if the authenticated user is friends with another user.',
+			tags: ['Friends'],
+			params: UserIdCoerceSchema,
+			response: {
+				200: z.object({
+					isFriend: z.boolean(),
+					status: z.number().optional()
+				}),
+				400: HttpErrorSchema.meta({ description: 'Invalid user ID' }),
+				401: HttpErrorSchema.meta({ description: 'Authentication required' })
+			}
 		},
 		handler: isFriendController
 	})

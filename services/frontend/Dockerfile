@@ -1,5 +1,5 @@
 # ============================================
-# Stage 1: Build - Asset Compilation
+# Stage 1: Build - Compilation
 # ============================================
 FROM node:22-alpine AS build-app
 
@@ -17,14 +17,12 @@ COPY services/frontend/app ./services/frontend/app
 COPY packages/common ./packages/common
 COPY packages/pong-shared ./packages/pong-shared
 
-
-# Compile TypeScript + Build Vite + Tailwind
 RUN npm run build --workspace=packages/common
 RUN npm run build --workspace=packages/pong-shared
 RUN npm run build --workspace=frontend
 
 # ============================================
-# Stage 2: Production - Lightweight Server
+# Stage 2: Production - Server
 # ============================================
 FROM node:22-alpine AS production
 

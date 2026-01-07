@@ -18,14 +18,6 @@ const MessagesTemplates: Record<
 		`${username} has rejected your friend request.`
 }
 
-/**
- * Send notification to a user
- * @param type
- * @param fromUserId
- * @param fromUsername
- * @param toUserId
- * @param friendInfo - Optional friend info to include in the friendListUpdate
- */
 function sendFriendNotification(
 	type:
 		| WSMessageType.FRIEND_ACCEPT
@@ -58,22 +50,9 @@ function sendFriendNotification(
 
 	const sent = sendToUser(toUserId, notification)
 
-	if (sent) {
-		console.log(`${type} notification sent to ${toUserId}`)
-	} else {
-		console.log(`User ${toUserId} not connected, ${type} notification not sent`)
-	}
-
 	return sent
 }
 
-/**
- * Send friend request notification
- * @param fromUserId
- * @param fromUsername
- * @param toUserId
- * @param friendInfo - Friend info to include in friendListUpdate
- */
 export async function friendRequestNotification(
 	fromUserId: number,
 	fromUsername: string,
@@ -94,13 +73,6 @@ export async function friendRequestNotification(
 	)
 }
 
-/**
- * Send friend accepted notification
- * @param fromUserId
- * @param fromUsername
- * @param toUserId
- * @param friendInfo - Friend info to include in friendListUpdate
- */
 export async function friendAcceptedNotification(
 	fromUserId: number,
 	fromUsername: string,
@@ -121,12 +93,6 @@ export async function friendAcceptedNotification(
 	)
 }
 
-/**
- * Send friend removed notification
- * @param fromUserId
- * @param fromUsername
- * @param toUserId
- */
 export async function friendRemovedNotification(
 	fromUserId: number,
 	fromUsername: string,
@@ -140,12 +106,6 @@ export async function friendRemovedNotification(
 	)
 }
 
-/**
- * Send friend rejected notification
- * @param fromUserId
- * @param fromUsername
- * @param toUserId
- */
 export async function friendRejectedNotification(
 	fromUserId: number,
 	fromUsername: string,

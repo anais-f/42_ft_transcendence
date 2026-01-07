@@ -9,11 +9,6 @@ import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { syncCurrentUser } from '../../usecases/userValidation.js'
 import { ToastActionType } from '../../types/toast.js'
 
-/**
- * Verify the current user's password using JWT
- * @param password - The password to verify
- * @returns true if password is valid, false otherwise
- */
 export async function verifyCurrentUserPassword(
 	password: string
 ): Promise<boolean> {
@@ -39,10 +34,6 @@ export async function verifyCurrentUserPassword(
 	return true
 }
 
-/**
- * Generate the 2FA QR code and otpauth_url
- * Use POST /auth/api/2fa/setup
- */
 export async function handleGenerateQRCode() {
 	if (!currentUser) {
 		notyf.open({
@@ -97,12 +88,6 @@ export async function handleGenerateQRCode() {
 	}
 }
 
-/**
- * Enable the 2FA after verifying the code
- * 2-step verification: 1) Verify password 2) Verify 2FA code and enable
- * @param form
- * @returns Promise<void>
- */
 export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	const formData = new FormData(form)
 	const code = formData.get('code') as string
@@ -116,7 +101,6 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 		return
 	}
 
-	// STEP 1: Verify password
 	if (
 		!currentUser?.is_google_user &&
 		!(await verifyCurrentUserPassword(password))
@@ -125,7 +109,6 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 		return
 	}
 
-	// STEP 2: Verify 2FA code and enable
 	const { error, status } = await verifySetup2FAAPI(code)
 
 	if (error) {
@@ -158,12 +141,6 @@ export async function handleEnable2FA(form: HTMLFormElement): Promise<void> {
 	})
 }
 
-/**
- * Disable the 2FA after verifying the code
- * 2-step verification: 1) Verify password 2) Disable 2FA with code
- * @param form
- * @returns Promise<void>
- */
 export async function handleDisable2FA(form: HTMLFormElement) {
 	const formData = new FormData(form)
 	const code = formData.get('code') as string
@@ -177,7 +154,6 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 		return
 	}
 
-	// STEP 1: Verify password
 	if (
 		!currentUser?.is_google_user &&
 		!(await verifyCurrentUserPassword(password))
@@ -186,7 +162,6 @@ export async function handleDisable2FA(form: HTMLFormElement) {
 		return
 	}
 
-	// STEP 2: Disable 2FA
 	const { error, status } = await disable2FAAPI(code)
 
 	if (error) {

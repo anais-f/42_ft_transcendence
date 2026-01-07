@@ -1,3 +1,11 @@
+/**
+ * Renders a lives component with heart icons.
+ * @param props.max - The maximum number of lives.
+ * @param props.current - The current number of lives.
+ * @param props.livesID - The ID for the lives container element.
+ * @param props.size - The size of the heart icons (3, 4, 5, or 6).
+ * @param props.additionalClasses - Additional CSS classes for styling.
+ */
 interface LivesProps {
 	max: number
 	current: number

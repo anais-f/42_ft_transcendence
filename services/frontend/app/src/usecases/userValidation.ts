@@ -25,33 +25,38 @@ export async function syncCurrentUser(errorMessage?: string): Promise<boolean> {
 		return false
 	}
 	setCurrentUser(updatedUser)
+
 	return true
 }
 
 export function validateUsername(username: unknown) {
 	const validation = UsernameSchema.safeParse(username?.toString())
+
 	if (!validation.success) {
 		const errorMessage =
 			validation.error.issues?.[0]?.message ||
 			'Login must be 4-32 characters long and can include letters, numbers, underscores, and hyphens'
 		return { success: false, error: errorMessage }
 	}
+
 	return { success: true, data: validation.data }
 }
 
 export function validatePassword(password: unknown) {
 	const validation = PasswordSchema.safeParse(password?.toString())
+
 	if (!validation.success) {
 		const errorMessage =
 			validation.error.issues?.[0]?.message ||
 			'Password must be 8-128 characters long and include at least one letter and one number'
 		return { success: false, error: errorMessage }
 	}
+
 	return { success: true, data: validation.data }
 }
 
 export function validateAvatarFile(file: File) {
-	const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+	const MAX_FILE_SIZE = 5 * 1024 * 1024
 	const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png']
 
 	if (!file || !(file instanceof File)) {

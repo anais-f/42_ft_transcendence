@@ -1,11 +1,11 @@
 import { gameStore } from '../../usecases/gameStore.js'
-import { createGameApi, MapOptions } from '../../api/game/createGame.js'
-import { joinGameApi } from '../../api/game/joinGame.js'
+import { createGameAPI, MapOptions } from '../../api/game/createGame.js'
+import { joinGameAPI } from '../../api/game/joinGame.js'
 import { sendGameError } from './errorMapUtils.js'
 import { showRejoinTournamentModal } from './rejoinTournamentModalHandler.js'
 
 export async function handleCreateGame(mapOptions?: MapOptions) {
-	const { data, error, status } = await createGameApi(mapOptions)
+	const { data, error, status } = await createGameAPI(mapOptions)
 
 	if (error) {
 		if (data?.tournamentCode) {
@@ -17,7 +17,7 @@ export async function handleCreateGame(mapOptions?: MapOptions) {
 	}
 
 	const code = data.code
-	const joinPayload = await joinGameApi(code)
+	const joinPayload = await joinGameAPI(code)
 
 	gameStore.gameCode = code
 	if (joinPayload.error) {

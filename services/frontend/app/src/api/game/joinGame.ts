@@ -9,7 +9,7 @@ export interface AssignedGameResponse {
 	code: string
 }
 
-export async function joinGameApi(code: string): Promise<IApiResponse> {
+export async function joinGameAPI(code: string): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/game/api/game/join-game/${code}`, {
 			method: 'POST',
@@ -30,7 +30,7 @@ export async function joinGameApi(code: string): Promise<IApiResponse> {
 	}
 }
 
-export async function getAssignedGameApi(): Promise<IApiResponse> {
+export async function getAssignedGameAPI(): Promise<IApiResponse> {
 	try {
 		const response = await fetch('/game/api/game/assigned', {
 			method: 'GET',

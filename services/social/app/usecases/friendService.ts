@@ -14,12 +14,6 @@ import {
 } from './notificationService.js'
 import createHttpError from 'http-errors'
 
-/**
- * Send a notification using the provided notify function
- * @param userId
- * @param friendId
- * @param notifyFn
- */
 async function sendNotification(
 	userId: IUserId,
 	friendId: IUserId,
@@ -58,32 +52,35 @@ async function sendNotification(
 			isFriendshipUpdate ? friendInfo : undefined
 		)
 		if (!sent) {
-			console.log(
-				`User ${friendId.user_id}, ${fromUsername}, not connected, notification not sent`
-			)
 		}
 
 		return sent
 	} catch (error) {
-		console.log('Failed to send notification:', error)
 		return false
 	}
 }
 
 export class FriendService {
 	/**
-	 * Send a friend request from userId to friendId
-	 * If a pending request exists from friendId to userId, accept it instead
-	 * @param userId
-	 * @param friendId
-	 * @return void
+	 * Sends a friend request with automatic acceptance logic.
+	 *
+	 * Algorithm:
+	 * - If no relation exists → creates pending friend request
+	 * - If pending request exists from other user → auto-accepts (both become friends)
+	 * - If pending request exists from same user → rejects as duplicate
+	 *
+	 * IMPORTANT: This allows mutual friend requests to be automatically accepted,
+	 * avoiding the need for both users to manually accept each other's requests.
+	 *
+	 * @throws {BadRequest} If users are already friends or request already sent
+	 * @throws {NotFound} If friend user doesn't exist
 	 */
 	static async sendFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw createHttpError.BadRequest('Cannot add yourself as a friend')
+			throw createHttpError.BadRequest("Can't add yourself as a friend")
 
 		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
@@ -119,18 +116,12 @@ export class FriendService {
 		return
 	}
 
-	/**
-	 * Accept a friend request from friendId to userId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async acceptFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw createHttpError.BadRequest('Cannot accept yourself as a friend')
+			throw createHttpError.BadRequest("Can't accept yourself as a friend")
 
 		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
@@ -143,24 +134,18 @@ export class FriendService {
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId === userId.user_id)
-			throw createHttpError.BadRequest('Cannot accept yourself as a friend')
+			throw createHttpError.BadRequest("Can't accept yourself as a friend")
 
 		SocialRepository.updateRelationStatus(userId, friendId, 1)
 		await sendNotification(userId, friendId, friendAcceptedNotification)
 	}
 
-	/**
-	 * Reject a friend request from friendId to userId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async rejectFriendRequest(
 		userId: IUserId,
 		friendId: IUserId
 	): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw createHttpError.BadRequest('Cannot reject yourself as a friend')
+			throw createHttpError.BadRequest("Can't reject yourself as a friend")
 
 		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
@@ -171,65 +156,27 @@ export class FriendService {
 
 		const originId = SocialRepository.getOriginId(userId, friendId)
 		if (originId === userId.user_id)
-			throw createHttpError.BadRequest('Cannot reject yourself as a friend')
+			throw createHttpError.BadRequest("Can't reject yourself as a friend")
 
 		SocialRepository.deleteRelation(userId, friendId)
 		await sendNotification(userId, friendId, friendRejectedNotification)
 	}
 
-	/**
-	 * Cancel a sent friend request from userId to friendId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
-	static async cancelFriendRequest(
-		userId: IUserId,
-		friendId: IUserId
-	): Promise<void> {
-		if (userId.user_id === friendId.user_id)
-			throw createHttpError.BadRequest('Cannot cancel yourself as a friend')
-
-		const friendExisted = await UsersApi.userExists(friendId)
-		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
-
-		const status = SocialRepository.getRelationStatus(userId, friendId)
-		if (status !== RelationStatus.PENDING)
-			throw createHttpError.NotFound('No pending friend request')
-
-		const originId = SocialRepository.getOriginId(userId, friendId)
-		if (originId !== userId.user_id)
-			throw createHttpError.BadRequest('Cannot cancel yourself as a friend')
-
-		SocialRepository.deleteRelation(userId, friendId)
-	}
-
-	/**
-	 * Remove a friend relationship between userId and friendId
-	 * @param userId
-	 * @param friendId
-	 * @return void
-	 */
 	static async removeFriend(userId: IUserId, friendId: IUserId): Promise<void> {
 		if (userId.user_id === friendId.user_id)
-			throw createHttpError.BadRequest('Cannot remove yourself as a friend')
+			throw createHttpError.BadRequest("Can't remove yourself as a friend")
 
 		const friendExisted = await UsersApi.userExists(friendId)
 		if (!friendExisted) throw createHttpError.NotFound('Invalid friend ID')
 
 		const status = SocialRepository.getRelationStatus(userId, friendId)
 		if (status !== RelationStatus.FRIENDS)
-			throw createHttpError.BadRequest('You are not friends')
+			throw createHttpError.BadRequest("You're not friends")
 
 		SocialRepository.deleteRelation(userId, friendId)
 		await sendNotification(userId, friendId, friendRemovedNotification)
 	}
 
-	/**
-	 * Get the friends list for a user
-	 * @param userId
-	 * @return IPublicProfileUser[]
-	 */
 	static async getFriendsList(userId: IUserId): Promise<IPublicProfileUser[]> {
 		const userExisted = await UsersApi.userExists(userId)
 		if (!userExisted) throw createHttpError.NotFound('Invalid user ID')
@@ -240,11 +187,6 @@ export class FriendService {
 		)
 	}
 
-	/**
-	 * Get pending friend requests for a user
-	 * @param userId
-	 * @return PendingFriendsListDTO
-	 */
 	static async getPendingRequests(
 		userId: IUserId
 	): Promise<{ pendingFriends: PendingFriendsListDTO }> {

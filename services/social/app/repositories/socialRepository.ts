@@ -5,6 +5,8 @@ import createHttpError from 'http-errors'
 export type RelationRow = { relation_status: number }
 export type RelationUserRow = { user_id: number; friend_id: number }
 
+const MAX_FRIENDS = 20
+
 export class SocialRepository {
 	private static getOrderedPair(a: IUserId, b: IUserId): [number, number] {
 		return a.user_id < b.user_id
@@ -41,13 +43,13 @@ export class SocialRepository {
 			this.getFriendsCount(friend_id)
 		]
 
-		if (userCount >= 20)
+		if (userCount >= MAX_FRIENDS)
 			throw createHttpError.BadRequest(
-				'User has reached the maximum limit of 20 friends'
+				`User has reached the maximum limit of ${MAX_FRIENDS} friends`
 			)
-		if (friendCount >= 20)
+		if (friendCount >= MAX_FRIENDS)
 			throw createHttpError.BadRequest(
-				'Friend has reached the maximum limit of 20 friends'
+				`Friend has reached the maximum limit of ${MAX_FRIENDS} friends`
 			)
 
 		const insertStmt = db.prepare(
@@ -68,13 +70,13 @@ export class SocialRepository {
 				this.getFriendsCount(friend_id)
 			]
 
-			if (userCount >= 20)
+			if (userCount >= MAX_FRIENDS)
 				throw createHttpError.BadRequest(
-					'User has reached the maximum limit of 20 friends'
+					`User has reached the maximum limit of ${MAX_FRIENDS} friends`
 				)
-			if (friendCount >= 20)
+			if (friendCount >= MAX_FRIENDS)
 				throw createHttpError.BadRequest(
-					'Friend has reached the maximum limit of 20 friends'
+					`Friend has reached the maximum limit of ${MAX_FRIENDS} friends`
 				)
 		}
 

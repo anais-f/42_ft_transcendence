@@ -1,7 +1,7 @@
 import { IPublicProfileUser } from '@ft_transcendence/common'
 import { IApiResponse } from '../types/api.js'
 
-export async function UserByIdAPI(userId: number): Promise<IApiResponse> {
+export async function userByIdAPI(userId: number): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/users/api/users/profile/${userId}`, {
 			method: 'GET',
@@ -28,7 +28,7 @@ export async function UserByIdAPI(userId: number): Promise<IApiResponse> {
 	}
 }
 
-export async function UserByUsernameAPI(
+export async function userByUsernameAPI(
 	username: string
 ): Promise<IPublicProfileUser | null> {
 	try {

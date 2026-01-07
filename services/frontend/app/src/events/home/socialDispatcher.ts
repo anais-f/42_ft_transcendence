@@ -10,15 +10,10 @@ import {
 } from './friendsHandler.js'
 import { updateStatusCircle } from '../../components/friends/StatusCircle.js'
 
-/**
- * Handles incoming WebSocket messages related to social features
- * @param message - The WebSocket message event
- */
 export async function handleSocialDispatcher(message: MessageEvent) {
 	try {
 		const msg = JSON.parse(message.data)
 		if (msg.type === WSMessageType.CONNECTION_ESTABLISHED) {
-			// Connection established
 		} else if (msg.type === WSMessageType.FRIEND_REQUEST) {
 			await handleFriendRequest(msg as NotificationPayload)
 		} else if (msg.type === WSMessageType.FRIEND_ACCEPT) {
@@ -48,11 +43,6 @@ export async function handleSocialDispatcher(message: MessageEvent) {
 	}
 }
 
-/**
- * Updates the online status of a friend in the friends list UI and profile page
- * @param userId - The ID of the user whose status has changed
- * @param status - The new status (1 for online, 0 for offline)
- */
 function updateFriendStatus(userId: number, status: number) {
 	const isOnline = status === 1
 	const statusText = isOnline ? 'Online' : 'Offline'
@@ -76,14 +66,7 @@ function updateFriendStatus(userId: number, status: number) {
 	}
 }
 
-/**
- * Handles incoming friend requests
- * Displays a notification and refreshes the friend requests list
- * @param payload
- */
 async function handleFriendRequest(payload: NotificationPayload) {
-	const fromUsername = payload.data.from.username
-	const fromUserId = payload.data.from.userId
 	const message = payload.data.message
 
 	notyf.open({
@@ -94,20 +77,12 @@ async function handleFriendRequest(payload: NotificationPayload) {
 	await fetchAndRenderFriendRequests()
 }
 
-/**
- * Handles friend notifications (accept, remove, reject)
- * Displays a notification and optionally refreshes the friend list
- * @param payload
- * @param notifType
- * @param shouldRefreshFriendList
- */
 async function handleFriendNotification(
 	payload: NotificationPayload,
 	notifType: ToastActionType,
 	shouldRefreshFriendList: boolean
 ) {
 	const message = payload.data.message
-	const fromUsername = payload.data.from.username
 
 	notyf.open({
 		type: notifType,

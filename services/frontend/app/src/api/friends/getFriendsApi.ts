@@ -1,6 +1,6 @@
 import { IApiResponse } from '../../types/api.js'
 
-export async function getFriendsListApi(): Promise<IApiResponse> {
+export async function getFriendsListAPI(): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/friends-list/me`, {
 			method: 'GET',
@@ -27,7 +27,7 @@ export async function getFriendsListApi(): Promise<IApiResponse> {
 	}
 }
 
-export async function getPendingRequestsApi(): Promise<IApiResponse> {
+export async function getPendingRequestsAPI(): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/pending-requests/me`, {
 			method: 'GET',
@@ -55,7 +55,7 @@ export async function getPendingRequestsApi(): Promise<IApiResponse> {
 	}
 }
 
-export async function checkIsFriendApi(userId: number): Promise<IApiResponse> {
+export async function checkIsFriendAPI(userId: number): Promise<IApiResponse> {
 	try {
 		const res = await fetch(`/social/api/social/is-friend/${userId}`, {
 			method: 'GET',
