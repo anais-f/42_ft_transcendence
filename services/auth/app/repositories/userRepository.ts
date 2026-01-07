@@ -12,6 +12,12 @@ export function createUser(login: string, passwordHash: string) {
 	stmt.run(login, passwordHash)
 }
 
+export function verifyUserLoginExists(login: string): boolean {
+	const stmt = db().prepare('SELECT 1 FROM users WHERE LOWER(login) = LOWER(?)')
+	const row = stmt.get(login) as { '1': number } | undefined
+	return !!row
+}
+
 export function createAdminUser(login: string, passwordHash: string) {
 	const stmt = db().prepare(
 		'INSERT INTO users (login, password, is_admin) VALUES (?, ?, ?)'
@@ -20,7 +26,7 @@ export function createAdminUser(login: string, passwordHash: string) {
 }
 
 export function findUserByLogin(login: string): IUserAuth | undefined {
-	const stmt = db().prepare('SELECT * FROM users WHERE login = ?')
+	const stmt = db().prepare('SELECT * FROM users WHERE LOWER(login) = LOWER(?)')
 	return stmt.get(login) as IUserAuth | undefined
 }
 
@@ -32,7 +38,9 @@ export function findUserById(id: number): IUserAuth | undefined {
 export function findPublicUserByLogin(
 	login: string
 ): PublicUserAuthDTO | undefined {
-	const stmt = db().prepare('SELECT user_id, login FROM users WHERE login = ?')
+	const stmt = db().prepare(
+		'SELECT user_id, login FROM users WHERE LOWER(login) = LOWER(?)'
+	)
 	return stmt.get(login) as PublicUserAuthDTO | undefined
 }
 
@@ -45,7 +53,6 @@ export function findPublicUserById(id: number): PublicUserAuthDTO | undefined {
 
 export function listPublicUsers(): PublicUserListAuthDTO | undefined {
 	const stmt = db().prepare('SELECT user_id, login FROM users')
-	console.log('stmt', stmt.all())
 	const users = stmt.all() as { user_id: number; login: string }[]
 	return { users }
 }

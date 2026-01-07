@@ -8,6 +8,7 @@ import { signToken, verifyToken } from '../utils/jwt.js'
 import createHttpError from 'http-errors'
 import { env } from '../env/checkEnv.js'
 import { successfulLoginCounter } from '@ft_transcendence/monitoring'
+import { verifyUserLoginExists } from '../repositories/userRepository.js'
 
 export async function registerUserUsecase(
 	login: string,
@@ -15,6 +16,9 @@ export async function registerUserUsecase(
 ): Promise<{ publicUser: any; token: string }> {
 	const authApiSecret = env.INTERNAL_API_SECRET
 
+	if (verifyUserLoginExists(login)) {
+		throw createHttpError.Conflict('Login already exists')
+	}
 	try {
 		await registerUser(login, password)
 	} catch (e: any) {
