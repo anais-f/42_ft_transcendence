@@ -19,13 +19,15 @@ export function signToken(
 	return jwt.sign(payload, secret, { expiresIn: expiresIn })
 }
 
-export function verifyToken(token: string): {
+export interface JwtPayload {
 	user_id: number
 	login: string
 	is_admin?: boolean
 	iat: number
 	exp: number
-} {
+}
+
+export function verifyToken(token: string): JwtPayload {
 	const secret = getJWTSecret()
-	return jwt.verify(token, secret) as any
+	return jwt.verify(token, secret) as JwtPayload
 }

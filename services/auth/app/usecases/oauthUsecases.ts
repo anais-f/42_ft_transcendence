@@ -12,6 +12,10 @@ import { OAuth2Client } from 'google-auth-library'
 import { env } from '../env/checkEnv.js'
 import { status2FA } from './twofa.js'
 
+interface SqliteError extends Error {
+	code?: string
+}
+
 const getGoogleClient = () => {
 	return new OAuth2Client(env.GOOGLE_CLIENT_ID || undefined)
 }
@@ -32,8 +36,7 @@ export async function googleLoginUsecase(
 			idToken: credential,
 			audience: env.GOOGLE_CLIENT_ID || undefined
 		})
-	} catch (error) {
-		console.error('Google token verification failed:', error)
+	} catch {
 		throw createHttpError.Unauthorized('Invalid Google token')
 	}
 
@@ -42,12 +45,10 @@ export async function googleLoginUsecase(
 		throw createHttpError.Unauthorized('Invalid Google token')
 
 	const googleId = payload.sub
-	console.log('Google User Info:', { payload })
 
 	const user = findUserByGoogleId(googleId)
 	if (user) {
 		const is2FAEnabled = await status2FA(user.user_id)
-		console.log('Google user already exists, logging in')
 		if (!is2FAEnabled.enabled) {
 			const authToken = signToken(
 				{
@@ -56,7 +57,7 @@ export async function googleLoginUsecase(
 					is_admin: user.is_admin,
 					type: 'auth'
 				},
-				'1h'
+				'4h'
 			)
 			return {
 				response: {
@@ -83,14 +84,14 @@ export async function googleLoginUsecase(
 
 	const authApiSecret = env.INTERNAL_API_SECRET
 	if (!authApiSecret) {
-		console.error('INTERNAL_API_SECRET is not set')
 		throw createHttpError.InternalServerError('Server configuration error')
 	}
 
 	try {
 		createGoogleUser(googleId)
-	} catch (e: any) {
-		if (e?.code === 'SQLITE_CONSTRAINT_UNIQUE')
+	} catch (e) {
+		const sqliteError = e as SqliteError
+		if (sqliteError?.code === 'SQLITE_CONSTRAINT_UNIQUE')
 			throw createHttpError.Conflict('Google user already exists')
 		throw createHttpError.InternalServerError('Database error')
 	}
@@ -101,7 +102,6 @@ export async function googleLoginUsecase(
 
 	const newLogin = generateUsername(givenName || payload.given_name || 'user')
 	publicUser.login = newLogin
-	console.log('Created new Google user:', publicUser)
 
 	const url = `${env.USERS_SERVICE_URL}/api/internal/users/new-user`
 	const response = await fetch(url, {
@@ -115,7 +115,7 @@ export async function googleLoginUsecase(
 
 	if (response.status === 401) {
 		deleteUserById(publicUser.user_id)
-		throw createHttpError.BadGateway('Failed to sync user with users service')
+		throw createHttpError.BadGateway("Can't sync user with users service")
 	} else if (!response.ok) {
 		deleteUserById(publicUser.user_id)
 		throw createHttpError.ServiceUnavailable('Users service unavailable')
@@ -128,7 +128,7 @@ export async function googleLoginUsecase(
 			is_admin: false,
 			type: 'auth'
 		},
-		'1h'
+		'4h'
 	)
 
 	return {

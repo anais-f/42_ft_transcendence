@@ -1,4 +1,4 @@
-import createHttpError from 'http-errors'
+import createHttpError, { isHttpError } from 'http-errors'
 import {
 	findUserById,
 	changeUserPassword
@@ -40,12 +40,14 @@ async function verify2FACode(
 		}
 
 		return true
-	} catch (e: any) {
-		if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+	} catch (e) {
+		if (
+			e instanceof Error &&
+			(e.name === 'TimeoutError' || e.name === 'AbortError')
+		) {
 			throw createHttpError.GatewayTimeout('2FA service timeout')
 		}
-		// Re-throw if it's already an HTTP error
-		if (e.statusCode || e.status) {
+		if (isHttpError(e)) {
 			throw e
 		}
 		throw createHttpError.ServiceUnavailable('2FA service unavailable')

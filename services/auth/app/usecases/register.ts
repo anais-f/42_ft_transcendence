@@ -47,7 +47,7 @@ export async function loginUser(login: string, password: string) {
 					is_admin: isAdmin,
 					type: 'auth'
 				},
-				'1h'
+				'4h'
 			)
 		}
 	} else {

@@ -45,7 +45,6 @@ export function findPublicUserById(id: number): PublicUserAuthDTO | undefined {
 
 export function listPublicUsers(): PublicUserListAuthDTO | undefined {
 	const stmt = db().prepare('SELECT user_id, login FROM users')
-	console.log('stmt', stmt.all())
 	const users = stmt.all() as { user_id: number; login: string }[]
 	return { users }
 }
