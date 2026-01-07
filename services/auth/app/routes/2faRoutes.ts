@@ -14,9 +14,11 @@ import {
 	status2FAResponseSchema,
 	twofaCodeSchema,
 	Verify2FALoginResponseSchema,
-	HttpErrorSchema
+	HttpErrorSchema,
+	internalGoogleUserStatusResponseSchema
 } from '@ft_transcendence/common'
 import { apiKeyMiddleware, jwtAuthMiddleware } from '@ft_transcendence/security'
+import { z } from 'zod'
 
 export async function twoFARoutes(app: FastifyInstance) {
 	app.post(
@@ -50,7 +52,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 				tags: ['2fa'],
 				body: twofaCodeSchema,
 				response: {
-					200: { type: 'object' },
+					200: z.any().meta({ description: '2FA setup verified successfully' }),
 					401: HttpErrorSchema.meta({
 						description: 'Invalid 2FA code'
 					}),
@@ -93,7 +95,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 				description: 'Disables 2FA for the authenticated user.',
 				tags: ['2fa'],
 				response: {
-					200: { type: 'object' },
+					200: z.any().meta({ description: '2FA disabled successfully' }),
 					401: HttpErrorSchema.meta({
 						description: 'Not authenticated'
 					}),
@@ -156,7 +158,7 @@ export async function twoFARoutes(app: FastifyInstance) {
 				tags: ['oauth', 'internal'],
 				params: IdParamSchema,
 				response: {
-					200: { type: 'object' },
+					200: internalGoogleUserStatusResponseSchema,
 					401: HttpErrorSchema.meta({
 						description: 'Invalid API key'
 					}),
