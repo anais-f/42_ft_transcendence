@@ -3,7 +3,7 @@
 Ensure you have the required environment variables configured:
 
 ```bash
-# Install all necessary dependencies
+# Install all necessary dependencies (for dev/test only)
 make install
 ```
 
