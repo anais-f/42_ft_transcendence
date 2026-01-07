@@ -1,7 +1,7 @@
 import {
 	getMatchHistoryByPlayerId,
 	getStatsByPlayerId
-} from '../repositories/matchsRepository.js'
+} from '../repositories/matchesRepository.js'
 import type {
 	MatchHistoryResponseDTO,
 	PlayerStatsDTO

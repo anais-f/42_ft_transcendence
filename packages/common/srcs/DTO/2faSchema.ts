@@ -48,6 +48,9 @@ export const setup2FAResponseSchema = z
 		expires_at: z.string()
 	})
 	.strict()
+	.meta({
+		description: 'Successfully generated 2FA setup data with QR code'
+	})
 
 export const verify2FAResponseSchema = z
 	.object({
@@ -55,18 +58,27 @@ export const verify2FAResponseSchema = z
 		activated: z.boolean()
 	})
 	.strict()
+	.meta({
+		description: 'Verification result with success and activation status'
+	})
 
 export const disable2FAResponseSchema = z
 	.object({
 		success: z.boolean()
 	})
 	.strict()
+	.meta({
+		description: '2FA successfully disabled for the user'
+	})
 
 export const status2FAResponseSchema = z
 	.object({
 		enabled: z.boolean()
 	})
 	.strict()
+	.meta({
+		description: 'Current 2FA status for the user'
+	})
 
 export const Call2FAResponseSchema = z
 	.object({

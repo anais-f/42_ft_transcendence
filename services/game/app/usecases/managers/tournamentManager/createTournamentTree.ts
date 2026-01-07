@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors'
 import { Tournament } from '@ft_transcendence/common'
 
-function shuffle(array: any[]) {
+function shuffle(array: unknown[]) {
 	let currentIndex = array.length
 
 	while (currentIndex != 0) {
@@ -18,9 +18,7 @@ export function createTournamentTree(tournament: Tournament) {
 	if (!tournament) {
 		throw new Error('Tournament not found')
 	}
-	console.log('Before shuffle:', tournament.participants)
 	shuffle(tournament.participants)
-	console.log('Shuffled participants:', tournament.participants)
 	if (tournament.participants.length !== tournament.maxParticipants) {
 		throw createHttpError.Conflict(
 			'Not enough participants to create the tournament tree'
@@ -37,7 +35,7 @@ export function createTournamentTree(tournament: Tournament) {
 				`Invalid participant indices: ${player1Index}, ${player2Index}`
 			)
 		}
-		tournament.matchs.push({
+		tournament.matches.push({
 			round: maxRound,
 			matchNumber: match,
 			player1Id: player1,
@@ -48,15 +46,8 @@ export function createTournamentTree(tournament: Tournament) {
 	for (let round = maxRound - 1; round > 0; --round) {
 		const matchesInRound =
 			tournament.maxParticipants / 2 ** (maxRound - round + 1)
-		console.log(
-			'Creating matches for round',
-			round,
-			'with',
-			matchesInRound,
-			'matches'
-		)
 		for (let match = 0; match < matchesInRound; match++) {
-			tournament.matchs.push({
+			tournament.matches.push({
 				previousMatchId1: match * 2,
 				previousMatchId2: match * 2 + 1,
 				round: round,
@@ -65,6 +56,4 @@ export function createTournamentTree(tournament: Tournament) {
 			})
 		}
 	}
-	console.log('Tournament Matches:', tournament.matchs)
-	console.log('Tournament tree created successfully')
 }

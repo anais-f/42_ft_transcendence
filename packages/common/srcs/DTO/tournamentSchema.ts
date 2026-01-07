@@ -45,7 +45,7 @@ export const TournamentSchema = z.object({
 	status: TournamentStatusSchema,
 	maxParticipants: z.number(),
 	participants: z.array(z.number()),
-	matchs: z.array(MatchTournamentSchema)
+	matches: z.array(MatchTournamentSchema)
 })
 
 export const GetTournamentResponseSchema = z.object({

@@ -17,7 +17,7 @@ export function quitTournamentByUserId(userId: number): void {
 	}
 	if (tournament.status !== 'pending') {
 		throw createHttpError.Conflict(
-			'Cannot quit a tournament that has already started'
+			"You can't quit a tournament that has already started"
 		)
 	}
 	const participantIndex = tournament.participants.indexOf(userId)

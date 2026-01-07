@@ -35,11 +35,11 @@ export interface GameData {
 	mapOptions: MapOptions
 }
 
-// individial game
+// Games related
 export const games = new Map<string, GameData>()
 export const playerToGame = new Map<number, string>()
 export const busyPlayers = new Set<number>()
 
-// tournament
+// Tournaments related
 export const tournaments = new Map<string, Tournament>()
 export const usersToTournament = new Map<number, string>()

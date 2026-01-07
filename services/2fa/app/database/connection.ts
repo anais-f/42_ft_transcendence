@@ -1,17 +1,11 @@
 import BetterSqlite3 from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
-import { mkdirSync } from 'fs'
-import { dirname } from 'path'
 import { env } from '../env/checkEnv.js'
 
 let db: Database
 
 export function getDb(): Database {
-	if (!db) {
-		// Ensure directory exists
-		mkdirSync(dirname(env.TWOFA_DB_PATH), { recursive: true })
-		db = new BetterSqlite3(env.TWOFA_DB_PATH)
-	}
+	if (!db) db = new BetterSqlite3(env.TWOFA_DB_PATH)
 	return db
 }
 
