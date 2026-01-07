@@ -9,7 +9,7 @@
 graph TB
     Client[Client Browser]
 
-    Client -->|"HTTPS ${PORT} -- default 8080"| Nginx[NGINX Reverse Proxy]
+    Client -->|"HTTPS ${PORT}"| Nginx[NGINX Reverse Proxy]
 
     Nginx --> Frontend[Frontend Vite TypeScript TailwindCSS]
     Nginx --> Auth[Auth Service]
