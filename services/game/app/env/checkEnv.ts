@@ -5,14 +5,14 @@ const envSchema = z
 	.object({
 		DTO_OPENAPI_FILE: z.string().min(1),
 		PORT: z.coerce.number().min(1).max(65535),
-		JWT_SECRET: z.string().min(1),
+		JWT_SECRET_AUTH: z.string().min(1),
 		JWT_SECRET_GAME: z.string().min(1),
 		GAME_DB_PATH: z.string().min(1),
 		SWAGGER_HOST: z.string().min(1).default('http://localhost')
 	})
 	.transform((env) => ({
 		PORT: env.PORT,
-		JWT_SECRET: env.JWT_SECRET,
+		JWT_SECRET_AUTH: env.JWT_SECRET_AUTH,
 		JWT_SECRET_GAME: env.JWT_SECRET_GAME,
 		GAME_DB_PATH: env.GAME_DB_PATH,
 		openAPISchema: loadOpenAPISchema(env.DTO_OPENAPI_FILE),

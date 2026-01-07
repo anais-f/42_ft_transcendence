@@ -22,7 +22,7 @@ export const app: FastifyInstance = Fastify({
 
 app.register(fastifyCookie)
 app.register(fastifyJwt, {
-	secret: env.JWT_SECRET,
+	secret: env.JWT_SECRET_AUTH,
 	cookie: {
 		cookieName: 'auth_token',
 		signed: false
