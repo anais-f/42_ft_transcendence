@@ -5,8 +5,15 @@ import { IWsJwtTokenQuery } from '@ft_transcendence/common'
 import { handleWsConnection } from '@ft_transcendence/security'
 
 /**
- * Handle WebSocket connection: verify token and setup connection.
- * This is the ONLY place where WS logic lives - everything else is in services.
+ * Handles WebSocket connection for the social service.
+ *
+ * Process:
+ * 1. Verifies JWT token from query parameters
+ * 2. Initializes connection and registers user as online
+ * 3. Sets up connection monitoring and presence tracking
+ *
+ * IMPORTANT: This service only sends notifications via WebSocket
+ * (friend requests, status changes). It does not process incoming messages.
  */
 export async function handleSocialWSConnection(
 	socket: WebSocket,

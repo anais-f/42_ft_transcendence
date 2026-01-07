@@ -1,4 +1,4 @@
-import { broadcast, sendToUser } from './connectionManager.js'
+import { sendToUser } from './connectionManager.js'
 import { SocialRepository } from '../repositories/socialRepository.js'
 import {
 	IUserId,

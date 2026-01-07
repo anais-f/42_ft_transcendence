@@ -148,31 +148,6 @@ export function sendToUser(userId: number, message: unknown): boolean {
 	return false
 }
 
-export function broadcast(message: unknown): void {
-	const payload =
-		typeof message === 'string' ? message : JSON.stringify(message)
-	let totalSent = 0
-
-	for (const [userId, conn] of wsConnections.entries()) {
-		try {
-			if (conn.ws.readyState === WebSocket.OPEN) {
-				conn.ws.send(payload)
-				totalSent++
-			}
-		} catch (e) {
-			const msg = e instanceof Error ? e.message : String(e)
-		}
-	}
-}
-
 export function getTotalConnections(): number {
 	return wsConnections.size
 }
-
-// export function getOnlineUsers(): number[] {
-// 	const onlineUsers: number[] = []
-// 	for (const userId of wsConnections.keys()) {
-// 		onlineUsers.push(Number(userId))
-// 	}
-// 	return onlineUsers
-// }
