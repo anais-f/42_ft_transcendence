@@ -7,25 +7,49 @@ The monitoring system uses the Prometheus/Grafana stack for metrics collection, 
 **The monitoring stack is now integrated into the main `docker-compose.yaml` file** and starts automatically with the application.
 
 ```mermaid
-graph TB
-    Client[Client Browser]
+graph LR
 
-    Client -->|HTTPS 8080| Nginx[NGINX Reverse Proxy]
+  Auth["Auth Service"]
+  Users["Users Service"]
+  TwoFA["TwoFA Service"]
+  Social["Social Service"]
+  Game["Game Service"]
 
-    Nginx --> Grafana[Grafana Dashboards]
-    Nginx --> Prometheus[Prometheus Metrics]
-    Nginx --> AlertManager[AlertManager Alerts]
+  NginxExporter["Nginx Exporter"]
+  Prometheus["Prometheus"]
+  Grafana["Grafana"]
+  AlertManager["Alert Manager"]
+
+  subgraph External["External Layer"]
+    Discord
+  end
+
+  subgraph Monitoring["Monitoring Layer"]
+    NginxExporter
+    Prometheus
+    Grafana
+    AlertManager
+    PromData
+    GrafanaData
+  end
+
+  subgraph Services["Services Layer"]
+    Auth
+    Users
+    Social
+    TwoFA
+    Game
+  end
+
 
     NginxExporter[NGINX Exporter]
-    Nginx -->|stub_status| NginxExporter
 
-    Prometheus -->|scrape| Auth[Auth Service]
-    Prometheus -->|scrape| Users[Users Service]
-    Prometheus -->|scrape| Social[Social Service]
-    Prometheus -->|scrape| Game[Game Service]
-    Prometheus -->|scrape| TwoFA[2FA Service]
-    Prometheus -->|scrape| Frontend[Frontend]
-    Prometheus -->|scrape| NginxExporter
+    Prometheus ====> Auth[Auth Service]
+    Prometheus ==> Users[Users Service]
+    Prometheus ==> Social[Social Service]
+    Prometheus ==> Game[Game Service]
+    Prometheus ==> TwoFA[2FA Service]
+    Prometheus ==> NginxExporter
 
     Prometheus -->|query| Grafana
     Prometheus -->|alerts| AlertManager
@@ -35,7 +59,12 @@ graph TB
     Prometheus -.-> PromData[(Prometheus Data)]
     Grafana -.-> GrafanaData[(Grafana Data)]
 
-    style Nginx fill:#2d6fb5,stroke:#1a4d8f,color:#fff
+  subgraph Legend["Legend"]
+    direction LR
+    LS1[Service] ==>|Scrape| LS2[Service]
+    LS3[Service] -.->|Data to DB| LS4[DB]
+  end
+
     style NginxExporter fill:#009639,stroke:#006b29,color:#fff
     style Prometheus fill:#e6522c,stroke:#c7321b,color:#fff
     style Grafana fill:#f46800,stroke:#d65a00,color:#fff
@@ -46,7 +75,6 @@ graph TB
     style Social fill:#1abc9c,stroke:#16a085,color:#fff
     style Game fill:#3498db,stroke:#2980b9,color:#fff
     style TwoFA fill:#e74c3c,stroke:#c0392b,color:#fff
-    style Frontend fill:#646cff,stroke:#535bf2,color:#fff
 ```
 
 ## Monitoring Stack
@@ -267,12 +295,12 @@ The monitoring system uses two Docker networks:
 
 All monitoring interfaces are protected by admin authentication (`/_admin_validate`):
 
-| Service           | URL                                    | Authentication        | Description                 |
-| ----------------- | -------------------------------------- | --------------------- | --------------------------- |
-| Grafana           | `https://localhost:8080/grafana/`      | Admin JWT required    | Dashboards & visualizations |
-| Prometheus        | `https://localhost:8080/prometheus/`   | Admin JWT required    | PromQL query interface      |
-| AlertManager      | `https://localhost:8080/alertmanager/` | Admin JWT required    | Alert management            |
-| NGINX Exporter    | `http://localhost:9113/metrics`        | Public (port exposed) | NGINX metrics endpoint      |
+| Service        | URL                                    | Authentication        | Description                 |
+| -------------- | -------------------------------------- | --------------------- | --------------------------- |
+| Grafana        | `https://localhost:8080/grafana/`      | Admin JWT required    | Dashboards & visualizations |
+| Prometheus     | `https://localhost:8080/prometheus/`   | Admin JWT required    | PromQL query interface      |
+| AlertManager   | `https://localhost:8080/alertmanager/` | Admin JWT required    | Alert management            |
+| NGINX Exporter | `http://localhost:9113/metrics`        | Public (port exposed) | NGINX metrics endpoint      |
 
 **Note**: You need to be logged in as an admin user to access Grafana, Prometheus, and AlertManager interfaces.
 
