@@ -29,7 +29,7 @@ async function start(): Promise<void> {
 			transform: jsonSchemaTransform
 		},
 		{
-			main: env.JWT_SECRET,
+			main: env.JWT_SECRET_AUTH,
 			service: env.JWT_SECRET_GAME
 		}
 	)

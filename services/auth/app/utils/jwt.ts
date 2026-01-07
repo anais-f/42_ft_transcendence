@@ -2,10 +2,6 @@ import jwt from 'jsonwebtoken'
 import ms from 'ms'
 import { env } from '../env/checkEnv.js'
 
-function getJWTSecret(): string {
-	return env.JWT_SECRET
-}
-
 export function signToken(
 	payload: {
 		user_id: number
@@ -15,7 +11,7 @@ export function signToken(
 	},
 	expiresIn: ms.StringValue
 ): string {
-	const secret = getJWTSecret()
+	const secret = env.JWT_SECRET_AUTH
 	return jwt.sign(payload, secret, { expiresIn: expiresIn })
 }
 
@@ -28,6 +24,6 @@ export interface JwtPayload {
 }
 
 export function verifyToken(token: string): JwtPayload {
-	const secret = getJWTSecret()
+	const secret = env.JWT_SECRET_AUTH
 	return jwt.verify(token, secret) as JwtPayload
 }

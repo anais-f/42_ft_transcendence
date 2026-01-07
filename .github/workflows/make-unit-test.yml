@@ -65,9 +65,6 @@ jobs:
           # Admin credentials
           PASSWORD_ADMIN=Admin1234
 
-          # Monitoring / other
-          ADMIN_TOKEN=change-me
-
           # Frontend
           FRONTEND_BASE_URL=http://localhost:8080
 
@@ -81,7 +78,7 @@ jobs:
           DTO_OPENAPI_FILE=/app/packages/common/openapiDTO.json
 
           # JWT
-          JWT_SECRET=change-me
+          JWT_SECRET_AUTH=change-me
           JWT_SECRET_SOCIAL=change-me
           JWT_SECRET_GAME=change-me
           WS_TOKEN_EXPIRES_SECONDS=30
