@@ -11,12 +11,14 @@ export const MatchHistoryItemSchema = z
 		player2_score: z.number().int().nonnegative()
 	})
 	.strict()
+	.meta({ description: 'Single match history record with players and scores' })
 
 export const MatchHistoryResponseSchema = z
 	.object({
 		matches: z.array(MatchHistoryItemSchema)
 	})
 	.strict()
+	.meta({ description: 'List of match history records' })
 
 export const PlayerStatsSchema = z
 	.object({
@@ -28,6 +30,9 @@ export const PlayerStatsSchema = z
 		averageScoreAgainst: z.number().nonnegative()
 	})
 	.strict()
+	.meta({
+		description: 'Player statistics including wins, losses, and averages'
+	})
 
 export const SaveMatchSchema = z
 	.object({
@@ -37,6 +42,7 @@ export const SaveMatchSchema = z
 		scorePlayer2: z.number().int().nonnegative()
 	})
 	.strict()
+	.meta({ description: 'Save a new match with player IDs and scores' })
 
 export const SaveMatchResponseSchema = z
 	.object({
@@ -44,6 +50,10 @@ export const SaveMatchResponseSchema = z
 		matchId: z.number().int().positive()
 	})
 	.strict()
+	.meta({
+		description:
+			'Response after saving a match with success status and match ID'
+	})
 
 export type MatchHistoryItemDTO = z.infer<typeof MatchHistoryItemSchema>
 export type MatchHistoryResponseDTO = z.infer<typeof MatchHistoryResponseSchema>

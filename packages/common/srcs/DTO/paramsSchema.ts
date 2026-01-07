@@ -1,8 +1,10 @@
 import { z } from 'zod'
 
-export const IdParamSchema = z.object({
-	id: z.string().regex(/^[1-9]\d*$/, 'Invalid id')
-})
+export const IdParamSchema = z
+	.object({
+		id: z.string().regex(/^[1-9]\d*$/, 'Invalid id')
+	})
+	.meta({ description: 'URL parameter with numeric ID' })
 
 export const CodeParamSchema = z.object({
 	code: z

@@ -1,4 +1,3 @@
-// Fastify request augmentation for custom properties
 import 'fastify'
 
 declare module 'fastify' {

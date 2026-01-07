@@ -39,7 +39,7 @@ export const AvatarUrlSchema = z
 	.string()
 	.min(1, 'Avatar URL cannot be empty')
 	.max(2048, 'Avatar URL too long')
-	.regex(AVATAR_URL_REGEX, 'Avatar must be HTTP(S) URL or /path')
+	.regex(AVATAR_URL_REGEX, 'Avatar must be HTTP(S) URL or / path')
 	.refine(
 		(url) => {
 			const lower = url.toLowerCase()
