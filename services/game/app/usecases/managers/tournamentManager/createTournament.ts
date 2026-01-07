@@ -19,7 +19,9 @@ export function createTournament(
 	}
 	if (usersToTournament.has(userId)) {
 		const existingCode = usersToTournament.get(userId)
-		const error = createHttpError.Conflict('User is already in another tournament')
+		const error = createHttpError.Conflict(
+			'User is already in another tournament'
+		)
 		error.tournamentCode = existingCode
 		throw error
 	}
