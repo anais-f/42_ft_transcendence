@@ -37,9 +37,6 @@ export class UpdateUsersServices {
 		if (!user.user_id || user.user_id <= 0) {
 			throw createHttpError.BadRequest('Invalid user ID')
 		}
-		if (UsersRepository.existsByUsername({ username: newUsername })) {
-			throw createHttpError.Conflict('Username already taken')
-		}
 		UsersRepository.updateUsername({
 			user_id: user.user_id,
 			username: newUsername
