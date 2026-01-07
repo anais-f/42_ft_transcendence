@@ -17,6 +17,7 @@ import {
 	HttpErrorSchema
 } from '@ft_transcendence/common'
 import { jwtAuthMiddleware } from '@ft_transcendence/security'
+import { z } from 'zod'
 
 export async function authRoutes(app: FastifyInstance) {
 	app.post(
@@ -92,7 +93,7 @@ export async function authRoutes(app: FastifyInstance) {
 				description: 'Validates if the current user has admin privileges.',
 				tags: ['auth', 'admin'],
 				response: {
-					200: { type: 'object' },
+					200: z.any().meta({ description: 'User is an admin' }),
 					401: HttpErrorSchema.meta({
 						description: 'Not authenticated'
 					}),
@@ -113,7 +114,7 @@ export async function authRoutes(app: FastifyInstance) {
 				description: 'Logs out the current user and invalidates the session.',
 				tags: ['auth'],
 				response: {
-					200: { type: 'object' }
+					200: z.any().meta({ description: 'Logout successful' })
 				}
 			},
 			preHandler: jwtAuthMiddleware

@@ -5,7 +5,8 @@ import {
 	Enable2FAResponseDTO,
 	Status2FAResponseDTO,
 	twofaCodeSchema,
-	Verify2FALoginResponseDTO
+	Verify2FALoginResponseDTO,
+	InternalGoogleUserStatusResponseDTO
 } from '@ft_transcendence/common'
 import {
 	enable2FA,
@@ -142,7 +143,7 @@ export async function internalStatus2faController(
 export async function internalGoogleUserStatusController(
 	req: FastifyRequest,
 	reply: FastifyReply
-): Promise<{ is_google_user: boolean }> {
+): Promise<InternalGoogleUserStatusResponseDTO> {
 	const { id } = req.params as { id: string }
 	const userId = Number(id)
 	if (isNaN(userId)) throw createHttpError.BadRequest('Invalid user id')

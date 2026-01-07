@@ -102,6 +102,15 @@ export const Verify2FALoginResponseSchema = z
 	})
 	.strict()
 
+export const internalGoogleUserStatusResponseSchema = z
+	.object({
+		is_google_user: z.boolean()
+	})
+	.strict()
+	.meta({
+		description: 'Indicates if a Google user exists in the system'
+	})
+
 export type Verify2FADTO = z.infer<typeof verify2FASchema>
 export type Setup2FADTO = z.infer<typeof setup2FASchema>
 export type Disable2FADTO = z.infer<typeof disable2FASchema>
@@ -115,4 +124,7 @@ export type Call2FAResponseDTO = z.infer<typeof Call2FAResponseSchema>
 export type Enable2FAResponseDTO = z.infer<typeof Enable2FAResponseSchema>
 export type Verify2FALoginResponseDTO = z.infer<
 	typeof Verify2FALoginResponseSchema
+>
+export type InternalGoogleUserStatusResponseDTO = z.infer<
+	typeof internalGoogleUserStatusResponseSchema
 >

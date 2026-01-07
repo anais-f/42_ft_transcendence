@@ -14,6 +14,7 @@ import {
 	PasswordBodySchema,
 	HttpErrorSchema
 } from '@ft_transcendence/common'
+import { z } from 'zod'
 
 export async function userRoutes(app: FastifyInstance) {
 	app.patch(
@@ -24,7 +25,7 @@ export async function userRoutes(app: FastifyInstance) {
 				tags: ['user'],
 				body: ChangeMyPasswordSchema,
 				response: {
-					200: { type: 'object' },
+					200: z.any().meta({ description: 'Password changed successfully' }),
 					400: HttpErrorSchema.meta({
 						description: 'Invalid request body'
 					}),
@@ -47,7 +48,7 @@ export async function userRoutes(app: FastifyInstance) {
 				tags: ['user', 'auth'],
 				body: PasswordBodySchema,
 				response: {
-					200: { type: 'object' },
+					200: z.any().meta({ description: 'Password verified successfully' }),
 					401: HttpErrorSchema.meta({
 						description: 'Not authenticated or wrong password'
 					})

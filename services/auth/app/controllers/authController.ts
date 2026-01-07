@@ -108,9 +108,7 @@ export async function logoutController(
 			},
 			signal: AbortSignal.timeout(3000)
 		})
-	} catch (e) {
-		console.error(`[Logout] Failed to cleanup user ${userId}:`, e)
-	}
+	} catch (e) {}
 
 	reply.clearCookie('auth_token', { path: '/' })
 	reply.clearCookie('twofa_token', { path: '/' })
