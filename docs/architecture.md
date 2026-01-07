@@ -11,7 +11,7 @@ graph TB
 
     Client -->|"HTTPS ${PORT} -- default 8080"| Nginx[NGINX Reverse Proxy]
 
-    Nginx --> Frontend[Frontend Vite TypeScript TailwindCSS]
+    Nginx --> Frontend[Frontend]
     Nginx --> Auth[Auth Service]
     Nginx --> Users[Users Service]
     Nginx --> TwoFA[2FA Service]
