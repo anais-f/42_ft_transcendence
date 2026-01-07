@@ -22,7 +22,7 @@ make build
 ### Start the application
 
 ```bash
-# Start all services in detached mode (includes monitoring)
+# Start all services in detached mode
 make up
 ```
 
