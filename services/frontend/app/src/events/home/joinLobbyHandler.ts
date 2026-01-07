@@ -5,6 +5,7 @@ import { joinTournamentAPI } from '../../api/tournamentApi.js'
 import { tournamentStore } from '../../usecases/tournamentStore.js'
 import { notyfGlobal as notyf } from '../../utils/notyf.js'
 import { ToastActionType } from '../../types/toast.js'
+import { showRejoinTournamentModal } from './rejoinTournamentModalHandler.js'
 
 export async function handleJoinLobby(e: Event) {
 	e.preventDefault()
@@ -29,6 +30,11 @@ export async function handleJoinGame(code: string) {
 
 	gameStore.gameCode = code
 	if (error) {
+		if (data?.tournamentCode) {
+			showRejoinTournamentModal(data?.tournamentCode)
+			gameStore.clear()
+			return
+		}
 		sendGameError(error, status)
 		gameStore.clear()
 		return
@@ -41,13 +47,17 @@ export async function handleJoinGame(code: string) {
 export async function handleJoinTournament(code: string) {
 	const { data, error, status } = await joinTournamentAPI(code)
 
-	tournamentStore.tournamentCode = code
 	if (error) {
+		if (data?.tournamentCode) {
+			showRejoinTournamentModal(data?.tournamentCode)
+			return
+		}
 		sendGameError(error, status)
 		tournamentStore.clear()
 		return
 	}
 
+	tournamentStore.tournamentCode = code
 	tournamentStore.status = data?.status || 'pending'
 	window.navigate(`/tournament/${code}`)
 }

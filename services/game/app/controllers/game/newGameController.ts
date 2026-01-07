@@ -17,7 +17,10 @@ export async function createNewGameController(
 	const body = CreateGameSchema.parse(request.body ?? {})
 
 	if (usersToTournament.has(user.user_id)) {
-		throw createHttpError.Conflict('player already in a tournament')
+		const existingCode = usersToTournament.get(user.user_id)
+		const error = createHttpError.Conflict('player already in a tournament')
+		error.tournamentCode = existingCode
+		throw error
 	}
 
 	const mapOptions = body.mapOptions

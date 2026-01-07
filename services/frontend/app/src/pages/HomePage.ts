@@ -27,6 +27,14 @@ import {
 	GameConfigModal,
 	GAME_CONFIG_MODAL_ID
 } from '../components/modals/GameConfigModal.js'
+import {
+	REJOIN_TOURNAMENT_MODAL,
+	RejoinTournamentModal
+} from '../components/modals/rejoinTournament.js'
+import {
+	handleRejoinTournament,
+	handleQuiTournament
+} from '../events/home/rejoinTournamentModalHandler.js'
 
 export const HomePage = (): string => {
 	const user = currentUser || {
@@ -158,6 +166,7 @@ export const HomePage = (): string => {
 
   </section>
   ${GameConfigModal()}
+  ${RejoinTournamentModal()}
 `
 }
 
@@ -209,11 +218,13 @@ export async function attachHomeEvents(): Promise<void> {
 			if (action === 'close-modal') {
 				hideModal(GAME_CONFIG_MODAL_ID)
 				hideModal(USERNAME_INFO_MODAL_ID)
+				hideModal(REJOIN_TOURNAMENT_MODAL)
 				sessionStorage.removeItem('register_login')
 			}
 			if (action === 'close-modal-overlay' && target === actionButton) {
 				hideModal(GAME_CONFIG_MODAL_ID)
 				hideModal(USERNAME_INFO_MODAL_ID)
+				hideModal(REJOIN_TOURNAMENT_MODAL)
 				sessionStorage.removeItem('register_login')
 			}
 			if (action === 'toggle-option') handleToggleClick(actionButton)
@@ -240,6 +251,8 @@ export async function attachHomeEvents(): Promise<void> {
 				const id = actionButton.getAttribute('data-id')
 				if (id) await declineFriendRequest(Number(id))
 			}
+			if (action === 'rejoin-tournament') await handleRejoinTournament()
+			if (action === 'quit-tournament') await handleQuiTournament()
 		}
 	}
 
