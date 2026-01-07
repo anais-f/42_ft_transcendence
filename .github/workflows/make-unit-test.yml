@@ -88,8 +88,6 @@ jobs:
 
           DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK }}
 
-          HOST=0.0.0.0
-
           SUBNET_DOCKER_MONITORING=0.0.0.0
 
           EOF
