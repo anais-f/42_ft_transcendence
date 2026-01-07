@@ -241,7 +241,7 @@ export async function attachHomeEvents(): Promise<void> {
 			if (action === 'close-modal-overlay' && target === actionButton) {
 				hideModal(GAME_CONFIG_MODAL_ID)
 				hideModal(USERNAME_INFO_MODAL_ID)
-				hideModal(USERNAME_INFO_MODAL_ID)
+				hideModal(REJOIN_TOURNAMENT_MODAL)
 				sessionStorage.removeItem('register_login')
 			}
 			if (action === 'toggle-option') handleToggleClick(actionButton)
