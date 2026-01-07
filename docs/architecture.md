@@ -49,10 +49,10 @@ graph TB
 
 ### Frontend
 
-- **Technology**: Vite + TypeScript + TailwindCSS
 - **Internal port**: 3000
 - **Role**: User interface (SPA)
 - **Dependencies**: None (base service)
+- **Technology**: Vite + TypeScript + TailwindCSS
 
 ### Auth Service
 
