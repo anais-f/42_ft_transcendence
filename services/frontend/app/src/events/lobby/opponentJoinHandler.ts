@@ -1,6 +1,6 @@
 import { PlayerData } from '../../usecases/gameStore.js'
 
-export function oppenentJoinHandler(opponent: PlayerData) {
+export function opponentJoinHandler(opponent: PlayerData) {
 	const avatarEl = document.getElementById(
 		'opponent-avatar'
 	) as HTMLImageElement | null

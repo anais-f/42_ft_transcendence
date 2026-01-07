@@ -3,7 +3,6 @@ import { UserLink } from '../friends/UserLink.js'
 
 /**
  * Renders a single line in the game history table.
- * @param props - The properties for the game history line.
  * @param props.date - The date of the game.
  * @param props.player1 - The name of player 1.
  * @param props.player1Id - The ID of player 1.
@@ -12,7 +11,6 @@ import { UserLink } from '../friends/UserLink.js'
  * @param props.player2 - The name of player 2.
  * @param props.player2Id - The ID of player 2.
  * @param props.result - The result of the game ('Win' or 'Loss').
- * @returns A string representing a table row in HTML.
  */
 interface GameHistoryProps {
 	date: string
@@ -25,11 +23,6 @@ interface GameHistoryProps {
 	player2Id: number
 }
 
-/**
- * GameHistoryRow component to render a single row in the game history table.
- * @param props
- * @constructor
- */
 export const GameHistoryRow = (props: GameHistoryProps): string => {
 	const {
 		date,

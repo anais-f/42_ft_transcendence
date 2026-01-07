@@ -37,12 +37,8 @@ app.setSerializerCompiler(serializerCompiler)
 setupErrorHandler(app)
 setupFastifyMonitoringHooks(app)
 
-// readSecret now provided by @ft_transcendence/common
-
 async function runServer() {
-	console.log('Starting Auth service...')
 	initDB()
-	console.log('Admin user ensured')
 
 	await app.register(metricPlugin.default, { endpoint: '/metrics' })
 	await app.register(Swagger, {
@@ -53,7 +49,7 @@ async function runServer() {
 			},
 			servers: [
 				{
-					url: `${env.SWAGGER_HOST}:8080/auth`,
+					url: `${env.SWAGGER_HOST}:${env.PORT}/auth`,
 					description: 'Local server'
 				}
 			],
@@ -64,18 +60,9 @@ async function runServer() {
 	await app.register(SwaggerUI, {
 		routePrefix: '/docs'
 	})
+
 	if (findPublicUserByLogin(env.LOGIN_ADMIN) === undefined) {
 		registerAdminUser(env.LOGIN_ADMIN, env.PASSWORD_ADMIN)
-	}
-
-	// Vérifier les credentials Google (pour google-auth-library)
-	if (env.GOOGLE_CLIENT_ID) {
-		console.log(
-			'Google Sign-In configured with Client ID:',
-			env.GOOGLE_CLIENT_ID.substring(0, 20) + '...'
-		)
-	} else {
-		console.warn('GOOGLE_CLIENT_ID not found, Google Sign-In will be disabled')
 	}
 
 	await registerRoutes(app)
@@ -83,7 +70,7 @@ async function runServer() {
 		port: 3000,
 		host: '0.0.0.0'
 	})
-	console.log('Auth service running on http://localhost:', 3000)
+	app.log.info('Auth service started on port 3000')
 }
 
 runServer().catch((err) => {

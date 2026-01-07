@@ -84,12 +84,11 @@ export const TournamentPage = (): string => {
 let clickHandler: ((e: Event) => void) | null = null
 
 export async function attachTournamentEvents() {
-	const content = document.getElementById('content')
+	const content = document.getElementById('content') as HTMLElement
 	if (!content) return
 
 	const code = routeParams.code
 	if (!code) {
-		console.error('No tournament code in URL')
 		window.navigate('/')
 		return
 	}
@@ -107,11 +106,7 @@ export async function attachTournamentEvents() {
 			const action = actionButton.getAttribute('data-action')
 
 			if (action === 'copy-tournament-code') {
-				handleCopyCode(
-					actionButton as HTMLElement,
-					'tournament-code',
-					'Copy Tournament Code'
-				)
+				handleCopyCode(actionButton, 'tournament-code', 'Copy Tournament Code')
 			}
 			if (action === 'close-modal') {
 				hideModal(NEXT_MATCH_MODAL_ID)
@@ -126,7 +121,7 @@ export async function attachTournamentEvents() {
 }
 
 export function detachTournamentEvents() {
-	const content = document.getElementById('content')
+	const content = document.getElementById('content') as HTMLElement
 	if (!content) return
 
 	if (clickHandler) {

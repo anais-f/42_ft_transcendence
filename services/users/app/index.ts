@@ -114,7 +114,7 @@ export async function start(): Promise<void> {
 			host: '0.0.0.0'
 		})
 		console.log('Listening on port ', 3000)
-		console.log(`Swagger UI available at ${env.HOST}/users/docs`)
+		console.log(`Swagger UI available at ${env.SWAGGER_HOST}/users/docs`)
 	} catch (err) {
 		console.error('Error starting server: ', err)
 		process.exit(1)

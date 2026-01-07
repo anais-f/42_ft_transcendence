@@ -9,9 +9,8 @@ import {
 	loginUserUsecase,
 	validateAdminUsecase
 } from '../usecases/authUsecases.js'
-import createHttpError from 'http-errors'
+import createHttpError, { isHttpError } from 'http-errors'
 import { env } from '../env/checkEnv.js'
-import { tr } from 'zod/v4/locales'
 
 export async function registerController(
 	request: FastifyRequest,
@@ -86,8 +85,8 @@ export async function validateAdminController(
 
 	try {
 		return validateAdminUsecase(token)
-	} catch (e: any) {
-		if (e && (e.statusCode || e.status)) {
+	} catch (e) {
+		if (isHttpError(e)) {
 			throw e
 		}
 		throw createHttpError.Unauthorized('Invalid token')

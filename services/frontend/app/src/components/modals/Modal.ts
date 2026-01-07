@@ -1,11 +1,11 @@
 /**
- * Modal component props interface
- * id: modal id for targeting
- * title: modal header title
- * titleClass: optional additional classes for the title
- * subtitle: optional subtitle displayed above the title
- * subtitleClass: optional additional classes for the subtitle
- * content: modal body content (HTML string)
+ * Generates HTML for a modal dialog with customizable title, subtitle, and content.
+ * @param.prop id - The unique identifier for the modal.
+ * @param.prop title - The main title of the modal.
+ * @param.prop titleClass - Optional CSS classes for styling the title.
+ * @param.prop subtitle - Optional subtitle text for the modal.
+ * @param.prop subtitleClass - Optional CSS classes for styling the subtitle.
+ * @param.prop content - The HTML content to be displayed inside the modal.
  */
 interface ModalProps {
 	id: string
@@ -19,11 +19,9 @@ interface ModalProps {
 export const Modal = (props: ModalProps): string => {
 	const { id, title, titleClass, subtitle, subtitleClass, content } = props
 
-	// base classes CSS for the modal overlay
 	const overlayClasses =
 		'hidden overflow-y-auto overflow-x-hidden fixed inset-0 z-50 justify-center items-center w-full h-full bg-black/50'
 
-	// base classes CSS for the modal container with paper texture
 	const containerClasses =
 		'relative border-2 border-black bg-[#fffefc] shadow-[6px_6px_0_rgba(0,0,0,0.2)]'
 

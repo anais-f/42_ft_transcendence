@@ -109,12 +109,6 @@ export async function attachProfileEvents(): Promise<void> {
 	console.log('Profile page events attached')
 }
 
-/**
- * Detach event listeners for the profile page.
- * Removes the click event handler from the content element.
- * Logs detachment status to the console.
- * @returns {void}
- */
 export function detachProfileEvents(): void {
 	const content = document.getElementById('content')
 	if (!content) return

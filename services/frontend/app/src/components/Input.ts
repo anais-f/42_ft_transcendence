@@ -1,15 +1,15 @@
 /**
- * Input component props interface
- * id: input id for label and input -> for CSS/TS target, must be unique
- * name: input name for the form -> for submit, key/value pair
- * placeholder: input placeholder
- * type: input type (text, password, email, etc.)
- * required: input required
- * additionalClasses: optional additional CSS classes
- * maxLength: optional maximum length of the input
- * pattern: optional validation pattern for the input
- * autoComplete: optional autocomplete attribute
- * inputmode: optional inputmode attribute
+ * A reusable input component that generates an HTML input element with customizable properties and styling.
+ * @param props.id - The id attribute for the input element.
+ * @param props.name - The name attribute for the input element.
+ * @param props.placeholder - The placeholder text for the input element.
+ * @param props.type - The type of the input element (e.g., 'text', 'password', 'file').
+ * @param props.required - A boolean indicating whether the input is required.
+ * @param props.additionalClasses - Optional additional CSS classes to apply to the input element.
+ * @param props.maxLength - Optional maximum length for the input value.
+ * @param props.pattern - Optional regex pattern that the input value must match.
+ * @param props.autoComplete - Optional autocomplete attribute for the input element.
+ * @param props.inputmode - Optional input mode attribute for the input element.
  */
 interface InputProps {
 	id: string
@@ -24,11 +24,6 @@ interface InputProps {
 	inputmode?: string
 }
 
-/**
- * Input component
- * @param props
- * @constructor
- */
 export const Input = (props: InputProps): string => {
 	const {
 		id,
@@ -43,14 +38,11 @@ export const Input = (props: InputProps): string => {
 		inputmode
 	} = props
 
-	// base classes CSS for the input
 	const baseClasses =
 		'px-2 border-b-2 text-lg border-black bg-inherit w-full font-special'
 
-	// combinate all classes for the input
 	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
-	// conditionnal attributes
 	const maxLengthAttr = maxLength ? `maxlength="${maxLength}"` : ''
 	const patternAttr = pattern ? `pattern="${pattern}"` : ''
 	const autoCompleteAttr = autoComplete ? `autocomplete="${autoComplete}"` : ''

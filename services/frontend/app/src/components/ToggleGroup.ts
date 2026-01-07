@@ -1,7 +1,7 @@
 /**
  * Toggle option interface
- * value: option value
- * label: option display label
+ * @property value - the value of the toggle option
+ * @property label - the label displayed on the toggle button
  */
 interface ToggleOption {
 	value: string
@@ -10,10 +10,10 @@ interface ToggleOption {
 
 /**
  * ToggleGroup component props interface
- * name: input name for form submission
- * label: group label displayed above buttons
- * options: array of toggle options
- * defaultValue: initially selected value
+ * @property name - the name of the toggle group (for form submission)
+ * @property label - the label displayed above the toggle buttons
+ * @property options - array of toggle options with value and label
+ * @property defaultValue - the default selected value
  */
 interface ToggleGroupProps {
 	name: string
@@ -65,7 +65,6 @@ export function handleToggleClick(button: HTMLElement): void {
 	const value = button.getAttribute('data-toggle-value')
 	if (!name || !value) return
 
-	// update visual state
 	const container = button.parentElement
 	if (container) {
 		container.querySelectorAll('button').forEach((btn) => {
@@ -76,7 +75,6 @@ export function handleToggleClick(button: HTMLElement): void {
 		button.classList.remove('hover:bg-gray-200')
 	}
 
-	// update hidden input
 	const input = document.getElementById(`toggle-${name}`) as HTMLInputElement
 	if (input) {
 		input.value = value

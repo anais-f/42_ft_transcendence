@@ -1,6 +1,6 @@
 import { IApiResponse } from '../types/api.js'
 
-export async function CreateTournamentAPI(): Promise<IApiResponse> {
+export async function createTournamentAPI(): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/game/api/game/createTournament`, {
 			method: 'POST',
@@ -27,7 +27,7 @@ export async function CreateTournamentAPI(): Promise<IApiResponse> {
 	}
 }
 
-export async function JoinTournamentAPI(code: string): Promise<IApiResponse> {
+export async function joinTournamentAPI(code: string): Promise<IApiResponse> {
 	try {
 		const response = await fetch(`/game/api/game/joinTournament/${code}`, {
 			method: 'POST',

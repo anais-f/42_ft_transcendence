@@ -1,9 +1,9 @@
-import { CreateTournamentAPI } from '../../api/tournamentApi.js'
+import { createTournamentAPI } from '../../api/tournamentApi.js'
 import { tournamentStore } from '../../usecases/tournamentStore.js'
 import { sendGameError } from './errorMapUtils.js'
 
 export async function handleCreateTournament() {
-	const { data, error, status } = await CreateTournamentAPI()
+	const { data, error, status } = await createTournamentAPI()
 
 	if (error) {
 		sendGameError(error, status)

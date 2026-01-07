@@ -1,6 +1,14 @@
 import { LivesComp } from './Lives.js'
-import { escapeHtml, sanitizeAvatarUrl } from '../../usecases/sanitize.js'
 
+/**
+ * Renders a player component with username, avatar, and lives.
+ * @param props.username - The username of the player.
+ * @param props.avatar - The URL of the player's avatar image.
+ * @param props.livesID - The ID for the lives component ('my-lives' or 'opponent-lives').
+ * @param props.maxLives - The maximum number of lives the player can have.
+ * @param props.currentLives - The current number of lives the player has.
+ * @param props.additionalClasses - Additional CSS classes to apply to the player container.
+ */
 interface PlayerProps {
 	username: string
 	avatar: string
@@ -20,20 +28,16 @@ export const PlayerComp = (props: PlayerProps): string => {
 		additionalClasses = ''
 	} = props
 
-	// Sanitize user inputs
-	const safeUsername = escapeHtml(username)
-	const safeAvatar = sanitizeAvatarUrl(avatar)
-
 	const baseClasses = 'flex flex-col items-center justify-center'
 	const classes = `${baseClasses} ${additionalClasses}`.trim()
 
 	return /*html*/ `
     <div class="${classes}">
-      <h1 class="text-xl text-center w-fit px-2 line-clamp">${safeUsername}</h1>
+      <h1 class="text-xl text-center w-fit px-2 line-clamp">${username}</h1>
       ${LivesComp({ max: maxLives, current: currentLives, livesID, additionalClasses: 'mb-4', size: 5 })}
       <img
-        src="${safeAvatar}"
-        alt="${safeUsername}"
+        src="${avatar}"
+        alt="${username}"
         class="w-full aspect-square object-cover object-center select-none border-solid border-2 border-black rounded"
       >
     </div>

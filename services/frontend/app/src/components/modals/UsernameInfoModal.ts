@@ -2,6 +2,11 @@ import { Modal } from './Modal.js'
 
 export const USERNAME_INFO_MODAL_ID = 'username-info-modal'
 
+/**
+ * Displays a modal with information about the user's login and username.
+ * @param props.login - The user's login (used for authentication).
+ * @param props.username - The user's username (displayed publicly).
+ */
 interface UsernameInfoModalProps {
 	login: string
 	username: string
