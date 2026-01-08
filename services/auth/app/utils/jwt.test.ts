@@ -13,7 +13,7 @@ import { describe, test, expect, beforeAll } from '@jest/globals'
 import jwt from 'jsonwebtoken'
 
 // Mock du secret JWT pour les tests
-const JWT_SECRET = 'test-secret-key-for-jwt-testing'
+const JWT_SECRET_AUTH = 'test-secret-key-for-jwt-testing'
 
 // Fonctions à tester (réimplémentées pour éviter les dépendances)
 function signToken(
@@ -24,14 +24,14 @@ function signToken(
 		type: string
 	},
 	expiresIn: string,
-	secret: string = JWT_SECRET
+	secret: string = JWT_SECRET_AUTH
 ): string {
 	return jwt.sign(payload, secret, { expiresIn })
 }
 
 function verifyToken(
 	token: string,
-	secret: string = JWT_SECRET
+	secret: string = JWT_SECRET_AUTH
 ): {
 	user_id: number
 	login: string
@@ -106,7 +106,7 @@ describe('JWT Utils', () => {
 		const token = signToken(payload, '1h', 'different-secret')
 
 		expect(() => {
-			verifyToken(token, JWT_SECRET)
+			verifyToken(token, JWT_SECRET_AUTH)
 		}).toThrow()
 	})
 

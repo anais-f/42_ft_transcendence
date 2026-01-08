@@ -11,7 +11,7 @@
 import { describe, test, expect, jest, beforeAll } from '@jest/globals'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = 'test-secret-for-admin-validation'
+const JWT_SECRET_AUTH = 'test-secret-for-admin-validation'
 
 // Mock createHttpError
 const createHttpError = {
@@ -26,7 +26,7 @@ function mockVerifyToken(token: string): {
 	iat: number
 	exp: number
 } {
-	return jwt.verify(token, JWT_SECRET) as any
+	return jwt.verify(token, JWT_SECRET_AUTH) as any
 }
 
 // Function to test
@@ -44,7 +44,7 @@ describe('Validate Admin Usecase', () => {
 		is_admin?: boolean
 		type: string
 	}): string {
-		return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' })
+		return jwt.sign(payload, JWT_SECRET_AUTH, { expiresIn: '1h' })
 	}
 
 	// ===========================================

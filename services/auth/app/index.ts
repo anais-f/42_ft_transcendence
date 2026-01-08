@@ -24,7 +24,7 @@ const app = Fastify({
 
 app.register(cookie)
 app.register(fastifyJwt, {
-	secret: env.JWT_SECRET,
+	secret: env.JWT_SECRET_AUTH,
 	cookie: {
 		cookieName: 'auth_token',
 		signed: false

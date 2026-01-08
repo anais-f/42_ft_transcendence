@@ -9,7 +9,7 @@ const envSchema = z
 	.object({
 		DTO_OPENAPI_FILE: z.string().min(1),
 		PORT: z.coerce.number().min(1).max(65535),
-		JWT_SECRET: z.string().min(1),
+		JWT_SECRET_AUTH: z.string().min(1),
 		AUTH_DB_PATH: z.string().min(1),
 		PASSWORD_ADMIN: PasswordSchema,
 		GOOGLE_CLIENT_ID: z.string().min(1),
@@ -22,7 +22,7 @@ const envSchema = z
 	})
 	.transform((env) => ({
 		PORT: env.PORT,
-		JWT_SECRET: env.JWT_SECRET,
+		JWT_SECRET_AUTH: env.JWT_SECRET_AUTH,
 		AUTH_DB_PATH: env.AUTH_DB_PATH,
 		LOGIN_ADMIN: 'transcendence',
 		PASSWORD_ADMIN: env.PASSWORD_ADMIN,
