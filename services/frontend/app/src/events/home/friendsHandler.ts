@@ -8,6 +8,8 @@ import {
 } from '../../api/friends/handleFriendsApi.js'
 import { FriendRequestItem } from '../../components/friends/FriendRequestItem.js'
 import { FriendListItem } from '../../components/friends/FriendListItem.js'
+import { ToastActionType } from '../../types/toast.js'
+import { notyfGlobal as notyf } from '../../utils/notyf.js'
 
 export async function fetchAndRenderFriendsList(): Promise<void> {
 	const listFriends = document.getElementById('friend_list')
@@ -67,6 +69,12 @@ export async function fetchAndRenderFriendRequests(): Promise<void> {
 export async function acceptFriendRequest(requestId: number): Promise<void> {
 	const response = await acceptFriendAPI(requestId)
 	if (response.error) {
+		if (response.error.includes('has reached the maximum limit')) {
+			notyf.open({
+				type: ToastActionType.ERROR_ACTION,
+				message: 'You have reached the maximum number of friends allowed.'
+			})
+		}
 		return
 	}
 	await fetchAndRenderFriendsList()
