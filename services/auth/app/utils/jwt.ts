@@ -18,7 +18,7 @@ export function signToken(
 export interface JwtPayload {
 	user_id: number
 	login: string
-	is_admin?: boolean
+	is_admin: boolean
 	iat: number
 	exp: number
 }
