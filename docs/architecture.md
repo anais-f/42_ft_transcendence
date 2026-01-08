@@ -11,7 +11,7 @@ graph TB
 
     Client -->|"HTTPS ${PORT}"| Nginx[NGINX Reverse Proxy]
 
-    Nginx --> Frontend[Frontend Vite TypeScript TailwindCSS]
+    Nginx --> Frontend[Frontend]
     Nginx --> Auth[Auth Service]
     Nginx --> Users[Users Service]
     Nginx --> TwoFA[2FA Service]
@@ -49,10 +49,10 @@ graph TB
 
 ### Frontend
 
-- **Technology**: Vite + TypeScript + TailwindCSS
 - **Internal port**: 3000
 - **Role**: User interface (SPA)
 - **Dependencies**: None (base service)
+- **Technology**: Vite + TypeScript + TailwindCSS
 
 ### Auth Service
 
@@ -78,14 +78,14 @@ graph TB
 ### Social Service
 
 - **Internal port**: 3000
-- **Role**: Friend relationships, presence tracking, real-time notifications via WebSocket
+- **Role**: Friend relationships, presence tracking, real-time notifications
 - **Volumes**: SQLite (db_social_data volume)
 - **Dependencies**: Frontend, Auth, Users
 
 ### Game Service
 
 - **Internal port**: 3000
-- **Role**: Pong game logic, matchmaking, real-time gameplay via WebSocket
+- **Role**: Pong game logic, matchmaking, real-time gameplay
 - **Volumes**: SQLite (db_game_data volume)
 - **Dependencies**: Frontend
 
@@ -198,7 +198,7 @@ graph LR
   subgraph Legend["Legend"]
     direction LR
     LS1[Service] ==>|HTTP API| LS2[Service]
-    LS3[Service] -.->|WebSocket| LS4[Service]
+    LS3[Service] <-.->|WebSocket| LS4[Service]
   end
 
   style Auth fill:#f39c12,stroke:#e67e22,color:#fff

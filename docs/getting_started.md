@@ -3,7 +3,7 @@
 Ensure you have the required environment variables configured:
 
 ```bash
-# Install all necessary dependencies
+# Install all necessary dependencies (for dev/test only)
 make install
 ```
 
@@ -15,14 +15,14 @@ make verif-env
 ### Build the application
 
 ```bash
-# Build all services (includes monitoring stack)
+# Build all services
 make build
 ```
 
 ### Start the application
 
 ```bash
-# Start all services in detached mode (includes monitoring)
+# Start all services in detached mode
 make up
 ```
 
