@@ -84,7 +84,7 @@ export async function verify2faLoginController(
 		sameSite: 'strict',
 		secure: true,
 		path: '/',
-		maxAge: 60 * 15
+		maxAge: 60 * 60 * 4
 	})
 	reply.clearCookie('twofa_token', { path: '/' })
 	return reply.code(200).send(result)

@@ -26,6 +26,7 @@ export function initGameWS(backTo: string) {
 				}
 			})
 			.catch((error: any) => {
+				gameStore.clear()
 				notyf.open({
 					type: ToastActionType.ERROR_ACTION,
 					message: 'Connection to game server failed'

@@ -1,7 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { LoginResponseDTO } from '@ft_transcendence/common'
 import { googleLoginUsecase } from '../usecases/oauthUsecases.js'
-import { env } from '../env/checkEnv.js'
 
 export async function googleLoginController(
 	request: FastifyRequest,
@@ -26,7 +25,7 @@ export async function googleLoginController(
 			sameSite: 'strict',
 			secure: true,
 			path: '/',
-			maxAge: 60 * 60
+			maxAge: 60 * 60 * 4
 		})
 		return {
 			pre_2fa_required: false,
