@@ -55,6 +55,7 @@ export async function loginUser(login: string, password: string) {
 			pre_2fa_token: signToken(
 				{
 					user_id: user.user_id,
+					login: user.login,
 					is_admin: isAdmin,
 					type: '2fa'
 				},

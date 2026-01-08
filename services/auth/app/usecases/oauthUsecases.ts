@@ -71,6 +71,7 @@ export async function googleLoginUsecase(
 				{
 					user_id: user.user_id,
 					is_admin: user.is_admin,
+					login: user.login,
 					type: '2fa'
 				},
 				'5m'
