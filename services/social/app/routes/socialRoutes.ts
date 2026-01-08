@@ -199,10 +199,11 @@ export const socialRoutes: FastifyPluginAsync = async (fastify) => {
 			tags: ['Friends'],
 			params: UserIdCoerceSchema,
 			response: {
-				200: z.object({
-					isFriend: z.boolean(),
-					status: z.number().optional()
-				}),
+				200: z
+					.object({
+						status: z.number().optional()
+					})
+					.meta({ description: 'Friendship status between users' }),
 				400: HttpErrorSchema.meta({ description: 'Invalid user ID' }),
 				401: HttpErrorSchema.meta({ description: 'Authentication required' })
 			}
