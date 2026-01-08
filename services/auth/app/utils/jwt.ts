@@ -5,8 +5,8 @@ import { env } from '../env/checkEnv.js'
 export function signToken(
 	payload: {
 		user_id: number
-		login?: string
-		is_admin?: boolean
+		login: string
+		is_admin: boolean
 		type: string
 	},
 	expiresIn: ms.StringValue
@@ -18,7 +18,7 @@ export function signToken(
 export interface JwtPayload {
 	user_id: number
 	login: string
-	is_admin?: boolean
+	is_admin: boolean
 	iat: number
 	exp: number
 }

@@ -98,7 +98,7 @@ export async function enable2FA(
 export async function verify2FALogin(
 	userId: number,
 	login: string,
-	isAdmin: boolean | undefined,
+	isAdmin: boolean,
 	twofaCode: string
 ): Promise<Verify2FALoginResponseDTO> {
 	const { ok, status, data } = await call2faService<Verify2FAResponseDTO>(
