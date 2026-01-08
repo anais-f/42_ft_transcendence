@@ -70,7 +70,7 @@ export const routerMap: Record<Pages, Route> = {
 		page: GamePage,
 		binds: [attachGameEvents],
 		unbinds: [detachGameEvents],
-		index: 6
+		index: 7
 	},
 
 	lobby: {
@@ -116,6 +116,6 @@ export const routerMap: Record<Pages, Route> = {
 		page: TournamentPage,
 		binds: [attachTournamentEvents],
 		unbinds: [detachTournamentEvents],
-		index: 5
+		index: 6
 	}
 }

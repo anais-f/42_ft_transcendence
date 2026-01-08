@@ -125,7 +125,7 @@ export async function handleChangePassword(form: HTMLFormElement) {
 	if (newPassword !== confirmNewPassword) {
 		notyf.open({
 			type: ToastActionType.ERROR_ACTION,
-			message: 'New password and confirmation do not match'
+			message: "New password and confirmation don't match"
 		})
 		return
 	}

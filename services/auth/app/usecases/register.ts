@@ -24,8 +24,6 @@ export async function registerUser(login: string, password: string) {
 	return { success: true }
 }
 
-// TODO : why return null ? we can't throw an error here ?
-// TODO : typing of return value
 export async function loginUser(login: string, password: string) {
 	if (!password) return null
 	const user = findUserByLogin(login)

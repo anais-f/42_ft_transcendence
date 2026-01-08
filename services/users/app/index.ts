@@ -93,12 +93,9 @@ function createApp(): FastifyInstance {
  */
 async function initializeUsers(): Promise<void> {
 	try {
-		console.log('Initializing users from auth service...')
 		await UsersServices.syncAllUsersFromAuth()
-		console.log('User initialization complete.')
 		updateUserMetrics()
 	} catch (error) {
-		console.error('Error initializing users:', error)
 		throw error
 	}
 }

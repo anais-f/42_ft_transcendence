@@ -106,10 +106,7 @@ export class Router {
 						bind()
 					} catch (e) {}
 				})
-				console.log('Rendered:', route.id)
 			}, 0)
-		} else {
-			console.log('Rendered:', route.id)
 		}
 	}
 

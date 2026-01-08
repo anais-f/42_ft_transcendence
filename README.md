@@ -11,5 +11,4 @@ Welcome to the 42_ft_transcendence project.
 
 ## Other Resources
 
-- [DTO & OpenAPI Schemas](./packages/common/openapiDTO.json)
 - [Example .env Configuration](./.env.example)
