@@ -7,7 +7,8 @@ import {
 import {
 	IdParamSchema,
 	MatchHistoryResponseSchema,
-	PlayerStatsSchema
+	PlayerStatsSchema,
+	HttpErrorSchema
 } from '@ft_transcendence/common'
 
 export function statsRoutes(app: FastifyInstance) {
@@ -18,7 +19,10 @@ export function statsRoutes(app: FastifyInstance) {
 				tags: ['info'],
 				params: IdParamSchema,
 				response: {
-					200: MatchHistoryResponseSchema
+					200: MatchHistoryResponseSchema,
+					401: HttpErrorSchema.meta({
+						description: 'Not authenticated'
+					})
 				}
 			},
 			preHandler: jwtAuthMiddleware
@@ -32,7 +36,10 @@ export function statsRoutes(app: FastifyInstance) {
 				tags: ['info'],
 				params: IdParamSchema,
 				response: {
-					200: PlayerStatsSchema
+					200: PlayerStatsSchema,
+					401: HttpErrorSchema.meta({
+						description: 'Not authenticated'
+					})
 				}
 			},
 			preHandler: jwtAuthMiddleware

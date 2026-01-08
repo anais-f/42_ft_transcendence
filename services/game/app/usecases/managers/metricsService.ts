@@ -11,11 +11,7 @@ import {
 } from './gameData.js'
 import { TournamentStatus } from '@ft_transcendence/common'
 
-/**
- * Update all game-related Prometheus metrics
- */
 export function updateGameMetrics(): void {
-	// Count games by status
 	const gamesByStatus: Record<GameStatus, number> = {
 		waiting: 0,
 		active: 0,
@@ -26,12 +22,10 @@ export function updateGameMetrics(): void {
 		gamesByStatus[gameData.status]++
 	}
 
-	// Update game metrics
 	activeGamesGauge.set({ status: 'waiting' }, gamesByStatus.waiting)
 	activeGamesGauge.set({ status: 'active' }, gamesByStatus.active)
 	activeGamesGauge.set({ status: 'ended' }, gamesByStatus.ended)
 
-	// Count tournaments by status
 	const tournamentsByStatus: Record<TournamentStatus, number> = {
 		pending: 0,
 		ongoing: 0,
@@ -42,7 +36,6 @@ export function updateGameMetrics(): void {
 		tournamentsByStatus[tournament.status]++
 	}
 
-	// Update tournament metrics
 	activeTournamentsGauge.set({ status: 'pending' }, tournamentsByStatus.pending)
 	activeTournamentsGauge.set({ status: 'ongoing' }, tournamentsByStatus.ongoing)
 	activeTournamentsGauge.set(
@@ -50,6 +43,5 @@ export function updateGameMetrics(): void {
 		tournamentsByStatus.completed
 	)
 
-	// Update players in tournaments
 	playersInTournamentsGauge.set(usersToTournament.size)
 }
