@@ -28,7 +28,7 @@ export async function registerController(
 		sameSite: 'strict',
 		secure: true,
 		path: '/',
-		maxAge: 60 * 60
+		maxAge: 60 * 60 * 4
 	})
 	reply.code(201)
 	return { message: 'User registered successfully', token }
@@ -60,7 +60,7 @@ export async function loginController(
 			sameSite: 'strict',
 			secure: true,
 			path: '/',
-			maxAge: 60 * 60
+			maxAge: 60 * 60 * 4
 		})
 		return {
 			pre_2fa_required: false,

@@ -62,7 +62,6 @@ export async function checkAndJoinUserMatches(
 	onStopPolling: () => void
 ): Promise<void> {
 	if (!['completed', 'ongoing'].includes(tournament.status)) return
-	if (gameStore.gameCode) return
 
 	const match = findPendingUserMatch(tournament)
 	if (!match?.gameCode) return
