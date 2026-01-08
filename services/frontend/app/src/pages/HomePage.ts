@@ -175,7 +175,6 @@ let submitHandler: ((e: Event) => Promise<void>) | null = null
 
 async function initHomePage(): Promise<void> {
 	try {
-		console.log('Initializing home page...')
 		await fetchAndRenderFriendsList()
 		await fetchAndRenderFriendRequests()
 	} catch (error) {
@@ -260,7 +259,6 @@ export async function attachHomeEvents(): Promise<void> {
 		const form = e.target as HTMLElement
 		e.preventDefault()
 		const formName = form.getAttribute('data-form')
-		console.log('e submitted form:', form)
 
 		if (formName === 'join-lobby') await handleJoinLobby(e)
 		if (formName === 'search-user-form') await handleSearchUser(e)
