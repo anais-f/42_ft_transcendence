@@ -10,7 +10,6 @@ describe('Segment', () => {
 		expect(s.points).toEqual([a, b])
 	})
 	describe('intersect', () => {
-		// TODO: add more test later
 		describe('circle', () => {
 			test('basic intersect test', () => {
 				const a = new Vector2(0, 0)

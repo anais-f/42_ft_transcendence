@@ -20,7 +20,6 @@ import {
 } from '../events/home/friendsHandler.js'
 import { MapOptions } from '../api/game/createGame.js'
 import { ObstacleType, PaddleShape } from '@pong-shared'
-import { sanitizeAvatarUrl } from '../usecases/sanitize.js'
 import { handleCreateTournament } from '../events/home/createTournamentHandler.js'
 import { UserLink } from '../components/friends/UserLink.js'
 import {
