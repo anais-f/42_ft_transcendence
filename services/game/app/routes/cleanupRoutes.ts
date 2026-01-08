@@ -7,7 +7,7 @@ import { HttpErrorSchema } from '@ft_transcendence/common'
 
 export function cleanupRoutes(app: FastifyInstance) {
 	app.post(
-		'/api/game/internal/cleanup/:user_id',
+		'/api/internal/game/cleanup/:user_id',
 		{
 			schema: {
 				description:
